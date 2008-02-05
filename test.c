@@ -6,9 +6,15 @@
 #include <sys/time.h>
 #include <sched.h>
 #include <errno.h>
+#include <unistd.h>
+#include "ipc_objects.h"
+
+void * hFramework;
 
 int testLog()
 {
+	LCV_ERR err;
+
 	/* Test without log setting a log level first */
 	LCVLog(DEBUG, "This is a debug message.\n");
 	LCVLog(INFO, "This is an info message.\n");
@@ -17,6 +23,9 @@ int testLog()
 	LCVLog(CRITICAL, "This is a critical error message.\n");
 
 	LCVLog(SIMULATION, "This is a simulation log message.\n");
+
+	/* Test the debug macro */
+	LCVDbg(("This is a debug macro message.\n"));
 
 	/* Set a log level and monitor the difference */
 	LCVLogSetConsoleLogLevel(INFO);
@@ -34,6 +43,7 @@ int testLog()
 
 	LCVLogSetConsoleLogLevel(DEBUG);
 	LCVLogSetFileLogLevel(DEBUG);
+
 	return 0;
 }
 
@@ -42,6 +52,9 @@ int testCamRegs()
 	uint16 maxShutterWidth;
 	uint32 shutterWidth;
 	LCV_ERR err;
+
+	if((err = LCVCamCreate(hFramework)))
+		return -1;
 
 	/* General register manipulation */
 	err = LCVCamGetRegisterValue(0xbd, &maxShutterWidth);
@@ -95,6 +108,7 @@ int testCamRegs()
 		LCVLog(INFO, "Shutter width: %d.\n", shutterWidth);
 	}
 
+	LCVCamDestroy(hFramework);
 	LCVLog(INFO, "-------------------------------------------------------\n");
 	return 0;
 }
@@ -104,8 +118,12 @@ int testBMP()
 	struct LCV_PICTURE pic1;
 	struct LCV_PICTURE pic2;
 	struct LCV_PICTURE pic3;
+	LCV_ERR err;
 
 	uint32 imageSize;
+
+	if((err = LCVBmpCreate(hFramework)))
+		return -1;
 
 	memset(&pic1, 0, sizeof(struct LCV_PICTURE));
 	memset(&pic2, 0, sizeof(struct LCV_PICTURE));
@@ -161,6 +179,8 @@ int testBMP()
 
 	free(pic1.data);
 	LCVLog(INFO, "-------------------------------------------------------\n");
+
+	LCVBmpDestroy(hFramework);
 	return 0;
 }
 
@@ -174,6 +194,9 @@ int testCam()
 	LCV_ERR  err;
 	void *pPic;
 	int i;
+
+	if((err = LCVCamCreate(hFramework)))
+		return -1;
 
 	/* The camera trigger is floating when specifying BF537-LCV-IND as the
 	   target platform. Therefore this will only work with BF537-LCV and
@@ -257,7 +280,8 @@ int testCam()
 
 	LCVLog(DEBUG, "Getting latest picture.\n");
 	LCVCamReadLatestPicture((uint8**)(&pPic));
-	
+
+	LCVCamDestroy(hFramework);
 	LCVLog(DEBUG, "------------------------------------------------------\n");
 	return 0;
 }
@@ -293,15 +317,143 @@ int testPriority()
 	return 0;
 }
 
+int testWatchdog()
+{
+	LCV_ERR err;
+	int i;
+
+	if((err = LCVMiscCreate(hFramework)))
+		return -1;
+	
+	LCVMiscWdtInit();
+	LCVLog(DEBUG, "%s: Watchdog initialized!\n", __func__);
+	
+	for(i=0; i < 5; i++)
+	{
+		sleep(10); // Sleep for ten seconds
+		LCVMiscWdtKeepAlive();
+	}
+	LCVMiscWdtClose();
+	LCVLog(DEBUG, "%s: Watchdog closed!\n", __func__);
+
+	LCVLog(INFO, "-------------------------------------------------------\n");
+	LCVMiscDestroy(hFramework);
+	return 0;
+}
+
+int testCycles()
+{
+	LCV_ERR err;;
+	uint32 start, end, musecs;
+	static volatile int test;
+
+	if((err = LCVMiscCreate(hFramework)))
+		return -1;
+
+	test = 0xdeadbeef;
+
+	LCVLog(DEBUG, "Starting cycle test.\n");
+	start = LCVMiscCycGet();
+	usleep(100000);
+	end = LCVMiscCycGet();
+	musecs = LCVMiscCycToMicroSecs(end - start);
+
+	LCVLog(INFO, "%s:\tstart: %u\tend: %u\tdiff: %u\tmuSecs: %u\n",
+	       __func__, start, end, end - start, musecs);
+
+	LCVLog(INFO, "-------------------------------------------------------\n");
+	LCVMiscDestroy(hFramework);
+	return 0;
+}
+
+
+/* This process acts only as one part of the IPC connection.
+It implements only the server part, the client part is in a 
+separate executable called cgitest,
+which must be started after this.
+*/
+LCV_ERR testIpc()
+{
+	LCV_IPC_CHAN_ID chan;
+	struct LCV_IPC_REQUEST req;
+	uint32 servParam;
+	LCV_ERR err;
+	int i;
+
+	if((err = LCVIpcCreate(hFramework)))
+		return -1;
+
+	/* Open channel as non-blocking and server */
+	err = LCVIpcRegisterChannel(&chan, "LCVRequest.fifo", "LCVResponse.fifo", FALSE, TRUE);
+	LCVLog(DEBUG, "IpcRegisterChannel: %d => %d\n", err, chan);
+	if(err)
+	{
+		LCVLog(ERROR, "Unable to register channel!\n");
+		return err;
+	}
+
+	for(i = 0; i < 2; i++)
+//	while(1)
+	{
+		while(1)
+		{
+			/* receive request */
+			err = LCVIpcGetRequest(chan, &req);
+			if(err)
+			{
+				usleep(1); // yield
+				if(err != -ENO_MSG_AVAIL)
+				{
+					LCVLog(ERROR, "Unable to receive IPC msg! (%d)\n", err);
+					return err;
+				}
+			} else
+				break;
+		}
+		
+		if(req.enType == REQ_TYPE_READ)
+		{
+			/* Execute the request. When compiled with mudflap this will of course yield an error. */
+			*((uint32*)req.pAddr) = 0xdeadbeef;
+		} else { /* REQ_TYPE_WRITE */
+			servParam = *((uint32*)req.pAddr);
+			LCVLog(DEBUG, "Wrote 0x%x!\n", servParam);
+		}
+		
+		do
+		{
+			err = LCVIpcAckRequest(chan, &req, TRUE);
+		}while(err == -ETRY_AGAIN);
+
+		if(err)
+		{
+			LCVLog(ERROR, "Unable to acknowledge request!\n");
+			return err;
+		}
+	}
+
+
+	err = LCVIpcUnregisterChannel(chan);
+	if(err){
+		LCVLog(ERROR, "Unregistering channel  failed!\n");
+		return -1;
+	}
+
+	LCVIpcDestroy(hFramework);
+	LCVLog(INFO, "-------------------------------------------------------\n");
+	return err;
+}
+
+
 int main()
 {
-	void * hFramework;
 	LCV_ERR err;
 
 #ifdef LCV_TARGET
 	if(testPriority())
 		return -1;
 #endif
+
 
 	err = LCVCreate(&hFramework);
 	if(err < 0) 
@@ -310,19 +462,10 @@ int main()
 		return -1;
 	}
 
-	if((err = LCVBmpCreate(hFramework)))
-		return -1;
-
-	if((err = LCVCamCreate(hFramework)))
-		return -1;
-
 	if((err = LCVLogCreate(hFramework)))
 		return -1;
 
-	if((err = LCVIpcCreate(hFramework)))
-		return -1;
-
-	if(testLog())
+/*	if(testLog())
 		return -1;
 
 	if(testCamRegs())
@@ -333,8 +476,21 @@ int main()
 		return -1;
 #endif
 	if(testCam())
+	return -1;
+	
+	if(testCycles())
 		return -1;
 
+	if(testWatchdog())
+		return -1;
+
+	if(testIpc())
+		return -1;
+	else
+		LCVLog(DEBUG, "IPC test succeeded!\n");
+*/
+
+	LCVLogDestroy(hFramework);
 	LCVDestroy(hFramework);
 	return 0;
 }
