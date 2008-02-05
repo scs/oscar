@@ -7,14 +7,11 @@
 #include <sched.h>
 #include <errno.h>
 #include <unistd.h>
-#include "ipc_objects.h"
 
 void * hFramework;
 
 int testLog()
 {
-	LCV_ERR err;
-
 	/* Test without log setting a log level first */
 	LCVLog(DEBUG, "This is a debug message.\n");
 	LCVLog(INFO, "This is an info message.\n");
@@ -49,10 +46,11 @@ int testLog()
 
 int testLgx()
 {
+	LCV_ERR err;
 	uint16 clock = FALSE;
 
 	if((err = LCVLgxCreate(hFramework)))
-                return -1
+                return -1;
        
         LCVLogSetConsoleLogLevel(DEBUG);
         LCVLogSetFileLogLevel(DEBUG);

@@ -6,7 +6,6 @@
 #include <sys/time.h>
 #include <sched.h>
 #include <errno.h>
-#include "ipc_objects.h"
 
 /* This implements the client side of the IPC. The server side is implemented
    in the 'test' executable, which needs to be started before this. */

@@ -14,21 +14,21 @@ TARGET_LDFLAGS = -Wl,-elf2flt="-s 1048576" -fmudflap -lmudflap
 
 all: 	target host
 
-host:	test.c cgi_host ipc_objects.h lib/liblcv_host.a inc/*.h
+host:	test.c cgi_host lib/liblcv_host.a inc/*.h
 	@echo "Creating host executable..."
 	$(HOST_CC) test.c lib/liblcv_host.a $(HOST_CFLAGS) -o test
 	@echo "Host executable done."
 
-target: test.c cgi_target ipc_objects.h lib/liblcv_target.a inc/*.h
+target: test.c cgi_target lib/liblcv_target.a inc/*.h
 	@echo "Creating target executable..."
 	$(TARGET_CC) test.c lib/liblcv_target.a $(TARGET_CFLAGS) $(TARGET_LDFLAGS) -o test
 	cp test /tftpboot
 	@echo "Target executable done."
 
-cgi_host: cgitest.c ipc_objects.h
+cgi_host: cgitest.c
 	$(HOST_CC) cgitest.c lib/liblcv_host.a $(HOST_CFLAGS) -o cgitest
 
-cgi_target: cgitest.c ipc_objects.h
+cgi_target: cgitest.c
 	$(TARGET_CC) cgitest.c lib/liblcv_target.a $(TARGET_CFLAGS) $(TARGET_LDFLAGS) -o cgitest
 	cp cgitest /tftpboot
 	
