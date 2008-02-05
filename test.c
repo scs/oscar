@@ -47,6 +47,55 @@ int testLog()
 	return 0;
 }
 
+int testLgx()
+{
+	uint16 clock = FALSE;
+
+	if((err = LCVLgxCreate(hFramework)))
+                return -1
+       
+        LCVLogSetConsoleLogLevel(DEBUG);
+        LCVLogSetFileLogLevel(DEBUG);
+
+        LCVLgxIoPinWrite( LCV_LGX_OKAY, TRUE);
+	LCVLgxIoPinRead( LCV_LGX_CLOCK, &clock);
+        printf("t=%d, CLOCK=%d\n", (int)LCVSimGetCurTimeStep(), clock);
+        LCVSimStep();
+        LCVLgxIoPinWrite( LCV_LGX_OKAY, FALSE);
+        LCVLgxIoPinWrite( LCV_LGX_STOP, TRUE);
+        LCVLgxIoPinRead( LCV_LGX_CLOCK, &clock);
+        printf("t=%d, CLOCK=%d\n", (int)LCVSimGetCurTimeStep(), clock);
+        LCVSimStep();
+
+        LCVLgxIoPinRead( LCV_LGX_CLOCK, &clock);
+        printf("t=%d, CLOCK=%d\n", (int)LCVSimGetCurTimeStep(), clock);
+
+        LCVSimStep();
+
+        LCVLgxIoPinRead( LCV_LGX_CLOCK, &clock);
+        printf("t=%d, CLOCK=%d\n", (int)LCVSimGetCurTimeStep(), clock);
+
+        LCVSimStep();
+
+        LCVLgxIoPinRead( LCV_LGX_CLOCK, &clock);
+        printf("t=%d, CLOCK=%d\n", (int)LCVSimGetCurTimeStep(), clock);
+
+        LCVSimStep();
+
+        LCVLgxIoPinRead( LCV_LGX_CLOCK, &clock);
+        printf("t=%d, CLOCK=%d\n", (int)LCVSimGetCurTimeStep(), clock);
+
+
+        LCVSimStep();
+
+        LCVLgxIoPinRead( LCV_LGX_CLOCK, &clock);
+        printf("t=%d, CLOCK=%d\n", (int)LCVSimGetCurTimeStep(), clock);
+
+        LCVLog(INFO, "-------------------------------------------------------\n");
+	LCVLgxDestroy(hFramework);
+        return 0;
+}
+
 int testCamRegs()
 {
 	uint16 maxShutterWidth;
@@ -465,7 +514,7 @@ int main()
 	if((err = LCVLogCreate(hFramework)))
 		return -1;
 
-/*	if(testLog())
+/*	if(testLgx())
 		return -1;
 
 	if(testCamRegs())
@@ -476,7 +525,7 @@ int main()
 		return -1;
 #endif
 	if(testCam())
-	return -1;
+	        return -1;
 	
 	if(testCycles())
 		return -1;
