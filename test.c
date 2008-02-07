@@ -369,22 +369,22 @@ int testWatchdog()
 	LCV_ERR err;
 	int i;
 
-	if((err = LCVMiscCreate(hFramework)))
+	if((err = LCVSupCreate(hFramework)))
 		return -1;
 	
-	LCVMiscWdtInit();
+	LCVSupWdtInit();
 	LCVLog(DEBUG, "%s: Watchdog initialized!\n", __func__);
 	
 	for(i=0; i < 5; i++)
 	{
 		sleep(10); // Sleep for ten seconds
-		LCVMiscWdtKeepAlive();
+		LCVSupWdtKeepAlive();
 	}
-	LCVMiscWdtClose();
+	LCVSupWdtClose();
 	LCVLog(DEBUG, "%s: Watchdog closed!\n", __func__);
 
 	LCVLog(INFO, "-------------------------------------------------------\n");
-	LCVMiscDestroy(hFramework);
+	LCVSupDestroy(hFramework);
 	return 0;
 }
 
@@ -394,22 +394,22 @@ int testCycles()
 	uint32 start, end, musecs;
 	static volatile int test;
 
-	if((err = LCVMiscCreate(hFramework)))
+	if((err = LCVSupCreate(hFramework)))
 		return -1;
 
 	test = 0xdeadbeef;
 
 	LCVLog(DEBUG, "Starting cycle test.\n");
-	start = LCVMiscCycGet();
+	start = LCVSupCycGet();
 	usleep(100000);
-	end = LCVMiscCycGet();
-	musecs = LCVMiscCycToMicroSecs(end - start);
+	end = LCVSupCycGet();
+	musecs = LCVSupCycToMicroSecs(end - start);
 
 	LCVLog(INFO, "%s:\tstart: %u\tend: %u\tdiff: %u\tmuSecs: %u\n",
 	       __func__, start, end, end - start, musecs);
 
 	LCVLog(INFO, "-------------------------------------------------------\n");
-	LCVMiscDestroy(hFramework);
+	LCVSupDestroy(hFramework);
 	return 0;
 }
 
@@ -418,6 +418,9 @@ int testCycles()
 It implements only the server part, the client part is in a 
 separate executable called cgitest,
 which must be started after this.
+Also, for the host, the permissions of the two created FIFOs must
+currently be changed manually, since they are automatically created
+as root only.
 */
 LCV_ERR testIpc()
 {
@@ -521,7 +524,8 @@ int main()
 #ifdef LCV_HOST
 	if(testBMP())
 		return -1;
-#endif
+		#endif*/
+
 	if(testCam())
 	        return -1;
 	
@@ -530,7 +534,7 @@ int main()
 
 	if(testWatchdog())
 		return -1;
-
+/*
 	if(testIpc())
 		return -1;
 	else
