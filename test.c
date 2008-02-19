@@ -494,6 +494,22 @@ LCV_ERR testIpc()
 	return err;
 }
 
+int testRtl()
+{
+	LCV_ERR err = SUCCESS;
+	fract16 a;
+	complex_fract16 c;
+
+	c.re = 0x5a82; /* 0.707 */
+	c.im = 0x5a82;
+
+	LCVRtlCreate(hFramework);
+	a = LCVRtlCAbsFr16(c);
+	printf("Complex absolute of %f + %fi = %f\n", LCVRtlFr16ToFloat(c.re), LCVRtlFr16ToFloat(c.im), LCVRtlFr16ToFloat(a));
+
+	LCVRtlDestroy(hFramework);
+	return err;
+}
 
 int main()
 {
@@ -515,6 +531,9 @@ int main()
 	if((err = LCVLogCreate(hFramework)))
 		return -1;
 
+	if(testRtl())
+		return -1;
+
 /*	if(testLgx())
 		return -1;
 
@@ -524,7 +543,7 @@ int main()
 #ifdef LCV_HOST
 	if(testBMP())
 		return -1;
-		#endif*/
+		#endif
 
 	if(testCam())
 	        return -1;
@@ -534,7 +553,7 @@ int main()
 
 	if(testWatchdog())
 		return -1;
-/*
+
 	if(testIpc())
 		return -1;
 	else
