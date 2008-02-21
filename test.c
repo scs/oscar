@@ -511,6 +511,118 @@ int testRtl()
 	return err;
 }
 
+/*..........................................................................*/
+/* For the HSM module test we use a small state diagram example called Fsm.
+ * It consists of two main states (alpha, beta) and a substate (subbeta) of 
+ * beta. Two events are defined which force transitions:
+ * TOSUBBETA defined for state alpha, forces transition to subbeta.
+ * TOALPHA defined for beta, forces transitions to alpha (from beta or subbeta)
+ * The start transition goes to alpha.
+ * */
+
+typedef struct Fsm Fsm;
+struct Fsm {
+    Hsm super;
+    State alpha, beta;
+    State subbeta; /* substate of beta */
+};
+
+enum FsmEvents {
+	TOALPHA_EVT,
+	TOSUBBETA_EVT
+};
+
+
+Msg const *Fsm_top(Fsm *me, Msg *msg) {
+    switch (msg->evt) {
+    case START_EVT:
+        STATE_START(me, &me->alpha);
+        return 0;
+    }
+    return msg;
+}
+
+Msg const *Fsm_alpha(Fsm *me, Msg *msg) {
+	switch (msg->evt) {
+	case ENTRY_EVT:
+		LCVLog(INFO, "Enter state Alpha\n");
+		return 0;
+    
+	case TOSUBBETA_EVT:
+		LCVLog(INFO, "msg arrived TOSUBBETA_EVT\n");
+		STATE_TRAN(me, &me->subbeta);	
+		return 0;
+    	}
+    	return msg;
+}
+
+Msg const *Fsm_beta(Fsm *me, Msg *msg) {
+        switch (msg->evt) {
+        case ENTRY_EVT:
+                LCVLog(INFO, "Enter state Beta\n");
+                return 0;
+    
+        case TOALPHA_EVT:
+                LCVLog(INFO, "msg arrived ALPHA_EVT\n");
+                STATE_TRAN(me, &me->alpha);   
+                return 0;
+        }
+        return msg;
+}
+
+Msg const *Fsm_subbeta(Fsm *me, Msg *msg) {
+        switch (msg->evt) {
+        case ENTRY_EVT:
+                LCVLog(INFO, "Enter state Sub-Beta\n");
+                return 0;
+        }
+        return msg;
+}
+
+
+
+void FsmCtor(Fsm *me){
+	HsmCtor((Hsm *)me, "Fsm", (EvtHndlr)Fsm_top);
+	StateCtor(&me->alpha, "alpha",
+              &((Hsm *)me)->top, (EvtHndlr)Fsm_alpha);
+        StateCtor(&me->beta, "beta",
+              &((Hsm *)me)->top, (EvtHndlr)Fsm_beta);
+        StateCtor(&me->subbeta, "subbeta",
+              &me->beta, (EvtHndlr)Fsm_subbeta);
+}
+
+const Msg fsmMsg[] = { 
+        {TOALPHA_EVT},
+        {TOSUBBETA_EVT} 
+};
+
+
+int testHsm()
+{
+	LCV_ERR err = SUCCESS;
+
+        LCVHsmCreate(hFramework);
+
+	Msg const *msg;
+	Fsm fsm;
+	FsmCtor(&fsm);
+	HsmOnStart((Hsm *)&fsm);
+
+	msg = &fsmMsg[ TOSUBBETA_EVT];
+	HsmOnEvent((Hsm *)&fsm, msg);
+
+        msg = &fsmMsg[ TOALPHA_EVT];
+        HsmOnEvent((Hsm *)&fsm, msg);
+
+        msg = &fsmMsg[ TOSUBBETA_EVT];
+        HsmOnEvent((Hsm *)&fsm, msg);
+
+	LCVRtlDestroy(hFramework);
+	return err;
+}
+/*..........................................................................*/
+
+
 int main()
 {
 	LCV_ERR err;
@@ -531,10 +643,13 @@ int main()
 	if((err = LCVLogCreate(hFramework)))
 		return -1;
 
-	if(testRtl())
+	if(testHsm())
 		return -1;
 
-/*	if(testLgx())
+/*	if(testRtl())
+		return -1;
+
+	if(testLgx())
 		return -1;
 
 	if(testCamRegs())
