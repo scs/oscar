@@ -34,7 +34,7 @@ cgi_target: cgitest.c
 	cp cgitest /tftpboot
 	
 get:
-	@rm -r inc lib || exit $?
+	@rm -r inc lib || continue
 	@cp -r ../framework/staging/* . 
 	@echo "Fetched LCV framework."
 

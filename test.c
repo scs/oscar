@@ -21,9 +21,6 @@ int testLog()
 
 	LCVLog(SIMULATION, "This is a simulation log message.\n");
 
-	/* Test the debug macro */
-	LCVDbg(("This is a debug macro message.\n"));
-
 	/* Set a log level and monitor the difference */
 	LCVLogSetConsoleLogLevel(INFO);
 	LCVLogSetFileLogLevel(ERROR);
@@ -511,6 +508,109 @@ int testRtl()
 	return err;
 }
 
+void pblkl (void *a, int w, int h, int s)
+{
+  unsigned *p = a;
+  int x,y;
+  printf ("%08x\n", (unsigned int)p);
+  for (y=0;y<h;y++) {
+    for (x=0;x<w;x++)
+      printf ("%4d ", *p++);
+    printf ("\n");
+    if (s)
+      p += (s-w);
+  }
+  printf ("\n");
+}
+
+int testDma()
+{
+	void * hDmaChain;
+	int i;
+	LCV_ERR err = SUCCESS;
+
+	uint32 buf1[1024/4];
+	uint32 buf2[1024/4];
+
+	LCVDmaCreate(hFramework);
+	
+	for(i=0; i < 1024/4; i++)
+	{
+		buf1[i] = 0x10000 + i;
+		buf2[i] = 0;
+	}
+	
+	pblkl(buf1, 16, 16, 16);
+	/* Flush the source memory. */
+	FLUSH_REGION((void*)buf1, 1024 + CACHE_LINE_LEN);
+	/* Invalidate the destination memory. Do this before the actual
+	 transfer since if you do it afterwards, the newly written memory
+	will get overwritten again by the contents of the cache. 
+	(!FLUSH!)INVALIDATE */
+	FLUSHINV_REGION((void*)buf2, 1024 + CACHE_LINE_LEN);
+	
+	LCVDmaAllocChain(&hDmaChain);
+	LCVLog(INFO, "MemcpySync:\n\n");
+	LCVDmaMemCpySync(hDmaChain, buf2, buf1, 1024);
+	pblkl(buf2, 16, 16, 16);
+
+	for(i=0; i < 1024/4; i++)
+	{
+		buf1[i] = 0;
+	}
+	FLUSHINV_REGION((void*)buf1, 1024 + CACHE_LINE_LEN);
+
+	LCVLog(INFO, "1D/2D move:\n\n");
+	LCVDmaResetChain(hDmaChain);
+	err = LCVDmaAdd1DMove(hDmaChain,
+			      buf1,
+			      DMA_WDSIZE_16,
+			      1024/4, 4,
+			      buf2,
+			      DMA_WDSIZE_16,
+			      1024/4, 4);
+	if(err != SUCCESS)
+	{
+		LCVLog(ERROR, "Unable to add 1D move!(%d)\n", err);
+		return err;
+	}
+	err = LCVDmaAdd2DMove(hDmaChain,
+			      buf2,
+			      DMA_WDSIZE_32,
+			      16, 4,
+			      16, 4,
+			      buf1,
+			      DMA_WDSIZE_32,
+			      16, 16*4,
+			      16, -15*16*4 + 4);
+	if(err != SUCCESS) {
+		LCVLog(ERROR, "Unable to add 2D move!(%d)\n", err);
+		return err;
+		}
+	err = LCVDmaAddSyncPoint(hDmaChain);
+	if(err != SUCCESS){
+		LCVLog(ERROR, "Unable to add sync point!(%d)\n", err);
+		return err;
+	}
+
+	LCVDmaStart(hDmaChain);
+	LCVLog(DEBUG, "Started...\n");
+	err = LCVDmaSync(hDmaChain);
+	if(err != SUCCESS)
+	{
+		LCVLog(ERROR, "Unable to sync to DMA chain! (%d)\n", err);
+		return err;
+	}
+	LCVLog(INFO, "Buf1:\n");
+	pblkl(buf1, 16, 16, 16);
+
+	LCVLog(INFO, "Buf2:\n");
+	pblkl(buf2, 16, 16, 16);
+
+	LCVDmaDestroy(hFramework);
+	return 0;
+}
+
 int main()
 {
 	LCV_ERR err;
@@ -531,10 +631,10 @@ int main()
 	if((err = LCVLogCreate(hFramework)))
 		return -1;
 
-	if(testRtl())
+/*	if(testRtl())
 		return -1;
 
-/*	if(testLgx())
+	if(testLgx())
 		return -1;
 
 	if(testCamRegs())
@@ -559,6 +659,8 @@ int main()
 	else
 		LCVLog(DEBUG, "IPC test succeeded!\n");
 */
+	if(testDma())
+		return -1;
 
 	LCVLogDestroy(hFramework);
 	LCVDestroy(hFramework);
