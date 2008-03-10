@@ -757,12 +757,11 @@ int main()
 
 	if(testCamRegs())
 		return -1;
-
-#ifdef LCV_HOST
+*/
 	if(testBMP())
 		return -1;
-		#endif
 
+/*
 	if(testCam())
 	        return -1;
 	
