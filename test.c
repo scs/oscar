@@ -91,6 +91,60 @@ int testLgx()
         return 0;
 }
 
+int testSwr()
+{
+#ifdef LCV_HOST
+	LCV_ERR err;
+	void* pWr;
+	void* pSig1;
+	void* pSig2;
+	float sig1;
+	char sig2[20];
+
+        if((err = LCVSwrCreate(hFramework)))
+                return -1;
+
+	LCVSwrCreateWriter( 
+        	&pWr,        
+	        "swr.txt", 
+        	FALSE, /* bReportTime */
+	        FALSE ); /* bReportCyclic */
+
+	LCVSwrRegisterSignal( 
+	        &pSig1,        
+	        pWr, 
+	        "Sig1",
+	        SWR_FLOAT,        
+	        NULL, /* default value */
+	        "%1.3f" );
+
+        LCVSwrRegisterSignal(        
+                &pSig2,
+                pWr,
+                "Sig2",
+                SWR_STRING,
+                NULL, /* default value */
+                "%s" );
+
+
+        sig1 = 1.23456;
+        strcpy( sig2, "Some Text");
+	LCVSwrUpdateSignal( pSig1, &sig1);
+	LCVSwrUpdateSignal( pSig2, sig2);
+	LCVSwrManualReport( pWr);
+
+        sig1 = 9.8765;
+        strcpy( sig2, "Other Text");
+        LCVSwrUpdateSignal( pSig1, &sig1);
+        LCVSwrUpdateSignal( pSig2, sig2);
+        LCVSwrManualReport( pWr);
+        
+	LCVSwrManualReport( pWr);
+
+#endif /*LCV_HOST*/
+	return 0;
+}
+
 int testCamRegs()
 {
 	uint16 maxShutterWidth;
@@ -501,7 +555,7 @@ int testRtl()
 	c.im = 0x5a82;
 
 	LCVRtlCreate(hFramework);
-	a = LCVRtlCAbsFr16(c);
+	a = LCVRtl_cabs_fr16(c);
 	printf("Complex absolute of %f + %fi = %f\n", LCVRtlFr16ToFloat(c.re), LCVRtlFr16ToFloat(c.im), LCVRtlFr16ToFloat(a));
 
 	LCVRtlDestroy(hFramework);
@@ -757,8 +811,11 @@ int main()
 
 	if(testCamRegs())
 		return -1;
-*/
+
 	if(testBMP())
+		return -1;
+*/
+	if(testSwr())
 		return -1;
 
 /*
