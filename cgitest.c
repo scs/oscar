@@ -18,7 +18,7 @@ LCV_ERR testIpc()
 
 
 	/* Open channel as blocking and as client */
-	err = LCVIpcRegisterChannel(&chan, "LCVResponse.fifo", "LCVRequest.fifo", TRUE, FALSE);
+	err = LCVIpcRegisterChannel(&chan, "/tmp/SHTSocket.sock", 0);
 	LCVLog(DEBUG, "IpcRegisterChannel: %d => %d\n", err, chan);
 	if(err)
 	{

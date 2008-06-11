@@ -52,38 +52,38 @@ int testLgx()
         LCVLogSetConsoleLogLevel(DEBUG);
         LCVLogSetFileLogLevel(DEBUG);
 
-        LCVLgxIoPinWrite( LCV_LGX_OKAY, TRUE);
-	LCVLgxIoPinRead( LCV_LGX_CLOCK, &clock);
+        LCVLgxIoPinWrite( LCV_LGX_OUT1, TRUE);
+	LCVLgxIoPinRead( LCV_LGX_IN1, &clock);
         printf("t=%d, CLOCK=%d\n", (int)LCVSimGetCurTimeStep(), clock);
         LCVSimStep();
-        LCVLgxIoPinWrite( LCV_LGX_OKAY, FALSE);
-        LCVLgxIoPinWrite( LCV_LGX_STOP, TRUE);
-        LCVLgxIoPinRead( LCV_LGX_CLOCK, &clock);
+        LCVLgxIoPinWrite( LCV_LGX_OUT1, FALSE);
+        LCVLgxIoPinWrite( LCV_LGX_OUT3, TRUE);
+        LCVLgxIoPinRead( LCV_LGX_IN1, &clock);
         printf("t=%d, CLOCK=%d\n", (int)LCVSimGetCurTimeStep(), clock);
         LCVSimStep();
 
-        LCVLgxIoPinRead( LCV_LGX_CLOCK, &clock);
-        printf("t=%d, CLOCK=%d\n", (int)LCVSimGetCurTimeStep(), clock);
-
-        LCVSimStep();
-
-        LCVLgxIoPinRead( LCV_LGX_CLOCK, &clock);
+        LCVLgxIoPinRead( LCV_LGX_IN1, &clock);
         printf("t=%d, CLOCK=%d\n", (int)LCVSimGetCurTimeStep(), clock);
 
         LCVSimStep();
 
-        LCVLgxIoPinRead( LCV_LGX_CLOCK, &clock);
+        LCVLgxIoPinRead( LCV_LGX_IN1, &clock);
         printf("t=%d, CLOCK=%d\n", (int)LCVSimGetCurTimeStep(), clock);
 
         LCVSimStep();
 
-        LCVLgxIoPinRead( LCV_LGX_CLOCK, &clock);
+        LCVLgxIoPinRead( LCV_LGX_IN1, &clock);
+        printf("t=%d, CLOCK=%d\n", (int)LCVSimGetCurTimeStep(), clock);
+
+        LCVSimStep();
+
+        LCVLgxIoPinRead( LCV_LGX_IN1, &clock);
         printf("t=%d, CLOCK=%d\n", (int)LCVSimGetCurTimeStep(), clock);
 
 
         LCVSimStep();
 
-        LCVLgxIoPinRead( LCV_LGX_CLOCK, &clock);
+        LCVLgxIoPinRead( LCV_LGX_IN1, &clock);
         printf("t=%d, CLOCK=%d\n", (int)LCVSimGetCurTimeStep(), clock);
 
         LCVLog(INFO, "-------------------------------------------------------\n");
@@ -485,7 +485,7 @@ LCV_ERR testIpc()
 		return -1;
 
 	/* Open channel as non-blocking and server */
-	err = LCVIpcRegisterChannel(&chan, "LCVRequest.fifo", "LCVResponse.fifo", FALSE, TRUE);
+	err = LCVIpcRegisterChannel(&chan, "/tmp/SHTSocket.sock", F_IPC_SERVER | F_IPC_NONBLOCKING);
 	LCVLog(DEBUG, "IpcRegisterChannel: %d => %d\n", err, chan);
 	if(err)
 	{
