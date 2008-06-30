@@ -1,0 +1,8 @@
+# Ignore generated binaries
+*.[oa]
+*.gdb
+.settings
+staging
+doc
+.metadata
+lgx

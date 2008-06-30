@@ -1,0 +1,291 @@
+/*! @file cfg_pub.h
+ * @brief API definition for configuration file module
+ * 
+ * Sample configuration file (eeprom.txt):
+ * 
+ *     IP: 193.168.1.1@n
+ *     MAC: 00:20:e3:22:00:00@n
+ *     DEL: 99@n
+ * 
+ * 
+ * Sample usage of API:
+ * 
+ *     // variable declaration@n
+ * 	   struct CFG_VAL_STR val;@n
+ * 	   struct CFG_KEY key;@n
+ * 	   CFG_FILE_CONTENT_HANDLE hCfgHandle;@n
+ * 	   const char fileName[] = "eeprom.txt";@n
+ * 	   int16 tmpInt = 0;@n
+ * 	   
+ * 	   // register file and read it to memory@n
+ * 	   LCVCfgRegisterFile(&hCfgHandle, fileName, 256);@n 
+ * 	   
+ * 	   // read out string@n
+ * 	   key.strSection = NULL;@n
+ * 	   key.strTag = "IP";@n
+ * 	   LCVCfgGetStr(hCfgHandle, &key, &val);@n
+ * 	   
+ * 	   // read int@n
+ * 	   key.strSection = NULL;@n
+ * 	   key.strTag = "DEL";@n
+ * 	   LCVCfgGetInt(hCfgHandle, &key, &tmpInt);@n
+ * 	   
+ * 	   // set new string value@n
+ * 	   key.strSection = NULL;@n
+ * 	   key.strTag = "MAC";@n
+ * 	   LCVCfgSetStr(hCfgHandle, &key, "00:20:e3:22:00:01");@n
+ * 	   
+ * 	   // flush the file to disk@n
+ * 	   LCVCfgFlushContent(hCfgHandle);@n
+ * 
+ * @author Men Muheim
+ */
+#ifndef CFG_PUB_H_
+#define CFG_PUB_H_
+
+#include "framework_error.h"
+#ifdef LCV_HOST
+    #include "framework_types_host.h"
+    #include "framework_host.h"
+#else
+    #include "framework_types_target.h"
+    #include "framework_target.h"
+#endif /* LCV_HOST */
+
+/*! @brief Module-specific error codes.
+ * 
+ * These are enumerated with the offset
+ * assigned to each module, so a distinction over
+ * all modules can be made */
+enum EnLcvCfgErrors {
+    ECFG_UNSUPPORTED_FORMAT = LCV_CFG_ERROR_OFFSET,
+    ECFG_INVALID_RANGE,
+    ECFG_INVALID_VAL,
+    ECFG_INVALID_KEY,
+    ECFG_NO_HANDLES,
+    ECFG_INVALID_FUNC_PARAMETER,
+    ECFG_UNABLE_TO_OPEN_FILE,
+    ECFG_UNABLE_TO_CLOSE_FILE,
+    ECFG_UNABLE_TO_WRITE_FILE,
+    ECFG_UNABLE_TO_READ_FILE,
+    ECFG_ERROR
+};
+/*! @brief Macro defining the maximal value string size*/
+#define CONFIG_VAL_MAX_SIZE 1024
+
+/*! @brief Type for Config File Handles */
+typedef uint16 CFG_FILE_CONTENT_HANDLE;
+
+/*! @brief Structure for key */
+struct CFG_KEY {
+	char *strSection; /* Section string (global if set to NULL) */
+	char *strTag; /* Tag string */
+};
+
+/*! @brief Structure for configuration values */
+struct CFG_VAL_STR {
+	char str[CONFIG_VAL_MAX_SIZE];
+};
+
+/*====================== API functions =================================*/
+
+/*********************************************************************//*!
+ * @brief Constructor
+ * 
+ * @param hFw Pointer to the handle of the framework.
+ * @return SUCCESS or an appropriate error code otherwise
+ *//*********************************************************************/
+LCV_ERR LCVCfgCreate(void *hFw);
+
+/*********************************************************************//*!
+ * @brief Destructor
+ * 
+ * @param hFw Pointer to the handle of the framework.
+ *//*********************************************************************/
+void LCVCfgDestroy(void *hFw);
+
+/*********************************************************************//*!
+ * @brief Opens a new file and reads its content to the file content structure
+ * 
+ * @param pFileContentHandle Ptr to handle to the File content. Is set by this function.
+ * @param strFileName Configuration file name.
+ * @param maxFileSize maximal file length.
+ * @return SUCCESS or an appropriate error code otherwise
+ *//*********************************************************************/
+LCV_ERR LCVCfgRegisterFile(
+		CFG_FILE_CONTENT_HANDLE* pFileContentHandle, 
+		const char *strFileName,
+		const unsigned int maxFileSize);
+
+/*********************************************************************//*!
+ * @brief Delete configuration file
+ * 
+ * @return SUCCESS or an appropriate error code otherwise
+ *//*********************************************************************/
+LCV_ERR LCVCfgDeleteAll( void);
+
+/*********************************************************************//*!
+ * @brief Writes content to the file content structure
+ * 
+ * @param hFileContent Handle to the File content.
+ * @return SUCCESS or an appropriate error code otherwise
+ *//*********************************************************************/
+LCV_ERR LCVCfgFlushContent(const CFG_FILE_CONTENT_HANDLE hFileContent);
+
+/*********************************************************************//*!
+ * @brief Writes content of the whole allocated buffer to the file.
+ * If the used string is smaller than the allocated buffer, the content
+ * of the rest of the file is cleared with '\0'.
+ * 
+ * @param hFileContent Handle to the File content.
+ * @return SUCCESS or an appropriate error code otherwise
+ *//*********************************************************************/
+LCV_ERR LCVCfgFlushContentAll(const CFG_FILE_CONTENT_HANDLE hFileContent);
+
+/*********************************************************************//*!
+ * @brief Read string from content structure
+ * 
+ * @param hFileContent Handle to the File content.
+ * @param pKey The name of the section and tag.
+ * @param pVal Return value (string).
+ * @return SUCCESS or an appropriate error code otherwise
+ *//*********************************************************************/
+LCV_ERR LCVCfgGetStr(
+		const CFG_FILE_CONTENT_HANDLE hFileContent,
+		const struct CFG_KEY *pKey,
+		struct CFG_VAL_STR *pVal);
+
+/*********************************************************************//*!
+ * @brief Write string to content structure
+ * 
+ * @param hFileContent Handle to the File content.
+ * @param pKey The name of the section and tag.
+ * @param strNewVal Write value (string).
+ * @return SUCCESS or an appropriate error code otherwise
+ *//*********************************************************************/
+LCV_ERR LCVCfgSetStr(
+		const CFG_FILE_CONTENT_HANDLE hFileContent, 
+		const struct CFG_KEY *pKey,
+		const char *strNewVal);
+
+/*********************************************************************//*!
+ * @brief Read Int from content structure
+ * 
+ * @param hFileContent Handle to the File content.
+ * @param pKey The name of the section and tag.
+ * @param iVal Return value.
+ * @return SUCCESS or an appropriate error code otherwise
+ *//*********************************************************************/
+LCV_ERR LCVCfgGetUInt8(
+        const CFG_FILE_CONTENT_HANDLE hFileContent, 
+        const struct CFG_KEY *pKey,
+        uint8 *iVal);
+
+/*********************************************************************//*!
+ * @brief Read Int from content structure
+ * 
+ * @param hFileContent Handle to the File content.
+ * @param pKey The name of the section and tag.
+ * @param iVal Return value.
+ * @return SUCCESS or an appropriate error code otherwise
+ *//*********************************************************************/
+LCV_ERR LCVCfgGetInt(
+		const CFG_FILE_CONTENT_HANDLE hFileContent, 
+		const struct CFG_KEY *pKey,
+		int16 *iVal);
+
+/*********************************************************************//*!
+ * @brief Read Int from content structure
+ * 
+ * @param hFileContent Handle to the File content.
+ * @param pKey The name of the section and tag.
+ * @param iVal Return value.
+ * @return SUCCESS or an appropriate error code otherwise
+ *//*********************************************************************/
+LCV_ERR LCVCfgGetInt32(
+        const CFG_FILE_CONTENT_HANDLE hFileContent, 
+        const struct CFG_KEY *pKey,
+        int32 *iVal);
+
+/*********************************************************************//*!
+ * @brief Read Int from content structure
+ * 
+ * @param hFileContent Handle to the File content.
+ * @param pKey The name of the section and tag.
+ * @param iVal Return value.
+ * @return SUCCESS or an appropriate error code otherwise
+ *//*********************************************************************/
+LCV_ERR LCVCfgGetUInt32(
+        const CFG_FILE_CONTENT_HANDLE hFileContent, 
+        const struct CFG_KEY *pKey,
+        uint32 *iVal);
+
+/*********************************************************************//*!
+ * @brief Read Int from content structure and check range
+ * 
+ * @param hFileContent Handle to the File content.
+ * @param pKey The name of the section and tag.
+ * @param iVal Return value.
+ * @param min Min value for range check.
+ * @param max Max value for range check. Ignored if -1.
+ * @return SUCCESS or an appropriate error code otherwise
+ *//*********************************************************************/
+LCV_ERR LCVCfgGetIntRange(
+		const CFG_FILE_CONTENT_HANDLE hFileContent, 
+		const struct CFG_KEY *pKey,
+		int16 *iVal, 
+		const int16 min, 
+		const int16 max);
+
+/*********************************************************************//*!
+ * @brief Read Int from content structure and check range
+ * 
+ * @param hFileContent Handle to the File content.
+ * @param pKey The name of the section and tag.
+ * @param iVal Return value.
+ * @param min Min value for range check.
+ * @param max Max value for range check. Ignored if -1.
+ * @return SUCCESS or an appropriate error code otherwise
+ *//*********************************************************************/
+LCV_ERR LCVCfgGetUInt16Range(
+        const CFG_FILE_CONTENT_HANDLE hFileContent, 
+        const struct CFG_KEY *pKey,
+        uint16 *iVal, 
+        const uint16 min, 
+        const uint16 max);
+
+/*********************************************************************//*!
+ * @brief Read Int from content structure and check range
+ * 
+ * @param hFileContent Handle to the File content.
+ * @param pKey The name of the section and tag.
+ * @param iVal Return value.
+ * @param min Min value for range check.
+ * @param max Max value for range check. Ignored if -1.
+ * @return SUCCESS or an appropriate error code otherwise
+ *//*********************************************************************/
+LCV_ERR LCVCfgGetInt32Range(
+        const CFG_FILE_CONTENT_HANDLE hFileContent, 
+        const struct CFG_KEY *pKey,
+        int32 *iVal, 
+        const int32 min, 
+        const int32 max);
+
+/*********************************************************************//*!
+ * @brief Read Int from content structure and check range
+ * 
+ * @param hFileContent Handle to the File content.
+ * @param pKey The name of the section and tag.
+ * @param iVal Return value.
+ * @param min Min value for range check.
+ * @param max Max value for range check. Ignored if -1.
+ * @return SUCCESS or an appropriate error code otherwise
+ *//*********************************************************************/
+LCV_ERR LCVCfgGetUInt32Range(
+        const CFG_FILE_CONTENT_HANDLE hFileContent, 
+        const struct CFG_KEY *pKey,
+        uint32 *iVal, 
+        const uint32 min, 
+        const uint32 max);
+
+#endif /*CFG_PUB_H_*/
