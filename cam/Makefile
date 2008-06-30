@@ -1,6 +1,6 @@
 ############################################################################
 #
-# Makefile for the Camera Module of the OSC Framework
+# Makefile for the Camera Module of the Oscar framework
 #
 # 
 ############################################################################
@@ -34,7 +34,7 @@ clean:
 	rm -f *.o *.elf *.gdb
 	
 ######################## Host object file ################################
-cam_host: *.c *.h ../framework*.h
+cam_host: *.c *.h ../oscar*.h
 	@echo "Compiling Cam Module for host."
 	$(HOST_CC) $(HOST_CFLAGS) -c $(SOURCES_HOST)
 	$(HOST_CC) $(HOST_CFLAGS) -c cam_multibuffer.c \
@@ -43,7 +43,7 @@ cam_host: *.c *.h ../framework*.h
 		-o cam_shared_host.o ;
 	
 ####################### Target object file ###############################
-cam_target: *.c *.h ../framework*.h
+cam_target: *.c *.h ../oscar*.h
 	@echo "Compiling Cam Module for target."
 	$(TARGET_CC) $(TARGET_CFLAGS) -c $(SOURCES_TARGET)
 	$(TARGET_CC) $(TARGET_CFLAGS) -c cam_multibuffer.c \

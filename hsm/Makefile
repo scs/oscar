@@ -1,6 +1,6 @@
 ############################################################################
 #
-# Makefile for the Hierarchical State Machine (hsm) Module of OSC Framework
+# Makefile for the Hierarchical State Machine (hsm) Module of OScar framework
 #
 # 
 ############################################################################

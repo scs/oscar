@@ -1,6 +1,6 @@
 ############################################################################
 #
-# Makefile for the bitmap Module of the OSC Framework
+# Makefile for the bitmap Module of the Oscar framework
 #
 # 
 ############################################################################
@@ -32,12 +32,12 @@ clean:
 	rm -f *.o *.elf *.gdb
 	
 ############################# Host object file ####################################
-cfg_host.o: *.c *.h ../framework*.h
+cfg_host.o: *.c *.h ../oscar*.h
 	@echo "Compiling bitmap Module for host."
 	$(HOST_CC) $(HOST_CFLAGS) -c $(SOURCES_HOST) -o cfg_host.o
 	
 ########################### Target object file ####################################
-cfg_target.o: *.c *.h ../framework*.h
+cfg_target.o: *.c *.h ../oscar*.h
 	@echo "Compiling bitmap Module for target."
 	$(TARGET_CC) $(TARGET_CFLAGS) -c $(SOURCES_TARGET) -o cfg_target.o
 	@cp cfg_target.o cfg_target_sim.o

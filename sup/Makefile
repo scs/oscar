@@ -1,6 +1,6 @@
 ############################################################################
 #
-# Makefile for the Support Module of the OSC Framework
+# Makefile for the Support Module of the Oscar framework
 #
 # 
 ############################################################################
@@ -32,12 +32,12 @@ clean:
 	rm -f *.o *.elf *.gdb
 	
 ############################# Host object file ####################################
-sup_host.o: *.c *.h ../framework*.h
+sup_host.o: *.c *.h ../oscar*.h
 	@echo "Compiling sup Module for host."
 	$(HOST_CC) $(HOST_CFLAGS) -c $(SOURCES_HOST)
 	
 ########################### Target object file ####################################
-sup_target.o: *.c *.h ../framework*.h
+sup_target.o: *.c *.h ../oscar*.h
 	@echo "Compiling sup Module for target."
 	$(TARGET_CC) $(TARGET_CFLAGS) -c $(SOURCES_TARGET)
 	@cp sup_target.o sup_target_sim.o

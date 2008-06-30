@@ -1,5 +1,5 @@
-#ifndef FRAMEWORK_DEPENDENCIES_H_
-#define FRAMEWORK_DEPENDENCIES_H_
+#ifndef OSCAR_DEPENDENCIES_H_
+#define OSCAR_DEPENDENCIES_H_
 
 #ifdef OSC_HOST
     #include "oscar_types_host.h"
@@ -49,4 +49,4 @@ OSC_ERR OSCLoadDependencies(void *pFw,
 void OSCUnloadDependencies(void *pFw,
         const struct OSC_DEPENDENCY aryDeps[], 
         const uint32 nDeps);
-#endif /*FRAMEWORK_DEPENDENCIES_H_*/
+#endif /*OSCAR_DEPENDENCIES_H_*/

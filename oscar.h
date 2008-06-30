@@ -1,14 +1,12 @@
-/*! @file framework.h
- * @brief API definition for OSC framework
+/*! @file oscar.h
+ * @brief API definition for Oscar framework
  * 
  * Must be included by the application.
  * 
- * @date 22.1.2008
- * @version 1.0
  */
 
-#ifndef FRAMEWORK_H_
-#define FRAMEWORK_H_
+#ifndef OSCAR_H_
+#define OSCAR_H_
 
 /* Include the correct type header file, depending on the target
  */
@@ -31,7 +29,7 @@
  * @param phFw Pointer to the handle location for the framework
  * @return SUCCESS or appropriate error code otherwise
  *//*********************************************************************/
-OSC_ERR OSCCreate(void ** phFw);
+OSC_ERR OscCreate(void ** phFw);
 
 /*********************************************************************//*!
  * @brief Destructor for framework
@@ -41,7 +39,7 @@ OSC_ERR OSCCreate(void ** phFw);
  * @param hFw Pointer to the handle of the framework to be destroyed.
  * @return SUCCESS or an appropriate error code.
  *//*********************************************************************/
-OSC_ERR OSCDestroy(void *hFw);
+OSC_ERR OscDestroy(void *hFw);
 
 /* Include the public header files of the different modules, which
  * contain the declarations of the API functions of the respective
@@ -58,11 +56,11 @@ OSC_ERR OSCDestroy(void *hFw);
 #include "ipc_pub.h"
 #include "sup_pub.h"
 #include "frd_pub.h"
-#include "rtl_pub.h"
+#include "dspl_pub.h"
 #include "dma_pub.h"
 #include "hsm_pub.h"
 #include "cfg_pub.h"
 #include "clb_pub.h"
 #include "vis_pub.h"
 
-#endif /*FRAMEWORK_H_*/
+#endif /*OSCAR_H_*/

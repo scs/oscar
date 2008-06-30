@@ -2,8 +2,8 @@
  * @brief Framework internal definitions
  */
 
-#ifndef FRAMEWORK_INTERN_H_
-#define FRAMEWORK_INTERN_H_
+#ifndef OSCAR_INTERN_H_
+#define OSCAR_INTERN_H_
 
 #include "oscar_dependencies.h"
 #ifdef OSC_HOST
@@ -28,7 +28,7 @@ struct OSC_MODULE
     int         useCnt;  
 };
 
-/*! @brief The OSC framework object with handle to modules*/
+/*! @brief The Oscar framework object with handle to modules*/
 struct OSC_FRAMEWORK 
 {
     struct OSC_MODULE log;     /*!< @brief logging */
@@ -42,7 +42,7 @@ struct OSC_FRAMEWORK
     struct OSC_MODULE ipc;     /*!< @brief interprocess communication */
     struct OSC_MODULE sup;     /*!< @brief support */
     struct OSC_MODULE frd;     /*!< @brief filename reader */
-    struct OSC_MODULE rtl;     /*!< @brief DSP runtime library */
+    struct OSC_MODULE dspl;    /*!< @brief DSP runtime library */
     struct OSC_MODULE dma;     /*!< @brief Memory DMA */
     struct OSC_MODULE hsm;     /*!< @brief hierarchical state machine*/
     struct OSC_MODULE cfg;     /*!< @brief configuration file reader and writer*/
@@ -50,5 +50,5 @@ struct OSC_FRAMEWORK
     struct OSC_MODULE vis;     /*!< @brief Vision library*/    
 };
 
-#endif /* FRAMEWORK_INTER_H_ */
+#endif /* OSCAR_INTER_H_ */
 

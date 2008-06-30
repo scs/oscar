@@ -1,6 +1,6 @@
 ############################################################################
 #
-# Makefile for the OSC Framework
+# Makefile for the Oscar Framework
 #
 # 
 ############################################################################
@@ -28,7 +28,7 @@ MODULES += srd
 MODULES += ipc
 MODULES += sup
 MODULES += frd
-MODULES += rtl
+MODULES += dspl
 MODULES += dma
 MODULES += hsm
 MODULES += cfg
@@ -40,7 +40,7 @@ MODULES += vis
 STAGING_DIR = staging
 
 # Header files needed by an application using this framework
-FW_HEADERS = framework.h oscar_error.h oscar_dependencies.h
+FW_HEADERS = oscar.h oscar_error.h oscar_dependencies.h
 
 # Header file suffix for headers marked as public by modules
 MOD_HEADER_SUFFIX = _pub.h
@@ -58,7 +58,7 @@ TARGET_CC = bfin-uclinux-gcc
 TARGET_CFLAGS = -Wall -pedantic -ggdb3 -I./ -DOSC_TARGET -D$(TARGET_TYPE)
 
 # Source files of the camera module
-SOURCES = framework.c
+SOURCES = oscar.c
 
 # Default target
 all: $(OUT)
@@ -117,10 +117,10 @@ host: oscar_host modules_host lib_host
 	@echo "Host framework done."
 	
 # Compile the framework main object file
-oscar_host: $(SOURCES) framework.h oscar_priv.h
+oscar_host: $(SOURCES) oscar.h oscar_priv.h
 	$(HOST_CC) $(HOST_CFLAGS) -c $(SOURCES) -o oscar_host.o
 	
-oscar_target: $(SOURCES) framework.h oscar_priv.h
+oscar_target: $(SOURCES) oscar.h oscar_priv.h
 	$(TARGET_CC) $(TARGET_CFLAGS) -c $(SOURCES) -o oscar_target.o
 	
 # Compile the modules
@@ -163,7 +163,7 @@ clean:
 	for i in $(MODULES) ; do  make clean -C $$i || exit $? ; done
 	rm -f $(OUT)$(HOST_SUFFIX) $(OUT)$(TARGET_SUFFIX)
 	rm -rf $(STAGING_DIR)
-	rm -f framework.o
+	rm -f *.o
 	@echo "Directory cleaned"
 
 	

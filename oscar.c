@@ -1,5 +1,5 @@
-/*! @file framework.c
- * @brief Framework implementation
+/*! @file oscar.c
+ * @brief Oscar framework implementation
  * 
  * Create, destroy and module dependency functionality.
  *   
@@ -12,7 +12,7 @@
 
 struct OSC_FRAMEWORK fw;	/*!< @brief Module singelton instance */
 
-OSC_ERR OSCCreate(void **phFw)
+OSC_ERR OscCreate(void **phFw)
 {
 	memset(&fw, 0, sizeof(struct OSC_FRAMEWORK));
 	
@@ -23,7 +23,7 @@ OSC_ERR OSCCreate(void **phFw)
 	return SUCCESS;
 }
 
-OSC_ERR OSCDestroy(void *hFw)
+OSC_ERR OscDestroy(void *hFw)
 {
     struct OSC_FRAMEWORK *pFw;
     
@@ -96,7 +96,7 @@ OSC_ERR OSCDestroy(void *hFw)
                 __func__);
         return -ECANNOT_UNLOAD;
     }	
-    if(pFw->rtl.useCnt)
+    if(pFw->dspl.useCnt)
     {
         fprintf(stderr, "%s: ERROR: Dspl module still loaded!\n",
                 __func__);
@@ -131,7 +131,7 @@ OSC_ERR OSCDestroy(void *hFw)
 }
 
 
-OSC_ERR OSCLoadDependencies(void *hFw,
+OSC_ERR OscLoadDependencies(void *hFw,
         const struct OSC_DEPENDENCY aryDeps[], 
         const uint32 nDeps)
 {
@@ -163,7 +163,7 @@ OSC_ERR OSCLoadDependencies(void *hFw,
     return err;
 }
 
-void OSCUnloadDependencies(void *hFw,
+void OscUnloadDependencies(void *hFw,
         const struct OSC_DEPENDENCY aryDeps[], 
         const uint32 nDeps)
 {

@@ -1,6 +1,6 @@
 ############################################################################
 #
-# Makefile for the Logging Module of the OSC Framework
+# Makefile for the Logging Module of the Oscar framework
 #
 # 
 ############################################################################
@@ -32,12 +32,12 @@ clean:
 	rm -f *.o *.elf *.gdb
 	
 ############################# Host object file ####################################
-log_host.o: *.c *.h ../framework*.h
+log_host.o: *.c *.h ../oscar*.h
 	@echo "Compiling Log Module for host."
 	$(HOST_CC) $(HOST_CFLAGS) -c $(SOURCES_HOST)
 	
 ########################### Target object file ####################################
-log_target.o: *.c *.h ../framework*.h
+log_target.o: *.c *.h ../oscar*.h
 	@echo "Compiling Log Module for target."
 	$(TARGET_CC) $(TARGET_CFLAGS) -c $(SOURCES_TARGET)
 	@cp log_target.o log_target_sim.o

@@ -1,6 +1,6 @@
 ############################################################################
 #
-# Makefile for the Calibration Module of the OSC Framework
+# Makefile for the Calibration Module of the Oscar framework
 #
 # 
 ############################################################################
@@ -34,12 +34,12 @@ clean:
 	rm -f *.o *.elf *.gdb
 	
 ######################## Host object file ################################
-clb_host: *.c *.h ../framework*.h
+clb_host: *.c *.h ../oscar*.h
 	@echo "Compiling Clb Module for host."
 	$(HOST_CC) $(HOST_CFLAGS) -c $(SOURCES_HOST)
 	
 ####################### Target object file ###############################
-clb_target: *.c *.h ../framework*.h
+clb_target: *.c *.h ../oscar*.h
 	@echo "Compiling Clb Module for target."
 	$(TARGET_CC) $(TARGET_CFLAGS) -c $(SOURCES_TARGET)
 	$(TARGET_CC) $(TARGET_SIM_CFLAGS) -c $(SOURCES_TARGET_SIM) \

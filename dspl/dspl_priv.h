@@ -1,9 +1,9 @@
-/*! @file rtl_priv.h
+/*! @file dspl_priv.h
  * @brief Private module definition for the Blackfin DSP runtime library.
  * 
  */
-#ifndef RTL_PRIV_H_
-#define RTL_PRIV_H_
+#ifndef DSPL_PRIV_H_
+#define DSPL_PRIV_H_
 
 #include <stdio.h>
 #include <stdarg.h>
@@ -11,7 +11,7 @@
 #include <string.h>
 
 /*! @brief The object struct of the camera module */
-struct OSC_RTL {
+struct OSC_DSPL {
     /*! @brief Dummy to have at least one member in this struct. */
     int dummy; 
 };
@@ -74,4 +74,4 @@ int OscDsplCDscale( complex_fract16 butterflycfr16[], int fft_size);
 *//*********************************************************************/
 long long int OscDsplSatFr64(long long int in);
 
-#endif /*RTL_PRIV_H_*/
+#endif /*DSPL_PRIV_H_*/

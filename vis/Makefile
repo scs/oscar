@@ -1,6 +1,6 @@
 ############################################################################
 #
-# Makefile for the vision library Module of the OSC Framework
+# Makefile for the vision library Module of the Oscar framework
 #
 # 
 ############################################################################
@@ -32,7 +32,7 @@ clean:
 	rm -f *.o *.elf *.gdb
 	
 ############################# Host object files ####################################
-objects_host: *.c *.h ../framework*.h
+objects_host: *.c *.h ../oscar*.h
 	@echo "Compiling vision Module for host."
 	for i in $(SOURCES_HOST) ; \
 	do \
@@ -41,7 +41,7 @@ objects_host: *.c *.h ../framework*.h
 	done
 	
 ########################### Target object files ####################################
-objects_target: *.c *.h ../framework*.h
+objects_target: *.c *.h ../oscar*.h
 	@echo "Compiling vision Module for target."
 	for i in $(SOURCES_TARGET) ; \
 	do \

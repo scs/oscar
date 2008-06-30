@@ -1,6 +1,6 @@
 ############################################################################
 #
-# Makefile for the Cpld Module of the OSC Framework
+# Makefile for the Cpld Module of the Oscar framework
 #
 # 
 ############################################################################

@@ -1,6 +1,6 @@
 ############################################################################
 #
-# Makefile for the Interprocess communication Module of the OSC Framework
+# Makefile for the Interprocess communication Module of the Oscar framework
 #
 # 
 ############################################################################
@@ -32,13 +32,13 @@ clean:
 	rm -f *.o *.elf *.gdb
 	
 ############################# Host object file ####################################
-ipc_host.o: *.c *.h ../framework*.h
+ipc_host.o: *.c *.h ../oscar*.h
 	@echo "Compiling IPC Module for host."
 	$(HOST_CC) $(HOST_CFLAGS) -c $(SOURCES_HOST)
 	mv ipc_shared.o ipc_shared_host.o
 	
 ########################### Target object file ####################################
-ipc_target.o: *.c *.h ../framework*.h
+ipc_target.o: *.c *.h ../oscar*.h
 	@echo "Compiling IPC Module for target."
 	$(TARGET_CC) $(TARGET_CFLAGS) -c $(SOURCES_TARGET)
 	@mv ipc_shared.o ipc_shared_target.o

@@ -1,4 +1,4 @@
-/*! @file rtl_target.c
+/*! @file dspl_target.c
  * @brief Blackfin DSP runtime library implementation for host. 
  * 
  * All functions of the DSP runtime library used on the target must
@@ -10,12 +10,12 @@
 
 #include "oscar_types_target.h"
 
-#include "rtl_pub.h"
-#include "rtl_priv.h"
+#include "dspl_pub.h"
+#include "dspl_priv.h"
 #include "oscar_intern.h"
 
 /*! @brief The module singelton instance.  */
-struct OSC_RTL osc_rtl;		
+struct OSC_DSPL osc_dspl;		
 
 
 OSC_ERR OscDsplCreate(void *hFw)
@@ -23,18 +23,18 @@ OSC_ERR OscDsplCreate(void *hFw)
     struct OSC_FRAMEWORK *pFw;
 
     pFw = (struct OSC_FRAMEWORK *)hFw;
-    if(pFw->rtl.useCnt != 0)
+    if(pFw->dspl.useCnt != 0)
     {
-        pFw->rtl.useCnt++;
+        pFw->dspl.useCnt++;
         /* The module is already allocated */
         return SUCCESS;
     }    
         
-	memset(&osc_rtl, 0, sizeof(struct OSC_RTL));
+	memset(&osc_dspl, 0, sizeof(struct OSC_DSPL));
 		
     /* Increment the use count */
-    pFw->rtl.hHandle = (void*)&osc_rtl;
-    pFw->rtl.useCnt++;    
+    pFw->dspl.hHandle = (void*)&osc_dspl;
+    pFw->dspl.useCnt++;    
 
 	return SUCCESS;
 }
@@ -46,13 +46,13 @@ void OscDsplDestroy(void *hFw)
     pFw = (struct OSC_FRAMEWORK *)hFw; 
     /* Check if we really need to release or whether we still 
      * have users. */
-    pFw->rtl.useCnt--;
-    if(pFw->rtl.useCnt > 0)
+    pFw->dspl.useCnt--;
+    if(pFw->dspl.useCnt > 0)
     {
         return;
     }
 	
-	memset(&osc_rtl, 0, sizeof(struct OSC_RTL));
+	memset(&osc_dspl, 0, sizeof(struct OSC_DSPL));
 }
 
 

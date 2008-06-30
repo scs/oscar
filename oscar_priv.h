@@ -2,8 +2,8 @@
  * @brief Private framework definitions
  * 
  */
-#ifndef FRAMEWORK_PRIV_H_
-#define FRAMEWORK_PRIV_H_
+#ifndef OSCAR_PRIV_H_
+#define OSCAR_PRIV_H_
 
 #include <string.h>
 
@@ -17,4 +17,4 @@
 #include "oscar_intern.h"
 
 
-#endif /*FRAMEWORK_PRIV_H_*/
+#endif /*OSCAR_PRIV_H_*/

@@ -2,8 +2,8 @@
  * @brief General framework definitions for the target
  * 
  */
-#ifndef FRAMEWORK_TARGET_H_
-#define FRAMEWORK_TARGET_H_
+#ifndef OSCAR_TARGET_H_
+#define OSCAR_TARGET_H_
 
 /* Bluntly copied from linux/compiler.h from uclinux */
 /*! @brief Used to mark likely expressions for compiler optimization */
@@ -11,4 +11,4 @@
 /*! @brief Used to mark unlikely expressions for compiler optimization */
 #define unlikely(x)     __builtin_expect(!!(x), 0)
 
-#endif /*FRAMEWORK_TARGET_H_*/
+#endif /*OSCAR_TARGET_H_*/

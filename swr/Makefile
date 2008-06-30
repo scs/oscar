@@ -1,6 +1,6 @@
 ############################################################################
 #
-# Makefile for the StimuliWriter (swr) Module of the OSC Framework
+# Makefile for the StimuliWriter (swr) Module of the Oscar framework
 #
 # 
 ############################################################################

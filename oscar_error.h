@@ -1,11 +1,9 @@
 /*! @file oscar_error.h
- * @brief Error declarations for OSC framework
+ * @brief Error declarations for Oscar framework
  * 
- * @date 22.1.2008
- * @version 1.0
  */
-#ifndef FRAMEWORK_ERROR_H_
-#define FRAMEWORK_ERROR_H_
+#ifndef OSCAR_ERROR_H_
+#define OSCAR_ERROR_H_
 
 /*! @brief Define general non-module-specific
  * error codes for the OSC framework */
@@ -62,4 +60,4 @@ enum EnOscErrors {
 /*! @brief Error identifier offset of the clb module. */
 #define OSC_CLB_ERROR_OFFSET    1400
 
-#endif /*FRAMEWORK_ERROR_H_*/
+#endif /*OSCAR_ERROR_H_*/

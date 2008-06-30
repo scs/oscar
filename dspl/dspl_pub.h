@@ -1,9 +1,9 @@
-/*! @file rtl_pub.h
+/*! @file dspl_pub.h
  * @brief API definition for the Blackfin DSP realtime module
  * 
  */
-#ifndef RTL_PUB_H_
-#define RTL_PUB_H_
+#ifndef DSPL_PUB_H_
+#define DSPL_PUB_H_
 
 #include "oscar_error.h"
 #ifdef OSC_HOST
@@ -390,7 +390,7 @@ void  rfft_fr16( const fract16          in[],
  * Equivalent to rfft_fr16 from the ADI DSP library.
  * 
  * This FFT uses the decimation-in-time FFT algorithm, for more details 
- * please read the following webpage: /home/osc/framework/rtl/FFT/fft.html
+ * please read the following webpage: oscar/dspl/FFT/fft.html
  * 
  * The FFT consists of differt stages:
  * 
@@ -670,5 +670,5 @@ fract16 OscDspl_cabs_fr16(complex_fract16 c);
 #endif /* OSC_HOST */
 
 
-#endif /*RTL_PUB_H_*/
+#endif /*DSPL_PUB_H_*/
 

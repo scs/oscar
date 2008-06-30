@@ -1,6 +1,6 @@
 ############################################################################
 #
-# Makefile for the FileNameReader (frd) Module of the OSC Framework
+# Makefile for the FileNameReader (frd) Module of the Oscar framework
 #
 # 
 ############################################################################

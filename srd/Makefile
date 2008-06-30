@@ -1,6 +1,6 @@
 ############################################################################
 #
-# Makefile for the StimuliReader (srd) Module of the OSC Framework
+# Makefile for the StimuliReader (srd) Module of the Oscar Framework
 #
 # 
 ############################################################################

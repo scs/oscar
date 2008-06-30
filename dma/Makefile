@@ -1,6 +1,6 @@
 ############################################################################
 #
-# Makefile for the DMA Module of the OSC Framework
+# Makefile for the DMA Module of the OScar framework
 #
 # 
 ############################################################################
@@ -32,13 +32,13 @@ clean:
 	rm -f *.o *.elf *.gdb
 	
 ############################# Host object file ####################################
-dma_host.o: *.c *.h ../framework*.h
+dma_host.o: *.c *.h ../oscar*.h
 	@echo "Compiling dma Module for host."
 	$(HOST_CC) $(HOST_CFLAGS) -c $(SOURCES_HOST)
 	mv dma_shared.o dma_shared_host.o
 	
 ########################### Target object file ####################################
-dma_target.o: *.c *.h ../framework*.h
+dma_target.o: *.c *.h ../oscar*.h
 	@echo "Compiling dma Module for target."
 	$(TARGET_CC) $(TARGET_CFLAGS) -c $(SOURCES_TARGET)
 	@mv dma_shared.o dma_shared_target.o
