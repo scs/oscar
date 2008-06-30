@@ -1,19 +1,18 @@
 /*! @file vis_pub.h
  * @brief API definition for vision library module
  * 
- * @author Markus Berner
  */
 #ifndef VIS_PUB_H_
 #define VIS_PUB_H_
 
-#include "framework_error.h"
-#ifdef LCV_HOST
-    #include "framework_types_host.h"
-    #include "framework_host.h"
+#include "oscar_error.h"
+#ifdef OSC_HOST
+    #include "oscar_types_host.h"
+    #include "oscar_host.h"
 #else
-    #include "framework_types_target.h"
-    #include "framework_target.h"
-#endif /* LCV_HOST */
+    #include "oscar_types_target.h"
+    #include "oscar_target.h"
+#endif /* OSC_HOST */
 
 #include "bayer_pub.h"
 
@@ -25,14 +24,14 @@
  * @param hFw Pointer to the handle of the framework.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-LCV_ERR LCVVisCreate(void *hFw);
+OSC_ERR OscVisCreate(void *hFw);
 
 /*********************************************************************//*!
  * @brief Destructor
  * 
  * @param hFw Pointer to the handle of the framework.
  *//*********************************************************************/
-void LCVVisDestroy(void *hFw);
+void OscVisDestroy(void *hFw);
 
 /*********************************************************************//*!
  * @brief Convert a raw image captured by a camera sensor with bayer
@@ -61,11 +60,11 @@ void LCVVisDestroy(void *hFw);
  * @param height Height of the input and output image.
  * @param enBayerOrderFirstRow The order of the bayer pattern colors
  * in the first row of the image to be debayered. Can be queried by
- * LCVCamGetBayerOrder().
+ * OscCamGetBayerOrder().
  * @param pOut Pointer to the BGR output image.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-LCV_ERR LCVVisDebayer(const uint8* pRaw,
+OSC_ERR OscVisDebayer(const uint8* pRaw,
 		const uint16 width,
 		const uint16 height,
 		const enum EnBayerOrder enBayerOrderFirstRow,

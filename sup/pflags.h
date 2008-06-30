@@ -3,7 +3,6 @@
  *    File:         pflags.h
  *    Rev:          0.1
  *    Created:      Fri Jan 14 12:40:55 CEST 2005
- *    Author:       Michael Hennerich
  *    mail:         hennerich@blackfin.org
  *    Description:  pfbits driver for bf53x
  *                  

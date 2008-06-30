@@ -1,43 +1,42 @@
 /*! @file dma_shared.c
  * @brief Memory DMA module implementation shared by target and host.
  * 
- * @author Markus Berner
  */
 
-#ifdef LCV_TARGET
-#include "framework_types_target.h"
-#endif /* LCV_TARGET */
+#ifdef OSC_TARGET
+#include "oscar_types_target.h"
+#endif /* OSC_TARGET */
 
-#ifdef LCV_HOST
-#include "framework_types_host.h"
-#endif /* LCV_HOST */
+#ifdef OSC_HOST
+#include "oscar_types_host.h"
+#endif /* OSC_HOST */
 
 #include "dma_pub.h"
 #include "dma_priv.h"
-#include "framework_intern.h"
+#include "oscar_intern.h"
 
 #include "sup/sup_pub.h"
 #include "log/log_pub.h"
 
 /*! @brief The module singelton instance. */
-struct LCV_DMA dma;
+struct OSC_DMA dma;
 
 /*! @brief Data field filled with only ones. */
 static uint32 allOnes = 0xffffffff;
 
 /*! @brief The dependencies of this module. */
-struct LCV_DEPENDENCY dma_deps[] = {
-        {"log", LCVLogCreate, LCVLogDestroy},
-        {"sup", LCVSupCreate, LCVSupDestroy}
+struct OSC_DEPENDENCY dma_deps[] = {
+        {"log", OscLogCreate, OscLogDestroy},
+        {"sup", OscSupCreate, OscSupDestroy}
 };
 
 
-LCV_ERR LCVDmaCreate(void *hFw)
+OSC_ERR OscDmaCreate(void *hFw)
 {
-    struct LCV_FRAMEWORK *pFw;
-    LCV_ERR err = SUCCESS;
+    struct OSC_FRAMEWORK *pFw;
+    OSC_ERR err = SUCCESS;
 
-    pFw = (struct LCV_FRAMEWORK *)hFw;
+    pFw = (struct OSC_FRAMEWORK *)hFw;
     if(pFw->dma.useCnt != 0)
     {
         pFw->dma.useCnt++;
@@ -46,9 +45,9 @@ LCV_ERR LCVDmaCreate(void *hFw)
     }  
     
     /* Load the module dependencies of this module. */
-    err = LCVLoadDependencies(pFw, 
+    err = OSCLoadDependencies(pFw, 
             dma_deps, 
-            sizeof(dma_deps)/sizeof(struct LCV_DEPENDENCY));
+            sizeof(dma_deps)/sizeof(struct OSC_DEPENDENCY));
     
     if(err != SUCCESS)
     {
@@ -58,7 +57,7 @@ LCV_ERR LCVDmaCreate(void *hFw)
         return err;
     }
     
-    memset(&dma, 0, sizeof(struct LCV_DMA));
+    memset(&dma, 0, sizeof(struct OSC_DMA));
     
     /* Increment the use count */
     pFw->dma.hHandle = (void*)&dma;
@@ -67,11 +66,11 @@ LCV_ERR LCVDmaCreate(void *hFw)
     return err;
 }
 
-void LCVDmaDestroy(void *hFw)
+void OscDmaDestroy(void *hFw)
 {
-    struct LCV_FRAMEWORK *pFw;
+    struct OSC_FRAMEWORK *pFw;
 
-    pFw = (struct LCV_FRAMEWORK *)hFw; 
+    pFw = (struct OSC_FRAMEWORK *)hFw; 
     /* Check if we really need to release or whether we still 
      * have users. */
     pFw->dma.useCnt--;
@@ -80,14 +79,14 @@ void LCVDmaDestroy(void *hFw)
         return;
     }
        
-    LCVUnloadDependencies(pFw, 
+    OSCUnloadDependencies(pFw, 
             dma_deps, 
-            sizeof(dma_deps)/sizeof(struct LCV_DEPENDENCY));
+            sizeof(dma_deps)/sizeof(struct OSC_DEPENDENCY));
     
-    memset(&dma, 0, sizeof(struct LCV_DMA));
+    memset(&dma, 0, sizeof(struct OSC_DMA));
 }
 
-LCV_ERR LCVDmaAllocChain(void **phChainHandle)
+OSC_ERR OscDmaAllocChain(void **phChainHandle)
 {
     struct DMA_CHAIN ** pChain;
     
@@ -98,7 +97,7 @@ LCV_ERR LCVDmaAllocChain(void **phChainHandle)
 
     if(unlikely(dma.nChainsAllocated == MAX_NR_DMA_CHAINS))
     {
-        LCVLog(WARN, "%s: All DMA chains already allocated!\n", 
+        OscLog(WARN, "%s: All DMA chains already allocated!\n", 
                 __func__);
         *phChainHandle = NULL;
         return -EDMA_NO_MORE_CHAINS_AVAILABLE;
@@ -109,19 +108,19 @@ LCV_ERR LCVDmaAllocChain(void **phChainHandle)
     dma.nChainsAllocated++;
     
     /* Reset the chain, just to be sure. */
-    LCVDmaResetChain(*pChain);
+    OscDmaResetChain(*pChain);
     
     return SUCCESS;
 }
 
-inline void LCVDmaResetChain(void *hChainHandle)
+inline void OscDmaResetChain(void *hChainHandle)
 {
     struct DMA_CHAIN *pChain = (struct DMA_CHAIN*)hChainHandle;
     
     pChain->nMoves = 0;
 }
 
-LCV_ERR LCVDmaAdd2DMove(void *hChainHandle,
+OSC_ERR OscDmaAdd2DMove(void *hChainHandle,
         const void *pDstAddr, 
         const enum EnDmaWdSize enDstWdSize,
         const uint16 dstXCount, const int32 dstXModify, 
@@ -185,7 +184,7 @@ LCV_ERR LCVDmaAdd2DMove(void *hChainHandle,
     return SUCCESS;
 }
 
-inline LCV_ERR LCVDmaAdd1DMove(void *hChainHandle,
+inline OSC_ERR OscDmaAdd1DMove(void *hChainHandle,
         const void *pDstAddr, 
         const enum EnDmaWdSize enDstWdSize,
         const uint16 dstCount, const int32 dstModify, 
@@ -193,7 +192,7 @@ inline LCV_ERR LCVDmaAdd1DMove(void *hChainHandle,
         const enum EnDmaWdSize enSrcWdSize,
         const uint16 srcCount, const int32 srcModify)
 {
-    return LCVDmaAdd2DMove(hChainHandle,
+    return OscDmaAdd2DMove(hChainHandle,
             pDstAddr,
             enDstWdSize,
             dstCount, dstModify,
@@ -204,7 +203,7 @@ inline LCV_ERR LCVDmaAdd1DMove(void *hChainHandle,
             1, 4);
 }
 
-LCV_ERR LCVDmaAddSyncPoint(void *hChainHandle)
+OSC_ERR OscDmaAddSyncPoint(void *hChainHandle)
 {
     struct DMA_CHAIN *pChain = (struct DMA_CHAIN*)hChainHandle;
     struct DMA_DESC  *pSrcDesc = &pChain->arySrcDesc[pChain->nMoves];
@@ -269,15 +268,15 @@ LCV_ERR LCVDmaAddSyncPoint(void *hChainHandle)
     return SUCCESS;    
 }
 
-LCV_ERR LCVDmaMemCpy(void *hChainHandle,
+OSC_ERR OscDmaMemCpy(void *hChainHandle,
         void *pDstAddr,
         void *pSrcAddr,
         uint32 len)
 {
-    LCV_ERR err;
+    OSC_ERR err;
     /* Add the move to the chain (effectively a 1D move with 32 bit word
      * length. */
-    err = LCVDmaAdd2DMove(hChainHandle,
+    err = OscDmaAdd2DMove(hChainHandle,
             pDstAddr,
             DMA_WDSIZE_32,
             (len >> 2), 4,
@@ -289,25 +288,25 @@ LCV_ERR LCVDmaMemCpy(void *hChainHandle,
     
     if(unlikely(err != SUCCESS))
     {
-        LCVLog(ERROR, "%s: Unable to add move!\n", __func__);
+        OscLog(ERROR, "%s: Unable to add move!\n", __func__);
         return err;
     }
    
     /* Start the transfer. */
-    LCVDmaStart(hChainHandle);
+    OscDmaStart(hChainHandle);
     
     return SUCCESS;
 }
 
-LCV_ERR LCVDmaMemCpySync(void *hChainHandle,
+OSC_ERR OscDmaMemCpySync(void *hChainHandle,
         void *pDstAddr,
         void *pSrcAddr,
         uint32 len)
 {
-    LCV_ERR err;
+    OSC_ERR err;
     /* Add the move to the chain (effectively a 1D move with 32 bit word
      * length xModify = 4 and xCount = len/4). */
-    err = LCVDmaAdd2DMove(hChainHandle,
+    err = OscDmaAdd2DMove(hChainHandle,
             pDstAddr,
             DMA_WDSIZE_32,
             (len >> 2), 4,
@@ -319,24 +318,24 @@ LCV_ERR LCVDmaMemCpySync(void *hChainHandle,
     
     if(unlikely(err != SUCCESS))
     {
-        LCVLog(ERROR, "%s: Unable to add move!\n", __func__);
+        OscLog(ERROR, "%s: Unable to add move!\n", __func__);
         return err;
     }
     
     /* Add a sync point so we can wait for it later. */
-    err = LCVDmaAddSyncPoint(hChainHandle);
+    err = OscDmaAddSyncPoint(hChainHandle);
     if(unlikely(err != SUCCESS))
     {
-        LCVLog(ERROR, "%s: Unable to add synchronizaion point!\n",
+        OscLog(ERROR, "%s: Unable to add synchronizaion point!\n",
                 __func__);
         return err;
     }
 
     /* Start the transfer. */
-    LCVDmaStart(hChainHandle);
+    OscDmaStart(hChainHandle);
     
     /* Wait for the transfer to be finished. */
-    err = LCVDmaSync(hChainHandle);
+    err = OscDmaSync(hChainHandle);
     
     return err;
 }

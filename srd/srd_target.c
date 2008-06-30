@@ -1,28 +1,27 @@
 /*! @file srd_target.c
  * @brief Stimuli reader module implementation for target.
  * 
- * @author Samuel Zahnd
  ************************************************************************/
 
-#include "framework_types_target.h"
+#include "oscar_types_target.h"
 
 #include "srd_pub.h"
 #include "srd_priv.h"
-#include "framework_intern.h"
+#include "oscar_intern.h"
 
-struct LCV_SRD srd;		/*!< Module singelton instance */
+struct OSC_SRD srd;		/*!< Module singelton instance */
 
 /*! The dependencies of this module. */
-struct LCV_DEPENDENCY srd_deps[] = {
-        {"log", LCVLogCreate, LCVLogDestroy}
+struct OSC_DEPENDENCY srd_deps[] = {
+        {"log", OscLogCreate, OscLogDestroy}
 };
 
-LCV_ERR LCVSrdCreate(void *hFw)
+OSC_ERR OscSrdCreate(void *hFw)
 {
-    struct LCV_FRAMEWORK *pFw;
-    LCV_ERR err;
+    struct OSC_FRAMEWORK *pFw;
+    OSC_ERR err;
 
-    pFw = (struct LCV_FRAMEWORK *)hFw;
+    pFw = (struct OSC_FRAMEWORK *)hFw;
     if(pFw->srd.useCnt != 0)
     {
         pFw->srd.useCnt++;
@@ -31,9 +30,9 @@ LCV_ERR LCVSrdCreate(void *hFw)
     }
 
     /* Load the module srd_deps of this module. */
-    err = LCVLoadDependencies(pFw, 
+    err = OSCLoadDependencies(pFw, 
             srd_deps, 
-            sizeof(srd_deps)/sizeof(struct LCV_DEPENDENCY));
+            sizeof(srd_deps)/sizeof(struct OSC_DEPENDENCY));
     
     if(err != SUCCESS)
     {
@@ -43,7 +42,7 @@ LCV_ERR LCVSrdCreate(void *hFw)
         return err;
     }
     
- 	memset(&srd, 0, sizeof(struct LCV_SRD));
+ 	memset(&srd, 0, sizeof(struct OSC_SRD));
 	
     /* Increment the use count */
     pFw->srd.hHandle = (void*)&srd;
@@ -52,11 +51,11 @@ LCV_ERR LCVSrdCreate(void *hFw)
     return SUCCESS;
 }
 
-void LCVSrdDestroy(void *hFw)
+void OscSrdDestroy(void *hFw)
 {
-    struct LCV_FRAMEWORK *pFw;
+    struct OSC_FRAMEWORK *pFw;
         
-    pFw = (struct LCV_FRAMEWORK *)hFw; 
+    pFw = (struct OSC_FRAMEWORK *)hFw; 
     /* Check if we really need to release or whether we still 
      * have users. */
     pFw->srd.useCnt--;
@@ -65,10 +64,10 @@ void LCVSrdDestroy(void *hFw)
         return;
     }
     
-    LCVUnloadDependencies(pFw, 
+    OSCUnloadDependencies(pFw, 
             srd_deps, 
-            sizeof(srd_deps)/sizeof(struct LCV_DEPENDENCY));
+            sizeof(srd_deps)/sizeof(struct OSC_DEPENDENCY));
     
-	memset(&srd, 0, sizeof(struct LCV_SRD));
+	memset(&srd, 0, sizeof(struct OSC_SRD));
 }
 

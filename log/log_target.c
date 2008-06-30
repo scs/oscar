@@ -1,28 +1,27 @@
 /*! @file log_target.c
  * @brief Logging module implementation for target
  * 
- * @author Markus Berner
  */
 
-#include "framework_types_target.h"
+#include "oscar_types_target.h"
 
 #include "log_pub.h"
 #include "log_priv.h"
-#include "framework_intern.h"
+#include "oscar_intern.h"
 #include <syslog.h>
 
 /*! @brief The module singelton instance. 
  * 
- * This is called lcv_log
+ * This is called osc_log
  * instead of log because log is a internal function of the C
  * library */
-struct LCV_LOG lcv_log;
+struct OSC_LOG osc_log;
 
-LCV_ERR LCVLogCreate(void *hFw)
+OSC_ERR OscLogCreate(void *hFw)
 {
-    struct LCV_FRAMEWORK *pFw;
+    struct OSC_FRAMEWORK *pFw;
 
-    pFw = (struct LCV_FRAMEWORK *)hFw;
+    pFw = (struct OSC_FRAMEWORK *)hFw;
     if(pFw->log.useCnt != 0)
     {
         pFw->log.useCnt++;
@@ -30,29 +29,29 @@ LCV_ERR LCVLogCreate(void *hFw)
         return SUCCESS;
     }  
     
-    memset(&lcv_log, 0, sizeof(struct LCV_LOG));
+    memset(&osc_log, 0, sizeof(struct OSC_LOG));
     /* Enable all logging by default */
-    lcv_log.consoleLogLevel = DEFAULT_CONSOLE_LOGLEVEL;
-    lcv_log.fileLogLevel = DEFAULT_FILE_LOGLEVEL;
+    osc_log.consoleLogLevel = DEFAULT_CONSOLE_LOGLEVEL;
+    osc_log.fileLogLevel = DEFAULT_FILE_LOGLEVEL;
 
     /* logName must remain persistent, which is why we move it to the
      * module structure */
-    sprintf(lcv_log.logName, LOG_NAME);
+    sprintf(osc_log.logName, LOG_NAME);
     /* Initialize the connection to syslog */
-    openlog(lcv_log.logName, 0, LOG_USER);
+    openlog(osc_log.logName, 0, LOG_USER);
     
     /* Increment the use count */
-    pFw->log.hHandle = (void*)&lcv_log;
+    pFw->log.hHandle = (void*)&osc_log;
     pFw->log.useCnt++; 
 
     return SUCCESS;
 }
 
-void LCVLogDestroy(void *hFw)
+void OscLogDestroy(void *hFw)
 {
-    struct LCV_FRAMEWORK *pFw;
+    struct OSC_FRAMEWORK *pFw;
 
-    pFw = (struct LCV_FRAMEWORK *)hFw; 
+    pFw = (struct OSC_FRAMEWORK *)hFw; 
     /* Check if we really need to release or whether we still 
      * have users. */
     pFw->log.useCnt--;
@@ -64,28 +63,28 @@ void LCVLogDestroy(void *hFw)
     /* Close the connection to syslog */
     closelog();
     
-    memset(&lcv_log, 0, sizeof(struct LCV_LOG));
+    memset(&osc_log, 0, sizeof(struct OSC_LOG));
 }
 
-inline void LCVLogSetConsoleLogLevel(const enum EnLcvLogLevel level)
+inline void OscLogSetConsoleLogLevel(const enum EnOscLogLevel level)
 {
-    lcv_log.consoleLogLevel = level;
+    osc_log.consoleLogLevel = level;
 }
 
-inline void LCVLogSetFileLogLevel(const enum EnLcvLogLevel level)
+inline void OscLogSetFileLogLevel(const enum EnOscLogLevel level)
 {
-    lcv_log.fileLogLevel = level;
+    osc_log.fileLogLevel = level;
 }
 
 
-void LCVLog(const enum EnLcvLogLevel level, const char * strFormat, ...)
+void OscLog(const enum EnOscLogLevel level, const char * strFormat, ...)
 {
     uint16 len;
     va_list ap; /*< The dynamic argument list */
 
-    lcv_log.strTemp[0] = 0; /* Mark the string as empty */
+    osc_log.strTemp[0] = 0; /* Mark the string as empty */
 
-    if (level <= lcv_log.consoleLogLevel)
+    if (level <= osc_log.consoleLogLevel)
     {
         /* Log to console if the current log level is high enough */
 
@@ -96,17 +95,17 @@ void LCVLog(const enum EnLcvLogLevel level, const char * strFormat, ...)
         va_end(ap);
     }
 
-    if (level <= lcv_log.fileLogLevel)
+    if (level <= osc_log.fileLogLevel)
     {
         /* Log to the log file if the current log level is high enough */
 
         /* We can't use sprintf because we only have the additional 
          * arguments as a list => use vsprintf */
         va_start(ap, strFormat);
-        len += vsprintf(lcv_log.strTemp, strFormat, ap);
+        len += vsprintf(osc_log.strTemp, strFormat, ap);
         va_end(ap);
 
         /* Write the message to the syslog daemon. */
-        syslog(level, lcv_log.strTemp);
+        syslog(level, osc_log.strTemp);
     }
 }

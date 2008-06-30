@@ -8,33 +8,32 @@
  * corretion is disabled. This save time and memory in case no calibration
  * is required.
  * 
- * @author Samuel Zahnd
  */
 #ifndef CLB_PUB_H_
 #define CLB_PUB_H_
 
-#include "framework_error.h"
+#include "oscar_error.h"
 
 #define MAX_NR_HOTPIXEL         1000    /*!< @brief Max number of hotpixels */
 
 /*! Module-specific error codes. */
-/*enum EnLcvClbErrors
+/*enum EnOscClbErrors
  *{
- *    Exxx = LCV_CLB_ERROR_OFFSET
+ *    Exxx = OSC_CLB_ERROR_OFFSET
  *}; */
 
 
 /*! @brief The different sensor calibration modes */
-enum EnLcvClbCalibrateSlope
+enum EnOscClbCalibrateSlope
 {
     /*! @brief No slope calibration data is applied */
-    LCV_CLB_CALIBRATE_OFF,        
+    OSC_CLB_CALIBRATE_OFF,        
     /*! @brief Fix Pattern Noise (offset) */
-    LCV_CLB_CALIBRATE_FPN,    
+    OSC_CLB_CALIBRATE_FPN,    
     /*! @brief Photo Receptive Non-Uniformity (gain) */
-    LCV_CLB_CALIBRATE_PRNU,     
+    OSC_CLB_CALIBRATE_PRNU,     
     /*! @brief combined method */
-    LCV_CLB_CALIBRATE_FPN_PRNU  
+    OSC_CLB_CALIBRATE_FPN_PRNU  
 };
 
 
@@ -48,14 +47,14 @@ enum EnLcvClbCalibrateSlope
  * @param hFw Pointer to the handle of the framework.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-LCV_ERR LCVClbCreate(void *hFw);
+OSC_ERR OscClbCreate(void *hFw);
 
 /*********************************************************************//*!
  * @brief Destructor
  * 
  * @param hFw Pointer to the handle of the framework.
  *//*********************************************************************/
-void LCVClbDestroy(void *hFw);
+void OscClbDestroy(void *hFw);
 
 
 /*********************************************************************//*!
@@ -72,18 +71,18 @@ void LCVClbDestroy(void *hFw);
  * @param bHotpixel  Enable hotpixel removal
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-LCV_ERR LCVClbSetupCalibrate(
-        enum EnLcvClbCalibrateSlope calibSlope,
+OSC_ERR OscClbSetupCalibrate(
+        enum EnOscClbCalibrateSlope calibSlope,
         bool bHotpixel);
 
 /*********************************************************************//*!
  * @brief Apply image correction.
  * 
  * Image correction is usually called from the camera module in 
- * conjunction with LCVCamReadPicture postprocessing. Therefor the 
- * function can be registered with LCVCamRegisterPostProc.
+ * conjunction with OscCamReadPicture postprocessing. Therefor the 
+ * function can be registered with OscCamRegisterPostProc.
  * 
- * @see LCVClbSetupCalibrate To configure the correction methods.
+ * @see OscClbSetupCalibrate To configure the correction methods.
  * 
  * Host: No effect
  * 
@@ -94,7 +93,7 @@ LCV_ERR LCVClbSetupCalibrate(
  * @param height Height of the rectangle. 
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-LCV_ERR LCVClbApplyCorrection( uint8 *pImg,
+OSC_ERR OscClbApplyCorrection( uint8 *pImg,
         const uint16 lowX, const uint16 lowY,
         const uint16 width, const uint16 height);                
         

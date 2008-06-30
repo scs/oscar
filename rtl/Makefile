@@ -1,15 +1,14 @@
 ############################################################################
 #
-# Makefile for the Blackfin DSP runtime library Module of the LCV 
+# Makefile for the Blackfin DSP runtime library Module of the OSC 
 # Framework
 #
-# Author: Markus Berner, Samuel Zahnd
 # 
 ############################################################################
 
 # Defines for C files
-TARGET_FEATURES += -DLCV_TARGET
-HOST_FEATURES += -DLCV_HOST
+TARGET_FEATURES += -DOSC_TARGET
+HOST_FEATURES += -DOSC_HOST
 
 # Host-Compiler executables and flags
 HOST_CC = gcc 

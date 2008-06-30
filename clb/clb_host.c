@@ -3,27 +3,26 @@
  *  
  * No calibration is applied to host pictures.
  * 
- * @author Samuel Zahnd
  */
-#include "framework_intern.h"
+#include "oscar_intern.h"
 #include "clb_pub.h"
 #include "clb_priv.h"
 #include <stdlib.h>
 
 /*! @brief The dependencies of this module. */
-struct LCV_DEPENDENCY clb_deps[] = {
-        {"log", LCVLogCreate, LCVLogDestroy}
+struct OSC_DEPENDENCY clb_deps[] = {
+        {"log", OscLogCreate, OscLogDestroy}
 };
 
-struct LCV_CLB clb; /*!< @brief The clbera module singelton instance */
+struct OSC_CLB clb; /*!< @brief The clbera module singelton instance */
 
 
-LCV_ERR LCVClbCreate(void *hFw)
+OSC_ERR OscClbCreate(void *hFw)
 {
-    struct LCV_FRAMEWORK    *pFw;
-    LCV_ERR                 err;
+    struct OSC_FRAMEWORK    *pFw;
+    OSC_ERR                 err;
     
-    pFw = (struct LCV_FRAMEWORK *)hFw;
+    pFw = (struct OSC_FRAMEWORK *)hFw;
     if(pFw->clb.useCnt != 0)
     {
         pFw->clb.useCnt++;
@@ -32,9 +31,9 @@ LCV_ERR LCVClbCreate(void *hFw)
     }  
 
     /* Load the module clb_deps of this module. */
-    err = LCVLoadDependencies(pFw, 
+    err = OSCLoadDependencies(pFw, 
             clb_deps, 
-            sizeof(clb_deps)/sizeof(struct LCV_DEPENDENCY));
+            sizeof(clb_deps)/sizeof(struct OSC_DEPENDENCY));
     if(err != SUCCESS)
     {
         printf("%s: ERROR: Unable to load clb_deps! (%d)\n",
@@ -43,7 +42,7 @@ LCV_ERR LCVClbCreate(void *hFw)
         return err;
     }
         
-    memset(&clb, 0, sizeof(struct LCV_CLB));    
+    memset(&clb, 0, sizeof(struct OSC_CLB));    
 
     /* Increment the use count */
     pFw->clb.hHandle = (void*)&clb;
@@ -52,11 +51,11 @@ LCV_ERR LCVClbCreate(void *hFw)
     return SUCCESS;
 }
 
-void LCVClbDestroy(void *hFw)
+void OscClbDestroy(void *hFw)
 {
-    struct LCV_FRAMEWORK *pFw;
+    struct OSC_FRAMEWORK *pFw;
             
-    pFw = (struct LCV_FRAMEWORK *)hFw; 
+    pFw = (struct OSC_FRAMEWORK *)hFw; 
     
     /* Check if we really need to release or whether we still 
      * have users. */
@@ -66,21 +65,21 @@ void LCVClbDestroy(void *hFw)
         return;
     }
         
-    LCVUnloadDependencies(pFw, 
+    OSCUnloadDependencies(pFw, 
             clb_deps, 
-            sizeof(clb_deps)/sizeof(struct LCV_DEPENDENCY));
+            sizeof(clb_deps)/sizeof(struct OSC_DEPENDENCY));
     
-    memset(&clb, 0, sizeof(struct LCV_CLB));
+    memset(&clb, 0, sizeof(struct OSC_CLB));
 }
 
-LCV_ERR LCVClbSetupCalibrate(
-        enum EnLcvClbCalibrateSlope calibSlope,
+OSC_ERR OscClbSetupCalibrate(
+        enum EnOscClbCalibrateSlope calibSlope,
         bool bHotpixel)
 {
     return SUCCESS;
 }
 
-LCV_ERR LCVClbApplyCorrection( uint8 *pImg,
+OSC_ERR OscClbApplyCorrection( uint8 *pImg,
         const uint16 lowX, const uint16 lowY,
         const uint16 width, const uint16 height)
 {

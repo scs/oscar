@@ -1,29 +1,28 @@
 /*! @file swr_host.c
  * @brief Stimuli writer module implementation for host.
  *
- * @author Samuel Zahnd
  ************************************************************************/
 
-#include "framework_intern.h"
+#include "oscar_intern.h"
 
 #include "swr_pub.h"
 #include "swr_priv.h"
 
 #include <sim/sim_pub.h>
 
-struct LCV_SWR swr; /*!< Module singelton instance */
+struct OSC_SWR swr; /*!< Module singelton instance */
 
 /*! The dependencies of this module. */
-struct LCV_DEPENDENCY swr_deps[] = {
-        {"log", LCVLogCreate, LCVLogDestroy}
+struct OSC_DEPENDENCY swr_deps[] = {
+        {"log", OscLogCreate, OscLogDestroy}
 };
 
-LCV_ERR LCVSwrCreate(void *hFw)
+OSC_ERR OscSwrCreate(void *hFw)
 {
-    struct LCV_FRAMEWORK *pFw;
-    LCV_ERR err;
+    struct OSC_FRAMEWORK *pFw;
+    OSC_ERR err;
 
-    pFw = (struct LCV_FRAMEWORK *)hFw;
+    pFw = (struct OSC_FRAMEWORK *)hFw;
     if(pFw->swr.useCnt != 0)
     {
         pFw->swr.useCnt++;
@@ -32,9 +31,9 @@ LCV_ERR LCVSwrCreate(void *hFw)
     }
 
     /* Load the module swr_deps of this module. */
-    err = LCVLoadDependencies(pFw,
+    err = OSCLoadDependencies(pFw,
             swr_deps,
-            sizeof(swr_deps)/sizeof(struct LCV_DEPENDENCY));
+            sizeof(swr_deps)/sizeof(struct OSC_DEPENDENCY));
 
     if(err != SUCCESS)
     {
@@ -44,9 +43,9 @@ LCV_ERR LCVSwrCreate(void *hFw)
         return err;
     }
 
-    memset(&swr, 0, sizeof(struct LCV_SWR));
+    memset(&swr, 0, sizeof(struct OSC_SWR));
 
-    LCVSimRegisterCycleCallback( &LCVSwrCycleCallback);
+    OscSimRegisterCycleCallback( &OscSwrCycleCallback);
 
     /* Increment the use count */
     pFw->swr.hHandle = (void*)&swr;
@@ -55,12 +54,12 @@ LCV_ERR LCVSwrCreate(void *hFw)
     return SUCCESS;
 }
 
-void LCVSwrDestroy(void *hFw)
+void OscSwrDestroy(void *hFw)
 {
-    struct LCV_FRAMEWORK *pFw;
+    struct OSC_FRAMEWORK *pFw;
     uint16 wrId;    
 
-    pFw = (struct LCV_FRAMEWORK *)hFw;
+    pFw = (struct OSC_FRAMEWORK *)hFw;
     /* Check if we really need to release or whether we still
      * have users. */
     pFw->swr.useCnt--;
@@ -69,23 +68,23 @@ void LCVSwrDestroy(void *hFw)
         return;
     }
 
-    LCVUnloadDependencies(pFw,
+    OSCUnloadDependencies(pFw,
             swr_deps,
-            sizeof(swr_deps)/sizeof(struct LCV_DEPENDENCY));
+            sizeof(swr_deps)/sizeof(struct OSC_DEPENDENCY));
 
     /* close all files */
     for( wrId = 0; wrId<swr.nrOfWriters; wrId++)
     {
         fclose( swr.wr[ wrId].pFile);
-        LCVLog(INFO, "Close %s\n", &swr.wr[ wrId].strFile);
+        OscLog(INFO, "Close %s\n", &swr.wr[ wrId].strFile);
     }
     
     
-    memset(&swr, 0, sizeof(struct LCV_SWR));
+    memset(&swr, 0, sizeof(struct OSC_SWR));
 }
 
 
-LCV_ERR LCVSwrCreateWriter( 
+OSC_ERR OscSwrCreateWriter( 
         void** ppWriter,        
         const char* strFile, 
         const bool bReportTime,
@@ -114,23 +113,23 @@ LCV_ERR LCVSwrCreateWriter(
     swr.wr[id].bReportCyclic = bReportCyclic;
     
     strcpy(swr.wr[id].strFile, strFile);
-    LCVLog(INFO, "Open %s\n", strFile);
+    OscLog(INFO, "Open %s\n", strFile);
     
     *ppWriter = &swr.wr[ id];
 
     return SUCCESS;
 }
 
-LCV_ERR LCVSwrRegisterSignal( 
+OSC_ERR OscSwrRegisterSignal( 
         void** ppSignal,        
         const void* pWriter, 
         const char* strSignal,
-        const enum EnLcvSwrSignalType type,        
+        const enum EnOscSwrSignalType type,        
         const void* pDefaultValue,
         const char* strFormat )
 {
-    struct LCV_SWR_WRITER* pWr;
-    struct LCV_SWR_SIGNAL* pSig;
+    struct OSC_SWR_WRITER* pWr;
+    struct OSC_SWR_SIGNAL* pSig;
     uint16 id;
 
     pWr = (void*) pWriter;
@@ -167,11 +166,11 @@ LCV_ERR LCVSwrRegisterSignal(
     return SUCCESS;
 }
 
-LCV_ERR LCVSwrUpdateSignal( 
+OSC_ERR OscSwrUpdateSignal( 
         const void* pSignal, 
         const void* pValue)       
 {
-    struct LCV_SWR_SIGNAL* pSig;
+    struct OSC_SWR_SIGNAL* pSig;
     pSig = (void*) pSignal;
     
     switch( pSig->type)
@@ -188,17 +187,17 @@ LCV_ERR LCVSwrUpdateSignal(
     return SUCCESS;
 }
 
-LCV_ERR LCVSwrManualReport( const void* pWriter)
+OSC_ERR OscSwrManualReport( const void* pWriter)
 {
-    LCVSwrReport( pWriter);
+    OscSwrReport( pWriter);
     return SUCCESS;
 }
 
-void LCVSwrReport( const void* pWriter)
+void OscSwrReport( const void* pWriter)
 {
     uint16 sigId;    
-    struct LCV_SWR_WRITER* pWr;
-    struct LCV_SWR_SIGNAL* pSig;
+    struct OSC_SWR_WRITER* pWr;
+    struct OSC_SWR_SIGNAL* pSig;
     
     pWr = (void*) pWriter;
     
@@ -222,7 +221,7 @@ void LCVSwrReport( const void* pWriter)
     /* print instruction line */
     if(pWr->bReportTime)
     {    
-        fprintf( pWr->pFile, "@\t%lu\t", LCVSimGetCurTimeStep() );
+        fprintf( pWr->pFile, "@\t%lu\t", OscSimGetCurTimeStep() );
     }
     for( sigId = 0; sigId < pWr->nrOfSignals; sigId++)
     { 
@@ -246,7 +245,7 @@ void LCVSwrReport( const void* pWriter)
     fprintf( pWr->pFile, "\n");    
 }
 
-void LCVSwrCycleCallback( void)
+void OscSwrCycleCallback( void)
 {
     uint16 wrId;
 
@@ -256,7 +255,7 @@ void LCVSwrCycleCallback( void)
          * is selected */
         if( swr.wr[ wrId].bReportCyclic)
         {
-            LCVSwrReport( &swr.wr[ wrId]);            
+            OscSwrReport( &swr.wr[ wrId]);            
         }
     }
 

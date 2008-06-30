@@ -4,7 +4,6 @@
  * Used to automatically manage multi
  * buffers (e.g. double buffers).
  * 
- * @author Markus Berner
  */
 #include "cam_multibuffer.h"
 /* For defines */
@@ -19,29 +18,29 @@
  * 
  * Returns the correct buffer id to sync next and adjusts the idNextSync
  * and idNextCapture variables accordingly. Can return 
- * LCV_CAM_INVALID_BUFFER_ID if sync currently not possible.
+ * OSC_CAM_INVALID_BUFFER_ID if sync currently not possible.
  * 
- * @see LCVCamMultiBufferCapture
- * @see LCVCamMultiBufferSync
- * @see LCVCamCreateMultiBuffer
+ * @see OscCamMultiBufferCapture
+ * @see OscCamMultiBufferSync
+ * @see OscCamCreateMultiBuffer
  * 
  * @param pMB Pointer to corresponding multi buffer.
  * @param fbID Frame buffer ID to get the next from.
  * @return Buffer ID for the next capture.
  *//*********************************************************************/
-static uint8 LCVCamMultiBufferGetNext(struct LCV_CAM_MULTIBUFFER * pMB,
+static uint8 OscCamMultiBufferGetNext(struct OSC_CAM_MULTIBUFFER * pMB,
         uint8 fbID);
 
 
 /*=========================== Code =====================================*/
 
-LCV_ERR LCVCamMultiBufferCreate(struct LCV_CAM_MULTIBUFFER * pMB,
+OSC_ERR OscCamMultiBufferCreate(struct OSC_CAM_MULTIBUFFER * pMB,
         const uint8 multiBufferDepth,
         const uint8 bufferIDs[])
 {
     if(pMB->multiBufferDepth != 0)
     {
-        LCVLog(NOTICE, "%s: \
+        OscLog(NOTICE, "%s: \
                 Replacing existing multibuffer.\n",
                 __func__);
     }
@@ -53,28 +52,28 @@ LCV_ERR LCVCamMultiBufferCreate(struct LCV_CAM_MULTIBUFFER * pMB,
 
     pMB->idNextCapture = pMB->fbIDs[0];
     /* Since there was no capture yet, we have nothing to sync to */
-    pMB->idNextSync = LCV_CAM_INVALID_BUFFER_ID;
+    pMB->idNextSync = OSC_CAM_INVALID_BUFFER_ID;
 
     return SUCCESS;
 }
 
-inline LCV_ERR LCVCamMultiBufferDestroy(struct LCV_CAM_MULTIBUFFER * pMB)
+inline OSC_ERR OscCamMultiBufferDestroy(struct OSC_CAM_MULTIBUFFER * pMB)
 {
     if (pMB->multiBufferDepth == 0)
     {
-        LCVLog(WARN, "%s: Nothing to delete.\n", __func__);
+        OscLog(WARN, "%s: Nothing to delete.\n", __func__);
     }
     pMB->multiBufferDepth = 0;
     return SUCCESS;
 }
 
-static uint8 LCVCamMultiBufferGetNext(struct LCV_CAM_MULTIBUFFER * pMB,
+static uint8 OscCamMultiBufferGetNext(struct OSC_CAM_MULTIBUFFER * pMB,
         uint8 fbID)
 {
     int i;
     uint8 ret;
 
-    ret = LCV_CAM_INVALID_BUFFER_ID;
+    ret = OSC_CAM_INVALID_BUFFER_ID;
     for (i = 0; i < pMB->multiBufferDepth; i++)
     {
         if (pMB->fbIDs[i] == fbID)
@@ -91,13 +90,13 @@ static uint8 LCVCamMultiBufferGetNext(struct LCV_CAM_MULTIBUFFER * pMB,
     return ret;
 }
 
-inline uint8 LCVCamMultiBufferGetCapBuf(
-        const struct LCV_CAM_MULTIBUFFER *pMB)
+inline uint8 OscCamMultiBufferGetCapBuf(
+        const struct OSC_CAM_MULTIBUFFER *pMB)
 {
     return pMB->idNextCapture;
 }
 
-void LCVCamMultiBufferCapture(struct LCV_CAM_MULTIBUFFER *pMB)
+void OscCamMultiBufferCapture(struct OSC_CAM_MULTIBUFFER *pMB)
 {
     uint8 cur;
 
@@ -105,38 +104,38 @@ void LCVCamMultiBufferCapture(struct LCV_CAM_MULTIBUFFER *pMB)
 
     /* Find the next buffer to capture to */
     pMB->idNextCapture =
-    LCVCamMultiBufferGetNext(pMB, pMB->idNextCapture);
+    OscCamMultiBufferGetNext(pMB, pMB->idNextCapture);
 
     /* Find the next buffer to sync */
-    if(pMB->idNextSync == LCV_CAM_INVALID_BUFFER_ID)
+    if(pMB->idNextSync == OSC_CAM_INVALID_BUFFER_ID)
     {
         pMB->idNextSync = cur;
     }
     else if(pMB->idNextSync == cur)
     {
         pMB->idNextSync =
-        LCVCamMultiBufferGetNext(pMB, pMB->idNextSync);
+        OscCamMultiBufferGetNext(pMB, pMB->idNextSync);
     }
 }
 
-inline uint8 LCVCamMultiBufferGetSyncBuf(
-        const struct LCV_CAM_MULTIBUFFER *pMB)
+inline uint8 OscCamMultiBufferGetSyncBuf(
+        const struct OSC_CAM_MULTIBUFFER *pMB)
 {
     return pMB->idNextSync;
 }
 
-void LCVCamMultiBufferSync(struct LCV_CAM_MULTIBUFFER * pMB)
+void OscCamMultiBufferSync(struct OSC_CAM_MULTIBUFFER * pMB)
 {
     uint8 cur;
 
     cur = pMB->idNextSync;
 
     pMB->idNextSync =
-        LCVCamMultiBufferGetNext(pMB, pMB->idNextSync);
+        OscCamMultiBufferGetNext(pMB, pMB->idNextSync);
     
     if(pMB->idNextSync == pMB->idNextCapture)
     {
         /* We need to prevent a sync before the capture has happened */
-        pMB->idNextSync = LCV_CAM_INVALID_BUFFER_ID;
+        pMB->idNextSync = OSC_CAM_INVALID_BUFFER_ID;
     }
 }

@@ -1,7 +1,6 @@
 /*! @file sim_priv.h
  * @brief Private simulation module definition
  * 
- * @author Markus Berner
  */
 #ifndef SIM_PRIV_H_
 #define SIM_PRIV_H_
@@ -13,11 +12,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef LCV_HOST
-    #include <framework_types_host.h>
+#ifdef OSC_HOST
+    #include <oscar_types_host.h>
 #else
-    #include <framework_types_target.h>
-#endif /* LCV_HOST */
+    #include <oscar_types_target.h>
+#endif /* OSC_HOST */
 
 /*! @brief Prefix of the test image file names.
  * 
@@ -34,15 +33,15 @@
 
 
 /*! @brief The object struct of the simulation module */
-struct LCV_SIM_OBJ
+struct OSC_SIM_OBJ
 {
     /*! @brief The current timestep, i.e. image analysed */
     uint32          curTimeStep;
     /*! @brief List with Callback functions to call every cycle */
     uint16 numCycleCallback;
-#if defined(LCV_HOST) || defined(LCV_SIM)    
+#if defined(OSC_HOST) || defined(OSC_SIM)    
     void (*aryCycleCallback[ MAX_NUMBER_CALLBACK_FUNCTION])(void);
-#endif /*LCV_HOST*/    
+#endif /*OSC_HOST*/    
 };
 
 /*======================= Private methods ==============================*/

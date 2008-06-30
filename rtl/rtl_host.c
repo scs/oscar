@@ -6,27 +6,26 @@
  * other hand must not be done in the framework, since it already exists
  * in optimized form in the library.  
  * 
- * @author Samuel Zahnd, Markus Berner
  */
 
-#include "framework_types_host.h"
+#include "oscar_types_host.h"
 
 #include "rtl_pub.h"
 #include "rtl_priv.h"
-#include "framework_intern.h"
+#include "oscar_intern.h"
 #include <math.h>
 
 
 
 /*! @brief The module singelton instance.  */
-struct LCV_RTL lcv_rtl;		
+struct OSC_RTL osc_rtl;		
 
 
-LCV_ERR LCVRtlCreate(void *hFw)
+OSC_ERR OscDsplCreate(void *hFw)
 {
-    struct LCV_FRAMEWORK *pFw;
+    struct OSC_FRAMEWORK *pFw;
 
-    pFw = (struct LCV_FRAMEWORK *)hFw;
+    pFw = (struct OSC_FRAMEWORK *)hFw;
     if(pFw->rtl.useCnt != 0)
     {
         pFw->rtl.useCnt++;
@@ -34,20 +33,20 @@ LCV_ERR LCVRtlCreate(void *hFw)
         return SUCCESS;
     }    
         
-	memset(&lcv_rtl, 0, sizeof(struct LCV_RTL));
+	memset(&osc_rtl, 0, sizeof(struct OSC_RTL));
 		
     /* Increment the use count */
-    pFw->rtl.hHandle = (void*)&lcv_rtl;
+    pFw->rtl.hHandle = (void*)&osc_rtl;
     pFw->rtl.useCnt++;    
 
 	return SUCCESS;
 }
 
-void LCVRtlDestroy(void *hFw)
+void OscDsplDestroy(void *hFw)
 {
-    struct LCV_FRAMEWORK *pFw;
+    struct OSC_FRAMEWORK *pFw;
         
-    pFw = (struct LCV_FRAMEWORK *)hFw; 
+    pFw = (struct OSC_FRAMEWORK *)hFw; 
     /* Check if we really need to release or whether we still 
      * have users. */
     pFw->rtl.useCnt--;
@@ -56,15 +55,15 @@ void LCVRtlDestroy(void *hFw)
         return;
     }
 	
-	memset(&lcv_rtl, 0, sizeof(struct LCV_RTL));
+	memset(&osc_rtl, 0, sizeof(struct OSC_RTL));
 }
 
-inline float LCVRtlFr16ToFloat(fract16 n)
+inline float OscDsplFr16ToFloat(fract16 n)
 {
     return (((float)n)/FR16_SCALE);
 }
 
-inline fract16 LCVRtlFloatToFr16(float n)
+inline fract16 OscDsplFloatToFr16(float n)
 {
     float ret = (n*FR16_SCALE);
     if(ret > FR16_SAT)
@@ -72,17 +71,17 @@ inline fract16 LCVRtlFloatToFr16(float n)
     return (fract16)ret;
 }
 
-fract16 LCVRtlHigh_of_fr2x16(fract2x16 x)
+fract16 OscDsplHigh_of_fr2x16(fract2x16 x)
 {
     return (fract16)(x >> 16);
 }
 
-fract16 LCVRtlLow_of_fr2x16(fract2x16 x)
+fract16 OscDsplLow_of_fr2x16(fract2x16 x)
 {
     return (fract16)( 0xffff & x);
 }
 
-fract2x16 LCVRtlCompose_fr2x16(fract16 h, fract16 l)
+fract2x16 OscDsplCompose_fr2x16(fract16 h, fract16 l)
 {
     return (fract2x16)( (h << 16) | l );
 }
@@ -92,12 +91,12 @@ fract2x16 LCVRtlCompose_fr2x16(fract16 h, fract16 l)
  * multiplication of two fract16 numbers back to a fract16 with
  * rounding.
  * 
- * @see LCVRtlTransRfr32fr16
+ * @see OscDsplTransRfr32fr16
  * 
  * @param multfr32 Input fract32.
  * @return Compacted result.
  *//*********************************************************************/
-fract16 LCVRtlTransRfr32fr16(fract32 multfr32)
+fract16 OscDsplTransRfr32fr16(fract32 multfr32)
 {
     fract16 cutoffbits, resultfr16;
     
@@ -127,24 +126,24 @@ fract16 LCVRtlTransRfr32fr16(fract32 multfr32)
 }
 
 
-fract16 LCVRtlMultRFr16(fract16 a, fract16 b)
+fract16 OscDsplMultRFr16(fract16 a, fract16 b)
 {
     fract32 multfr32;
 
     multfr32 = (fract32) a*b;
-    return LCVRtlTransRfr32fr16(multfr32);
+    return OscDsplTransRfr32fr16(multfr32);
 }
 
 /*********************************************************************//*!
  * @brief Transform a fract32 number being the result of the
  * multiplication of two fract16 numbers back to a fract16 without
  * rounding.
- * @see LCVRtlTransRfr32fr16
+ * @see OscDsplTransRfr32fr16
  * 
  * @param multfr32 Input fract32.
  * @return Compacted result.
  *//*********************************************************************/
-fract16 LCVRtlTransfr32fr16(fract32 multfr32)
+fract16 OscDsplTransfr32fr16(fract32 multfr32)
 {
     fract16 resultfr16;
     
@@ -160,16 +159,16 @@ fract16 LCVRtlTransfr32fr16(fract32 multfr32)
 }
 
 
-fract16 LCVRtlMultFr16(fract16 a, fract16 b)
+fract16 OscDsplMultFr16(fract16 a, fract16 b)
 {
 	fract32 multfr32;
 
 	multfr32 = (fract32) a*b;
-	return LCVRtlTransfr32fr16(multfr32);
+	return OscDsplTransfr32fr16(multfr32);
 }
 
 
-fract16 LCVRtl_sin_fr16(fract16 x)
+fract16 OscDspl_sin_fr16(fract16 x)
 {
 	fract32 accufr32 = 0;
 	fract16 resultfr16,afr16,bfr16;
@@ -185,7 +184,7 @@ fract16 LCVRtl_sin_fr16(fract16 x)
 	for(i=0; i<5;i++)
 	{
 		accufr32 += (fract32)afr16 * (fract32)coef[i] << 1;
-		afr16= LCVRtlMultRFr16(afr16,bfr16);
+		afr16= OscDsplMultRFr16(afr16,bfr16);
 	}
 	if( (uint32)accufr32  > 0x3fffC000)	/* saturating */
 		resultfr16= 0x7fff;
@@ -196,7 +195,7 @@ fract16 LCVRtl_sin_fr16(fract16 x)
 	return resultfr16;
 }
 
-fract16 LCVRtl_cos_fr16(fract16 x)
+fract16 OscDspl_cos_fr16(fract16 x)
 {
 	fract32 accufr32 = 0;
 	fract16 resultfr16,afr16,bfr16;
@@ -213,7 +212,7 @@ fract16 LCVRtl_cos_fr16(fract16 x)
 	for(i=0; i<5;i++)
 	{
 		accufr32 += (fract32)afr16 * (fract32)coef[i] << 1;
-		afr16= LCVRtlMultRFr16(afr16,bfr16);
+		afr16= OscDsplMultRFr16(afr16,bfr16);
 	}
 	if( (uint32)accufr32  > 0x3fffC000)	/* saturating */
 		resultfr16= 0x7fff;
@@ -222,7 +221,7 @@ fract16 LCVRtl_cos_fr16(fract16 x)
 	return resultfr16;
 }
 
-fract16 LCVRtl_mean_fr16(const fract16 x[], int length)
+fract16 OscDspl_mean_fr16(const fract16 x[], int length)
 {
 	int i=0;
 	fract32 tmp=0;
@@ -253,7 +252,7 @@ fract16 LCVRtl_mean_fr16(const fract16 x[], int length)
    Description:  addition of two complex numbers
 
 ***************************************************************/
-complex_fract16 LCVRtl_cadd_fr16(complex_fract16 a, complex_fract16 b)
+complex_fract16 OscDspl_cadd_fr16(complex_fract16 a, complex_fract16 b)
 {
     complex_fract16 result;
     fract32 real, imag;
@@ -291,7 +290,7 @@ complex_fract16 LCVRtl_cadd_fr16(complex_fract16 a, complex_fract16 b)
    Description:  subtraction of two complex numbers
 
 *******************************************************************/
-complex_fract16 LCVRtl_csub_fr16( complex_fract16 a, complex_fract16 b)
+complex_fract16 OscDspl_csub_fr16( complex_fract16 a, complex_fract16 b)
 {
     complex_fract16 result;
     fract32 real, imag;
@@ -316,7 +315,7 @@ complex_fract16 LCVRtl_csub_fr16( complex_fract16 a, complex_fract16 b)
     return (result);
 }
 
-fract16 LCVRtlSatFr16(fract32 satfr32)
+fract16 OscDsplSatFr16(fract32 satfr32)
 {
 	fract16 resultfr16;
     if(satfr32 >= 32767)
@@ -330,7 +329,7 @@ fract16 LCVRtlSatFr16(fract32 satfr32)
 }
 
 // cdiv
-complex_fract16 LCVRtl_cdiv_fr16(complex_fract16 a, complex_fract16 b)
+complex_fract16 OscDspl_cdiv_fr16(complex_fract16 a, complex_fract16 b)
 {
 	fract32 denum, numRe, numIm;
 	complex_fract16 result;
@@ -352,8 +351,8 @@ complex_fract16 LCVRtl_cdiv_fr16(complex_fract16 a, complex_fract16 b)
 	numIm = (fract32) (a.im*b.re) - (fract32)(a.re * b.im);
 //	printf("numIm = %lx\n", numIm);
 	
-	result.re = LCVRtlSatFr16(numRe/denum);
-	result.im = LCVRtlSatFr16(numIm/denum);
+	result.re = OscDsplSatFr16(numRe/denum);
+	result.im = OscDsplSatFr16(numIm/denum);
 		
 	return result;
 
@@ -373,7 +372,7 @@ complex_fract16 LCVRtl_cdiv_fr16(complex_fract16 a, complex_fract16 b)
    Description:  multiplication of two complex numbers
 
 ******************************************************************/
-complex_fract16 LCVRtl_cmlt_fr16 ( complex_fract16 a, complex_fract16 b )
+complex_fract16 OscDspl_cmlt_fr16 ( complex_fract16 a, complex_fract16 b )
 {
     complex_fract16 result;
     fract32 real, imag;
@@ -399,7 +398,7 @@ complex_fract16 LCVRtl_cmlt_fr16 ( complex_fract16 a, complex_fract16 b )
 }
 
 
-complex_fract16 LCVRtl_conj_fr16 ( complex_fract16 a )
+complex_fract16 OscDspl_conj_fr16 ( complex_fract16 a )
 {	
   complex_fract16 c;
   
@@ -417,7 +416,7 @@ complex_fract16 LCVRtl_conj_fr16 ( complex_fract16 a )
 // Non-LGPL License is also available as part of VisualDSP++
 // from Analog Devices, Inc.
 //******************************************************************************
-void LCVRtl_twidfftrad2_fr16(complex_fract16 w[], int n )
+void OscDspl_twidfftrad2_fr16(complex_fract16 w[], int n )
 {
   int      i, idx;
   int      nquart = n/4;
@@ -440,12 +439,12 @@ void LCVRtl_twidfftrad2_fr16(complex_fract16 w[], int n )
     idx++;
 #ifdef __USE_FAST_LOOKUP__
     val[i] = (fract16) ((i*step) * 32767.0); //count up
-    w[idx].re = LCVRtl_cos_fr16(val[i]);
-    w[idx].im = -LCVRtl_sin_fr16(val[i]);
+    w[idx].re = OscDspl_cos_fr16(val[i]);
+    w[idx].im = -OscDspl_sin_fr16(val[i]);
 #else
     val = (fract16) ((i*step) * 32767.0); //count up
-    w[idx].re = LCVRtl_cos_fr16(val);
-    w[idx].im = -LCVRtl_sin_fr16(val);
+    w[idx].re = OscDspl_cos_fr16(val);
+    w[idx].im = -OscDspl_sin_fr16(val);
 #endif
   }
 
@@ -460,18 +459,18 @@ void LCVRtl_twidfftrad2_fr16(complex_fract16 w[], int n )
   {
     idx++;
 #ifdef __USE_FAST_LOOKUP__
-    w[idx].re = -LCVRtl_cos_fr16(val[nquart-i]);
+    w[idx].re = -OscDspl_cos_fr16(val[nquart-i]);
     w[idx].im = w[nquart-i].im; 
 #else
     val = (fract16) (((nquart-i)*step) * 32767.0); //count down
-    w[idx].re = -LCVRtl_cos_fr16(val);
+    w[idx].re = -OscDspl_cos_fr16(val);
     w[idx].im = w[nquart-i].im;
 #endif
   }
 }
 
 // Taken from http://www.codeproject.com/KB/recipes/howtofft.aspx
-void LCVRtlRBitrev(const fract16 in[], fract16 out[], int size)
+void OscDsplRBitrev(const fract16 in[], fract16 out[], int size)
 {
 	fract16 tmp;
 	int i,j;
@@ -497,7 +496,7 @@ void LCVRtlRBitrev(const fract16 in[], fract16 out[], int size)
     }
 }
 
-void LCVRtlCBitrev(const complex_fract16 in[],complex_fract16 out[],int size)
+void OscDsplCBitrev(const complex_fract16 in[],complex_fract16 out[],int size)
 {
 	complex_fract16 tmp;
 	int i,j;
@@ -524,7 +523,7 @@ void LCVRtlCBitrev(const complex_fract16 in[],complex_fract16 out[],int size)
 }
 
 
-int LCVRtlRDscale( fract16 butterflyfr16[], int fft_size)
+int OscDsplRDscale( fract16 butterflyfr16[], int fft_size)
 {
 	int i;
 	for(i=0; i< fft_size; i++)
@@ -536,7 +535,7 @@ int LCVRtlRDscale( fract16 butterflyfr16[], int fft_size)
 }
 
 
-int LCVRtlCDscale( complex_fract16 butterflycfr16[], int fft_size)
+int OscDsplCDscale( complex_fract16 butterflycfr16[], int fft_size)
 {
 	int i;
 	for(i=0; i< fft_size; i++)
@@ -549,7 +548,7 @@ int LCVRtlCDscale( complex_fract16 butterflycfr16[], int fft_size)
 }
 
 
-void  LCVRtl_rfft_fr16( const fract16          in[],
+void  OscDspl_rfft_fr16( const fract16          in[],
                                           complex_fract16  out[],
                                     const complex_fract16  twiddle[],
                                     int  stride,
@@ -577,13 +576,13 @@ void  LCVRtl_rfft_fr16( const fract16          in[],
 	
 	
 	/*	Bit reversing */	
-	LCVRtlRBitrev(in,bitrevfr16,fft_size);
+	OscDsplRBitrev(in,bitrevfr16,fft_size);
 	
 	/*stage 1 static scaling,no saturation 
 	 * (for more details about ASM: R6 = R2 +|+ R3, R7 = R2 -|- R3 (ASR) 
 	 * refer to manual page 708*/
 	if(scaling == 2)
-		dscale = LCVRtlRDscale(bitrevfr16,fft_size);
+		dscale = OscDsplRDscale(bitrevfr16,fft_size);
 	if(dscale || scaling == 1)
 		*block_exponent = *block_exponent + 1;
 	
@@ -591,8 +590,8 @@ void  LCVRtl_rfft_fr16( const fract16          in[],
 	{	
 		if(scaling == 3) /* no scaling */
 		{
-			butterflycfr16[i].re=LCVRtlSatFr16((fract32)(bitrevfr16[i] + bitrevfr16[i+1])); 
-			butterflycfr16[i+1].re=LCVRtlSatFr16((fract32)(bitrevfr16[i] - bitrevfr16[i+1]));
+			butterflycfr16[i].re=OscDsplSatFr16((fract32)(bitrevfr16[i] + bitrevfr16[i+1])); 
+			butterflycfr16[i+1].re=OscDsplSatFr16((fract32)(bitrevfr16[i] - bitrevfr16[i+1]));
 		}
 		else if(scaling == 2)
 		{
@@ -622,7 +621,7 @@ void  LCVRtl_rfft_fr16( const fract16          in[],
 	while(group>0)
 	{	
 		if(scaling == 2)
-			dscale = LCVRtlCDscale(butterflycfr16,fft_size);
+			dscale = OscDsplCDscale(butterflycfr16,fft_size);
 		if(dscale || scaling == 1)
 			*block_exponent = *block_exponent + 1;
 
@@ -644,15 +643,15 @@ void  LCVRtl_rfft_fr16( const fract16          in[],
 					accu0fr32=(fract32) R3.re * twiddle[twAct].re;
 					accu1fr32 += (fract32)R3.im * twiddle[twAct].re;
 					accu0fr32 -= (fract32)R3.im * twiddle[twAct].im;
-					R3.im = LCVRtlTransRfr32fr16(accu1fr32);
-					R3.re = LCVRtlTransRfr32fr16(accu0fr32);
+					R3.im = OscDsplTransRfr32fr16(accu1fr32);
+					R3.re = OscDsplTransRfr32fr16(accu0fr32);
 				}
 				if(scaling == 3) 	/* no scaling */
 				{
-					butterflycfr16[2*i*bOffset+j].re    =LCVRtlSatFr16((fract32)(R2.re + R3.re));
-					butterflycfr16[2*i*bOffset+j].im    =LCVRtlSatFr16((fract32)(R2.im + R3.im));
-					butterflycfr16[(2*i+1)*bOffset+j].re=LCVRtlSatFr16((fract32)(R2.re - R3.re));
-					butterflycfr16[(2*i+1)*bOffset+j].im=LCVRtlSatFr16((fract32)(R2.im - R3.im));				
+					butterflycfr16[2*i*bOffset+j].re    =OscDsplSatFr16((fract32)(R2.re + R3.re));
+					butterflycfr16[2*i*bOffset+j].im    =OscDsplSatFr16((fract32)(R2.im + R3.im));
+					butterflycfr16[(2*i+1)*bOffset+j].re=OscDsplSatFr16((fract32)(R2.re - R3.re));
+					butterflycfr16[(2*i+1)*bOffset+j].im=OscDsplSatFr16((fract32)(R2.im - R3.im));				
 				}
 				else if(scaling == 2)
 				{
@@ -690,7 +689,7 @@ void  LCVRtl_rfft_fr16( const fract16          in[],
 		out[i]=butterflycfr16[i];
 }
 
-void  LCVRtl_cfft_fr16( const complex_fract16   in[],
+void  OscDspl_cfft_fr16( const complex_fract16   in[],
                                           complex_fract16  out[],
                                     const complex_fract16  twiddle[],
                                     int  stride,
@@ -716,13 +715,13 @@ void  LCVRtl_cfft_fr16( const complex_fract16   in[],
 	*block_exponent = 0;
 	
 	/*	Bit reversing */	
-	LCVRtlCBitrev(in,bitrevfr16,fft_size);
+	OscDsplCBitrev(in,bitrevfr16,fft_size);
 	
 	/*stage 1 static scaling,no saturation 
 	 * (for more details about ASM: R6 = R2 +|+ R3, R7 = R2 -|- R3 (ASR) 
 	 * refer to manual page 708*/
 	if(scaling == 2)
-		dscale = LCVRtlCDscale(bitrevfr16,fft_size);
+		dscale = OscDsplCDscale(bitrevfr16,fft_size);
 	if( dscale == 1 || scaling == 1)
 		*block_exponent = *block_exponent + 1;
 
@@ -731,10 +730,10 @@ void  LCVRtl_cfft_fr16( const complex_fract16   in[],
 	{
 		if(scaling == 3 )	/* no scaling */
 		{
-			butterflycfr16[i].re  =LCVRtlSatFr16((fract32)(bitrevfr16[i].re + bitrevfr16[i+1].re));
-			butterflycfr16[i].im  =LCVRtlSatFr16((fract32)(bitrevfr16[i].im + bitrevfr16[i+1].im));
-			butterflycfr16[i+1].re=LCVRtlSatFr16((fract32)(bitrevfr16[i].re - bitrevfr16[i+1].re));
-			butterflycfr16[i+1].im=LCVRtlSatFr16((fract32)(bitrevfr16[i].im - bitrevfr16[i+1].im));
+			butterflycfr16[i].re  =OscDsplSatFr16((fract32)(bitrevfr16[i].re + bitrevfr16[i+1].re));
+			butterflycfr16[i].im  =OscDsplSatFr16((fract32)(bitrevfr16[i].im + bitrevfr16[i+1].im));
+			butterflycfr16[i+1].re=OscDsplSatFr16((fract32)(bitrevfr16[i].re - bitrevfr16[i+1].re));
+			butterflycfr16[i+1].im=OscDsplSatFr16((fract32)(bitrevfr16[i].im - bitrevfr16[i+1].im));
 		}
 		else if(scaling == 2)
 		{
@@ -772,7 +771,7 @@ void  LCVRtl_cfft_fr16( const complex_fract16   in[],
 	while(group>0)
 	{
 		if(scaling == 2)
-			dscale = LCVRtlCDscale(butterflycfr16,fft_size);
+			dscale = OscDsplCDscale(butterflycfr16,fft_size);
 		if(dscale == 1 || scaling == 1)
 			*block_exponent = *block_exponent + 1;
 		for(i=0; i< group; i++)
@@ -794,16 +793,16 @@ void  LCVRtl_cfft_fr16( const complex_fract16   in[],
 					accu0fr32=(fract32) R3.re * twiddle[twAct].re;
 					accu1fr32 += (fract32)R3.im * twiddle[twAct].re;
 					accu0fr32 -= (fract32)R3.im * twiddle[twAct].im;
-					R3.im = LCVRtlTransRfr32fr16(accu1fr32);
-					R3.re = LCVRtlTransRfr32fr16(accu0fr32);
+					R3.im = OscDsplTransRfr32fr16(accu1fr32);
+					R3.re = OscDsplTransRfr32fr16(accu0fr32);
 				}
 				
 				if(scaling == 3 )	/* no scaling */
 				{
-					butterflycfr16[2*i*bOffset+j].re    =LCVRtlSatFr16((fract32)(R2.re + R3.re));
-					butterflycfr16[2*i*bOffset+j].im    =LCVRtlSatFr16((fract32)(R2.im + R3.im));
-					butterflycfr16[(2*i+1)*bOffset+j].re=LCVRtlSatFr16((fract32)(R2.re - R3.re));
-					butterflycfr16[(2*i+1)*bOffset+j].im=LCVRtlSatFr16((fract32)(R2.im - R3.im));
+					butterflycfr16[2*i*bOffset+j].re    =OscDsplSatFr16((fract32)(R2.re + R3.re));
+					butterflycfr16[2*i*bOffset+j].im    =OscDsplSatFr16((fract32)(R2.im + R3.im));
+					butterflycfr16[(2*i+1)*bOffset+j].re=OscDsplSatFr16((fract32)(R2.re - R3.re));
+					butterflycfr16[(2*i+1)*bOffset+j].im=OscDsplSatFr16((fract32)(R2.im - R3.im));
 				}
 				else if(scaling == 2)
 				{
@@ -841,7 +840,7 @@ void  LCVRtl_cfft_fr16( const complex_fract16   in[],
 		out[i]=butterflycfr16[i];
 }
 
-void  LCVRtl_ifft_fr16( const complex_fract16   in[],
+void  OscDspl_ifft_fr16( const complex_fract16   in[],
                                           complex_fract16  out[],
                                     const complex_fract16  twiddle[],
                                     int  stride,
@@ -866,13 +865,13 @@ void  LCVRtl_ifft_fr16( const complex_fract16   in[],
 	dscale = 0; 
 	*block_exponent = 0;
 	/*	Bit reversing */	
-	LCVRtlCBitrev(in,bitrevfr16,fft_size);
+	OscDsplCBitrev(in,bitrevfr16,fft_size);
 	
 	/*stage 1 static scaling,no saturation 
 	 * (for more details about ASM: R6 = R2 +|+ R3, R7 = R2 -|- R3 (ASR) 
 	 * refer to manual page 708*/
 	if(scaling == 2)
-		dscale = LCVRtlCDscale(bitrevfr16,fft_size);
+		dscale = OscDsplCDscale(bitrevfr16,fft_size);
 	if(dscale == 1 || scaling == 1)
 		*block_exponent = *block_exponent + 1;
 
@@ -880,10 +879,10 @@ void  LCVRtl_ifft_fr16( const complex_fract16   in[],
 	{
 		if(scaling == 3)
 		{
-			butterflycfr16[i].re  =LCVRtlSatFr16((fract32)(bitrevfr16[i].re + bitrevfr16[i+1].re));
-			butterflycfr16[i].im  =LCVRtlSatFr16((fract32)(bitrevfr16[i].im + bitrevfr16[i+1].im));
-			butterflycfr16[i+1].re=LCVRtlSatFr16((fract32)(bitrevfr16[i].re - bitrevfr16[i+1].re));
-			butterflycfr16[i+1].im=LCVRtlSatFr16((fract32)(bitrevfr16[i].im - bitrevfr16[i+1].im));
+			butterflycfr16[i].re  =OscDsplSatFr16((fract32)(bitrevfr16[i].re + bitrevfr16[i+1].re));
+			butterflycfr16[i].im  =OscDsplSatFr16((fract32)(bitrevfr16[i].im + bitrevfr16[i+1].im));
+			butterflycfr16[i+1].re=OscDsplSatFr16((fract32)(bitrevfr16[i].re - bitrevfr16[i+1].re));
+			butterflycfr16[i+1].im=OscDsplSatFr16((fract32)(bitrevfr16[i].im - bitrevfr16[i+1].im));
 		}
 		else if(scaling == 2)
 		{
@@ -920,7 +919,7 @@ void  LCVRtl_ifft_fr16( const complex_fract16   in[],
 	while(group>0)
 	{
 		if(scaling == 2)
-			dscale = LCVRtlCDscale(butterflycfr16,fft_size);
+			dscale = OscDsplCDscale(butterflycfr16,fft_size);
 		if(dscale == 1 || scaling == 1)
 			*block_exponent = *block_exponent + 1;
 
@@ -942,15 +941,15 @@ void  LCVRtl_ifft_fr16( const complex_fract16   in[],
 					accu0fr32=(fract32) R3.im * twiddle[twAct].im;
 					accu1fr32 -= (fract32)R3.re * twiddle[twAct].im;
 					accu0fr32 += (fract32)R3.re * twiddle[twAct].re;
-					R3.im = LCVRtlTransRfr32fr16(accu1fr32);
-					R3.re = LCVRtlTransRfr32fr16(accu0fr32);
+					R3.im = OscDsplTransRfr32fr16(accu1fr32);
+					R3.re = OscDsplTransRfr32fr16(accu0fr32);
 				}
 				if(scaling == 3)
 				{
-					butterflycfr16[2*i*bOffset+j].re    =LCVRtlSatFr16((fract32)(R2.re + R3.re));
-					butterflycfr16[2*i*bOffset+j].im    =LCVRtlSatFr16((fract32)(R2.im + R3.im));
-					butterflycfr16[(2*i+1)*bOffset+j].re=LCVRtlSatFr16((fract32)(R2.re - R3.re));
-					butterflycfr16[(2*i+1)*bOffset+j].im=LCVRtlSatFr16((fract32)(R2.im - R3.im));
+					butterflycfr16[2*i*bOffset+j].re    =OscDsplSatFr16((fract32)(R2.re + R3.re));
+					butterflycfr16[2*i*bOffset+j].im    =OscDsplSatFr16((fract32)(R2.im + R3.im));
+					butterflycfr16[(2*i+1)*bOffset+j].re=OscDsplSatFr16((fract32)(R2.re - R3.re));
+					butterflycfr16[(2*i+1)*bOffset+j].im=OscDsplSatFr16((fract32)(R2.im - R3.im));
 				}
 				else if(scaling == 2)
 				{
@@ -988,7 +987,7 @@ void  LCVRtl_ifft_fr16( const complex_fract16   in[],
 		out[i]=butterflycfr16[i];
 }
 
-fract16 LCVRtl_vecmax_fr16(const fract16 vec[], int length)
+fract16 OscDspl_vecmax_fr16(const fract16 vec[], int length)
 {
 	fract16 max = 0x8000;
 	int i;
@@ -1004,7 +1003,7 @@ fract16 LCVRtl_vecmax_fr16(const fract16 vec[], int length)
 	return max;
 }
 
-int LCVRtl_vecmaxloc_fr16(const fract16 vec[], int length)
+int OscDspl_vecmaxloc_fr16(const fract16 vec[], int length)
 {
 	fract16 max = 0x8000;
 	int i;
@@ -1024,7 +1023,7 @@ int LCVRtl_vecmaxloc_fr16(const fract16 vec[], int length)
 	return maxLoc;
 }
 
-fract16 LCVRtl_vecmin_fr16(const fract16 vec[], int length)
+fract16 OscDspl_vecmin_fr16(const fract16 vec[], int length)
 {
 	fract16 result = 0x7fff;
 	int i;
@@ -1040,7 +1039,7 @@ fract16 LCVRtl_vecmin_fr16(const fract16 vec[], int length)
 	return result;
 }
 
-fract16 LCVRtl_vecminloc_fr16(const fract16 vec[], int length)
+fract16 OscDspl_vecminloc_fr16(const fract16 vec[], int length)
 {
 	fract16 result;
 	int i,j;
@@ -1062,7 +1061,7 @@ fract16 LCVRtl_vecminloc_fr16(const fract16 vec[], int length)
 	return j;
 }
 
-long long int LCVRtlSatFr64(long long int in)
+long long int OscDsplSatFr64(long long int in)
 {
 	long long int result;
 	if(in > (fract32)0x7FFFFFFF)
@@ -1075,7 +1074,7 @@ long long int LCVRtlSatFr64(long long int in)
 	return result;
 }
 
-fract16 LCVRtl_var_fr16(const fract16 sample[], int length)
+fract16 OscDspl_var_fr16(const fract16 sample[], int length)
 {
 	int i;
 	long long int sum64=0, sumsq64=0,sumn64=0;
@@ -1098,21 +1097,21 @@ fract16 LCVRtl_var_fr16(const fract16 sample[], int length)
 	{
 		for(i=0; i< length; i++)
 		{
-			sum64 = LCVRtlSatFr64(sum64 + sample[i]);
-			sumsq64 = LCVRtlSatFr64(sumsq64 + ((sample[i]*sample[i])>> 15)); 
+			sum64 = OscDsplSatFr64(sum64 + sample[i]);
+			sumsq64 = OscDsplSatFr64(sumsq64 + ((sample[i]*sample[i])>> 15)); 
 		}
 	}
 	
-	sumn16 = LCVRtlSatFr16((fract32)sum64/length);
+	sumn16 = OscDsplSatFr16((fract32)sum64/length);
 	sumn64 = (fract32) (sumn16);
 	sumn64 = (sumn64*sum64) >> 15;
 	
-	result = LCVRtlSatFr16(((fract32)sumsq64 - (fract32)sumn64)/(length-1));
+	result = OscDsplSatFr16(((fract32)sumsq64 - (fract32)sumn64)/(length-1));
 
 	return result;
 }
 
-void LCVRtl_histogram_fr16(	const fract16 samples[],
+void OscDspl_histogram_fr16(	const fract16 samples[],
 							int histogram[],
 							fract16 max_sample,
 							fract16 min_sample,
@@ -1150,7 +1149,7 @@ void LCVRtl_histogram_fr16(	const fract16 samples[],
 	}
 }
 
-fract16 LCVRtl_sqrt_fr16(fract16 x)
+fract16 OscDspl_sqrt_fr16(fract16 x)
 {
 	fract16 sqrtcoeff[]={0x2d41,0xd2ce,0xe7e8,0xf848,0xac7c,0x2d42,0x2d31,0xea5d,0x1021,0xf89e};
 	fract32 add32;
@@ -1199,7 +1198,7 @@ fract16 LCVRtl_sqrt_fr16(fract16 x)
 	for(i=icp;i<m; i++)
 	{
 		add32 += (fract32)xcp* (fract32)sqrtcoeff[i] << 1;
-		xcp = LCVRtlMultRFr16(x,xcp);
+		xcp = OscDsplMultRFr16(x,xcp);
 	}
 	
 	result = (fract16) (add32>>15) ;
@@ -1208,7 +1207,7 @@ fract16 LCVRtl_sqrt_fr16(fract16 x)
 	return result;
 }
 
-fract16 LCVRtl_cabs_fr16(complex_fract16 c)
+fract16 OscDspl_cabs_fr16(complex_fract16 c)
 {
 	fract16 result=0,div16;
 	fract32 mult32;
@@ -1247,30 +1246,30 @@ fract16 LCVRtl_cabs_fr16(complex_fract16 c)
 			return 0x7fff;
 		else
 		{
-			result = LCVRtlMultRFr16(0x5a82,ccp.re) << 1; /* Result = (1.414 * real) * 2 */
+			result = OscDsplMultRFr16(0x5a82,ccp.re) << 1; /* Result = (1.414 * real) * 2 */
 			return result;
 		}
 	}
 	
 	if(ccp.re >= ccp.im)
 	{
-		div16 = LCVRtlSatFr16(((((fract32)ccp.im) << 16)/(fract32)ccp.re)>>1);
+		div16 = OscDsplSatFr16(((((fract32)ccp.im) << 16)/(fract32)ccp.re)>>1);
 		mult32 = ((fract32) div16 * div16) << 1;
 		div16 = (fract16)(mult32 >> 0x12);
 		div16 += 0x2000;
-		div16 = LCVRtl_sqrt_fr16(div16);
+		div16 = OscDspl_sqrt_fr16(div16);
 		mult32 = ((fract32) ccp.re*div16) >> 14;
-		result = LCVRtlSatFr16(mult32);
+		result = OscDsplSatFr16(mult32);
 	}
 	else
 	{
-		div16 = LCVRtlSatFr16(((((fract32)ccp.re) << 16)/(fract32)ccp.im)>>1);
+		div16 = OscDsplSatFr16(((((fract32)ccp.re) << 16)/(fract32)ccp.im)>>1);
 		mult32 = ((fract32) div16 * div16) << 1;
 		div16 = (fract16)(mult32 >> 0x12);
 		div16 += 0x2000;
-		div16 = LCVRtl_sqrt_fr16(div16);
+		div16 = OscDspl_sqrt_fr16(div16);
 		mult32 = ((fract32) ccp.im*div16) >> 14;
-		result = LCVRtlSatFr16(mult32);
+		result = OscDsplSatFr16(mult32);
 	}
 	return result;
 }

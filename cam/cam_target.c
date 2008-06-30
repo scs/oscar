@@ -1,36 +1,35 @@
 /*! @file cam_target.c
  * @brief Camera module implementation for target
  
- * On the LCV-specific hardware featuring 
+ * On the OSC-specific hardware featuring 
  * a Micron MT9V032 CMOS image sensor.
  * 
- * @author Markus Berner, Samuel Zahnd
  */
 
-#include "framework_types_target.h"
+#include "oscar_types_target.h"
 
 #include "cam_pub.h"
 #include "cam_priv.h"
-#include "framework_intern.h"
+#include "oscar_intern.h"
 #include <sys/ioctl.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <errno.h>
 
 /*! @brief The dependencies of this module. */
-struct LCV_DEPENDENCY cam_deps[] = {
-        {"log", LCVLogCreate, LCVLogDestroy}
+struct OSC_DEPENDENCY cam_deps[] = {
+        {"log", OscLogCreate, OscLogDestroy}
 };
 
-struct LCV_CAM cam; /*!< @brief The camera module singelton instance */
+struct OSC_CAM cam; /*!< @brief The camera module singelton instance */
 
-LCV_ERR LCVCamCreate(void *hFw)
+OSC_ERR OscCamCreate(void *hFw)
 {
-    struct LCV_FRAMEWORK    *pFw;
-    LCV_ERR                 err;
+    struct OSC_FRAMEWORK    *pFw;
+    OSC_ERR                 err;
     uint16                  dummy;
     
-    pFw = (struct LCV_FRAMEWORK *)hFw;
+    pFw = (struct OSC_FRAMEWORK *)hFw;
     if(pFw->cam.useCnt != 0)
     {
         pFw->cam.useCnt++;
@@ -39,9 +38,9 @@ LCV_ERR LCVCamCreate(void *hFw)
     }  
 	
     /* Load the module cam_deps of this module. */
-    err = LCVLoadDependencies(pFw, 
+    err = OSCLoadDependencies(pFw, 
             cam_deps, 
-            sizeof(cam_deps)/sizeof(struct LCV_DEPENDENCY));
+            sizeof(cam_deps)/sizeof(struct OSC_DEPENDENCY));
     if(err != SUCCESS)
     {
         printf("%s: ERROR: Unable to load cam_deps! (%d)\n",
@@ -50,7 +49,7 @@ LCV_ERR LCVCamCreate(void *hFw)
         return err;
     }
         
-    memset(&cam, 0, sizeof(struct LCV_CAM));
+    memset(&cam, 0, sizeof(struct OSC_CAM));
 	/* Open the video device file.
 	 * We will be communicating with the camera driver by issuing
 	 * IOCTLs over this file descriptor. */
@@ -67,12 +66,12 @@ LCV_ERR LCVCamCreate(void *hFw)
 	
 	/* Read the current camera register values and build a model of the
 	 * current state from them. */
-	err = LCVCamGetShutterWidth(&cam.curExpTime);
-	err |= LCVCamGetRegisterValue(CAM_REG_HORIZ_BLANK, 
+	err = OscCamGetShutterWidth(&cam.curExpTime);
+	err |= OscCamGetRegisterValue(CAM_REG_HORIZ_BLANK, 
 	        &cam.curHorizBlank);
 	/* Read back the area of interest to implicitely update 
 	 * cam.curCamRowClks. */
-	err |= LCVCamGetAreaOfInterest(&dummy,
+	err |= OscCamGetAreaOfInterest(&dummy,
 	        &dummy,
 	        &dummy,
 	        &dummy);
@@ -90,11 +89,11 @@ LCV_ERR LCVCamCreate(void *hFw)
 	return SUCCESS;
 }
 
-void LCVCamDestroy(void *hFw)
+void OscCamDestroy(void *hFw)
 {
-    struct LCV_FRAMEWORK *pFw;
+    struct OSC_FRAMEWORK *pFw;
                 
-    pFw = (struct LCV_FRAMEWORK *)hFw; 
+    pFw = (struct OSC_FRAMEWORK *)hFw; 
 
     /* Check if we really need to release or whether we still 
      * have users. */
@@ -104,21 +103,21 @@ void LCVCamDestroy(void *hFw)
         return;
     }
   
-    LCVUnloadDependencies(pFw, 
+    OSCUnloadDependencies(pFw, 
             cam_deps, 
-            sizeof(cam_deps)/sizeof(struct LCV_DEPENDENCY));
+            sizeof(cam_deps)/sizeof(struct OSC_DEPENDENCY));
     
 	close(cam.vidDev);
-	memset(&cam, 0, sizeof(struct LCV_CAM));
+	memset(&cam, 0, sizeof(struct OSC_CAM));
 }
 
-LCV_ERR LCVCamSetFileNameReader(void* hReaderHandle)
+OSC_ERR OscCamSetFileNameReader(void* hReaderHandle)
 {
     /* Stump implementation on target platform. */
     return SUCCESS;
 }
 
-LCV_ERR LCVCamSetAreaOfInterest(const uint16 lowX, 
+OSC_ERR OscCamSetAreaOfInterest(const uint16 lowX, 
 								const uint16 lowY,
 								const uint16 width, 
 								const uint16 height)
@@ -132,7 +131,7 @@ LCV_ERR LCVCamSetAreaOfInterest(const uint16 lowX,
 	        lowX + width > MAX_IMAGE_WIDTH ||
 	        lowY + height > MAX_IMAGE_HEIGHT)
 	{
-	    LCVLog(ERROR,
+	    OscLog(ERROR,
 	            "%s: Invalid parameter (%dx%d at %d/%d). "
 	            "Must fit %dx%d and width must be even\n",
 	            __func__,
@@ -180,7 +179,7 @@ LCV_ERR LCVCamSetAreaOfInterest(const uint16 lowX,
 	ret = ioctl(cam.vidDev, CAM_SWINDOW, &cam.capWin);
 	if(unlikely(ret < 0))
 	{
-		LCVLog(ERROR, 
+		OscLog(ERROR, 
 				"%s: Unable to set capture window: \
 		        IOCTL failed with %d.\n", 
 				__func__, errno);
@@ -188,7 +187,7 @@ LCV_ERR LCVCamSetAreaOfInterest(const uint16 lowX,
 		/* An error has occured */
 		if(errno == -EINVAL) /* Invalid parameter */
 		{
-		    LCVLog(ERROR, "%s(%u, %u, %u, %u): Invalid parameter!\n",
+		    OscLog(ERROR, "%s(%u, %u, %u, %u): Invalid parameter!\n",
 		            __func__, lowX, lowY, width, height);
 			return -EINVALID_PARAMETER;
 		}
@@ -206,9 +205,9 @@ LCV_ERR LCVCamSetAreaOfInterest(const uint16 lowX,
     
     /* Recalculate and set the shutter width, since it changes when
      * changing the area of interest. */
-    LCVCamSetShutterWidth(cam.curExpTime);
+    OscCamSetShutterWidth(cam.curExpTime);
     
-	LCVLog(DEBUG, "%s: Area of interest set to %dx%d at %d/%d.\n",
+	OscLog(DEBUG, "%s: Area of interest set to %dx%d at %d/%d.\n",
 	        __func__,
 	        capWinNotMirror.width,
 	        capWinNotMirror.height,
@@ -218,7 +217,7 @@ LCV_ERR LCVCamSetAreaOfInterest(const uint16 lowX,
 	return SUCCESS;
 }
 
-LCV_ERR LCVCamSetRegisterValue(const uint32 reg, const uint16 value)
+OSC_ERR OscCamSetRegisterValue(const uint32 reg, const uint16 value)
 {
 	int 				ret;
 	struct reg_info 	reg_info;
@@ -231,7 +230,7 @@ LCV_ERR LCVCamSetRegisterValue(const uint32 reg, const uint16 value)
 	ret = ioctl(cam.vidDev, CAM_SCAMREG, &reg_info);
 	if(unlikely(ret < 0))
 	{
-		LCVLog(ERROR, 
+		OscLog(ERROR, 
 				"%s: Unable to set register 0x%x to 0x%x: \
 				IOCTL failed with %d.\n", 
 				__func__, reg, value, errno);
@@ -239,7 +238,7 @@ LCV_ERR LCVCamSetRegisterValue(const uint32 reg, const uint16 value)
 		/* An error has occured */
 		if(errno == -EINVAL) /* Invalid parameter */
 		{
-		    LCVLog(ERROR, "%s(%u, %u): Invalid parameter!\n",
+		    OscLog(ERROR, "%s(%u, %u): Invalid parameter!\n",
 		            __func__, reg, value);
 			return -EINVALID_PARAMETER;
 		}
@@ -248,7 +247,7 @@ LCV_ERR LCVCamSetRegisterValue(const uint32 reg, const uint16 value)
 	return SUCCESS;
 }
 
-LCV_ERR LCVCamGetRegisterValue(const uint32 reg, uint16 *pResult)
+OSC_ERR OscCamGetRegisterValue(const uint32 reg, uint16 *pResult)
 {
 	int 				ret;
 	struct 	reg_info 	reg_info;
@@ -267,7 +266,7 @@ LCV_ERR LCVCamGetRegisterValue(const uint32 reg, uint16 *pResult)
 	ret = ioctl(cam.vidDev, CAM_GCAMREG, &reg_info);
 	if(unlikely(ret < 0))
 	{
-		LCVLog(ERROR, 
+		OscLog(ERROR, 
 				"%s: Unable to get register 0x%x: \
 				IOCTL failed with %d.\n", 
 				__func__, reg, errno);
@@ -275,7 +274,7 @@ LCV_ERR LCVCamGetRegisterValue(const uint32 reg, uint16 *pResult)
 		/* An error has occured */
 		if(errno == -EINVAL) /* Invalid parameter */
 		{
-		    LCVLog(ERROR, "%s(%u, 0x%x): Invalid parameter!\n",
+		    OscLog(ERROR, "%s(%u, 0x%x): Invalid parameter!\n",
 		            __func__, reg, pResult);
 			return -EINVALID_PARAMETER;
 		}
@@ -285,7 +284,7 @@ LCV_ERR LCVCamGetRegisterValue(const uint32 reg, uint16 *pResult)
 	return SUCCESS;
 }
 
-LCV_ERR LCVCamSetFrameBuffer(const uint8 fbID,
+OSC_ERR OscCamSetFrameBuffer(const uint8 fbID,
 		const uint32 uSize,
 		const void * pData,
 		const int bCached)
@@ -298,7 +297,7 @@ LCV_ERR LCVCamSetFrameBuffer(const uint8 fbID,
 	if(unlikely(fbID > MAX_NR_FRAME_BUFFERS || 
 			(pData == NULL && uSize != 0)))
 	{
-		LCVLog(ERROR, 
+		OscLog(ERROR, 
 				"%s(%d, %d, 0x%x, %d): \
 				Invalid parameter.\n",
 				__func__, fbID, uSize, pData, bCached);
@@ -316,7 +315,7 @@ LCV_ERR LCVCamSetFrameBuffer(const uint8 fbID,
 	
 	if(unlikely(pData == NULL))
 	{
-	    LCVLog(INFO, "%s: Deleting frame buffer number %d.\n", 
+	    OscLog(INFO, "%s: Deleting frame buffer number %d.\n", 
 	            __func__, fbID);
 	    /* Check whether the deleted frame buffer belongs to a multi
 	     * buffer. */
@@ -324,7 +323,7 @@ LCV_ERR LCVCamSetFrameBuffer(const uint8 fbID,
 	    {
 	        if(cam.multiBuffer.fbIDs[i] == fbID)
 	        {
-	            LCVLog(ERROR, 
+	            OscLog(ERROR, 
 	                    "%s Deleting frame buffer %d being part of \
 	                    a multi buffer!.\n", 
 	                    __func__, fbID);
@@ -336,7 +335,7 @@ LCV_ERR LCVCamSetFrameBuffer(const uint8 fbID,
 	ret = ioctl(cam.vidDev, CAM_SFRAMEBUF, &fb);
 	if(unlikely(ret < 0))
 	{
-		LCVLog(ERROR, 
+		OscLog(ERROR, 
 				"%s: Unable to set framebuffer %d: \
 				IOCTL failed with %d.\n", 
 				__func__, fbID, errno);
@@ -344,18 +343,18 @@ LCV_ERR LCVCamSetFrameBuffer(const uint8 fbID,
 		switch(errno)
 		{
 		case EINVAL:  /* Invalid parameter */
-		    LCVLog(ERROR, "%s(%u, %u, 0x%x, %d): Invalid parameter!\n",
+		    OscLog(ERROR, "%s(%u, %u, 0x%x, %d): Invalid parameter!\n",
 		            __func__, fbID, uSize, pData, bCached);
 		    return -EINVALID_PARAMETER;
 		    break;
 		case EBUSY:
-		    LCVLog(ERROR,
+		    OscLog(ERROR,
 		            "%s: Camera device is busy.\n",
 		            __func__);
 		    return -EDEVICE_BUSY;
 		    break;
 		default:
-		    LCVLog(ERROR, "%s: IOCTL Error \"%s\" (%d)\n",
+		    OscLog(ERROR, "%s: IOCTL Error \"%s\" (%d)\n",
 		               __func__, strerror(errno), errno);
 		    return -EDEVICE;
 		}
@@ -367,14 +366,14 @@ LCV_ERR LCVCamSetFrameBuffer(const uint8 fbID,
 	return SUCCESS;
 }
 
-LCV_ERR LCVCamSetupCapture(uint8 fbID, 
-		const enum EnLcvCamTriggerMode tMode)
+OSC_ERR OscCamSetupCapture(uint8 fbID, 
+		const enum EnOscCamTriggerMode tMode)
 {
 	struct capture_param   cp;
 	int                    ret;
 	uint8                  fb;
 	
-	if(unlikely((fbID != LCV_CAM_MULTI_BUFFER) && 
+	if(unlikely((fbID != OSC_CAM_MULTI_BUFFER) && 
 	        (fbID > MAX_NR_FRAME_BUFFERS)))
 	{
 		return -EINVALID_PARAMETER;
@@ -382,17 +381,17 @@ LCV_ERR LCVCamSetupCapture(uint8 fbID,
 	
 	if(unlikely(cam.capWin.width == 0 || cam.capWin.height == 0))
 	{
-	    LCVLog(ERROR, "%s: No area of interest set!\n",
+	    OscLog(ERROR, "%s: No area of interest set!\n",
 	            __func__);
 	    return -ENO_AREA_OF_INTEREST_SET;
 	}
 	
 	switch(tMode)
 	{
-	case LCV_CAM_TRIGGER_MODE_EXTERNAL:
+	case OSC_CAM_TRIGGER_MODE_EXTERNAL:
 		cp.trigger_mode = TRIGGER_MODE_EXTERNAL;
 		break;
-	case LCV_CAM_TRIGGER_MODE_MANUAL:
+	case OSC_CAM_TRIGGER_MODE_MANUAL:
 		cp.trigger_mode = TRIGGER_MODE_MANUAL;
 		break;
 	default:
@@ -402,15 +401,15 @@ LCV_ERR LCVCamSetupCapture(uint8 fbID,
 	/* If the caller is using automatic multibuffer management,
 	 * get the correct frame buffer. */
 	fb = fbID;
-	if(fbID == LCV_CAM_MULTI_BUFFER)
+	if(fbID == OSC_CAM_MULTI_BUFFER)
 	{
 	    /* Get the buffer ID to write to next */
-	    fb = LCVCamMultiBufferGetCapBuf(&cam.multiBuffer);
+	    fb = OscCamMultiBufferGetCapBuf(&cam.multiBuffer);
 	}
 	cp.frame_buffer = fb;	
 	cp.window = cam.capWin;
 	
-	LCVLog(DEBUG, 
+	OscLog(DEBUG, 
 	            "%s: Setting up capture of %ux%d picture " \
 	            "on frame buffer %d.\n",
 	            __func__, cam.capWin.width, cam.capWin.height, fb);
@@ -418,7 +417,7 @@ LCV_ERR LCVCamSetupCapture(uint8 fbID,
 	ret = ioctl(cam.vidDev, CAM_CCAPTURE, &cp);
 	if(unlikely(ret < 0))
 	{
-		LCVLog(ERROR, 
+		OscLog(ERROR, 
 				"%s: Unable to set up capture on framebuffer %d: \
 				IOCTL failed with %d.\n", 
 				__func__, fb, errno);
@@ -426,18 +425,18 @@ LCV_ERR LCVCamSetupCapture(uint8 fbID,
         switch(errno)
         {
         case EINVAL:  /* Invalid parameter */
-            LCVLog(ERROR, "%s(%u, %d): Invalid parameter!\n",
+            OscLog(ERROR, "%s(%u, %d): Invalid parameter!\n",
                     __func__, fbID, tMode);
             return -EINVALID_PARAMETER;
             break;
         case EBUSY:
-            LCVLog(ERROR,
+            OscLog(ERROR,
                     "%s: Camera device is busy.\n",
                     __func__);
             return -EDEVICE_BUSY;
             break;
         default:
-            LCVLog(ERROR, "%s: IOCTL Error \"%s\" (%d)\n",
+            OscLog(ERROR, "%s: IOCTL Error \"%s\" (%d)\n",
                   __func__, strerror(errno), errno);
             return -EDEVICE;
         }
@@ -445,23 +444,23 @@ LCV_ERR LCVCamSetupCapture(uint8 fbID,
 	
 	/* The operation was successful */
 	
-    if(fbID == LCV_CAM_MULTI_BUFFER)
+    if(fbID == OSC_CAM_MULTI_BUFFER)
     {
         /* Allow the multi buffer to update is status according to this
          * successful capture. */
-        LCVCamMultiBufferCapture(&cam.multiBuffer);
+        OscCamMultiBufferCapture(&cam.multiBuffer);
     }
 	return SUCCESS;
 }
 
-LCV_ERR LCVCamCancelCapture()
+OSC_ERR OscCamCancelCapture()
 {
 	int ret;
 	
 	ret = ioctl(cam.vidDev, CAM_CABORTCAPT, 0);
 	if(unlikely(ret < 0))
 	{
-		LCVLog(ERROR, 
+		OscLog(ERROR, 
 				"%s: Unable to cancel capture: \
 				IOCTL failed with %d.\n", 
 				__func__, errno);
@@ -469,7 +468,7 @@ LCV_ERR LCVCamCancelCapture()
 		/* An error has occured */
 		if(errno == -ENOENT) /* Picture already finished */
 		{
-			LCVLog(WARN, "%s: Cancel request when no picture \
+			OscLog(WARN, "%s: Cancel request when no picture \
 					transfer to cancel.\n",
 					__func__);
 			return -ENOTHING_TO_ABORT;
@@ -479,24 +478,24 @@ LCV_ERR LCVCamCancelCapture()
 	return SUCCESS;
 }
 
-LCV_ERR LCVCamReadPicture(const uint8 fbID, 
+OSC_ERR OscCamReadPicture(const uint8 fbID, 
 		void ** ppPic, 
 		const uint16 maxAge,
 		const uint16 timeout)
 {
 	struct sync_param 	sp;
 	int 				ret;
-	LCV_ERR				err = SUCCESS;
+	OSC_ERR				err = SUCCESS;
 	uint8               fb;
 	
 	/* If the caller is using automatic multibuffer management,
 	 * get the correct frame buffer. */
 	fb = fbID;
-	if(fb == LCV_CAM_MULTI_BUFFER)
+	if(fb == OSC_CAM_MULTI_BUFFER)
 	{
 	    /* Get the correct buffer ID */
-	    fb = LCVCamMultiBufferGetSyncBuf(&cam.multiBuffer);
-	    if(fb == LCV_CAM_INVALID_BUFFER_ID)
+	    fb = OscCamMultiBufferGetSyncBuf(&cam.multiBuffer);
+	    if(fb == OSC_CAM_INVALID_BUFFER_ID)
 	    {
 	        return -ENO_CAPTURE_STARTED;
 	    }
@@ -515,7 +514,7 @@ LCV_ERR LCVCamReadPicture(const uint8 fbID,
 	sp.max_age = maxAge;
 	sp.timeout = timeout;
 	
-	LCVLog(DEBUG, 
+	OscLog(DEBUG, 
 	        "%s(%u, 0x%x, %u, %u): Syncing capture on frame buffer %d.\n",
 	        __func__, fbID, ppPic, maxAge, timeout, fb);
 	ret = ioctl(cam.vidDev, CAM_CSYNC, &sp);
@@ -524,24 +523,24 @@ LCV_ERR LCVCamReadPicture(const uint8 fbID,
 		switch(errno)
 		{
 		case EINVAL: /* Invalid parameter */
-		    LCVLog(ERROR, "%s(%u, 0x%x, %u, %u): Invalid parameter!\n",
+		    OscLog(ERROR, "%s(%u, 0x%x, %u, %u): Invalid parameter!\n",
 		            __func__, fb, ppPic, maxAge, timeout);
 			return -EINVALID_PARAMETER;
 			break;
 		case EAGAIN: /* Timeout */
 		case EINTR: /* Interrupt */
-			LCVLog(DEBUG, "%s: Sync on frame buffer %d timed out.\n", 
+			OscLog(DEBUG, "%s: Sync on frame buffer %d timed out.\n", 
 			        __func__, fb);
 			return -ETIMEOUT;
 			break;
 		case ERANGE: /* Too old */
-			LCVLog(DEBUG, 
+			OscLog(DEBUG, 
 			        "%s: Sync on frame buffer %d returned too late.\n", 
 					__func__, fbID);
 			err = -EPICTURE_TOO_OLD;
 			break; /* User may still want picture */	
 		default:
-		    LCVLog(ERROR, "%s: IOCTL Error \"%s\" (%d)\n",
+		    OscLog(ERROR, "%s: IOCTL Error \"%s\" (%d)\n",
 		            __func__, strerror(errno), errno);
 			return -EDEVICE;		
 		}
@@ -562,16 +561,16 @@ LCV_ERR LCVCamReadPicture(const uint8 fbID,
 
 	
     /* The operation was successful */
-    if(fbID == LCV_CAM_MULTI_BUFFER)
+    if(fbID == OSC_CAM_MULTI_BUFFER)
     {
         /* Allow the multi buffer to update is status according to this
          * successful read. */
-        LCVCamMultiBufferSync(&cam.multiBuffer);
+        OscCamMultiBufferSync(&cam.multiBuffer);
     }	
 	return err;
 }
 
-LCV_ERR LCVCamReadLatestPicture(uint8 ** ppPic)
+OSC_ERR OscCamReadLatestPicture(uint8 ** ppPic)
 {
 	struct image_info image_info;
 	int ret;
@@ -587,7 +586,7 @@ LCV_ERR LCVCamReadLatestPicture(uint8 ** ppPic)
 	ret = ioctl(cam.vidDev, CAM_GLASTFRAME, &image_info);
 	if(unlikely(ret < 0))
 	{
-		LCVLog(ERROR, 
+		OscLog(ERROR, 
 				"%s: Unable to get last frame: \
 				IOCTL failed with %d.\n", 
 				__func__, errno);
@@ -598,12 +597,12 @@ LCV_ERR LCVCamReadLatestPicture(uint8 ** ppPic)
 		    return -EINVALID_PARAMETER;
 		    break;
 		case ENOENT:
-		    LCVLog(ERROR, "%s: No matching picture found.\n",
+		    OscLog(ERROR, "%s: No matching picture found.\n",
 		            __func__);
 		    return -ENO_MATCHING_PICTURE;
 		    break;
 		default:
-		    LCVLog(ERROR, "%s: IOCTL Error \"%s\" (%d)\n",
+		    OscLog(ERROR, "%s: IOCTL Error \"%s\" (%d)\n",
 		            __func__, strerror(errno), errno);
 		    return -EIO;
 		}
@@ -612,7 +611,7 @@ LCV_ERR LCVCamReadLatestPicture(uint8 ** ppPic)
 	return SUCCESS;
 }
 
-LCV_ERR LCVCamRegisterCorretionCallback( 
+OSC_ERR OscCamRegisterCorretionCallback( 
         int (*pCallback)(
                 uint8 *pImg, 
                 const uint16 lowX, 

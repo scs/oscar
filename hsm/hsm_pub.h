@@ -1,27 +1,26 @@
 /*! @file hsm_pub.h
  * @brief API definition for Hierarchical State Machine module
  * 
- * @author Samuel Zahnd
  ************************************************************************/
 #ifndef HSM_PUB_H_
 #define HSM_PUB_H_
 
-#include "framework_error.h"
-#ifdef LCV_HOST
-    #include "framework_types_host.h"
-    #include "framework_host.h"
+#include "oscar_error.h"
+#ifdef OSC_HOST
+    #include "oscar_types_host.h"
+    #include "oscar_host.h"
 #else
-    #include "framework_types_target.h"
-    #include "framework_target.h"
-#endif /* LCV_HOST */
+    #include "oscar_types_target.h"
+    #include "oscar_target.h"
+#endif /* OSC_HOST */
 
 /*! Module-specific error codes.
  * These are enumerated with the offset
  * assigned to each module, so a distinction over
  * all modules can be made */
-enum EnLcvHsmErrors
+enum EnOscHsmErrors
 {
-    EHSM_PARSING_FAILURE = LCV_HSM_ERROR_OFFSET
+    EHSM_PARSING_FAILURE = OSC_HSM_ERROR_OFFSET
 };
 
 #define START_EVT ((Event)(-1))     /*!< @brief Predefined Start event */
@@ -138,14 +137,14 @@ void HsmOnEvent(Hsm *me, Msg const *msg);
  * @param hFw Pointer to the handle of the framework.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-LCV_ERR LCVHsmCreate(void *hFw);
+OSC_ERR OscHsmCreate(void *hFw);
 
 /*********************************************************************//*!
  * @brief Destructor
  * 
  * @param hFw Pointer to the handle of the framework.
  *//*********************************************************************/
-void LCVHsmDestroy(void *hFw);
+void OscHsmDestroy(void *hFw);
 
 
 

@@ -1,7 +1,6 @@
 /*! @file swr_priv.h
  * @brief Private stimuli writer module definition
  *
- * @author Samuel Zahnd
  ************************************************************************/
 #ifndef SWR_PRIV_H_
 #define SWR_PRIV_H_
@@ -11,14 +10,14 @@
 
 #include <log/log_pub.h>
 
-#ifdef LCV_HOST
-#include <framework_types_host.h>
+#ifdef OSC_HOST
+#include <oscar_types_host.h>
 #else
-#include <framework_types_target.h>
-#endif /* LCV_HOST */
+#include <oscar_types_target.h>
+#endif /* OSC_HOST */
 
 
-#if defined(LCV_HOST) || defined(LCV_SIM)
+#if defined(OSC_HOST) || defined(OSC_SIM)
 /*! @brief Limited number of writer instances */
 #define MAX_NR_WRITER   			10
 /*! @brief Limited number of signal instances per writer */
@@ -28,7 +27,7 @@
 #define MAX_LENGTH_STRING_VALUE    200
 
 /*!@brief Union for signal value (function argument)*/
-union uLCV_SWR_VALUE
+union uOSC_SWR_VALUE
 {
     int32 nValue;    /*!< @brief Integer coded value */
     float fValue;    /*!< @brief Float coded value */
@@ -36,16 +35,16 @@ union uLCV_SWR_VALUE
 };
 
 /*!@brief Signal object struct */
-struct LCV_SWR_SIGNAL
+struct OSC_SWR_SIGNAL
 {
     char* strName;	/*!< @brief Signal name for stimuli file report*/
-    enum EnLcvSwrSignalType type; /*!< @brief Signal value type*/
-    union uLCV_SWR_VALUE value;	/*!< @brief Signal value */
+    enum EnOscSwrSignalType type; /*!< @brief Signal value type*/
+    union uOSC_SWR_VALUE value;	/*!< @brief Signal value */
     char strFormat[20]; /*!< @brief logging format string */
 };
 
 /*!@brief Writer object struct */
-struct LCV_SWR_WRITER
+struct OSC_SWR_WRITER
 {
     FILE* pFile;              /*!< @brief Handle to writer file */
     char strFile[64];
@@ -54,26 +53,26 @@ struct LCV_SWR_WRITER
     bool bReportTime;
     bool bReportCyclic;   
     /*! @brief Signal instance array*/
-    struct LCV_SWR_SIGNAL sig[ MAX_NR_SIGNAL_PER_WRITER];
+    struct OSC_SWR_SIGNAL sig[ MAX_NR_SIGNAL_PER_WRITER];
 };
-#endif /* LCV_HOST or LCV_SIM*/
+#endif /* OSC_HOST or OSC_SIM*/
 
 /*!@brief Stimuli writer module object struct */
-struct LCV_SWR
+struct OSC_SWR
 {
     uint16 nrOfWriters;		/*!< @brief Number of managed writers */
     /*! @brief Writer instance array */
-    #if defined(LCV_HOST) || defined(LCV_SIM)
+    #if defined(OSC_HOST) || defined(OSC_SIM)
     /*! @brief Array of managed writers */
-    struct LCV_SWR_WRITER wr[ MAX_NR_WRITER];
+    struct OSC_SWR_WRITER wr[ MAX_NR_WRITER];
     #endif
 };
 
-#if defined(LCV_HOST) || defined(LCV_SIM)
+#if defined(OSC_HOST) || defined(OSC_SIM)
 /*! @brief Fuction */
-void LCVSwrCycleCallback( void);
-void LCVSwrReport( const void* pWriter);
-#endif /*LCV_HOST or LCV_SIM*/
+void OscSwrCycleCallback( void);
+void OscSwrReport( const void* pWriter);
+#endif /*OSC_HOST or OSC_SIM*/
 
 
 #endif /* SWR_PRIV_H_ */

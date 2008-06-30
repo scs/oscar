@@ -1,7 +1,6 @@
 /*! @file clb_priv.h
  * @brief Private calibration module definitions
  * 
- * @author Samuel Zahnd
  */
 #ifndef CLB_PRIV_H_
 #define CLB_PRIV_H_
@@ -11,11 +10,11 @@
 
 #include <log/log_pub.h>
 
-#ifdef LCV_HOST
-#include <framework_types_host.h>
+#ifdef OSC_HOST
+#include <oscar_types_host.h>
 #endif
-#ifdef LCV_TARGET
-#include <framework_types_target.h>
+#ifdef OSC_TARGET
+#include <oscar_types_target.h>
 #endif
 
 #include "../cam/mt9v032.h"
@@ -34,7 +33,7 @@ struct VEC_2D
 
 /*! @brief The structure representing sensor calibration data
   */
-struct LCV_CLB_CALIBRATION_DATA
+struct OSC_CLB_CALIBRATION_DATA
 {
     /*! @brief FixPatternNoise (offset) correction: 
      * 5bit [0..32), lsb aligend */
@@ -53,34 +52,34 @@ struct LCV_CLB_CALIBRATION_DATA
 
 /*! @brief Object struct of the clb module. This
  * sturcture root is placed cache alined. */
-struct LCV_CLB
+struct OSC_CLB
 {  
-#ifdef LCV_TARGET      
+#ifdef OSC_TARGET      
     /*! Sensor calibration configuration data.
      * Must be cache-line aligned! */
-    struct LCV_CLB_CALIBRATION_DATA calibData;        
+    struct OSC_CLB_CALIBRATION_DATA calibData;        
     
     /*! @brief Model for slope calibration correction */
-    enum EnLcvClbCalibrateSlope calibSlope;
+    enum EnOscClbCalibrateSlope calibSlope;
     /*! @brief Enable hotpixel removal */
     bool bHotpixel;    
     
     /*! @brief The current 'area-of-interest' capture window */
     struct capture_window capWin;
-#endif /*LCV_TARGET*/    
+#endif /*OSC_TARGET*/    
     uint16 dummy;    
 };
 
 /*======================= Private methods ==============================*/
 
-#ifdef LCV_TARGET
+#ifdef OSC_TARGET
 /*********************************************************************//*!
  * @brief Load the calibration data from file.
  * 
  * @param strCalibFN File name of the calibration file.
  * @return SUCCESS or an appropriate error code.
  *//*********************************************************************/
-LCV_ERR LoadCalibrationData(const char strCalibFN[]);
+OSC_ERR LoadCalibrationData(const char strCalibFN[]);
 
 #if 0
 /*********************************************************************//*!
@@ -89,7 +88,7 @@ LCV_ERR LoadCalibrationData(const char strCalibFN[]);
  * @param strCalibFN File name of the calibration file.
  * @return SUCCESS or an appropriate error code.
  *//*********************************************************************/
-LCV_ERR StoreCalibrationData(const char strCalibFN[]);
+OSC_ERR StoreCalibrationData(const char strCalibFN[]);
 #endif /*0*/
 
 /*********************************************************************//*!
@@ -100,7 +99,7 @@ LCV_ERR StoreCalibrationData(const char strCalibFN[]);
  * @param pImg  Pointer to image data.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-LCV_ERR LCVClbCorrectFpnPrnu(uint8* pImg);
+OSC_ERR OscClbCorrectFpnPrnu(uint8* pImg);
 
 /*********************************************************************//*!
  * @brief Target only: Interpolate hotpixels 
@@ -110,7 +109,7 @@ LCV_ERR LCVClbCorrectFpnPrnu(uint8* pImg);
  * @param pImg  Pointer to image data.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-LCV_ERR LCVClbCorrectHotpixel(uint8* pImg);
-#endif /*LCV_TARGET*/
+OSC_ERR OscClbCorrectHotpixel(uint8* pImg);
+#endif /*OSC_TARGET*/
 
 #endif /* CLB_PRIV_H_ */

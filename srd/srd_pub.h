@@ -21,20 +21,19 @@
  * The order of signal names has to match with the order of signal 
  * registration to the reader.
  *
- * @author Samuel Zahnd
  ************************************************************************/
 #ifndef SRD_PUB_H_
 #define SRD_PUB_H_
 
-#include "framework_error.h"
+#include "oscar_error.h"
 
 /*! Module-specific error codes.
  * These are enumerated with the offset
  * assigned to each module, so a distinction over
  * all modules can be made */
-enum EnLcvSrdErrors
+enum EnOscSrdErrors
 {
-    ESRD_PARSING_FAILURE = LCV_SRD_ERROR_OFFSET
+    ESRD_PARSING_FAILURE = OSC_SRD_ERROR_OFFSET
 };
 
 /*====================== API functions =================================*/
@@ -45,14 +44,14 @@ enum EnLcvSrdErrors
  * @param hFw Pointer to the handle of the framework.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-LCV_ERR LCVSrdCreate(void *hFw);
+OSC_ERR OscSrdCreate(void *hFw);
 
 /*********************************************************************//*!
  * @brief Destructor
  * 
  * @param hFw Pointer to the handle of the framework.
  *//*********************************************************************/
-void LCVSrdDestroy(void *hFw);
+void OscSrdDestroy(void *hFw);
 
 /*********************************************************************//*!
  * @brief Create Stimuli Reader (host only)
@@ -62,7 +61,7 @@ void LCVSrdDestroy(void *hFw);
  * @param ppReader			O: handle to reader instance
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-LCV_ERR LCVSrdCreateReader( char* strFile, 
+OSC_ERR OscSrdCreateReader( char* strFile, 
         void (*pUpdateCallback)(void), 
         void** ppReader);
 
@@ -74,7 +73,7 @@ LCV_ERR LCVSrdCreateReader( char* strFile,
  * @param ppSignal	O: handle to signal instance
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-LCV_ERR LCVSrdRegisterSignal( void* pReader, char* strSignal, void** ppSignal);
+OSC_ERR OscSrdRegisterSignal( void* pReader, char* strSignal, void** ppSignal);
 
 /*********************************************************************//*!
  * @brief GetUpdateSignal (host only)
@@ -83,7 +82,7 @@ LCV_ERR LCVSrdRegisterSignal( void* pReader, char* strSignal, void** ppSignal);
  * @param pbValue	O: return active signal value
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-LCV_ERR LCVSrdGetUpdateSignal( void* pSignal, bool* pbValue);
+OSC_ERR OscSrdGetUpdateSignal( void* pSignal, bool* pbValue);
 
 
 

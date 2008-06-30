@@ -1,7 +1,6 @@
 /*! @file frd_priv.h
  * @brief Private filename reader module definition
  * 
- * @author Markus Berner
  ************************************************************************/
 #ifndef FRD_PRIV_H_
 #define FRD_PRIV_H_
@@ -11,11 +10,11 @@
 
 #include <log/log_pub.h>
 
-#ifdef LCV_HOST
-#include <framework_types_host.h>
+#ifdef OSC_HOST
+#include <oscar_types_host.h>
 #else
-#include <framework_types_target.h>
-#endif /* LCV_HOST */
+#include <oscar_types_target.h>
+#endif /* OSC_HOST */
 
 /*! @brief The maximum number of readers that can be registered. */
 #define MAX_NR_READERS 8
@@ -29,7 +28,7 @@
 #define MAX_PATH_LEN 1024
 
 /*! @brief Reader object struct for a sequential reader*/
-struct LCV_FRD_SEQUENCE_READER
+struct OSC_FRD_SEQUENCE_READER
 {
     /*! @brief The prefix of the filenames. */
     char strPrefix[MAX_PREFIX_LEN];    
@@ -40,7 +39,7 @@ struct LCV_FRD_SEQUENCE_READER
 };
 
 /*! @brief Reader object struct for a filelist reader*/ 
-struct LCV_FRD_FILELIST_READER
+struct OSC_FRD_FILELIST_READER
 {
 	/* @brief The file name of the file list. */
 	char strFileList[1024];
@@ -51,7 +50,7 @@ struct LCV_FRD_FILELIST_READER
 };
 
 /*! @brief Reader object struct for a constant reader*/ 
-struct LCV_FRD_CONSTANT_READER
+struct OSC_FRD_CONSTANT_READER
 {
 	/* @brief The constant file name to return. */
 	char strFN[1024];
@@ -67,28 +66,28 @@ enum EnFilenameReaderType
 
 /* @brief A reader can only be of one type, thus placing all reader
  * types in a union. */
-struct LCV_FRD_READER
+struct OSC_FRD_READER
 {
 	/*! @brief The actual type of this reader. */
 	enum EnFilenameReaderType enType;
 	/*! @brief The actual data of the reader, depending on its type. */
-	union LCV_FRD_READER_DATA
+	union OSC_FRD_READER_DATA
 	{
     	/*! @brief Sequence file name reader. */
-    	struct LCV_FRD_SEQUENCE_READER seq;
+    	struct OSC_FRD_SEQUENCE_READER seq;
     	/*! @brief List file name reader. */
-    	struct LCV_FRD_FILELIST_READER list;
+    	struct OSC_FRD_FILELIST_READER list;
     	/*! @brief Constant file name reader. */
-    	struct LCV_FRD_CONSTANT_READER constant;
+    	struct OSC_FRD_CONSTANT_READER constant;
 	} reader;
 };
 
 /*!@brief Filename reader module object struct */
-struct LCV_FRD
+struct OSC_FRD
 {
     uint16 nrOfReaders;		/*!< @brief Number of managed readers */
 	/*! @brief Reader object array */
-    struct LCV_FRD_READER rd[MAX_NR_READERS];
+    struct OSC_FRD_READER rd[MAX_NR_READERS];
 };
 
 /*********************************************************************//*!
@@ -100,8 +99,8 @@ struct LCV_FRD
  * in the file.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-static LCV_ERR LCVFrdParseSequentialReader(FILE *pConfigFile, 
-		struct LCV_FRD_SEQUENCE_READER * pReader);
+static OSC_ERR OscFrdParseSequentialReader(FILE *pConfigFile, 
+		struct OSC_FRD_SEQUENCE_READER * pReader);
 
 /*********************************************************************//*!
  * @brief Parses in the parameters of a file name list reader.
@@ -112,8 +111,8 @@ static LCV_ERR LCVFrdParseSequentialReader(FILE *pConfigFile,
  * in the file.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-static LCV_ERR LCVFrdParseListReader(FILE *pConfigF, 
-		struct LCV_FRD_FILELIST_READER * pReader);
+static OSC_ERR OscFrdParseListReader(FILE *pConfigF, 
+		struct OSC_FRD_FILELIST_READER * pReader);
 
 /*********************************************************************//*!
  * @brief Parses in the parameters of a file name list reader.
@@ -124,8 +123,8 @@ static LCV_ERR LCVFrdParseListReader(FILE *pConfigF,
  * in the file.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-static LCV_ERR LCVFrdParseConstantReader(FILE *pConfigF, 
-		struct LCV_FRD_CONSTANT_READER * pReader);
+static OSC_ERR OscFrdParseConstantReader(FILE *pConfigF, 
+		struct OSC_FRD_CONSTANT_READER * pReader);
 		
 /*********************************************************************//*!
  * @brief Get the current file name of a list reader.
@@ -133,8 +132,8 @@ static LCV_ERR LCVFrdParseConstantReader(FILE *pConfigF,
  * @param pReader Handle to the file list reader.
  * @param strCurName Current file name is written to this string.
  *//*********************************************************************/
-static inline void LCVFrdListGetCurrentFileName(
-		const struct LCV_FRD_FILELIST_READER *pReader, 
+static inline void OscFrdListGetCurrentFileName(
+		const struct OSC_FRD_FILELIST_READER *pReader, 
         char strCurName[]);
 
 /*********************************************************************//*!
@@ -143,8 +142,8 @@ static inline void LCVFrdListGetCurrentFileName(
  * @param pReader Handle to the file sequence reader.
  * @param strCurName Current file name is written to this string.
  *//*********************************************************************/
-static void LCVFrdSeqGetCurrentFileName(
-		const struct LCV_FRD_SEQUENCE_READER *pReader, 
+static void OscFrdSeqGetCurrentFileName(
+		const struct OSC_FRD_SEQUENCE_READER *pReader, 
         char strCurName[]);
 
 /*********************************************************************//*!
@@ -153,8 +152,8 @@ static void LCVFrdSeqGetCurrentFileName(
  * @param pReader Handle to the file sequence reader.
  * @param strCurName Current file name is written to this string.
  *//*********************************************************************/        
-static void LCVFrdConstGetCurrentFileName(
-		const struct LCV_FRD_CONSTANT_READER *pReader, 
+static void OscFrdConstGetCurrentFileName(
+		const struct OSC_FRD_CONSTANT_READER *pReader, 
         char strCurName[]);
 
 /*********************************************************************//*!
@@ -162,11 +161,11 @@ static void LCVFrdConstGetCurrentFileName(
  * 
  * Execute periodic tasks depending on the reader type.
  *//*********************************************************************/
-static void LCVFrdSimCycleCallback();
+static void OscFrdSimCycleCallback();
 
 /*********************************************************************//*!
  * @brief Read the next file name from the file list.
  *//*********************************************************************/
-static void LCVFrdListFetchNextFileName();
+static void OscFrdListFetchNextFileName();
 
 #endif /* FRD_PRIV_H_ */

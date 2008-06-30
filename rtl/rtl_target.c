@@ -6,24 +6,23 @@
  * other hand must not be done in the framework, since it already exists
  * in optimized form in the library.  
  * 
- * @author Samuel Zahnd, Markus Berner
  */
 
-#include "framework_types_target.h"
+#include "oscar_types_target.h"
 
 #include "rtl_pub.h"
 #include "rtl_priv.h"
-#include "framework_intern.h"
+#include "oscar_intern.h"
 
 /*! @brief The module singelton instance.  */
-struct LCV_RTL lcv_rtl;		
+struct OSC_RTL osc_rtl;		
 
 
-LCV_ERR LCVRtlCreate(void *hFw)
+OSC_ERR OscDsplCreate(void *hFw)
 {
-    struct LCV_FRAMEWORK *pFw;
+    struct OSC_FRAMEWORK *pFw;
 
-    pFw = (struct LCV_FRAMEWORK *)hFw;
+    pFw = (struct OSC_FRAMEWORK *)hFw;
     if(pFw->rtl.useCnt != 0)
     {
         pFw->rtl.useCnt++;
@@ -31,20 +30,20 @@ LCV_ERR LCVRtlCreate(void *hFw)
         return SUCCESS;
     }    
         
-	memset(&lcv_rtl, 0, sizeof(struct LCV_RTL));
+	memset(&osc_rtl, 0, sizeof(struct OSC_RTL));
 		
     /* Increment the use count */
-    pFw->rtl.hHandle = (void*)&lcv_rtl;
+    pFw->rtl.hHandle = (void*)&osc_rtl;
     pFw->rtl.useCnt++;    
 
 	return SUCCESS;
 }
 
-void LCVRtlDestroy(void *hFw)
+void OscDsplDestroy(void *hFw)
 {
-    struct LCV_FRAMEWORK *pFw;
+    struct OSC_FRAMEWORK *pFw;
         
-    pFw = (struct LCV_FRAMEWORK *)hFw; 
+    pFw = (struct OSC_FRAMEWORK *)hFw; 
     /* Check if we really need to release or whether we still 
      * have users. */
     pFw->rtl.useCnt--;
@@ -53,16 +52,16 @@ void LCVRtlDestroy(void *hFw)
         return;
     }
 	
-	memset(&lcv_rtl, 0, sizeof(struct LCV_RTL));
+	memset(&osc_rtl, 0, sizeof(struct OSC_RTL));
 }
 
 
-inline float LCVRtlFr16ToFloat(fract16 n)
+inline float OscDsplFr16ToFloat(fract16 n)
 {
     return (((float)n)/FR16_SCALE);
 }
 
-inline fract16 LCVRtlFloatToFr16(float n)
+inline fract16 OscDsplFloatToFr16(float n)
 {
     float ret = (n*FR16_SCALE);
     if(ret > FR16_SAT)

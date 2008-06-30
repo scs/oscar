@@ -1,21 +1,21 @@
 #ifndef FRAMEWORK_DEPENDENCIES_H_
 #define FRAMEWORK_DEPENDENCIES_H_
 
-#ifdef LCV_HOST
-    #include "framework_types_host.h"
+#ifdef OSC_HOST
+    #include "oscar_types_host.h"
 #endif
-#ifdef LCV_TARGET
-    #include "framework_types_target.h"
+#ifdef OSC_TARGET
+    #include "oscar_types_target.h"
 #endif
 
 /*! @brief Describes a module dependency of a module and all necessary
  * information to load and unload that module. */
-struct LCV_DEPENDENCY
+struct OSC_DEPENDENCY
 {
     /*! @brief The name of the dependency. */
     char                strName[24];
     /*! @brief The constructor of the dependency. */
-    LCV_ERR             (*create)(void *);
+    OSC_ERR             (*create)(void *);
     /*! @brief The destructor of the dependency. */
     void                (*destroy)(void *);
 };
@@ -32,8 +32,8 @@ struct LCV_DEPENDENCY
  * @param nDeps Length of the dependency array.
  * @return SUCCESS or an appropriate error code.
  *//*********************************************************************/
-LCV_ERR LCVLoadDependencies(void *pFw,
-        const struct LCV_DEPENDENCY aryDeps[], 
+OSC_ERR OSCLoadDependencies(void *pFw,
+        const struct OSC_DEPENDENCY aryDeps[], 
         const uint32 nDeps);
 
 /*********************************************************************//*!
@@ -46,7 +46,7 @@ LCV_ERR LCVLoadDependencies(void *pFw,
  * @param aryDeps Array of Dependencies to be unloaded.
  * @param nDeps Length of the dependency array.
  *//*********************************************************************/
-void LCVUnloadDependencies(void *pFw,
-        const struct LCV_DEPENDENCY aryDeps[], 
+void OSCUnloadDependencies(void *pFw,
+        const struct OSC_DEPENDENCY aryDeps[], 
         const uint32 nDeps);
 #endif /*FRAMEWORK_DEPENDENCIES_H_*/

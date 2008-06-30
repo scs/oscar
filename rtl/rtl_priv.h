@@ -1,7 +1,6 @@
 /*! @file rtl_priv.h
  * @brief Private module definition for the Blackfin DSP runtime library.
  * 
- * @author Markus Berner
  */
 #ifndef RTL_PRIV_H_
 #define RTL_PRIV_H_
@@ -12,7 +11,7 @@
 #include <string.h>
 
 /*! @brief The object struct of the camera module */
-struct LCV_RTL {
+struct OSC_RTL {
     /*! @brief Dummy to have at least one member in this struct. */
     int dummy; 
 };
@@ -27,7 +26,7 @@ struct LCV_RTL {
  * @param out Real output array containing the values of the input array
  *  in bit reversed order
 *//*********************************************************************/
-void LCVRtlRBitrev(const fract16 in[], fract16 out[], int size);
+void OscDsplRBitrev(const fract16 in[], fract16 out[], int size);
 
 /*********************************************************************//*!
  * @brief Rearrange complex data array in bit reverse order
@@ -39,7 +38,7 @@ void LCVRtlRBitrev(const fract16 in[], fract16 out[], int size);
  * @param out Complex output array containing the values of the input array
  *  in bit reversed order
 *//*********************************************************************/
-void LCVRtlCBitrev(const complex_fract16 in[], complex_fract16 out[], int size);
+void OscDsplCBitrev(const complex_fract16 in[], complex_fract16 out[], int size);
 
 /*********************************************************************//*!
  * @brief Check if a fract16 array need scaling
@@ -51,7 +50,7 @@ void LCVRtlCBitrev(const complex_fract16 in[], complex_fract16 out[], int size);
  * @param fft_size size of the input array
  * @return  Returns 1 if the array needs scaling, else 0 
 *//*********************************************************************/
-int LCVRtlRDscale( fract16 butterflyfr16[], int fft_size);
+int OscDsplRDscale( fract16 butterflyfr16[], int fft_size);
 
 /*********************************************************************//*!
  * @brief Check if a complex_fract16 array need scaling
@@ -63,7 +62,7 @@ int LCVRtlRDscale( fract16 butterflyfr16[], int fft_size);
  * @param fft_size size of the input array
  * @return  Returns 1 if the array needs scaling, else 0 
 *//*********************************************************************/
-int LCVRtlCDscale( complex_fract16 butterflycfr16[], int fft_size);
+int OscDsplCDscale( complex_fract16 butterflycfr16[], int fft_size);
 
 /*********************************************************************//*!
  * @brief Saturate a fract64 value to fract32
@@ -73,6 +72,6 @@ int LCVRtlCDscale( complex_fract16 butterflycfr16[], int fft_size);
  * @param in fract64 input value 
  * @return  Returns saturated value
 *//*********************************************************************/
-long long int LCVRtlSatFr64(long long int in);
+long long int OscDsplSatFr64(long long int in);
 
 #endif /*RTL_PRIV_H_*/

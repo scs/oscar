@@ -1,30 +1,29 @@
 /*! @file log_pub.h
  * @brief API definition for logging module
  * 
- * @author Markus Berner
  */
 #ifndef LOG_PUB_H_
 #define LOG_PUB_H_
 
-#include "framework_error.h"
-#ifdef LCV_HOST
-    #include "framework_types_host.h"
-    #include "framework_host.h"
+#include "oscar_error.h"
+#ifdef OSC_HOST
+    #include "oscar_types_host.h"
+    #include "oscar_host.h"
 #else
-    #include "framework_types_target.h"
-    #include "framework_target.h"
-#endif /* LCV_HOST */
+    #include "oscar_types_target.h"
+    #include "oscar_target.h"
+#endif /* OSC_HOST */
 
 /*! Module-specific error codes.
  * These are enumerated with the offset
  * assigned to each module, so a distinction over
  * all modules can be made */
-enum EnLcvLogErrors {
-	ELOG_INVALID_EXPOSURE_VALID = LCV_LOG_ERROR_OFFSET
+enum EnOscLogErrors {
+	ELOG_INVALID_EXPOSURE_VALID = OSC_LOG_ERROR_OFFSET
 };
 
 /*! @brief The different log levels of the logging module */
-enum EnLcvLogLevel {
+enum EnOscLogLevel {
 	EMERG,
 	ALERT,
 	CRITICAL,
@@ -47,14 +46,14 @@ enum EnLcvLogLevel {
  * @param hFw Pointer to the handle of the framework.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-LCV_ERR LCVLogCreate(void *hFw);
+OSC_ERR OscLogCreate(void *hFw);
 
 /*********************************************************************//*!
  * @brief Destructor
  * 
  * @param hFw Pointer to the handle of the framework.
  *//*********************************************************************/
-void LCVLogDestroy(void *hFw);
+void OscLogDestroy(void *hFw);
 
 /*********************************************************************//*!
  * @brief Sets the highest log level to be output to the console
@@ -63,7 +62,7 @@ void LCVLogDestroy(void *hFw);
  * 
  * @param level The log level to set.
  *//*********************************************************************/
-inline void LCVLogSetConsoleLogLevel(const enum EnLcvLogLevel level);
+inline void OscLogSetConsoleLogLevel(const enum EnOscLogLevel level);
 
 /*********************************************************************//*!
  * @brief Sets the highest log level to be output to the log file
@@ -72,7 +71,7 @@ inline void LCVLogSetConsoleLogLevel(const enum EnLcvLogLevel level);
  * 
  * @param level The log level to set.
  *//*********************************************************************/
-inline void LCVLogSetFileLogLevel(const enum EnLcvLogLevel level);
+inline void OscLogSetFileLogLevel(const enum EnOscLogLevel level);
 
 /*********************************************************************//*!
  * @brief Logs a message.
@@ -84,7 +83,7 @@ inline void LCVLogSetFileLogLevel(const enum EnLcvLogLevel level);
  * @param strFormat Format string of the message.
  * @param ... Format parameters of the message.
  *//*********************************************************************/
-void LCVLog(const enum EnLcvLogLevel level, const char * strFormat, ...);
+void OscLog(const enum EnOscLogLevel level, const char * strFormat, ...);
 
 
 #endif /*LOG_PUB_H_*/

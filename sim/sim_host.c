@@ -1,23 +1,22 @@
 /*! @file sim_host.c
  * @brief Simulation module implementation for host
  * 
- * @author Markus Berner
  */
 
-#include "framework_intern.h"
+#include "oscar_intern.h"
 
 #include "sim_pub.h"
 #include "sim_priv.h"
 
 /*! @brief The module singelton instance. */
-struct LCV_SIM_OBJ sim;		
+struct OSC_SIM_OBJ sim;		
 
 
-LCV_ERR LCVSimCreate(void *hFw)
+OSC_ERR OscSimCreate(void *hFw)
 {
-    struct LCV_FRAMEWORK *pFw;
+    struct OSC_FRAMEWORK *pFw;
 
-    pFw = (struct LCV_FRAMEWORK *)hFw;
+    pFw = (struct OSC_FRAMEWORK *)hFw;
     if(pFw->sim.useCnt != 0)
     {
         pFw->sim.useCnt++;
@@ -25,7 +24,7 @@ LCV_ERR LCVSimCreate(void *hFw)
         return SUCCESS;
     }
     
-	memset(&sim, 0, sizeof(struct LCV_SIM_OBJ));
+	memset(&sim, 0, sizeof(struct OSC_SIM_OBJ));
 	
     /* Increment the use count */
     pFw->sim.hHandle = (void*)&sim;
@@ -34,11 +33,11 @@ LCV_ERR LCVSimCreate(void *hFw)
     return SUCCESS;
 }
 
-void LCVSimDestroy(void *hFw)
+void OscSimDestroy(void *hFw)
 {
-    struct LCV_FRAMEWORK *pFw;
+    struct OSC_FRAMEWORK *pFw;
             
-    pFw = (struct LCV_FRAMEWORK *)hFw; 
+    pFw = (struct OSC_FRAMEWORK *)hFw; 
     /* Check if we really need to release or whether we still 
      * have users. */
     pFw->sim.useCnt--;
@@ -47,10 +46,10 @@ void LCVSimDestroy(void *hFw)
         return;
     }
     
-	memset(&sim, 0, sizeof(struct LCV_SIM_OBJ));
+	memset(&sim, 0, sizeof(struct OSC_SIM_OBJ));
 }
 
-void LCVSimInitialize(void)
+void OscSimInitialize(void)
 {
     uint16 i;
     
@@ -60,7 +59,7 @@ void LCVSimInitialize(void)
     }    
 }
 
-void LCVSimStep()
+void OscSimStep()
 {
     uint16 i;
     
@@ -76,13 +75,13 @@ void LCVSimStep()
     }
 }
 
-uint32 LCVSimGetCurTimeStep()
+uint32 OscSimGetCurTimeStep()
 {
     return sim.curTimeStep;
 }
 
 
-LCV_ERR LCVSimRegisterCycleCallback( void (*pCallback)(void))
+OSC_ERR OscSimRegisterCycleCallback( void (*pCallback)(void))
 {
     uint16 id;
     

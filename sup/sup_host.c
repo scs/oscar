@@ -1,25 +1,24 @@
 /*! @file sup_host.c
  * @brief Support module implementation for host
  * 
- * @author Markus Berner
  */
 
-#include "framework_types_host.h"
+#include "oscar_types_host.h"
 
 #include "sup_pub.h"
 #include "sup_priv.h"
-#include "framework_intern.h"
+#include "oscar_intern.h"
 #include <time.h>
 
 /*! @brief The module singelton instance. */
-struct LCV_SUP sup;		
+struct OSC_SUP sup;		
 
 
-LCV_ERR LCVSupCreate(void *hFw)
+OSC_ERR OscSupCreate(void *hFw)
 {
-    struct LCV_FRAMEWORK *pFw;
+    struct OSC_FRAMEWORK *pFw;
 
-    pFw = (struct LCV_FRAMEWORK *)hFw;
+    pFw = (struct OSC_FRAMEWORK *)hFw;
     if(pFw->sup.useCnt != 0)
     {
         pFw->sup.useCnt++;
@@ -27,7 +26,7 @@ LCV_ERR LCVSupCreate(void *hFw)
         return SUCCESS;
     }
     
-	memset(&sup, 0, sizeof(struct LCV_SUP));
+	memset(&sup, 0, sizeof(struct OSC_SUP));
 	
     /* Increment the use count */
     pFw->sup.hHandle = (void*)&sup;
@@ -36,11 +35,11 @@ LCV_ERR LCVSupCreate(void *hFw)
     return SUCCESS;
 }
 
-void LCVSupDestroy(void *hFw)
+void OscSupDestroy(void *hFw)
 {
-    struct LCV_FRAMEWORK *pFw;
+    struct OSC_FRAMEWORK *pFw;
             
-    pFw = (struct LCV_FRAMEWORK *)hFw; 
+    pFw = (struct OSC_FRAMEWORK *)hFw; 
     /* Check if we really need to release or whether we still 
      * have users. */
     pFw->sup.useCnt--;
@@ -51,34 +50,34 @@ void LCVSupDestroy(void *hFw)
     
     /* Make sure the watchdog is closed, otherwise the board may
      * be reset by it after the application has closed. */
-    LCVSupWdtClose();
+    OscSupWdtClose();
     
-	memset(&sup, 0, sizeof(struct LCV_SUP));
+	memset(&sup, 0, sizeof(struct OSC_SUP));
 }
 
 /*=========================== Watchdog =================================*/
 
-LCV_ERR LCVSupWdtInit()
+OSC_ERR OscSupWdtInit()
 {
     /* There is no watchdog on the host => do nothing. */
 
     return SUCCESS;
 }
 
-LCV_ERR LCVSupWdtClose()
+OSC_ERR OscSupWdtClose()
 {
     /* There is no watchdog on the host => do nothing. */
 
     return SUCCESS;
 }
 
-inline void LCVSupWdtKeepAlive()
+inline void OscSupWdtKeepAlive()
 {
     /* There is no watchdog on the host => do nothing. */
 }
 
 /*============================= Cycles =================================*/
-inline uint32 LCVSupCycGet()
+inline uint32 OscSupCycGet()
 {
   /* The host implementation uses the ANSI C function clock() 
    * with much lower precision than on the blackfin. 
@@ -88,60 +87,60 @@ inline uint32 LCVSupCycGet()
   return ((uint32)clock()); 
 }
 
-inline uint32 LCVSupCycToMicroSecs(uint32 cycles)
+inline uint32 OscSupCycToMicroSecs(uint32 cycles)
 {
   return (cycles/(CLOCKS_PER_SEC/1000000));
 }
 
 /*============================== SRAM =================================*/
-inline uint32 LCVSupSramL1ALen()
+inline uint32 OscSupSramL1ALen()
 {
     return SRAM_L1A_LENGTH;
 }
 
-inline void* LCVSupSramL1A()
+inline void* OscSupSramL1A()
 {
     return sup.pL1A;
 }
 
-inline uint32 LCVSupSramL1BLen()
+inline uint32 OscSupSramL1BLen()
 {
     return SRAM_L1B_LENGTH;
 }
 
-inline void* LCVSupSramL1B()
+inline void* OscSupSramL1B()
 {
     return sup.pL1B;
 }
 
-inline uint32 LCVSupSramScratchLen()
+inline uint32 OscSupSramScratchLen()
 {
     return SRAM_SCRATCH_LENGTH;
 }
 
-inline void* LCVSupSramScratch()
+inline void* OscSupSramScratch()
 {
     return sup.pScratch;
 }
 
 /*============================== LED =================================*/
-#ifdef TARGET_TYPE_LCV_IND
-LCV_ERR LCVSupLedInit()
+#ifdef TARGET_TYPE_INDXCAM
+OSC_ERR OscSupLedInit()
 {
     return -SUCCESS;
 }
-#else /* TARGET_TYPE_LCV_IND */
-LCV_ERR LCVSupLedInit()
+#else /* TARGET_TYPE_INDXCAM */
+OSC_ERR OscSupLedInit()
 {
     return -ENO_SUCH_DEVICE;
 }
-#endif /* TARGET_TYPE_LCV_IND */
+#endif /* TARGET_TYPE_INDXCAM */
 
-inline void LCVSupLedWrite(char val)
+inline void OscSupLedWrite(char val)
 {
 }
 
-void LCVSupLedClose()
+void OscSupLedClose()
 {
 }
 

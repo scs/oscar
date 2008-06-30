@@ -1,9 +1,8 @@
 /*! @file framework.h
- * @brief API definition for LCV framework
+ * @brief API definition for OSC framework
  * 
  * Must be included by the application.
  * 
- * @author Markus Berner, Samuel Zahnd
  * @date 22.1.2008
  * @version 1.0
  */
@@ -13,17 +12,17 @@
 
 /* Include the correct type header file, depending on the target
  */
-#ifdef LCV_HOST
-	#include "framework_types_host.h"
-    #include "framework_host.h"
+#ifdef OSC_HOST
+	#include "oscar_types_host.h"
+    #include "oscar_host.h"
 #endif
-#ifdef LCV_TARGET
-	#include "framework_types_target.h"
-    #include "framework_target.h"
+#ifdef OSC_TARGET
+	#include "oscar_types_target.h"
+    #include "oscar_target.h"
 #endif 
 
-#include "framework_error.h"
-#include "framework_dependencies.h"
+#include "oscar_error.h"
+#include "oscar_dependencies.h"
 
 
 /*********************************************************************//*!
@@ -32,7 +31,7 @@
  * @param phFw Pointer to the handle location for the framework
  * @return SUCCESS or appropriate error code otherwise
  *//*********************************************************************/
-LCV_ERR LCVCreate(void ** phFw);
+OSC_ERR OSCCreate(void ** phFw);
 
 /*********************************************************************//*!
  * @brief Destructor for framework
@@ -42,7 +41,7 @@ LCV_ERR LCVCreate(void ** phFw);
  * @param hFw Pointer to the handle of the framework to be destroyed.
  * @return SUCCESS or an appropriate error code.
  *//*********************************************************************/
-LCV_ERR LCVDestroy(void *hFw);
+OSC_ERR OSCDestroy(void *hFw);
 
 /* Include the public header files of the different modules, which
  * contain the declarations of the API functions of the respective

@@ -1,15 +1,14 @@
 ############################################################################
 #
-# Makefile for the Simulation Module of the LCV Framework
+# Makefile for the Simulation Module of the OSC Framework
 #
-# Author: Markus Berner
 # 
 ############################################################################
 
 # Defines for C files
-TARGET_FEATURES += -DLCV_TARGET
-TARGET_SIM_FEATURES += -DLCV_TARGET -DLCV_SIM
-HOST_FEATURES += -DLCV_HOST
+TARGET_FEATURES += -DOSC_TARGET
+TARGET_SIM_FEATURES += -DOSC_TARGET -DOSC_SIM
+HOST_FEATURES += -DOSC_HOST
 
 # Host-Compiler executables and flags
 HOST_CC = gcc 

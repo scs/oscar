@@ -1,7 +1,6 @@
 /*! @file cam_priv.h
  * @brief Private camera module definitions
  * 
- * @author Markus Berner
  */
 #ifndef CAM_PRIV_H_
 #define CAM_PRIV_H_
@@ -11,19 +10,19 @@
 
 #include <log/log_pub.h>
 
-#ifdef LCV_HOST
-#include <framework_types_host.h>
+#ifdef OSC_HOST
+#include <oscar_types_host.h>
 #endif
-#ifdef LCV_TARGET
-#include <framework_types_target.h>
+#ifdef OSC_TARGET
+#include <oscar_types_target.h>
 #endif
 
-#if defined(LCV_HOST) || defined(LCV_SIM)
+#if defined(OSC_HOST) || defined(OSC_SIM)
 /* To load test images from bmp's */
 #include "bmp/bmp_pub.h" 
 /* Generate file names for test images depending on time step */
 #include "frd/frd_pub.h"
-#endif /* LCV_HOST  or LCV_SIM*/
+#endif /* OSC_HOST  or OSC_SIM*/
 
 /*! @brief For communication with the frame capture device driver */
 #include "mt9v032.h" 
@@ -64,9 +63,9 @@
 /*! @brief The config file used to set up the filename reader. */
 #define FILENAME_READER_CONFIG_FILE "cam.frdconf"
 
-#if defined(LCV_HOST) || defined(LCV_SIM)
+#if defined(OSC_HOST) || defined(OSC_SIM)
 /*! @brief Host only: The different states a frame buffer can be in */
-enum EnLcvFrameBufferStatus {
+enum EnOscFrameBufferStatus {
     STATUS_UNITIALIZED,
     STATUS_READY,
     STATUS_CAPTURING_EXT_TRIGGER,
@@ -74,9 +73,9 @@ enum EnLcvFrameBufferStatus {
     STATUS_VALID,
     STATUS_CORRUPTED
 };
-#endif /* LCV_HOST or LCV_SIM*/
+#endif /* OSC_HOST or OSC_SIM*/
 /*! @brief Object struct of the camera module */
-struct LCV_CAM
+struct OSC_CAM
 {
     /*! @brief The configured frame buffers */
     struct frame_buffer fbufs[MAX_NR_FRAME_BUFFERS];
@@ -84,7 +83,7 @@ struct LCV_CAM
     uint16 nFrameBuffers;
     /*! @brief Describes a multi buffer for automatic buffer management
      * if activated */
-    struct LCV_CAM_MULTIBUFFER multiBuffer;
+    struct OSC_CAM_MULTIBUFFER multiBuffer;
     /*! @brief Video driver device file descriptor */
     int vidDev;
 
@@ -104,7 +103,7 @@ struct LCV_CAM
     /*! @brief The current exposure time in microseconds. */
     uint32 curExpTime;
     
-#ifdef LCV_TARGET   
+#ifdef OSC_TARGET   
     /*! @brief Pointer to callback fxn for image correction */      
     int (*pCallback)(
             uint8 *pImg,
@@ -112,16 +111,16 @@ struct LCV_CAM
                     const uint16 lowY,
                     const uint16 width, 
                     const uint16 height);
-#endif /*LCV_TARGET*/   
+#endif /*OSC_TARGET*/   
     
     /* Members only needed for the host implementation */
-#if defined(LCV_HOST) || defined(LCV_SIM) 
+#if defined(OSC_HOST) || defined(OSC_SIM) 
     /*! @brief Host only: All registers of the mt9v032 CMOS sensor */
     struct reg_info regs[NUM_CAM_REGS];
     /*! @brief Host only: The current status of the frame buffers */
-    enum EnLcvFrameBufferStatus fbStat[MAX_NR_FRAME_BUFFERS];
+    enum EnOscFrameBufferStatus fbStat[MAX_NR_FRAME_BUFFERS];
     /*! @brief Host only: The capture window during the last call to
-     * LCVCamSetupCapture() */
+     * OscCamSetupCapture() */
     struct capture_window lastCapWin;
     /*! @brief Host only: ID of the last buffer where a valid image was 
      * captured
@@ -130,7 +129,7 @@ struct LCV_CAM
     /*! @brief Host only: The handle to the file name reader used to 
      * generate the file names of the test images. */
     void *hFNReader;
-#endif /* LCV_HOST or LCV_SIM*/
+#endif /* OSC_HOST or OSC_SIM*/
 };
 
 /*======================= Private methods ==============================*/  

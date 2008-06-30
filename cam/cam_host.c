@@ -1,25 +1,24 @@
 /*! @file cam_host.c
  * @brief Camera module implementation for host
  *  
- * Simulation of the LCV-specific hardware featuring 
+ * Simulation of the OSC-specific hardware featuring 
  * a Micron MT9V032 CMOS image sensor.
  * 
- * @author Markus Berner
  */
-#include "framework_intern.h"
+#include "oscar_intern.h"
 #include "cam_pub.h"
 #include "cam_priv.h"
 #include <unistd.h>
 #include <stdlib.h>
 
 /*! @brief The dependencies of this module. */
-struct LCV_DEPENDENCY cam_deps[] = {
-        {"log", LCVLogCreate, LCVLogDestroy},
-        {"frd", LCVFrdCreate, LCVFrdDestroy},
-        {"bmp", LCVBmpCreate, LCVBmpDestroy}
+struct OSC_DEPENDENCY cam_deps[] = {
+        {"log", OscLogCreate, OscLogDestroy},
+        {"frd", OscFrdCreate, OscFrdDestroy},
+        {"bmp", OscBmpCreate, OscBmpDestroy}
 };
 
-struct LCV_CAM cam; /*!< @brief The camera module singelton instance */
+struct OSC_CAM cam; /*!< @brief The camera module singelton instance */
 
 /*! @brief Representation of a mt9v032 CMOS-Sensor register for 
  * simulation */
@@ -142,7 +141,7 @@ const struct CAM_REGISTER default_reg_values[] =
 /*********************************************************************//*!
  * @brief Host only: Initialize simulated camera registers with defaults
  *//*********************************************************************/
-static void LCVCamResetRegs()
+static void OscCamResetRegs()
 {
     int i;
     uint32 len;
@@ -167,7 +166,7 @@ static void LCVCamResetRegs()
  * @param addr Address of the desired register
  * @return Pointer to the structure describing the register or NULL
  *//*********************************************************************/
-static struct reg_info * LCVCamFindReg(const uint32 addr)
+static struct reg_info * OscCamFindReg(const uint32 addr)
 {
     int i;
     for (i = 0; i < NUM_CAM_REGS; i++)
@@ -183,7 +182,7 @@ static struct reg_info * LCVCamFindReg(const uint32 addr)
 /*********************************************************************//*!
  * @brief Host only: Crop a picture to the specified window.
  * 
- * The contents of the supplied LCV_PICTURE structure are cropped and
+ * The contents of the supplied OSC_PICTURE structure are cropped and
  * written to pDstBuffer. pPic is not changed.
  * 
  * Host only.
@@ -195,9 +194,9 @@ static struct reg_info * LCVCamFindReg(const uint32 addr)
  * @param pCropWin Window to crop the picture to.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-static LCV_ERR LCVCamCropPicture(uint8* pDstBuffer,
+static OSC_ERR OscCamCropPicture(uint8* pDstBuffer,
         const uint32 dstBufferSize,
-        const struct LCV_PICTURE *pPic,
+        const struct OSC_PICTURE *pPic,
         const struct capture_window *pCropWin)
 {
     uint8       *pTSrc, *pTDst;
@@ -210,14 +209,14 @@ static LCV_ERR LCVCamCropPicture(uint8* pDstBuffer,
     if((pPic == NULL) || (pPic->data == NULL) || (pCropWin == NULL) ||
             (pDstBuffer == NULL) || (dstBufferSize == 0))
     {
-        LCVLog(ERROR, "%s(0x%x, %u, 0x%x, 0x%x): Invalid parameter!\n",
+        OscLog(ERROR, "%s(0x%x, %u, 0x%x, 0x%x): Invalid parameter!\n",
                 __func__, pDstBuffer, dstBufferSize, pPic, pCropWin);
         return -EINVALID_PARAMETER;
     }
     if((pPic->width < (pCropWin->col_off + pCropWin->width)) ||
             pPic->height < (pCropWin->row_off + pCropWin->height))
     {
-        LCVLog(ERROR, 
+        OscLog(ERROR, 
                 "%s: Unable to crop image (%dx%d) to (%dx%d @ %d/%d).\n",
                 __func__, pPic->width, pPic->height,
                 pCropWin->width, pCropWin->height,
@@ -226,13 +225,13 @@ static LCV_ERR LCVCamCropPicture(uint8* pDstBuffer,
     }
     
     /* Allocate a temporary buffer for the cropped image */
-    colorDepth = LCV_PICTURE_TYPE_COLOR_DEPTH(pPic->type);
+    colorDepth = OSC_PICTURE_TYPE_COLOR_DEPTH(pPic->type);
     bytesPerPixel = colorDepth / 8;
     croppedSize = pCropWin->width *  pCropWin->height * bytesPerPixel;
     
     if(croppedSize > dstBufferSize)
     {
-        LCVLog(ERROR, "%s: Specified destination Buffer too small. \
+        OscLog(ERROR, "%s: Specified destination Buffer too small. \
                 (%d < %d)\n", __func__, dstBufferSize, croppedSize);
         return -EBUFFER_TOO_SMALL;
     }
@@ -262,13 +261,13 @@ static LCV_ERR LCVCamCropPicture(uint8* pDstBuffer,
     return SUCCESS;
 }
 
-LCV_ERR LCVCamCreate(void *hFw)
+OSC_ERR OscCamCreate(void *hFw)
 {
-    struct LCV_FRAMEWORK    *pFw;
-    LCV_ERR                 err;
+    struct OSC_FRAMEWORK    *pFw;
+    OSC_ERR                 err;
     uint16                  dummy;
     
-    pFw = (struct LCV_FRAMEWORK *)hFw;
+    pFw = (struct OSC_FRAMEWORK *)hFw;
     if(pFw->cam.useCnt != 0)
     {
         pFw->cam.useCnt++;
@@ -277,9 +276,9 @@ LCV_ERR LCVCamCreate(void *hFw)
     }  
 
     /* Load the module cam_deps of this module. */
-    err = LCVLoadDependencies(pFw, 
+    err = OSCLoadDependencies(pFw, 
             cam_deps, 
-            sizeof(cam_deps)/sizeof(struct LCV_DEPENDENCY));
+            sizeof(cam_deps)/sizeof(struct OSC_DEPENDENCY));
     if(err != SUCCESS)
     {
         printf("%s: ERROR: Unable to load cam_deps! (%d)\n",
@@ -288,29 +287,29 @@ LCV_ERR LCVCamCreate(void *hFw)
         return err;
     }
         
-    memset(&cam, 0, sizeof(struct LCV_CAM));
+    memset(&cam, 0, sizeof(struct OSC_CAM));
     
     /* Initialize camera registers */
-    LCVCamResetRegs();
+    OscCamResetRegs();
     
     /* Create the file name reader if the config file exists. Otherwise
      * the application will have to set the file name reader later over
-     * LCVFrdSetFileNameReader(). */
+     * OscFrdSetFileNameReader(). */
     if(access(FILENAME_READER_CONFIG_FILE, F_OK) == 0)
     {
-        LCVFrdCreateReader(&cam.hFNReader, FILENAME_READER_CONFIG_FILE);
+        OscFrdCreateReader(&cam.hFNReader, FILENAME_READER_CONFIG_FILE);
     }
     
-    cam.lastValidID = LCV_CAM_INVALID_BUFFER_ID;
+    cam.lastValidID = OSC_CAM_INVALID_BUFFER_ID;
     
     /* Read the current camera register values and build a model of the
      * current state from them. */
-    err = LCVCamGetShutterWidth(&cam.curExpTime);
-    err |= LCVCamGetRegisterValue(CAM_REG_HORIZ_BLANK, 
+    err = OscCamGetShutterWidth(&cam.curExpTime);
+    err |= OscCamGetRegisterValue(CAM_REG_HORIZ_BLANK, 
             &cam.curHorizBlank);
     /* Read back the area of interest to implicitely update 
      * cam.curCamRowClks. */
-    err |= LCVCamGetAreaOfInterest(&dummy,
+    err |= OscCamGetAreaOfInterest(&dummy,
                 &dummy,
                 &dummy,
                 &dummy);
@@ -328,11 +327,11 @@ LCV_ERR LCVCamCreate(void *hFw)
     return SUCCESS;
 }
 
-void LCVCamDestroy(void *hFw)
+void OscCamDestroy(void *hFw)
 {
-    struct LCV_FRAMEWORK *pFw;
+    struct OSC_FRAMEWORK *pFw;
             
-    pFw = (struct LCV_FRAMEWORK *)hFw; 
+    pFw = (struct OSC_FRAMEWORK *)hFw; 
     
     /* Check if we really need to release or whether we still 
      * have users. */
@@ -342,14 +341,14 @@ void LCVCamDestroy(void *hFw)
         return;
     }
         
-    LCVUnloadDependencies(pFw, 
+    OSCUnloadDependencies(pFw, 
             cam_deps, 
-            sizeof(cam_deps)/sizeof(struct LCV_DEPENDENCY));
+            sizeof(cam_deps)/sizeof(struct OSC_DEPENDENCY));
     
-    memset(&cam, 0, sizeof(struct LCV_CAM));
+    memset(&cam, 0, sizeof(struct OSC_CAM));
 }
 
-LCV_ERR LCVCamSetFileNameReader(void* hReaderHandle)
+OSC_ERR OscCamSetFileNameReader(void* hReaderHandle)
 {
     /* Input validation. */
     if(hReaderHandle == NULL)
@@ -359,7 +358,7 @@ LCV_ERR LCVCamSetFileNameReader(void* hReaderHandle)
     
     if(cam.hFNReader != NULL)
     {
-        LCVLog(WARN, "%s WARNING: Replacing file name reader already "
+        OscLog(WARN, "%s WARNING: Replacing file name reader already "
                 "associated with camera module!\n", __func__);
     }
     
@@ -368,7 +367,7 @@ LCV_ERR LCVCamSetFileNameReader(void* hReaderHandle)
     return SUCCESS;
 }
 
-LCV_ERR LCVCamSetAreaOfInterest(const uint16 lowX,
+OSC_ERR OscCamSetAreaOfInterest(const uint16 lowX,
         const uint16 lowY,
         const uint16 width,
         const uint16 height)
@@ -378,7 +377,7 @@ LCV_ERR LCVCamSetAreaOfInterest(const uint16 lowX,
             lowX + width > MAX_IMAGE_WIDTH ||
             lowY + height > MAX_IMAGE_HEIGHT)
     {
-        LCVLog(ERROR,
+        OscLog(ERROR,
                 "%s: Invalid parameter (%dx%d at %d/%d). "
                 "Must fit %dx%d and width must be even\n",
                 __func__,
@@ -412,9 +411,9 @@ LCV_ERR LCVCamSetAreaOfInterest(const uint16 lowX,
         
     /* Recalculate and set the shutter width, since it changes when
      * changing the area of interest. */
-    LCVCamSetShutterWidth(cam.curExpTime);
+    OscCamSetShutterWidth(cam.curExpTime);
         
-    LCVLog(DEBUG, "Area of interest set to %dx%d at %d/%d.\n",
+    OscLog(DEBUG, "Area of interest set to %dx%d at %d/%d.\n",
             cam.capWin.width,
             cam.capWin.height,
             cam.capWin.col_off,
@@ -422,11 +421,11 @@ LCV_ERR LCVCamSetAreaOfInterest(const uint16 lowX,
     return SUCCESS;
 }
 
-LCV_ERR LCVCamSetRegisterValue(const uint32 reg, const uint16 value)
+OSC_ERR OscCamSetRegisterValue(const uint32 reg, const uint16 value)
 {
     struct reg_info * pReg;
 
-    pReg = LCVCamFindReg(reg);
+    pReg = OscCamFindReg(reg);
     if(pReg == NULL)
     {
         return -EINVALID_PARAMETER;
@@ -436,7 +435,7 @@ LCV_ERR LCVCamSetRegisterValue(const uint32 reg, const uint16 value)
     return 0;
 }
 
-LCV_ERR LCVCamGetRegisterValue(const uint32 reg, uint16 *pResult)
+OSC_ERR OscCamGetRegisterValue(const uint32 reg, uint16 *pResult)
 {
     struct reg_info * pReg;
 
@@ -445,7 +444,7 @@ LCV_ERR LCVCamGetRegisterValue(const uint32 reg, uint16 *pResult)
         return -EINVALID_PARAMETER;
     }
 
-    pReg = LCVCamFindReg(reg);
+    pReg = OscCamFindReg(reg);
     if(pReg == NULL)
     {
         return -EINVALID_PARAMETER;
@@ -455,7 +454,7 @@ LCV_ERR LCVCamGetRegisterValue(const uint32 reg, uint16 *pResult)
     return SUCCESS;
 }
 
-LCV_ERR LCVCamSetFrameBuffer(const uint8 fbID,
+OSC_ERR OscCamSetFrameBuffer(const uint8 fbID,
         const uint32 uSize,
         const void * pData,
         const int bCached)
@@ -467,7 +466,7 @@ LCV_ERR LCVCamSetFrameBuffer(const uint8 fbID,
     if(fbID > MAX_NR_FRAME_BUFFERS ||
             (pData == NULL && uSize != 0))
     {
-        LCVLog(ERROR,
+        OscLog(ERROR,
                 "%s(%d, %d, 0x%x, %d): \
 				Invalid parameter.\n",
                 __func__, fbID, uSize, pData, bCached);
@@ -476,7 +475,7 @@ LCV_ERR LCVCamSetFrameBuffer(const uint8 fbID,
 
     if(pData == NULL)
     {
-        LCVLog(INFO, "%s: Deleting frame buffer number %d.\n", 
+        OscLog(INFO, "%s: Deleting frame buffer number %d.\n", 
                 __func__, fbID);
         /* Check whether the deleted frame buffer belongs to a multi
          * buffer. */
@@ -484,7 +483,7 @@ LCV_ERR LCVCamSetFrameBuffer(const uint8 fbID,
         {
             if(cam.multiBuffer.fbIDs[i] == fbID)
             {
-                LCVLog(ERROR, 
+                OscLog(ERROR, 
                         "%s: Deleting frame buffer %d being part of \
 	                    a multi buffer!.\n", 
 	                    __func__, fbID);
@@ -493,7 +492,7 @@ LCV_ERR LCVCamSetFrameBuffer(const uint8 fbID,
         }
         if(cam.fbStat[fbID] == STATUS_UNITIALIZED)
         {
-            LCVLog(WARN, 
+            OscLog(WARN, 
                     "%s: Deleting an unitialized frame buffer (%d)!\n",
                     __func__, fbID);
         }
@@ -515,7 +514,7 @@ LCV_ERR LCVCamSetFrameBuffer(const uint8 fbID,
     if((cam.fbufs[fbID].data != NULL) ||
             cam.fbStat[fbID] != STATUS_UNITIALIZED)
     {
-        LCVLog(ERROR, "%s: Unable to set frame buffer %d -> busy.\n",
+        OscLog(ERROR, "%s: Unable to set frame buffer %d -> busy.\n",
                 __func__, fbID);
         return -EFRAME_BUFFER_BUSY;
     }
@@ -527,8 +526,8 @@ LCV_ERR LCVCamSetFrameBuffer(const uint8 fbID,
     return SUCCESS;
 }
 
-LCV_ERR LCVCamSetupCapture(uint8 fbID,
-        const enum EnLcvCamTriggerMode tMode)
+OSC_ERR OscCamSetupCapture(uint8 fbID,
+        const enum EnOscCamTriggerMode tMode)
 {
     uint8           fb;
     int             i;
@@ -536,22 +535,22 @@ LCV_ERR LCVCamSetupCapture(uint8 fbID,
     /* If the caller is using automatic multibuffer management,
      * get the correct frame buffer. */
     fb = fbID;
-    if(fbID == LCV_CAM_MULTI_BUFFER)
+    if(fbID == OSC_CAM_MULTI_BUFFER)
     {
         /* Get the buffer ID to write to next */
-        fb = LCVCamMultiBufferGetCapBuf(&cam.multiBuffer);
+        fb = OscCamMultiBufferGetCapBuf(&cam.multiBuffer);
     }
     
     if(fb > MAX_NR_FRAME_BUFFERS)
     {
-        LCVLog(ERROR, "%s(%u, %d): Invalid parameter!\n",
+        OscLog(ERROR, "%s(%u, %d): Invalid parameter!\n",
                 __func__, fbID, tMode);
         return -EINVALID_PARAMETER;
     }
 
     if(unlikely(cam.capWin.width == 0 || cam.capWin.height == 0))
     {
-        LCVLog(ERROR, "%s: No area of interest set!\n",
+        OscLog(ERROR, "%s: No area of interest set!\n",
                 __func__);
         return -ENO_AREA_OF_INTEREST_SET;
     }
@@ -563,7 +562,7 @@ LCV_ERR LCVCamSetupCapture(uint8 fbID,
         {
             /* Can only capture one picture at a time but we don't
              * know how 'long ago' the last capture was. */
-            LCVLog(WARN, 
+            OscLog(WARN, 
                     "%s(%d, %d):" \
                     "Already capturing to different frame buffer (%d). "\
                     "This may not be possible on the target\n",
@@ -574,17 +573,17 @@ LCV_ERR LCVCamSetupCapture(uint8 fbID,
     /* Distinguish the trigger modes */
     switch(tMode)
     {
-    case LCV_CAM_TRIGGER_MODE_EXTERNAL:
+    case OSC_CAM_TRIGGER_MODE_EXTERNAL:
         cam.fbStat[fb] = STATUS_CAPTURING_EXT_TRIGGER;
         break;
-    case LCV_CAM_TRIGGER_MODE_MANUAL:
+    case OSC_CAM_TRIGGER_MODE_MANUAL:
         cam.fbStat[fb] = STATUS_CAPTURING_MAN_TRIGGER;
         break;
     default:
         return -EINVALID_PARAMETER;
     }
      
-    LCVLog(DEBUG, 
+    OscLog(DEBUG, 
             "%s: Setting up capture of %ux%d picture " \
             "on frame buffer %d.\n",
             __func__, cam.capWin.width, cam.capWin.height, fb);
@@ -592,11 +591,11 @@ LCV_ERR LCVCamSetupCapture(uint8 fbID,
     /* This is a void-operation in the host implementation, since we
      * can read a picture from file at any time. */
     
-    if(fbID == LCV_CAM_MULTI_BUFFER)
+    if(fbID == OSC_CAM_MULTI_BUFFER)
     {
         /* Allow the multi buffer to update is status according to this
          * successful capture. */
-        LCVCamMultiBufferCapture(&cam.multiBuffer);
+        OscCamMultiBufferCapture(&cam.multiBuffer);
     }
     
     /* Save the capture window currently configured since that will
@@ -607,7 +606,7 @@ LCV_ERR LCVCamSetupCapture(uint8 fbID,
     return SUCCESS;
 }
 
-LCV_ERR LCVCamCancelCapture()
+OSC_ERR OscCamCancelCapture()
 {
     int i;
     for(i = 0; i < MAX_NR_FRAME_BUFFERS; i++)
@@ -621,38 +620,38 @@ LCV_ERR LCVCamCancelCapture()
         }
     }
     
-    LCVLog(WARN, "%s: Cancel request when no picture \
+    OscLog(WARN, "%s: Cancel request when no picture \
             transfer to cancel.\n",
             __func__);
     return -ENOTHING_TO_ABORT;
 }
 
-LCV_ERR LCVCamReadPicture(const uint8 fbID,
+OSC_ERR OscCamReadPicture(const uint8 fbID,
         void ** ppPic,
         const uint16 maxAge,
         const uint16 timeout)
 {
-    LCV_ERR             err = SUCCESS;
+    OSC_ERR             err = SUCCESS;
     uint8               fb;
-    struct LCV_PICTURE  pic;
+    struct OSC_PICTURE  pic;
     char                strPicFileName[256];
     
 
     if(unlikely(cam.hFNReader == NULL))
     {
-        LCVLog(ERROR, "%s: No filename reader set!\n", __func__);
+        OscLog(ERROR, "%s: No filename reader set!\n", __func__);
         return -EDEVICE;
     }
     /* If the caller is using automatic multibuffer management,
      * get the correct frame buffer. */
     fb = fbID;
-    if(fb == LCV_CAM_MULTI_BUFFER)
+    if(fb == OSC_CAM_MULTI_BUFFER)
     {
         /* Get the correct buffer ID */
-        fb = LCVCamMultiBufferGetSyncBuf(&cam.multiBuffer);
-        if(fb == LCV_CAM_INVALID_BUFFER_ID)
+        fb = OscCamMultiBufferGetSyncBuf(&cam.multiBuffer);
+        if(fb == OSC_CAM_INVALID_BUFFER_ID)
         {
-            LCVLog(ERROR, "%s: No capture started!\n",
+            OscLog(ERROR, "%s: No capture started!\n",
                     __func__);
             return -ENO_CAPTURE_STARTED;
         }
@@ -662,7 +661,7 @@ LCV_ERR LCVCamReadPicture(const uint8 fbID,
     if((ppPic == NULL) || (fb > MAX_NR_FRAME_BUFFERS) ||
             (cam.fbufs[fb].data == NULL))
     {
-        LCVLog(ERROR, "%s(%u, 0x%x, %u, %u): Invalid parameter!\n",
+        OscLog(ERROR, "%s(%u, 0x%x, %u, %u): Invalid parameter!\n",
                 __func__, fbID, ppPic, maxAge, timeout);
         return -EINVALID_PARAMETER;
     }
@@ -673,49 +672,49 @@ LCV_ERR LCVCamReadPicture(const uint8 fbID,
             (cam.fbStat[fb] != STATUS_CAPTURING_MAN_TRIGGER))
     {
         /* There is no scheduled capture */
-        LCVLog(ERROR, "%s: No capture started on frame buffer %d!\n",
+        OscLog(ERROR, "%s: No capture started on frame buffer %d!\n",
                 __func__, fb);
         return -ENO_CAPTURE_STARTED;
     }
     
-    LCVLog(DEBUG, 
+    OscLog(DEBUG, 
             "%s(%u, 0x%x, %u, %u): Syncing capture on frame buffer %d.\n",
             __func__, fbID, ppPic, maxAge, timeout, fb);
     
     /* Get the current test image file name from the file name reader 
      * module */
-    LCVFrdGetCurrentFileName(cam.hFNReader, 
+    OscFrdGetCurrentFileName(cam.hFNReader, 
             strPicFileName);
     
     /* We have no assumptions about the picture format but let 
      * everything be filled and allocated by the loader routine */
-    memset(&pic, 0, sizeof(struct LCV_PICTURE));
+    memset(&pic, 0, sizeof(struct OSC_PICTURE));
     
     /* Read the file */
-    err = LCVBmpRead(&pic, strPicFileName);
+    err = OscBmpRead(&pic, strPicFileName);
     if(err != 0)
     {
-        LCVLog(ERROR, "%s: Unable to read test image (%s). Err: %d.\n", 
+        OscLog(ERROR, "%s: Unable to read test image (%s). Err: %d.\n", 
                 __func__, strPicFileName, err);
         return -EDEVICE;
     }
     
     /* Crop the picture to the window set by the application.
-     * We use the window at the time of the call to LCVCamSetupCapture()
+     * We use the window at the time of the call to OscCamSetupCapture()
      * to emulate the behavior of the target implementation. */
-    err = LCVCamCropPicture(cam.fbufs[fb].data, 
+    err = OscCamCropPicture(cam.fbufs[fb].data, 
             cam.fbufs[fb].size,
             &pic, 
             &cam.lastCapWin);    
     if(err != 0)
     {
-        LCVLog(ERROR, "%s: Unable to crop test image (%s). Err: %d.\n", 
+        OscLog(ERROR, "%s: Unable to crop test image (%s). Err: %d.\n", 
                 __func__, strPicFileName, err);
         return -EDEVICE;
     }
     
     /* Free the picture structure data again; it was allocated in the 
-     * LCVBmpRead routine. */
+     * OscBmpRead routine. */
     free(pic.data);
 
     *ppPic = cam.fbufs[fb].data;
@@ -723,18 +722,18 @@ LCV_ERR LCVCamReadPicture(const uint8 fbID,
     
     /* The operation was successful */
     
-    if(fbID == LCV_CAM_MULTI_BUFFER)
+    if(fbID == OSC_CAM_MULTI_BUFFER)
     {
         /* Allow the multi buffer to update is status according to this
          * successful read. */
-        LCVCamMultiBufferSync(&cam.multiBuffer);
+        OscCamMultiBufferSync(&cam.multiBuffer);
     }
     if(memcmp(&cam.capWin, &cam.lastCapWin, sizeof(struct capture_window)))
     {
         /* Reset the field storing the ID of the frame buffer with the 
          * lastvalid picture since now the format has changed and the 
          * application expects the new format. */
-        cam.lastValidID = LCV_CAM_INVALID_BUFFER_ID;      
+        cam.lastValidID = OSC_CAM_INVALID_BUFFER_ID;      
     } else {   
         /* Mark this frame buffer as the one containing the 
          * latest picture. */
@@ -744,7 +743,7 @@ LCV_ERR LCVCamReadPicture(const uint8 fbID,
     return err;
 }
 
-LCV_ERR LCVCamReadLatestPicture(uint8 ** ppPic)
+OSC_ERR OscCamReadLatestPicture(uint8 ** ppPic)
 {    
     /* Input Validation */
     if(ppPic == NULL)
@@ -754,18 +753,18 @@ LCV_ERR LCVCamReadLatestPicture(uint8 ** ppPic)
     
     *ppPic = NULL;  /* Precaution */
     
-    if(cam.lastValidID == LCV_CAM_INVALID_BUFFER_ID)
+    if(cam.lastValidID == OSC_CAM_INVALID_BUFFER_ID)
     {
         return -ENO_MATCHING_PICTURE;
     }
     
     if(cam.fbufs[cam.lastValidID].data == NULL)
     {
-        cam.lastValidID = LCV_CAM_INVALID_BUFFER_ID;
+        cam.lastValidID = OSC_CAM_INVALID_BUFFER_ID;
         return -ENO_MATCHING_PICTURE;
     }
     
-    LCVLog(DEBUG, 
+    OscLog(DEBUG, 
             "%s(0x%x): Getting latest picture from frame" \
             "buffer %d.\n",
             __func__, ppPic,cam.lastValidID);
@@ -774,7 +773,7 @@ LCV_ERR LCVCamReadLatestPicture(uint8 ** ppPic)
     return SUCCESS;
 }
 
-LCV_ERR LCVCamRegisterCorretionCallback( 
+OSC_ERR OscCamRegisterCorretionCallback( 
         int (*pCallback)(
                 uint8 *pImg, 
                 const uint16 lowX, 

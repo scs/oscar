@@ -1,7 +1,6 @@
 /*! @file bmp_priv.h
  * @brief Private bitmap module definitions with object structure
  * 
- * @author Markus Berner
  */
 #ifndef BMP_PRIV_H_
 #define BMP_PRIV_H_
@@ -11,11 +10,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef LCV_HOST
-    #include <framework_types_host.h>
+#ifdef OSC_HOST
+    #include <oscar_types_host.h>
 #else
-    #include <framework_types_target.h>
-#endif /* LCV_HOST */
+    #include <oscar_types_target.h>
+#endif /* OSC_HOST */
 
 #include <log/log_pub.h>
 
@@ -191,7 +190,7 @@ static uint8 aryBmpHeadGrey[] = {
 };
 
 /*! @brief Object struct of the bitmap module */
-struct LCV_BMP {
+struct OSC_BMP {
     uint32      bmp_dummy;  /*!< @brief dummy member */
 };
 
@@ -209,7 +208,7 @@ struct LCV_BMP {
  * @param pDataOffset Where to store the extracted data offset.
  * @param pColorDepth Where to store the extracted color depth.
  *//*********************************************************************/
-static inline void LCVBmpReadHdrInfo(const uint8 *pHdr,
+static inline void OscBmpReadHdrInfo(const uint8 *pHdr,
         int32 * pWidth, int32 * pHeight, int32 *pDataOffset,
         int16 * pColorDepth);
 
@@ -225,16 +224,16 @@ static inline void LCVBmpReadHdrInfo(const uint8 *pHdr,
  * @param colorDepth Desired color depth.
  * @param headerSize Size of the bitmap header used.
  *//*********************************************************************/
-static inline void LCVBmpWriteHdrInfo(uint8 *pHdr,
+static inline void OscBmpWriteHdrInfo(uint8 *pHdr,
         const int32 width, const int32 height, const int16 colorDepth,
         const int32 headerSize);
 
 /*********************************************************************//*!
- * @brief Reverse the row order of an LCV_PICTURE
+ * @brief Reverse the row order of an OSC_PICTURE
  * 
- * @param pPic Pointer to the fully initialized LCV picture.
+ * @param pPic Pointer to the fully initialized OSC picture.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-static LCV_ERR LCVBmpReverseRowOrder(struct LCV_PICTURE *pPic);
+static OSC_ERR OscBmpReverseRowOrder(struct OSC_PICTURE *pPic);
 
 #endif /*BMP_PRIV_H_*/

@@ -3,19 +3,18 @@
  * 
  * Contains stuff that is too small to be put in a separate module.
  * 
- * @author Markus Berner
  */
 #ifndef SUP_PUB_H_
 #define SUP_PUB_H_
 
-#include "framework_error.h"
-#ifdef LCV_HOST
-    #include "framework_types_host.h"
-    #include "framework_host.h"
+#include "oscar_error.h"
+#ifdef OSC_HOST
+    #include "oscar_types_host.h"
+    #include "oscar_host.h"
 #else
-    #include "framework_types_target.h"
-    #include "framework_target.h"
-#endif /* LCV_HOST */
+    #include "oscar_types_target.h"
+    #include "oscar_target.h"
+#endif /* OSC_HOST */
 
 
 /*======================== API functions ===============================*/
@@ -26,14 +25,14 @@
  * @param hFw Pointer to the handle of the framework.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-LCV_ERR LCVSupCreate(void *hFw);
+OSC_ERR OscSupCreate(void *hFw);
 
 /*********************************************************************//*!
  * @brief Destructor
  * 
  * @param hFw Pointer to the handle of the framework.
  *//*********************************************************************/
-void LCVSupDestroy(void *hFw);
+void OscSupDestroy(void *hFw);
 
 /*--------------------------- Watchdog ---------------------------------*/
 
@@ -55,13 +54,13 @@ void LCVSupDestroy(void *hFw);
  * for the built-in hardware watchdog appear. Otherwise, the less
  * reliable software watchdog can be used.
  * 
- * @see LCVSupWdtInit
- * @see LCVSupWdtClose
- * @see LCVSupWdtKeepAlive
+ * @see OscSupWdtInit
+ * @see OscSupWdtClose
+ * @see OscSupWdtKeepAlive
  * 
  * @return SUCCESS or an appropriate error code.
  *//*********************************************************************/
-LCV_ERR LCVSupWdtInit();
+OSC_ERR OscSupWdtInit();
 
 /*********************************************************************//*!
  * @brief Close and stop an initialized watchdog.
@@ -71,20 +70,20 @@ LCV_ERR LCVSupWdtInit();
  * 
  * Host: No functionality.
  * 
- * @see LCVSupWdtInit
+ * @see OscSupWdtInit
  * 
  * @return SUCCESS or an appropriate error code.
  *//*********************************************************************/
-LCV_ERR LCVSupWdtClose();
+OSC_ERR OscSupWdtClose();
 
 /*********************************************************************//*!
  * @brief Reset the watchdog counter tracking the keep alive period.
  * 
- * @see LCVSupWdtInit
+ * @see OscSupWdtInit
  * 
  * Host: No functionality.
  *//*********************************************************************/
-inline void LCVSupWdtKeepAlive();
+inline void OscSupWdtKeepAlive();
 
 /*---------------------------- Cycles ----------------------------------*/
 
@@ -98,11 +97,11 @@ inline void LCVSupWdtKeepAlive();
  * resolution is worse with this method, but it is compatible among a
  * wide selection of platforms.
  * /todo Low priority: Use whole 64 bit cycles counter.
- * @see LCVSupCycToMicroSecs
+ * @see OscSupCycToMicroSecs
  * 
  * @return The current cycle count (wraps).
  *//*********************************************************************/
-inline uint32 LCVSupCycGet();
+inline uint32 OscSupCycGet();
 
 /*********************************************************************//*!
  * @brief Convert a cycle count to microseconds.
@@ -110,74 +109,74 @@ inline uint32 LCVSupCycGet();
  * Use to get a real time measure of time passed by supplying the
  * difference between to cycle counts.
  * /todo Low priority: Use whole 64 bit cycles counter.
- * @see LCVSupCycGet
+ * @see OscSupCycGet
  * 
  * @param cycles Cycle count to be converted.
  * @return Microseconds corresponding to supplied cycle count.
  *//*********************************************************************/
-inline uint32 LCVSupCycToMicroSecs(uint32 cycles);
+inline uint32 OscSupCycToMicroSecs(uint32 cycles);
 
 /*------------------------------ SRAM ----------------------------------*/
 
 /*********************************************************************//*!
  * @brief Query the length of the available L1 SRAM in Block A
  * 
- * @see LCVSupSramL1A
+ * @see OscSupSramL1A
  * 
  * @return Length
  *//*********************************************************************/
-inline uint32 LCVSupSramL1ALen();
+inline uint32 OscSupSramL1ALen();
 
 /*********************************************************************//*!
  * @brief Get the pointer to the available L1 SRAM in block A
  * 
  * Host: This is implemented by a temporary memory area which is not
  * really faster than any other.
- * @see LCVSupSramL1ALen
+ * @see OscSupSramL1ALen
  * 
  * @return Pointer to L1A.
  *//*********************************************************************/
-inline void* LCVSupSramL1A();
+inline void* OscSupSramL1A();
 
 /*********************************************************************//*!
  * @brief Query the length of the available L1 SRAM in Block B
  * 
- * @see LCVSupSramL1B
+ * @see OscSupSramL1B
  * 
  * @return Length
  *//*********************************************************************/
-inline uint32 LCVSupSramL1BLen();
+inline uint32 OscSupSramL1BLen();
 
 /*********************************************************************//*!
  * @brief Get the pointer to the available L1 SRAM in block B
  * 
  * Host: This is implemented by a temporary memory area which is not
  * really faster than any other.
- * @see LCVSupSramL1BLen
+ * @see OscSupSramL1BLen
  * 
  * @return Pointer to L1B.
  *//*********************************************************************/
-inline void* LCVSupSramL1B();
+inline void* OscSupSramL1B();
 
 /*********************************************************************//*!
  * @brief Query the length of the available L1 SRAM in the Scratchpad
  * 
- * @see LCVSupSramScratch
+ * @see OscSupSramScratch
  * 
  * @return Length
  *//*********************************************************************/
-inline uint32 LCVSupSramScratchLen();
+inline uint32 OscSupSramScratchLen();
 
 /*********************************************************************//*!
  * @brief Get the pointer to the available L1 SRAM in the Scratchpad
  * 
  * Host: This is implemented by a temporary memory area which is not
  * really faster than any other.
- * @see LCVSupSramScratchLen
+ * @see OscSupSramScratchLen
  * 
  * @return Pointer to the Scratchpad.
  *//*********************************************************************/
-inline void* LCVSupSramScratch();
+inline void* OscSupSramScratch();
 
 
 /*------------------------------ Cache ---------------------------------*/
@@ -185,7 +184,7 @@ inline void* LCVSupSramScratch();
 /*! @brief the length of a cache line of the Blackfin Prozessor. */
 #define CACHE_LINE_LEN 32
 
-#ifdef LCV_TARGET
+#ifdef OSC_TARGET
 /*********************************************************************//*!
  * @brief Prefetch the cacheline containing an address.
  * 
@@ -291,9 +290,9 @@ inline void* LCVSupSramScratch();
         : "d" (size), "a" (address) \
         : "LC1", "LT1", "LB1", "P0", "P1" )
 
-#endif /* LCV_TARGET */
+#endif /* OSC_TARGET */
 
-#ifdef LCV_HOST
+#ifdef OSC_HOST
 #define PREFETCH(address)                   {}
 #define PREFETCH_NEXT(address)              {}
 #define FLUSH(address)                      {}
@@ -301,10 +300,10 @@ inline void* LCVSupSramScratch();
 #define IFLUSH(address)                     {}
 #define FLUSHINV_REGION(address, size)      {}
 #define FLUSH_REGION(address, size)         {}
-#endif /* LCV_HOST */
+#endif /* OSC_HOST */
 
 /*------------------------ Instruction Flow ----------------------------*/
-#ifdef LCV_TARGET
+#ifdef OSC_TARGET
 /*! @brief Wait until all previous actions have been completed
  * (system-wide) 
  * 
@@ -317,15 +316,15 @@ inline void* LCVSupSramScratch();
  * Host: This does nothing
  */
 #define CSYNC asm("csync;\n")
-#endif /* LCV_TARGET */
+#endif /* OSC_TARGET */
 
-#ifdef LCV_HOST
+#ifdef OSC_HOST
 #define SSYNC {}
 #define CSYNC {}
-#endif /* LCV_HOST */
+#endif /* OSC_HOST */
 
 /*------------------------ Memory copy ----------------------------*/
-#ifdef LCV_TARGET
+#ifdef OSC_TARGET
 /*********************************************************************//*!
  * @brief Copy a memory region with the CPU.
  * 
@@ -348,9 +347,9 @@ inline void* LCVSupSramScratch();
         :                                   \
         :"a" (pDst), "a" (pSrc), "a" (count-1) \
         : "LC1","LT1","LB1", "I0","P0", "R0")
-#endif /* LCV_TARGET */
+#endif /* OSC_TARGET */
 
-#ifdef LCV_HOST
+#ifdef OSC_HOST
 #define memcpy_inline(pDst,pSrc,count)      \
 {                                           \
     int i;                                  \
@@ -361,35 +360,35 @@ inline void* LCVSupSramScratch();
         *pD++ = *pS++;                      \
     }                                       \
 }
-#endif /* LCV_HOST */
+#endif /* OSC_HOST */
 
 /*------------------------------ LED ---------------------------------*/
 /*********************************************************************//*!
- * @brief Initialize the on-board LED of the Industrial LCV platform.
+ * @brief Initialize the on-board LED of the Industrial OSC platform.
  * 
- * Target only. Industrial LCV only. 
+ * Target only. Industrial OSC only. 
  * 
  * @return SUCCESS or an appropriate error code.
  *//*********************************************************************/
-LCV_ERR LCVSupLedInit();
+OSC_ERR OscSupLedInit();
 
 /*********************************************************************//*!
  * @brief Set the state of the LED.
  * 
- * Target only. Industrial LCV only. 
+ * Target only. Industrial OSC only. 
  * 
  * @param val   '1': on
  *              '0': off
  *              'T': toggle
  *//*********************************************************************/
-inline void LCVSupLedWrite(char val);
+inline void OscSupLedWrite(char val);
 
 /*********************************************************************//*!
  * @brief Close the driver of the LED.
  * 
- * Target only. Industrial LCV only. 
+ * Target only. Industrial OSC only. 
  *//*********************************************************************/
-void LCVSupLedClose();
+void OscSupLedClose();
 
 #endif /* SUP_PUB_H_ */
 

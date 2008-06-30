@@ -1,23 +1,22 @@
 /*! @file sim_target.c
  * @brief Simulation module implementation for host 
  * 
- * @author Markus Berner
  */
 
-#include "framework_types_target.h"
+#include "oscar_types_target.h"
 
 #include "sim_pub.h"
 #include "sim_priv.h"
-#include "framework_intern.h"
+#include "oscar_intern.h"
 
 /*! @brief The module singelton instance. */
-struct LCV_SIM_OBJ sim;     
+struct OSC_SIM_OBJ sim;     
 
-LCV_ERR LCVSimCreate(void *hFw)
+OSC_ERR OscSimCreate(void *hFw)
 {
-    struct LCV_FRAMEWORK *pFw;
+    struct OSC_FRAMEWORK *pFw;
 
-    pFw = (struct LCV_FRAMEWORK *)hFw;
+    pFw = (struct OSC_FRAMEWORK *)hFw;
     if(pFw->sim.useCnt != 0)
     {
         pFw->sim.useCnt++;
@@ -25,7 +24,7 @@ LCV_ERR LCVSimCreate(void *hFw)
         return SUCCESS;
     }
      
-    memset(&sim, 0, sizeof(struct LCV_SIM_OBJ));
+    memset(&sim, 0, sizeof(struct OSC_SIM_OBJ));
         
     /* Increment the use count */
     pFw->sim.hHandle = (void*)&sim;
@@ -34,11 +33,11 @@ LCV_ERR LCVSimCreate(void *hFw)
     return SUCCESS;
 }
 
-void LCVSimDestroy(void *hFw)
+void OscSimDestroy(void *hFw)
 {
-    struct LCV_FRAMEWORK *pFw;
+    struct OSC_FRAMEWORK *pFw;
             
-    pFw = (struct LCV_FRAMEWORK *)hFw; 
+    pFw = (struct OSC_FRAMEWORK *)hFw; 
     /* Check if we really need to release or whether we still 
      * have users. */
     pFw->sim.useCnt--;
@@ -47,21 +46,21 @@ void LCVSimDestroy(void *hFw)
         return;
     }
     
-    memset(&sim, 0, sizeof(struct LCV_SIM_OBJ));
+    memset(&sim, 0, sizeof(struct OSC_SIM_OBJ));
 }
 
 /*********************************************************************//*!
  * Target: Stump since simulation is only done on host.
  *//*********************************************************************/
-void LCVSimInitialize(void)
+void OscSimInitialize(void)
 {   
 }
 
-void LCVSimStep()
+void OscSimStep()
 {
 }
 
-uint32 LCVSimGetCurTimeStep()
+uint32 OscSimGetCurTimeStep()
 {
     return SUCCESS;
 }
@@ -70,7 +69,7 @@ uint32 LCVSimGetCurTimeStep()
 /*********************************************************************//*!
  * Target: Stump since simulation is only done on host.
  *//*********************************************************************/
-LCV_ERR LCVSimRegisterCycleCallback( void (*pCallback)(void))
+OSC_ERR OscSimRegisterCycleCallback( void (*pCallback)(void))
 {
     return SUCCESS;
 }

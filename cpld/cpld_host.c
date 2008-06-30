@@ -1,29 +1,28 @@
 /*! @file cpld_host.c
  * @brief Cpld module implementation for host.
  * 
- * @author Samuel Zahnd
  ************************************************************************/
 
-#include "framework_types_host.h"
+#include "oscar_types_host.h"
 
 #include "cpld_pub.h"
 #include "cpld_priv.h"
-#include "framework_intern.h"
+#include "oscar_intern.h"
 
-struct LCV_CPLD cpld; /*!< The cpld module singelton instance */
+struct OSC_CPLD cpld; /*!< The cpld module singelton instance */
 
 /*! The dependencies of this module. */
-struct LCV_DEPENDENCY cpld_deps[] = {
-        {"log", LCVLogCreate, LCVLogDestroy}
+struct OSC_DEPENDENCY cpld_deps[] = {
+        {"log", OscLogCreate, OscLogDestroy}
 };
 
-LCV_ERR LCVCpldCreate(void *hFw)
+OSC_ERR OscCpldCreate(void *hFw)
 {
-#ifdef TARGET_TYPE_LCV_IND
-    struct LCV_FRAMEWORK *pFw;
-    LCV_ERR err;
+#ifdef TARGET_TYPE_INDXCAM
+    struct OSC_FRAMEWORK *pFw;
+    OSC_ERR err;
     
-    pFw = (struct LCV_FRAMEWORK *)hFw;
+    pFw = (struct OSC_FRAMEWORK *)hFw;
     if(pFw->cpld.useCnt != 0)
     {
         pFw->cpld.useCnt++;
@@ -32,9 +31,9 @@ LCV_ERR LCVCpldCreate(void *hFw)
     }
     
     /* Load the module cpld_deps of this module. */
-    err = LCVLoadDependencies(pFw, 
+    err = OSCLoadDependencies(pFw, 
             cpld_deps, 
-            sizeof(cpld_deps)/sizeof(struct LCV_DEPENDENCY));
+            sizeof(cpld_deps)/sizeof(struct OSC_DEPENDENCY));
     if(err != SUCCESS)
     {
         printf("%s: ERROR: Unable to load cpld_deps! (%d)\n",
@@ -43,7 +42,7 @@ LCV_ERR LCVCpldCreate(void *hFw)
         return err;
     }
     
-    memset(&cpld, 0, sizeof(struct LCV_CPLD));
+    memset(&cpld, 0, sizeof(struct OSC_CPLD));
 
     /* Increment the use count */
     pFw->cpld.hHandle = (void*)&cpld;
@@ -51,17 +50,17 @@ LCV_ERR LCVCpldCreate(void *hFw)
     
     return SUCCESS;
 #else
-    LCVLog(ERROR, "%s: No CPLD available on this hardware platform!\n",
+    OscLog(ERROR, "%s: No CPLD available on this hardware platform!\n",
                 __func__);
     return -ENO_SUCH_DEVICE;
-#endif /* TARGET_TYPE_LCV_IND */
+#endif /* TARGET_TYPE_INDXCAM */
 }
 
-void LCVCpldDestroy(void *hFw)
+void OscCpldDestroy(void *hFw)
 {
-    struct LCV_FRAMEWORK *pFw;
+    struct OSC_FRAMEWORK *pFw;
 
-    pFw = (struct LCV_FRAMEWORK *)hFw; 
+    pFw = (struct OSC_FRAMEWORK *)hFw; 
     /* Check if we really need to release or whether we still 
      * have users. */
     pFw->cpld.useCnt--;
@@ -70,31 +69,31 @@ void LCVCpldDestroy(void *hFw)
         return;
     }
     
-    LCVUnloadDependencies(pFw, 
+    OSCUnloadDependencies(pFw, 
             cpld_deps, 
-            sizeof(cpld_deps)/sizeof(struct LCV_DEPENDENCY));
+            sizeof(cpld_deps)/sizeof(struct OSC_DEPENDENCY));
     
-    memset(&cpld, 0, sizeof(struct LCV_CPLD));
+    memset(&cpld, 0, sizeof(struct OSC_CPLD));
 }
 
-LCV_ERR LCVCpldRset( 
+OSC_ERR OscCpldRset( 
         const uint16 regId, 
         const uint8 val)
 {
-#ifdef TARGET_TYPE_LCV_IND
+#ifdef TARGET_TYPE_INDXCAM
     cpld.reg[ regId] = val;
     return SUCCESS;
 #else
     return -ENO_SUCH_DEVICE;
-#endif /* TARGET_TYPE_LCV_IND */
+#endif /* TARGET_TYPE_INDXCAM */
 }
 
-LCV_ERR LCVCpldFset( 
+OSC_ERR OscCpldFset( 
         uint16 regId, 
         uint8 field, 
         uint8 val)
 {
-#ifdef TARGET_TYPE_LCV_IND
+#ifdef TARGET_TYPE_INDXCAM
     uint8 current;
     current = cpld.reg[ regId];
     if( val)
@@ -109,27 +108,27 @@ LCV_ERR LCVCpldFset(
     return SUCCESS;
 #else
     return -ENO_SUCH_DEVICE;
-#endif /* TARGET_TYPE_LCV_IND */
+#endif /* TARGET_TYPE_INDXCAM */
 }
 
-LCV_ERR LCVCpldRget( 
+OSC_ERR OscCpldRget( 
         const uint16 regId,
         uint8* val)
 {
-#ifdef TARGET_TYPE_LCV_IND
+#ifdef TARGET_TYPE_INDXCAM
     *val = cpld.reg[ regId];    
     return SUCCESS;
 #else
     return -ENO_SUCH_DEVICE;
-#endif /* TARGET_TYPE_LCV_IND */
+#endif /* TARGET_TYPE_INDXCAM */
 }
 
-LCV_ERR LCVCpldFget( 
+OSC_ERR OscCpldFget( 
         const uint16 regId, 
         const uint8 field, 
         uint8* val)
 {
-#ifdef TARGET_TYPE_LCV_IND
+#ifdef TARGET_TYPE_INDXCAM
     uint8 current = cpld.reg[ regId];
     if( current & field)
     {
@@ -142,5 +141,5 @@ LCV_ERR LCVCpldFget(
     return SUCCESS;
 #else
     return -ENO_SUCH_DEVICE;
-#endif /* TARGET_TYPE_LCV_IND */
+#endif /* TARGET_TYPE_INDXCAM */
 }

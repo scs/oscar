@@ -1,28 +1,27 @@
 /*! @file swr_target.c
  * @brief Stimuli writer module implementation for target.
  * 
- * @author Samuel Zahnd
  ************************************************************************/
 
-#include "framework_types_target.h"
+#include "oscar_types_target.h"
 
 #include "swr_pub.h"
 #include "swr_priv.h"
-#include "framework_intern.h"
+#include "oscar_intern.h"
 
-struct LCV_SWR swr;		/*!< Module singelton instance */
+struct OSC_SWR swr;		/*!< Module singelton instance */
 
 /*! The dependencies of this module. */
-struct LCV_DEPENDENCY swr_deps[] = {
-        {"log", LCVLogCreate, LCVLogDestroy}
+struct OSC_DEPENDENCY swr_deps[] = {
+        {"log", OscLogCreate, OscLogDestroy}
 };
 
-LCV_ERR LCVSwrCreate(void *hFw)
+OSC_ERR OscSwrCreate(void *hFw)
 {
-    struct LCV_FRAMEWORK *pFw;
-    LCV_ERR err;
+    struct OSC_FRAMEWORK *pFw;
+    OSC_ERR err;
     
-    pFw = (struct LCV_FRAMEWORK *)hFw;
+    pFw = (struct OSC_FRAMEWORK *)hFw;
     if(pFw->swr.useCnt != 0)
     {
         pFw->swr.useCnt++;
@@ -31,9 +30,9 @@ LCV_ERR LCVSwrCreate(void *hFw)
     }
     
     /* Load the module swr_deps of this module. */
-    err = LCVLoadDependencies(pFw, 
+    err = OSCLoadDependencies(pFw, 
             swr_deps, 
-            sizeof(swr_deps)/sizeof(struct LCV_DEPENDENCY));
+            sizeof(swr_deps)/sizeof(struct OSC_DEPENDENCY));
     
     if(err != SUCCESS)
     {
@@ -43,7 +42,7 @@ LCV_ERR LCVSwrCreate(void *hFw)
         return err;
     }
     
- 	memset(&swr, 0, sizeof(struct LCV_SWR));
+ 	memset(&swr, 0, sizeof(struct OSC_SWR));
 	
     /* Increment the use count */
     pFw->swr.hHandle = (void*)&swr;
@@ -52,11 +51,11 @@ LCV_ERR LCVSwrCreate(void *hFw)
     return SUCCESS;
 }
 
-void LCVSwrDestroy(void *hFw)
+void OscSwrDestroy(void *hFw)
 {
-    struct LCV_FRAMEWORK *pFw;
+    struct OSC_FRAMEWORK *pFw;
         
-    pFw = (struct LCV_FRAMEWORK *)hFw; 
+    pFw = (struct OSC_FRAMEWORK *)hFw; 
     /* Check if we really need to release or whether we still 
      * have users. */
     pFw->swr.useCnt--;
@@ -65,10 +64,10 @@ void LCVSwrDestroy(void *hFw)
         return;
     }
     
-    LCVUnloadDependencies(pFw, 
+    OSCUnloadDependencies(pFw, 
             swr_deps, 
-            sizeof(swr_deps)/sizeof(struct LCV_DEPENDENCY));
+            sizeof(swr_deps)/sizeof(struct OSC_DEPENDENCY));
     
-	memset(&swr, 0, sizeof(struct LCV_SWR));
+	memset(&swr, 0, sizeof(struct OSC_SWR));
 }
 

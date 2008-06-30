@@ -1,7 +1,6 @@
-/*! @file framework_target.h
+/*! @file oscar_target.h
  * @brief General framework definitions for the target
  * 
- * @author Markus Berner, Samuel Zahnd
  */
 #ifndef FRAMEWORK_TARGET_H_
 #define FRAMEWORK_TARGET_H_

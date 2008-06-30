@@ -2,14 +2,13 @@
  * * @brief Interprocess communication module implementation shared 
  * part for host and target 
  * 
- * @author Markus Berner
  */
 
-#ifdef LCV_HOST
-# include "framework_types_host.h"
-#else /* LCV_HOST */
-# include "framework_types_target.h"
-#endif /* LCV_HOST */
+#ifdef OSC_HOST
+# include "oscar_types_host.h"
+#else /* OSC_HOST */
+# include "oscar_types_target.h"
+#endif /* OSC_HOST */
 
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -20,23 +19,23 @@
 #include <errno.h>
 #include "ipc_pub.h"
 #include "ipc_priv.h"
-#include "framework_intern.h"
+#include "oscar_intern.h"
 
 /*! The camera module singelton instance. */
-struct LCV_IPC ipc;     
+struct OSC_IPC ipc;     
 
 /*! The dependencies of this module. */
-struct LCV_DEPENDENCY ipc_deps[] = {
-        {"log", LCVLogCreate, LCVLogDestroy}
+struct OSC_DEPENDENCY ipc_deps[] = {
+        {"log", OscLogCreate, OscLogDestroy}
 };
 
 
-LCV_ERR LCVIpcCreate(void *hFw)
+OSC_ERR OscIpcCreate(void *hFw)
 {
-    struct LCV_FRAMEWORK *pFw;
-    LCV_ERR err;
+    struct OSC_FRAMEWORK *pFw;
+    OSC_ERR err;
 
-    pFw = (struct LCV_FRAMEWORK *)hFw;
+    pFw = (struct OSC_FRAMEWORK *)hFw;
     if(pFw->ipc.useCnt != 0)
     {
         pFw->ipc.useCnt++;
@@ -45,9 +44,9 @@ LCV_ERR LCVIpcCreate(void *hFw)
     }
 
     /* Load the module ipc_deps of this module. */
-    err = LCVLoadDependencies(pFw, 
+    err = OSCLoadDependencies(pFw, 
             ipc_deps, 
-            sizeof(ipc_deps)/sizeof(struct LCV_DEPENDENCY));
+            sizeof(ipc_deps)/sizeof(struct OSC_DEPENDENCY));
     
     if(err != SUCCESS)
     {
@@ -57,7 +56,7 @@ LCV_ERR LCVIpcCreate(void *hFw)
         return err;
     }
 
-    memset(&ipc, 0, sizeof(struct LCV_IPC));
+    memset(&ipc, 0, sizeof(struct OSC_IPC));
 
     /* Increment the use count */
     pFw->ipc.hHandle = (void*)&ipc;
@@ -66,12 +65,12 @@ LCV_ERR LCVIpcCreate(void *hFw)
     return SUCCESS;
 }
 
-void LCVIpcDestroy(void *hFw)
+void OscIpcDestroy(void *hFw)
 {
-    LCV_IPC_CHAN_ID         i;
-    struct LCV_FRAMEWORK    *pFw;
+    OSC_IPC_CHAN_ID         i;
+    struct OSC_FRAMEWORK    *pFw;
 
-    pFw = (struct LCV_FRAMEWORK *)hFw; 
+    pFw = (struct OSC_FRAMEWORK *)hFw; 
     /* Check if we really need to release or whether we still 
      * have users. */
     pFw->ipc.useCnt--;
@@ -87,16 +86,16 @@ void LCVIpcDestroy(void *hFw)
         {
             if(ipc.aryIpcChans[i].sock > 0)
             {
-                LCVIpcUnregisterChannel(ipc.aryIpcChans[i].sock);
+                OscIpcUnregisterChannel(ipc.aryIpcChans[i].sock);
             }
         }
     }
 
-    LCVUnloadDependencies(pFw, 
+    OSCUnloadDependencies(pFw, 
             ipc_deps, 
-            sizeof(ipc_deps)/sizeof(struct LCV_DEPENDENCY));    
+            sizeof(ipc_deps)/sizeof(struct OSC_DEPENDENCY));    
 
-    memset(&ipc, 0, sizeof(struct LCV_IPC));
+    memset(&ipc, 0, sizeof(struct OSC_IPC));
 }
 
 static inline void UniqueClientSocketName(char *strSocketPath)
@@ -106,8 +105,8 @@ static inline void UniqueClientSocketName(char *strSocketPath)
 			getpid());
 }
 
-LCV_ERR LCVIpcRegisterChannel(
-		LCV_IPC_CHAN_ID * pIpcChan,
+OSC_ERR OscIpcRegisterChannel(
+		OSC_IPC_CHAN_ID * pIpcChan,
         const char *strSocketPath,
         const int flags)
 {
@@ -118,7 +117,7 @@ LCV_ERR LCVIpcRegisterChannel(
     if(unlikely((pIpcChan == NULL) ||
     		(strSocketPath == NULL) || (strSocketPath[0] == '\0')))
     {
-    	LCVLog(ERROR, "%s(0x%x, 0x%x): Invalid parameter!\n",
+    	OscLog(ERROR, "%s(0x%x, 0x%x): Invalid parameter!\n",
     			__func__, pIpcChan, strSocketPath);
     	return -EINVALID_PARAMETER;
     }
@@ -133,7 +132,7 @@ LCV_ERR LCVIpcRegisterChannel(
     }
     if(unlikely(chan == MAX_NR_IPC_CHANNELS))
     {
-    	LCVLog(ERROR, "%s: All IPC channels busy!\n", __func__);
+    	OscLog(ERROR, "%s: All IPC channels busy!\n", __func__);
     	return -EDEVICE_BUSY;
     }
         
@@ -141,7 +140,7 @@ LCV_ERR LCVIpcRegisterChannel(
     ipc.aryIpcChans[chan].sock = socket(AF_UNIX, SOCK_STREAM, 0);
     if(sock < 0)
     {
-    	LCVLog(ERROR, "%s: Error allocating socket! (%s)\n", 
+    	OscLog(ERROR, "%s: Error allocating socket! (%s)\n", 
     			__func__,
     			strerror(errno));
     	return -ESOCKET;
@@ -156,7 +155,7 @@ LCV_ERR LCVIpcRegisterChannel(
 	    		O_NONBLOCK);
 	    if(ret < 0)
 	    {
-	    	LCVLog(ERROR, "%s: Unable to make socket non-blocking! (%s)\n",
+	    	OscLog(ERROR, "%s: Unable to make socket non-blocking! (%s)\n",
 	    			__func__,
 	    			strerror(errno));
 	    	return -ESOCKET;
@@ -184,7 +183,7 @@ LCV_ERR LCVIpcRegisterChannel(
     			len);
     	if(ret < 0)
     	{
-    		LCVLog(ERROR, "%s: Unable to bind socket! (%s)\n",
+    		OscLog(ERROR, "%s: Unable to bind socket! (%s)\n",
     				__func__, 
     				strerror(errno));
     		close(ipc.aryIpcChans[chan].sock);
@@ -195,7 +194,7 @@ LCV_ERR LCVIpcRegisterChannel(
     	ret = chmod(addr.sun_path, SERV_SOCKET_PERMISSIONS);
     	if(ret < 0)
     	{
-    		LCVLog(WARN, "%s: Unable to set access permissions of "
+    		OscLog(WARN, "%s: Unable to set access permissions of "
     				"socket file node \"%s\"! (%s)",
     				__func__,
     				addr.sun_path,
@@ -206,7 +205,7 @@ LCV_ERR LCVIpcRegisterChannel(
     	ret = listen(ipc.aryIpcChans[chan].sock, ACCEPT_WAIT_QUEUE_LEN);
     	if(ret < 0)
     	{
-    		LCVLog(ERROR, "%s: Unable to listen to socket! (%s)\n",
+    		OscLog(ERROR, "%s: Unable to listen to socket! (%s)\n",
     				__func__, 
     				strerror(errno));
     		close(ipc.aryIpcChans[chan].sock);
@@ -230,11 +229,11 @@ LCV_ERR LCVIpcRegisterChannel(
     		if(errno == EINPROGRESS)
     		{
     			/* Nonblocking connect. */
-    			LCVLog(WARN, "%s: Socket not fully connected yet "
+    			OscLog(WARN, "%s: Socket not fully connected yet "
     					"due to non-blocking operation...",
     					__func__);
     		} else {
-    			LCVLog(ERROR, "%s: Unable to connect socket! (%s)\n",
+    			OscLog(ERROR, "%s: Unable to connect socket! (%s)\n",
     					__func__,
     					strerror(errno));
     			close(ipc.aryIpcChans[chan].sock);
@@ -249,9 +248,9 @@ LCV_ERR LCVIpcRegisterChannel(
     return SUCCESS;
 }
 
-LCV_ERR LCVIpcUnregisterChannel(LCV_IPC_CHAN_ID chanID)
+OSC_ERR OscIpcUnregisterChannel(OSC_IPC_CHAN_ID chanID)
 {
-	struct LCV_IPC_CHANNEL 	*pChan;
+	struct OSC_IPC_CHANNEL 	*pChan;
 	
 	pChan = &ipc.aryIpcChans[chanID];
 	
@@ -275,18 +274,18 @@ LCV_ERR LCVIpcUnregisterChannel(LCV_IPC_CHAN_ID chanID)
 	return SUCCESS;
 }
 
-inline LCV_ERR LCVIpcRecvMsg(const LCV_IPC_CHAN_ID chanID, 
-        struct LCV_IPC_MSG *pMsg)
+inline OSC_ERR OscIpcRecvMsg(const OSC_IPC_CHAN_ID chanID, 
+        struct OSC_IPC_MSG *pMsg)
 {
-    return LCVIpcRecv(chanID, pMsg, sizeof(struct LCV_IPC_MSG));
+    return OscIpcRecv(chanID, pMsg, sizeof(struct OSC_IPC_MSG));
 }
 
-LCV_ERR LCVIpcRecv(const LCV_IPC_CHAN_ID chanID, 
+OSC_ERR OscIpcRecv(const OSC_IPC_CHAN_ID chanID, 
         void *pData,
         const uint32 dataLen)
 {
 	int 					ret;
-	struct LCV_IPC_CHANNEL 	*pChan;
+	struct OSC_IPC_CHANNEL 	*pChan;
 	struct sockaddr_un		remoteAddr;
 	socklen_t				remoteAddrLen;
 	int						sock;
@@ -312,7 +311,7 @@ LCV_ERR LCVIpcRecv(const LCV_IPC_CHAN_ID chanID,
 					/* No connection request pending.*/
 					return -ENO_MSG_AVAIL;
 				} else {
-					LCVLog(ERROR, "%s: Accepting connection failed! (%s)\n",
+					OscLog(ERROR, "%s: Accepting connection failed! (%s)\n",
 							__func__, strerror(errno));
 					return -ESOCKET;
 				}
@@ -327,7 +326,7 @@ LCV_ERR LCVIpcRecv(const LCV_IPC_CHAN_ID chanID,
 						O_NONBLOCK);
 				if(ret < 0)
 				{
-					LCVLog(ERROR, 
+					OscLog(ERROR, 
 							"%s: Unable to make socket non-blocking! (%s)\n",
 							__func__,
 							strerror(errno));
@@ -363,7 +362,7 @@ LCV_ERR LCVIpcRecv(const LCV_IPC_CHAN_ID chanID,
 	            pChan->acceptedSock = -1;			
 	            return -ENO_MSG_AVAIL;
 	        } else {
-	            LCVLog(ERROR, "%s: Reading pending messages failed! (%s)\n",
+	            OscLog(ERROR, "%s: Reading pending messages failed! (%s)\n",
 	                    __func__, strerror(errno));
 	            return -ESOCKET;
 	        }			
@@ -389,7 +388,7 @@ LCV_ERR LCVIpcRecv(const LCV_IPC_CHAN_ID chanID,
 	        pChan->acceptedSock = -1;           
 	        return -ENO_MSG_AVAIL;
 	    } else {
-	        LCVLog(ERROR, "%s: Reading pending messages failed! (%s)\n",
+	        OscLog(ERROR, "%s: Reading pending messages failed! (%s)\n",
 	                __func__, strerror(errno));
 	        return -ESOCKET;
 	    }           
@@ -397,18 +396,18 @@ LCV_ERR LCVIpcRecv(const LCV_IPC_CHAN_ID chanID,
 	return SUCCESS;
 }
 
-inline LCV_ERR LCVIpcSendMsg(const LCV_IPC_CHAN_ID chanID, 
-        const struct LCV_IPC_MSG *pMsg)
+inline OSC_ERR OscIpcSendMsg(const OSC_IPC_CHAN_ID chanID, 
+        const struct OSC_IPC_MSG *pMsg)
 {
-    return LCVIpcSend(chanID, (void*)pMsg, sizeof(struct LCV_IPC_MSG));
+    return OscIpcSend(chanID, (void*)pMsg, sizeof(struct OSC_IPC_MSG));
 }
 
-LCV_ERR LCVIpcSend(const LCV_IPC_CHAN_ID chanID, 
+OSC_ERR OscIpcSend(const OSC_IPC_CHAN_ID chanID, 
         const void *pData,
         uint32 dataLen)
 {
 	int 					ret = 0;
-	struct LCV_IPC_CHANNEL 	*pChan;
+	struct OSC_IPC_CHANNEL 	*pChan;
 	int 					sock;
 	
 	pChan = &ipc.aryIpcChans[chanID];
@@ -442,7 +441,7 @@ LCV_ERR LCVIpcSend(const LCV_IPC_CHAN_ID chanID,
 	if(unlikely(ret == -1))
 	{
 
-		LCVLog(ERROR, "%s: Sending to remote process failed! (%s)\n",
+		OscLog(ERROR, "%s: Sending to remote process failed! (%s)\n",
 				__func__, strerror(errno));
 		return -ESOCKET;
 	}

@@ -14,20 +14,19 @@
  * 
  * FileNameSuffix = .bmp
  * 
- * @author Markus Berner
  ************************************************************************/
 #ifndef FRD_PUB_H_
 #define FRD_PUB_H_
 
-#include "framework_error.h"
+#include "oscar_error.h"
 
 /*! Module-specific error codes.
  * These are enumerated with the offset
  * assigned to each module, so a distinction over
  * all modules can be made */
-enum EnLcvFrdErrors
+enum EnOscFrdErrors
 {
-    EFRD_PARSING_FAILURE = LCV_FRD_ERROR_OFFSET,
+    EFRD_PARSING_FAILURE = OSC_FRD_ERROR_OFFSET,
     EFRD_MAX_NR_READERS_REACHED,
     EFRD_INVALID_VALUES_CONFIGURED
 };
@@ -40,14 +39,14 @@ enum EnLcvFrdErrors
  * @param hFw Pointer to the handle of the framework.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-LCV_ERR LCVFrdCreate(void *hFw);
+OSC_ERR OscFrdCreate(void *hFw);
 
 /*********************************************************************//*!
  * @brief Destructor
  * 
  * @param hFw Pointer to the handle of the framework.
  *//*********************************************************************/
-void LCVFrdDestroy(void *hFw);
+void OscFrdDestroy(void *hFw);
 
 
 /*********************************************************************//*!
@@ -71,8 +70,8 @@ void LCVFrdDestroy(void *hFw);
  * READER_TYPE = FRD_CONSTANT_READER
  * FILENAME = <FILE-NAME>
  * 
- * @see LCVFrdCreateFileListReader
- * @see LCVFrdCreateSequenceReader
+ * @see OscFrdCreateFileListReader
+ * @see OscFrdCreateSequenceReader
  * 
  * @param phReaderHandle The handle to the reader is returned over
  * this pointer.
@@ -80,7 +79,7 @@ void LCVFrdDestroy(void *hFw);
  * the reader parameters are stored.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-LCV_ERR LCVFrdCreateReader(void ** phReaderHandle, 
+OSC_ERR OscFrdCreateReader(void ** phReaderHandle, 
         const char strReaderConfigFile[]);
 
 /*********************************************************************//*!
@@ -88,9 +87,9 @@ LCV_ERR LCVFrdCreateReader(void ** phReaderHandle,
  *
  * Create a filename reader for file-lists directly without parsing a
  * config file.
- * @see LCVFrdCreateReader
- * @see LCVFrdCreateSequenceReader
- * @see LCVFrdCreateConstantReader
+ * @see OscFrdCreateReader
+ * @see OscFrdCreateSequenceReader
+ * @see OscFrdCreateConstantReader
  * 
  * @param phReaderHandle The handle to the reader is returned over
  * this pointer.
@@ -98,7 +97,7 @@ LCV_ERR LCVFrdCreateReader(void ** phReaderHandle,
  * be associated with.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-LCV_ERR LCVFrdCreateFileListReader(void **phReaderHandle,
+OSC_ERR OscFrdCreateFileListReader(void **phReaderHandle,
         const char strFileList[]);
 
 /*********************************************************************//*!
@@ -106,9 +105,9 @@ LCV_ERR LCVFrdCreateFileListReader(void **phReaderHandle,
  *
  * Create a filename reader for sequential file names directly without 
  * parsing a config file.
- * @see LCVFrdCreateReader
- * @see LCVFrdCreateFileListReader
- * @see LCVFrdCreateConstantReader
+ * @see OscFrdCreateReader
+ * @see OscFrdCreateFileListReader
+ * @see OscFrdCreateConstantReader
  * 
  * @param phReaderHandle The handle to the reader is returned over
  * this pointer.
@@ -119,7 +118,7 @@ LCV_ERR LCVFrdCreateFileListReader(void **phReaderHandle,
  * the file type extension.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-LCV_ERR LCVFrdCreateSequenceReader(void **phReaderHandle,
+OSC_ERR OscFrdCreateSequenceReader(void **phReaderHandle,
         char strPrefix[], 
         int seqNrDigits,
         char strSuffix[]);
@@ -129,16 +128,16 @@ LCV_ERR LCVFrdCreateSequenceReader(void **phReaderHandle,
  *
  * Create a filename reader which always reads the same file name.
  * Good for simple testing.
- * @see LCVFrdCreateReader
- * @see LCVFrdCreateFileListReader
- * @see LCVFrdCreateSequenceReader
+ * @see OscFrdCreateReader
+ * @see OscFrdCreateFileListReader
+ * @see OscFrdCreateSequenceReader
  * 
  * @param phReaderHandle The handle to the reader is returned over
  * this pointer.
  * @param strFN The constant file name to read.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-LCV_ERR LCVFrdCreateConstantReader(void **phReaderHandle, char strFN[]);
+OSC_ERR OscFrdCreateConstantReader(void **phReaderHandle, char strFN[]);
 
 /*********************************************************************//*!
  * @brief Returns the file name corresponding to the current time step.
@@ -147,7 +146,7 @@ LCV_ERR LCVFrdCreateConstantReader(void **phReaderHandle, char strFN[]);
  * @param strCurName The current file name is written into this string.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-LCV_ERR LCVFrdGetCurrentFileName(const void *hReaderHandle, 
+OSC_ERR OscFrdGetCurrentFileName(const void *hReaderHandle, 
         char strCurName[]);
 
 

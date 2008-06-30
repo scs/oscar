@@ -39,7 +39,7 @@
 /*#define BENCHMARK*/
 #ifdef BENCHMARK
  #define BENCH_START(startCyc) \
-        startCyc = LCVSupCycGet(); 
+        startCyc = OscSupCycGet(); 
 #else /* BENCHMARK */
  #define BENCH_START(startCyc) \
         {}; 
@@ -47,8 +47,8 @@
 
 #ifdef BENCHMARK
     #define BENCH_STOP(label, startCyc) \
-    LCVLog(CRITICAL, label ": %dus\n", \
-    LCVSupCycToMicroSecs(LCVSupCycGet() - startCyc));
+    OscLog(CRITICAL, label ": %dus\n", \
+    OscSupCycToMicroSecs(OscSupCycGet() - startCyc));
 #else /* BENCHMARK */
  #define BENCH_STOP(label, startCyc) \
        {}; 
@@ -526,7 +526,7 @@ inline static void InterpRedAndBlue_FirstOrLastRow(
 	}
 }
 
-LCV_ERR LCVVisDebayer(const uint8* pRaw,
+OSC_ERR OscVisDebayer(const uint8* pRaw,
 		const uint16 width,
 		const uint16 height,
 		enum EnBayerOrder enBayerOrderFirstRow,
@@ -543,14 +543,14 @@ LCV_ERR LCVVisDebayer(const uint8* pRaw,
 	/*---------------------- Input validation. -------------------- */
 	if((pRaw == NULL) || (pOut == NULL) || (width == 0) || (height == 0))
 	{
-		LCVLog(ERROR, "%s(0x%x, %d, %d, %d 0x%x): Invalid arguments!",
+		OscLog(ERROR, "%s(0x%x, %d, %d, %d 0x%x): Invalid arguments!",
 				__func__, pRaw, width, height, enBayerOrderFirstRow, pOut);
 		return -EINVALID_PARAMETER;
 	}
 	
 	if((!IS_EVEN(width)) || (width < 4) || (height < 4))
 	{
-		LCVLog(ERROR, "%s: Invalid parameter! Width: %d Height: %d\n"
+		OscLog(ERROR, "%s: Invalid parameter! Width: %d Height: %d\n"
 				"Width must be even and >=4 and height must be >=4.\n",
 				__func__, width, height);
 		return -EINVALID_PARAMETER;

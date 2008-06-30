@@ -18,24 +18,23 @@
  * 
  *   @ tab {time} tab  {val}          tab  {val}         (instruction line) 
  *
- * @author Samuel Zahnd
  ************************************************************************/
 #ifndef SWR_PUB_H_
 #define SWR_PUB_H_
 
-#include "framework_error.h"
+#include "oscar_error.h"
 
 /*! Module-specific error codes.
  * These are enumerated with the offset
  * assigned to each module, so a distinction over
  * all modules can be made */
-enum EnLcvSwrErrors
+enum EnOscSwrErrors
 {
-    ESWR_PARSING_FAILURE = LCV_SWR_ERROR_OFFSET
+    ESWR_PARSING_FAILURE = OSC_SWR_ERROR_OFFSET
 };
 
 /*! Signal type */
-enum EnLcvSwrSignalType
+enum EnOscSwrSignalType
 {
     SWR_INTEGER,
     SWR_FLOAT,
@@ -50,14 +49,14 @@ enum EnLcvSwrSignalType
  * @param hFw Pointer to the handle of the framework.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-LCV_ERR LCVSwrCreate(void *hFw);
+OSC_ERR OscSwrCreate(void *hFw);
 
 /*********************************************************************//*!
  * @brief Destructor
  *
  * @param hFw Pointer to the handle of the framework.
  *//*********************************************************************/
-void LCVSwrDestroy(void *hFw);
+void OscSwrDestroy(void *hFw);
 
 /*********************************************************************//*!
  * @brief Create Stimuli Writer (host only)
@@ -68,7 +67,7 @@ void LCVSwrDestroy(void *hFw);
  * @param bReportCyclic  I: TRUE: autonomous cyclic reporting  
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-LCV_ERR LCVSwrCreateWriter( 
+OSC_ERR OscSwrCreateWriter( 
         void** ppWriter,        
         const char* strFile, 
         const bool bReportTime,
@@ -86,11 +85,11 @@ LCV_ERR LCVSwrCreateWriter(
  * @param strFormat     I: log format as fprintf format instruction string  
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-LCV_ERR LCVSwrRegisterSignal( 
+OSC_ERR OscSwrRegisterSignal( 
         void** ppSignal,        
         const void* pWriter, 
         const char* strSignal,
-        const enum EnLcvSwrSignalType type,        
+        const enum EnOscSwrSignalType type,        
         const void* pDefaultValue,
         const char* strFormat );
 
@@ -103,7 +102,7 @@ LCV_ERR LCVSwrRegisterSignal(
  *                     interpreted as in32, float or string.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-LCV_ERR LCVSwrUpdateSignal( 
+OSC_ERR OscSwrUpdateSignal( 
         const void* pSignal,
         const void* pValue);
 
@@ -113,7 +112,7 @@ LCV_ERR LCVSwrUpdateSignal(
  * @param pWriter   I: handle to writer
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-LCV_ERR LCVSwrManualReport( const void* pWriter);
+OSC_ERR OscSwrManualReport( const void* pWriter);
 
 
 #endif /*SWR_PUB_H_*/

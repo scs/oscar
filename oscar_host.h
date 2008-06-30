@@ -1,7 +1,6 @@
-/*! @file framework_host.h
+/*! @file oscar_host.h
  * @brief General definitions for the host platform
  * 
- * @author Markus Berner, Samuel Zahnd
  */
 #ifndef FRAMEWORK_HOST_H_
 #define FRAMEWORK_HOST_H_

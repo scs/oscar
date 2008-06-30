@@ -3,32 +3,31 @@
  * 
  * Create, destroy and module dependency functionality.
  *   
- * @author Markus Berner, Samuel Zahnd
  */
 
-#include "framework_priv.h"
-#include "framework_error.h"
+#include "oscar_priv.h"
+#include "oscar_error.h"
 
 #include <stdio.h>
 
-struct LCV_FRAMEWORK fw;	/*!< @brief Module singelton instance */
+struct OSC_FRAMEWORK fw;	/*!< @brief Module singelton instance */
 
-LCV_ERR LCVCreate(void **phFw)
+OSC_ERR OSCCreate(void **phFw)
 {
-	memset(&fw, 0, sizeof(struct LCV_FRAMEWORK));
+	memset(&fw, 0, sizeof(struct OSC_FRAMEWORK));
 	
-	/* LCV Create does not instantiate any modules */
+	/* OSC Create does not instantiate any modules */
 	
 	/* Return the handle */
 	*phFw = &fw;
 	return SUCCESS;
 }
 
-LCV_ERR LCVDestroy(void *hFw)
+OSC_ERR OSCDestroy(void *hFw)
 {
-    struct LCV_FRAMEWORK *pFw;
+    struct OSC_FRAMEWORK *pFw;
     
-    pFw = (struct LCV_FRAMEWORK*)hFw;
+    pFw = (struct OSC_FRAMEWORK*)hFw;
     
     /* Check if there are still any modules loaded. */
     if(pFw->bmp.useCnt)
@@ -99,7 +98,7 @@ LCV_ERR LCVDestroy(void *hFw)
     }	
     if(pFw->rtl.useCnt)
     {
-        fprintf(stderr, "%s: ERROR: Rtl module still loaded!\n",
+        fprintf(stderr, "%s: ERROR: Dspl module still loaded!\n",
                 __func__);
         return -ECANNOT_UNLOAD;
     }   
@@ -127,18 +126,18 @@ LCV_ERR LCVDestroy(void *hFw)
                 __func__);
         return -ECANNOT_UNLOAD;
     }       
-	memset(hFw, 0, sizeof(struct LCV_FRAMEWORK));
+	memset(hFw, 0, sizeof(struct OSC_FRAMEWORK));
 	return SUCCESS;
 }
 
 
-LCV_ERR LCVLoadDependencies(void *hFw,
-        const struct LCV_DEPENDENCY aryDeps[], 
+OSC_ERR OSCLoadDependencies(void *hFw,
+        const struct OSC_DEPENDENCY aryDeps[], 
         const uint32 nDeps)
 {
     int         i;
-    LCV_ERR     err = SUCCESS;
-    struct LCV_FRAMEWORK *pFw = (struct LCV_FRAMEWORK*)hFw;
+    OSC_ERR     err = SUCCESS;
+    struct OSC_FRAMEWORK *pFw = (struct OSC_FRAMEWORK*)hFw;
     
     for(i = 0; i < nDeps; i++)
     {
@@ -164,12 +163,12 @@ LCV_ERR LCVLoadDependencies(void *hFw,
     return err;
 }
 
-void LCVUnloadDependencies(void *hFw,
-        const struct LCV_DEPENDENCY aryDeps[], 
+void OSCUnloadDependencies(void *hFw,
+        const struct OSC_DEPENDENCY aryDeps[], 
         const uint32 nDeps)
 {
     int i;
-    struct LCV_FRAMEWORK *pFw = (struct LCV_FRAMEWORK*)hFw;
+    struct OSC_FRAMEWORK *pFw = (struct OSC_FRAMEWORK*)hFw;
     
     for(i = 0; i < nDeps; i++)
     {

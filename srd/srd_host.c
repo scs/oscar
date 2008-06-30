@@ -1,35 +1,34 @@
 /*! @file srd_host.c
  * @brief Stimuli reader module implementation for host.
  * 
- * @author Samuel Zahnd
  ************************************************************************/
 
-#ifdef LCV_HOST
-    #include "framework_types_host.h"
+#ifdef OSC_HOST
+    #include "oscar_types_host.h"
 #endif
-#ifdef LCV_TARGET
-    #include "framework_types_target.h"
+#ifdef OSC_TARGET
+    #include "oscar_types_target.h"
 #endif
-#include "framework_intern.h"
+#include "oscar_intern.h"
 
 #include "srd_pub.h"
 #include "srd_priv.h"
 
 #include <sim/sim_pub.h>
 
-struct LCV_SRD srd; /*!< Module singelton instance */
+struct OSC_SRD srd; /*!< Module singelton instance */
 
 /*! The dependencies of this module. */
-struct LCV_DEPENDENCY srd_deps[] = {
-        {"log", LCVLogCreate, LCVLogDestroy}
+struct OSC_DEPENDENCY srd_deps[] = {
+        {"log", OscLogCreate, OscLogDestroy}
 };
 
-LCV_ERR LCVSrdCreate(void *hFw)
+OSC_ERR OscSrdCreate(void *hFw)
 {
-    struct LCV_FRAMEWORK *pFw;
-    LCV_ERR err;
+    struct OSC_FRAMEWORK *pFw;
+    OSC_ERR err;
 
-    pFw = (struct LCV_FRAMEWORK *)hFw;
+    pFw = (struct OSC_FRAMEWORK *)hFw;
     if(pFw->srd.useCnt != 0)
     {
         pFw->srd.useCnt++;
@@ -38,9 +37,9 @@ LCV_ERR LCVSrdCreate(void *hFw)
     }
 
     /* Load the module srd_deps of this module. */
-    err = LCVLoadDependencies(pFw, 
+    err = OSCLoadDependencies(pFw, 
             srd_deps, 
-            sizeof(srd_deps)/sizeof(struct LCV_DEPENDENCY));
+            sizeof(srd_deps)/sizeof(struct OSC_DEPENDENCY));
     
     if(err != SUCCESS)
     {
@@ -50,9 +49,9 @@ LCV_ERR LCVSrdCreate(void *hFw)
         return err;
     }
     
-    memset(&srd, 0, sizeof(struct LCV_SRD));
+    memset(&srd, 0, sizeof(struct OSC_SRD));
     
-    LCVSimRegisterCycleCallback( &LCVSrdCycleCallback);    
+    OscSimRegisterCycleCallback( &OscSrdCycleCallback);    
 
     /* Increment the use count */
     pFw->srd.hHandle = (void*)&srd;
@@ -61,11 +60,11 @@ LCV_ERR LCVSrdCreate(void *hFw)
     return SUCCESS;
 }
 
-void LCVSrdDestroy(void *hFw)
+void OscSrdDestroy(void *hFw)
 {
-    struct LCV_FRAMEWORK *pFw;
+    struct OSC_FRAMEWORK *pFw;
         
-    pFw = (struct LCV_FRAMEWORK *)hFw; 
+    pFw = (struct OSC_FRAMEWORK *)hFw; 
     /* Check if we really need to release or whether we still 
      * have users. */
     pFw->srd.useCnt--;
@@ -74,15 +73,15 @@ void LCVSrdDestroy(void *hFw)
         return;
     }
     
-    LCVUnloadDependencies(pFw, 
+    OSCUnloadDependencies(pFw, 
             srd_deps, 
-            sizeof(srd_deps)/sizeof(struct LCV_DEPENDENCY));
+            sizeof(srd_deps)/sizeof(struct OSC_DEPENDENCY));
     
     
-    memset(&srd, 0, sizeof(struct LCV_SRD));
+    memset(&srd, 0, sizeof(struct OSC_SRD));
 }
 
-LCV_ERR LCVSrdCreateReader( 
+OSC_ERR OscSrdCreateReader( 
             char* strFile, 
             void (*pUpdateCallback)(void), 
             void** ppReader)
@@ -114,12 +113,12 @@ LCV_ERR LCVSrdCreateReader(
     return SUCCESS;
 }
 
-LCV_ERR LCVSrdRegisterSignal( 
+OSC_ERR OscSrdRegisterSignal( 
             void* pReader, 
             char* strSignal, 
             void** ppSignal)
 {
-    struct LCV_SRD_READER* pRd;
+    struct OSC_SRD_READER* pRd;
     uint16 id;
         
     pRd = pReader;
@@ -137,7 +136,7 @@ LCV_ERR LCVSrdRegisterSignal(
     return SUCCESS;
 }
 
-void LCVSrdCycleCallback( void)
+void OscSrdCycleCallback( void)
 {
     uint16 rdId;
     
@@ -151,18 +150,18 @@ void LCVSrdCycleCallback( void)
     return;
 }
 
-LCV_ERR LCVSrdGetUpdateSignal( 
+OSC_ERR OscSrdGetUpdateSignal( 
            void* pSignal, 
            bool* pbValue)
 {
-    struct LCV_SRD_SIGNAL* pSig;
+    struct OSC_SRD_SIGNAL* pSig;
 
     pSig = pSignal;
     *pbValue = pSig->bActiveValue;
     return SUCCESS;
 }
 
-LCV_ERR ReadAllDescriptor( void)
+OSC_ERR ReadAllDescriptor( void)
 {
     char strRead[50];
     int32 ret;
@@ -179,23 +178,23 @@ LCV_ERR ReadAllDescriptor( void)
             ret = fscanf(srd.rd[ rdId].pFile, "%*1[!]\t%*s");
             if( ret < 0)
             {
-                LCVLog(ERROR, "%s: Missing descriptor begin (! \t Time)\n", srd.rd[ rdId].strFile);
+                OscLog(ERROR, "%s: Missing descriptor begin (! \t Time)\n", srd.rd[ rdId].strFile);
                 return EFILE_PARSING_ERROR;
             }    
             for( sigId= 0; sigId<srd.rd[ rdId].nrOfSignals; sigId++)
             {
 				/* parse element: \t signalname */
                 ret = fscanf(srd.rd[ rdId].pFile, "\t%s", strRead);
-                LCVLog(DEBUG, "Parsing element: %s\n", strRead);
+                OscLog(DEBUG, "Parsing element: %s\n", strRead);
                 if( ret <= 0)
                 {
-                    LCVLog(ERROR, "%s: Missing descriptor element or name does not match.\n", 
+                    OscLog(ERROR, "%s: Missing descriptor element or name does not match.\n", 
                             srd.rd[ rdId].strFile);
                     return EFILE_PARSING_ERROR;
                 }
                 if( strcmp( strRead, srd.rd[ rdId].sig[ sigId].strName) != 0)
                 {
-                    LCVLog(ERROR, "%s: Wrong descriptor element order.\n", 
+                    OscLog(ERROR, "%s: Wrong descriptor element order.\n", 
                             srd.rd[ rdId].strFile);
                     return EFILE_PARSING_ERROR;
                 }        
@@ -205,7 +204,7 @@ LCV_ERR ReadAllDescriptor( void)
             ret = fscanf(srd.rd[ rdId].pFile, "\n");
             if( ret != 0)
             {
-                LCVLog(ERROR, "%s: Missing end of descriptor line.\n", srd.rd[ rdId].strFile);
+                OscLog(ERROR, "%s: Missing end of descriptor line.\n", srd.rd[ rdId].strFile);
                 return EFILE_PARSING_ERROR;
             }
         }
@@ -215,14 +214,14 @@ LCV_ERR ReadAllDescriptor( void)
     return SUCCESS;
 }
 
-LCV_ERR GetNext( uint16 rdId)
+OSC_ERR GetNext( uint16 rdId)
 {
     uint16 sigId;
     
     uint32 currTime;
-    LCV_ERR readLine;
+    OSC_ERR readLine;
     
-    currTime = LCVSimGetCurTimeStep();
+    currTime = OscSimGetCurTimeStep();
     readLine = SUCCESS;
     
     /* compare system time with the time stamp last time read (readtime)
@@ -251,7 +250,7 @@ LCV_ERR GetNext( uint16 rdId)
 }
     
    
-LCV_ERR ReadLine( uint16 rdId)
+OSC_ERR ReadLine( uint16 rdId)
 {
     int32 ret;
     uint16 sigId;
@@ -266,15 +265,15 @@ LCV_ERR ReadLine( uint16 rdId)
     }
     if( ret != 0)
     {
-        LCVLog(ERROR, "%s: Missing line opening (@ \t)\n", srd.rd[ rdId].strFile);
+        OscLog(ERROR, "%s: Missing line opening (@ \t)\n", srd.rd[ rdId].strFile);
         return EFILE_PARSING_ERROR;
     }
     
     ret = fscanf(srd.rd[ rdId].pFile, "\t%lu", &time);
-    LCVLog(DEBUG, "Parsing time: %d\n", time);
+    OscLog(DEBUG, "Parsing time: %d\n", time);
     if( ret <= 0)
     {
-        LCVLog(ERROR, "%s: Missing time value  (unsigned decimal number)\n", srd.rd[ rdId].strFile);
+        OscLog(ERROR, "%s: Missing time value  (unsigned decimal number)\n", srd.rd[ rdId].strFile);
         return EFILE_PARSING_ERROR;
     }            
     srd.rd[ rdId].readTime = time;
@@ -282,10 +281,10 @@ LCV_ERR ReadLine( uint16 rdId)
     for( sigId= 0; sigId<srd.rd[ rdId].nrOfSignals; sigId++)
     {
         ret = fscanf(srd.rd[ rdId].pFile, "\t%lu", &value);
-        LCVLog(DEBUG, "Parsing value: %d\n", value);
+        OscLog(DEBUG, "Parsing value: %d\n", value);
         if( ret <= 0)
         {
-            LCVLog(ERROR, "%s: Missing signal value (unsigned decimal number).\n", 
+            OscLog(ERROR, "%s: Missing signal value (unsigned decimal number).\n", 
                     srd.rd[ rdId].strFile);
             return EFILE_PARSING_ERROR;
         }
@@ -295,7 +294,7 @@ LCV_ERR ReadLine( uint16 rdId)
     ret = fscanf(srd.rd[ rdId].pFile, "\n");
     if( ret != 0)
     {
-        LCVLog(ERROR, "%s: Missing end of line.\n", srd.rd[ rdId].strFile);
+        OscLog(ERROR, "%s: Missing end of line.\n", srd.rd[ rdId].strFile);
         return EFILE_PARSING_ERROR;
     }
     

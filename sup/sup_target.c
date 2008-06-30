@@ -1,14 +1,13 @@
 /*! @file sup_target.c
  * @brief Support module implementation for host 
  * 
- * @author Markus Berner
  */
 
-#include "framework_types_target.h"
+#include "oscar_types_target.h"
 
 #include "sup_pub.h"
 #include "sup_priv.h"
-#include "framework_intern.h"
+#include "oscar_intern.h"
 #include "pflags.h"
 
 #include <sys/stat.h>
@@ -20,22 +19,22 @@
 #include <errno.h>
 
 /*! @brief The module singelton instance. */
-struct LCV_SUP sup;       
+struct OSC_SUP sup;       
 
 /*! @brief The dependencies of this module. */
-struct LCV_DEPENDENCY sup_deps[] = {
-        {"log", LCVLogCreate, LCVLogDestroy}
+struct OSC_DEPENDENCY sup_deps[] = {
+        {"log", OscLogCreate, OscLogDestroy}
 };
 
 /*! @brief The length of the dependency array of this module. */
-#define DEP_LEN (sizeof(sup_deps)/sizeof(struct LCV_DEPENDENCY))
+#define DEP_LEN (sizeof(sup_deps)/sizeof(struct OSC_DEPENDENCY))
 
-LCV_ERR LCVSupCreate(void *hFw)
+OSC_ERR OscSupCreate(void *hFw)
 {
-    struct LCV_FRAMEWORK *pFw;
-    LCV_ERR err;
+    struct OSC_FRAMEWORK *pFw;
+    OSC_ERR err;
 
-    pFw = (struct LCV_FRAMEWORK *)hFw;
+    pFw = (struct OSC_FRAMEWORK *)hFw;
     if(pFw->sup.useCnt != 0)
     {
         pFw->sup.useCnt++;
@@ -44,7 +43,7 @@ LCV_ERR LCVSupCreate(void *hFw)
     }
     
     /* Load the module dependencies of this module. */
-    err = LCVLoadDependencies(pFw, 
+    err = OSCLoadDependencies(pFw, 
             sup_deps, 
             DEP_LEN);
     
@@ -56,7 +55,7 @@ LCV_ERR LCVSupCreate(void *hFw)
         return err;
     }
     
-    memset(&sup, 0, sizeof(struct LCV_SUP));
+    memset(&sup, 0, sizeof(struct OSC_SUP));
     
     /* Increment the use count */
     pFw->sup.hHandle = (void*)&sup;
@@ -65,11 +64,11 @@ LCV_ERR LCVSupCreate(void *hFw)
     return SUCCESS;
 }
 
-void LCVSupDestroy(void *hFw)
+void OscSupDestroy(void *hFw)
 {
-    struct LCV_FRAMEWORK *pFw;
+    struct OSC_FRAMEWORK *pFw;
             
-    pFw = (struct LCV_FRAMEWORK *)hFw; 
+    pFw = (struct OSC_FRAMEWORK *)hFw; 
     /* Check if we really need to release or whether we still 
      * have users. */
     pFw->sup.useCnt--;
@@ -82,37 +81,37 @@ void LCVSupDestroy(void *hFw)
      * be reset by it after the application has closed. */
     if(sup.fdWatchdog > 0)
     {
-        LCVSupWdtClose();
+        OscSupWdtClose();
     }
 
-#ifdef TARGET_TYPE_LCV_IND    
+#ifdef TARGET_TYPE_INDXCAM    
     if(sup.fdLed)
     {
-        LCVSupLedClose();
+        OscSupLedClose();
     }
 #endif
     
-    LCVUnloadDependencies(pFw, 
+    OSCUnloadDependencies(pFw, 
             sup_deps, 
             DEP_LEN);
     
-    memset(&sup, 0, sizeof(struct LCV_SUP));
+    memset(&sup, 0, sizeof(struct OSC_SUP));
 }
 
 /*=========================== Watchdog =================================*/
 
-LCV_ERR LCVSupWdtInit()
+OSC_ERR OscSupWdtInit()
 {
     if(sup.fdWatchdog != 0)
     {
-        LCVLog(WARN, "%s: Watchdog already initialized!\n", __func__);
+        OscLog(WARN, "%s: Watchdog already initialized!\n", __func__);
         return -EALREADY_INITIALIZED;
     }
 
     sup.fdWatchdog = open("/dev/watchdog", O_WRONLY);
     if (sup.fdWatchdog < 0) 
     {
-        LCVLog(ERROR, "%s: Unable to open watchdog device node! (%s)\n", 
+        OscLog(ERROR, "%s: Unable to open watchdog device node! (%s)\n", 
                 __func__,
                 strerror(errno));
         return -EDEVICE;
@@ -121,14 +120,14 @@ LCV_ERR LCVSupWdtInit()
     return SUCCESS;
 }
 
-LCV_ERR LCVSupWdtClose()
+OSC_ERR OscSupWdtClose()
 {
     char magicChar = 'V';
     
     if(sup.fdWatchdog <= 0)
     {
         /* No watchdog open. */
-        LCVLog(WARN, "%s: Watchdog not initialized!\n", __func__);
+        OscLog(WARN, "%s: Watchdog not initialized!\n", __func__);
         return -ENO_SUCH_DEVICE;
     }
 
@@ -146,7 +145,7 @@ LCV_ERR LCVSupWdtClose()
     return SUCCESS;
 }
 
-inline void LCVSupWdtKeepAlive()
+inline void OscSupWdtKeepAlive()
 {
     /* Write anything to the watchdog to disable it and 
      * make sure it is flushed. */
@@ -157,7 +156,7 @@ inline void LCVSupWdtKeepAlive()
 /*============================= Cycles =================================*/
 
 /*! /todo Low priority: Use whole 64 bit cycles counter. */
-inline uint32 LCVSupCycGet()
+inline uint32 OscSupCycGet()
 {
   uint32 ret;
 
@@ -171,58 +170,58 @@ inline uint32 LCVSupCycGet()
   return ret;
 }
 
-inline uint32 LCVSupCycToMicroSecs(uint32 cycles)
+inline uint32 OscSupCycToMicroSecs(uint32 cycles)
 {
   return (cycles/(CPU_FREQ/1000000));
 }
 
 /*============================== SRAM =================================*/
-inline uint32 LCVSupSramL1ALen()
+inline uint32 OscSupSramL1ALen()
 {
     return SRAM_L1A_LENGTH;
 }
 
-inline void* LCVSupSramL1A()
+inline void* OscSupSramL1A()
 {
     return (void *)SRAM_L1A;
 }
 
-inline uint32 LCVSupSramL1BLen()
+inline uint32 OscSupSramL1BLen()
 {
     return SRAM_L1B_LENGTH;
 }
 
-inline void* LCVSupSramL1B()
+inline void* OscSupSramL1B()
 {
     return (void *)SRAM_L1B;
 }
 
-inline uint32 LCVSupSramScratchLen()
+inline uint32 OscSupSramScratchLen()
 {
     return SRAM_SCRATCH_LENGTH;
 }
 
-inline void* LCVSupSramScratch()
+inline void* OscSupSramScratch()
 {
     return (void *)SRAM_SCRATCH;
 }
 
 /*============================== LED =================================*/
-#ifdef TARGET_TYPE_LCV_IND
-LCV_ERR LCVSupLedInit()
+#ifdef TARGET_TYPE_INDXCAM
+OSC_ERR OscSupLedInit()
 {
     int     ret;
     
     if(sup.fdLed != 0)
     {
-        LCVLog(WARN, "%s: LED already open!\n", __func__);
+        OscLog(WARN, "%s: LED already open!\n", __func__);
         return -EALREADY_INITIALIZED;
     }
     
     sup.fdLed = open("/dev/pf27", O_RDWR, 0);
     if(sup.fdLed < 0)
     {
-        LCVLog(ERROR, "%s: Unable to open device! (%s)\n",
+        OscLog(ERROR, "%s: Unable to open device! (%s)\n",
                 __func__,
                 strerror(errno));
         return -EDEVICE;
@@ -233,7 +232,7 @@ LCV_ERR LCVSupLedInit()
     ret |= ioctl(sup.fdLed, SET_FIO_INEN, INPUT_DISABLE);
     if(ret != 0)
     {
-        LCVLog(ERROR, "%s: Unable to set output direction!\n", __func__);
+        OscLog(ERROR, "%s: Unable to set output direction!\n", __func__);
         close(sup.fdLed);
         return -EDEVICE;
     }
@@ -241,7 +240,7 @@ LCV_ERR LCVSupLedInit()
     return SUCCESS;
 }
 
-inline void LCVSupLedWrite(char val)
+inline void OscSupLedWrite(char val)
 {
     /* LED is low-active, so we need to switch polarity. */
     if(val == '0')
@@ -256,7 +255,7 @@ inline void LCVSupLedWrite(char val)
     }
 }
 
-void LCVSupLedClose()
+void OscSupLedClose()
 {
     if(sup.fdLed != 0)
     {
@@ -264,19 +263,19 @@ void LCVSupLedClose()
     }
 }
 
-#else /* TARGET_TYPE_LCV_IND */
+#else /* TARGET_TYPE_INDXCAM */
 
-LCV_ERR LCVSupLedInit()
+OSC_ERR OscSupLedInit()
 {
     return -ENO_SUCH_DEVICE;
 }
 
-inline void LCVSupLedWrite(char val)
+inline void OscSupLedWrite(char val)
 {
 }
 
-void LCVSupLedClose()
+void OscSupLedClose()
 {
 }
 
-#endif /* TARGET_TYPE_LCV_IND */
+#endif /* TARGET_TYPE_INDXCAM */

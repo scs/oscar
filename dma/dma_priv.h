@@ -1,7 +1,6 @@
 /*! @file dma_priv.h
  * @brief Private memory DMA module definition
  * 
- * @author Markus Berner
  */
 #ifndef DMA_PRIV_H_
 #define DMA_PRIV_H_
@@ -15,7 +14,7 @@
 #define MAX_MOVES_PER_CHAIN 4
 /*! @brief The maximum number of DMA chains that can be allocated. */
 #define MAX_NR_DMA_CHAINS 2
-/*! @brief The number of loop cycles before LCVDmaSync gives up and 
+/*! @brief The number of loop cycles before OscDmaSync gives up and 
  * returns. */
 #define DMA_SYNC_TIMEOUT_LOOPS 0xFFFFFFFF
 
@@ -90,7 +89,7 @@ struct DMA_CHAIN
 };
 
 /*! @brief The object struct of the camera module */
-struct LCV_DMA {
+struct OSC_DMA {
     /*! @brief The DMA chains that can be allocated. */
     struct DMA_CHAIN        dmaChains[MAX_NR_DMA_CHAINS];
     /*! @brief The current number of allocated DMA chains. */
@@ -98,7 +97,7 @@ struct LCV_DMA {
 };
 
 /*************************** Private methods ***************************/
-#ifdef LCV_HOST
+#ifdef OSC_HOST
 
 /*********************************************************************//*!
  * @brief Extract the transfer word size from a DMA config word.
@@ -106,7 +105,7 @@ struct LCV_DMA {
  * @param dmaConfigMask The DMA configuration word.
  * @return Number of bytes transferred in one DMA cycle or 0 if invalid.
  *//*********************************************************************/
-uint8 LCVDmaExtractWdSize(const uint16 dmaConfigMask);
+uint8 OscDmaExtractWdSize(const uint16 dmaConfigMask);
 
 /*********************************************************************//*!
  * @brief Emulate the copy functionality of a DMA channel.
@@ -123,10 +122,10 @@ uint8 LCVDmaExtractWdSize(const uint16 dmaConfigMask);
  * @param wdSize Word size used for transfers.
  * @return SUCCESS or an appropriate error code.
  *//*********************************************************************/
-LCV_ERR LCVDmaChanCopy(const struct DMA_DESC *pDesc, 
+OSC_ERR OscDmaChanCopy(const struct DMA_DESC *pDesc, 
         void *pTemp, 
         const uint8 wdSize);
 
-#endif /* LCV_HOST */
+#endif /* OSC_HOST */
 
 #endif /*DMA_PRIV_H_*/

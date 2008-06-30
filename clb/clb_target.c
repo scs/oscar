@@ -1,16 +1,15 @@
 /*! @file clb_target.c
  * @brief Calibration module implementation for target
  * 
- * @author Samuel Zahnd
  */
 
-#include "framework_types_target.h"
+#include "oscar_types_target.h"
 
 #include "clb_pub.h"
 #include "clb_priv.h"
 #include "sup/sup_pub.h"
 #include "cam/cam_pub.h"
-#include "framework_intern.h"
+#include "oscar_intern.h"
 #include <sys/ioctl.h>
 #include <fcntl.h>
 #include <errno.h> 
@@ -19,18 +18,18 @@
 #define ROUND_UP_DIVISION(x, y) ((x + (y - 1))/y)
 
 /*! @brief The dependencies of this module. */
-struct LCV_DEPENDENCY clb_deps[] = {
-        {"log", LCVLogCreate, LCVLogDestroy},
-		{"cam", LCVCamCreate, LCVCamDestroy}
+struct OSC_DEPENDENCY clb_deps[] = {
+        {"log", OscLogCreate, OscLogDestroy},
+		{"cam", OscCamCreate, OscCamDestroy}
 };
 
 /*! @brief Memory for the CLB object structure plus some reserve.
  * The actual structure will be manually cache-aligned within this 
  * memory. */
-uint8 unalignedMem[sizeof(struct LCV_CLB) + CACHE_LINE_LEN];
+uint8 unalignedMem[sizeof(struct OSC_CLB) + CACHE_LINE_LEN];
 
 /*! @brief This stores all variables needed by the algorithm. */
-struct LCV_CLB *pClb;
+struct OSC_CLB *pClb;
 
 
 /*********************************************************************//*!
@@ -41,15 +40,15 @@ static void AlignMemory()
 {
     uint32 temp = ROUND_UP_DIVISION((uint32)unalignedMem, CACHE_LINE_LEN);
     
-    pClb = (struct LCV_CLB*)(temp * CACHE_LINE_LEN);
+    pClb = (struct OSC_CLB*)(temp * CACHE_LINE_LEN);
 }
 
-LCV_ERR LCVClbCreate(void *hFw)
+OSC_ERR OscClbCreate(void *hFw)
 {
-    struct LCV_FRAMEWORK    *pFw;
-    LCV_ERR                 err;
+    struct OSC_FRAMEWORK    *pFw;
+    OSC_ERR                 err;
     
-    pFw = (struct LCV_FRAMEWORK *)hFw;
+    pFw = (struct OSC_FRAMEWORK *)hFw;
     if(pFw->clb.useCnt != 0)
     {
         pFw->clb.useCnt++;
@@ -58,9 +57,9 @@ LCV_ERR LCVClbCreate(void *hFw)
     }  
 	
     /* Load the module clb_deps of this module. */
-    err = LCVLoadDependencies(pFw, 
+    err = OSCLoadDependencies(pFw, 
             clb_deps, 
-            sizeof(clb_deps)/sizeof(struct LCV_DEPENDENCY));
+            sizeof(clb_deps)/sizeof(struct OSC_DEPENDENCY));
     if(err != SUCCESS)
     {
         printf("%s: ERROR: Unable to load clb_deps! (%d)\n",
@@ -74,8 +73,8 @@ LCV_ERR LCVClbCreate(void *hFw)
      * structure. */
     AlignMemory();
          
-    memset(pClb, 0, sizeof(struct LCV_CLB));
-    pClb->calibSlope = LCV_CLB_CALIBRATE_OFF;
+    memset(pClb, 0, sizeof(struct OSC_CLB));
+    pClb->calibSlope = OSC_CLB_CALIBRATE_OFF;
     pClb->bHotpixel = FALSE;
 
 #if 0  /* set trial calib data and write to flash */
@@ -97,11 +96,11 @@ LCV_ERR LCVClbCreate(void *hFw)
     /* Register correction function for camera module */
     if( err == SUCCESS)
     {
-        LCVCamRegisterCorretionCallback( LCVClbApplyCorrection);
+        OscCamRegisterCorretionCallback( OscClbApplyCorrection);
     }
     else
     {
-        LCVLog(WARN, "%s: Image calibration disabled due to error!"
+        OscLog(WARN, "%s: Image calibration disabled due to error!"
                 ,__func__);
     }
 	
@@ -112,11 +111,11 @@ LCV_ERR LCVClbCreate(void *hFw)
 	return SUCCESS;
 }
 
-void LCVClbDestroy(void *hFw)
+void OscClbDestroy(void *hFw)
 {
-    struct LCV_FRAMEWORK *pFw;
+    struct OSC_FRAMEWORK *pFw;
                 
-    pFw = (struct LCV_FRAMEWORK *)hFw; 
+    pFw = (struct OSC_FRAMEWORK *)hFw; 
 
     /* Check if we really need to release or whether we still 
      * have users. */
@@ -126,22 +125,22 @@ void LCVClbDestroy(void *hFw)
         return;
     }
   
-    LCVUnloadDependencies(pFw, 
+    OSCUnloadDependencies(pFw, 
             clb_deps, 
-            sizeof(clb_deps)/sizeof(struct LCV_DEPENDENCY));
+            sizeof(clb_deps)/sizeof(struct OSC_DEPENDENCY));
     
-	memset(pClb, 0, sizeof(struct LCV_CLB));
+	memset(pClb, 0, sizeof(struct OSC_CLB));
 }
 
 
-LCV_ERR LCVClbSetupCalibrate(
-        enum EnLcvClbCalibrateSlope calibSlope,
+OSC_ERR OscClbSetupCalibrate(
+        enum EnOscClbCalibrateSlope calibSlope,
         bool bHotpixel)
 {   
-    if( (calibSlope==LCV_CLB_CALIBRATE_FPN) 
-        || (calibSlope==LCV_CLB_CALIBRATE_PRNU) )
+    if( (calibSlope==OSC_CLB_CALIBRATE_FPN) 
+        || (calibSlope==OSC_CLB_CALIBRATE_PRNU) )
     {
-        LCVLog(ERROR, "%s: Selected Calibration configuration not yet supported!\n",
+        OscLog(ERROR, "%s: Selected Calibration configuration not yet supported!\n",
                 __func__);
         return EINVALID_PARAMETER;
     }
@@ -151,7 +150,7 @@ LCV_ERR LCVClbSetupCalibrate(
     return SUCCESS;
 }
 
-LCV_ERR LCVClbApplyCorrection( uint8 *pImg,
+OSC_ERR OscClbApplyCorrection( uint8 *pImg,
         const uint16 lowX, const uint16 lowY,
         const uint16 width, const uint16 height) 
 {
@@ -160,23 +159,23 @@ LCV_ERR LCVClbApplyCorrection( uint8 *pImg,
     pClb->capWin.width = width;
     pClb->capWin.height = height;
     
-    if( pClb->calibSlope == LCV_CLB_CALIBRATE_FPN_PRNU)
+    if( pClb->calibSlope == OSC_CLB_CALIBRATE_FPN_PRNU)
     {
-        LCVClbCorrectFpnPrnu( pImg);
+        OscClbCorrectFpnPrnu( pImg);
     }
     if( pClb->bHotpixel)
     {
-        LCVClbCorrectHotpixel( pImg);
+        OscClbCorrectHotpixel( pImg);
     }
     return SUCCESS;
 }
 
-LCV_ERR LoadCalibrationData(const char strCalibFN[])
+OSC_ERR LoadCalibrationData(const char strCalibFN[])
 {
     FILE    *pCalibF;
     uint32  n, idx, nElements;
     uint16  nHotpixel;
-    struct  LCV_CLB_CALIBRATION_DATA *pCalib = &pClb->calibData;
+    struct  OSC_CLB_CALIBRATION_DATA *pCalib = &pClb->calibData;
     uint32  magicnumber;
     uint16  pack;
     uint16  size;
@@ -184,7 +183,7 @@ LCV_ERR LoadCalibrationData(const char strCalibFN[])
     pCalibF = fopen(strCalibFN, "rb");
     if(pCalibF == NULL)
     {
-        LCVLog(ERROR, "%s: Unable to open calibration data file (%s)! "
+        OscLog(ERROR, "%s: Unable to open calibration data file (%s)! "
                 "%s.\n", __func__, strCalibFN, strerror(errno));
         return -EUNABLE_TO_OPEN_FILE;
     }    
@@ -271,21 +270,21 @@ LCV_ERR LoadCalibrationData(const char strCalibFN[])
     }      
     
     fclose(pCalibF);
-    LCVLog(DEBUG, "%s: done.\n", __func__);
+    OscLog(DEBUG, "%s: done.\n", __func__);
     return SUCCESS;    
     
 fread_err:
-    LCVLog(WARN, "%s: File read error from file %s!\n",
+    OscLog(WARN, "%s: File read error from file %s!\n",
             __func__, strCalibFN);
     return -EFILE_ERROR;    
 }
 
 #if 0
-LCV_ERR StoreCalibrationData(const char strCalibFN[])
+OSC_ERR StoreCalibrationData(const char strCalibFN[])
 {
     FILE    *pCalibF;
     uint32  n, idx, nElements;
-    struct  LCV_CLB_CALIBRATION_DATA *pCalib = &pClb->calibData;
+    struct  OSC_CLB_CALIBRATION_DATA *pCalib = &pClb->calibData;
     uint32  magicnumber;
     uint16  pack, dummy;
     uint16  size;
@@ -293,7 +292,7 @@ LCV_ERR StoreCalibrationData(const char strCalibFN[])
     pCalibF = fopen(strCalibFN, "wb");
     if(pCalibF == NULL)
     {
-        LCVLog(ERROR, "%s: Unable to open calibration data file (%s)! "
+        OscLog(ERROR, "%s: Unable to open calibration data file (%s)! "
                 "%s.\n", __func__, strCalibFN, strerror(errno));
         return -EUNABLE_TO_OPEN_FILE;
     }    
@@ -362,18 +361,18 @@ LCV_ERR StoreCalibrationData(const char strCalibFN[])
     dummy = EOF;
     fwrite(&dummy, sizeof(uint8), 1, pCalibF);
     fclose(pCalibF);
-    LCVLog(DEBUG, "%s: done.\n", __func__);
+    OscLog(DEBUG, "%s: done.\n", __func__);
     return SUCCESS;    
     
 fwrite_err:
-    LCVLog(ERROR, "%s: File write error for file %s!\n",
+    OscLog(ERROR, "%s: File write error for file %s!\n",
             __func__, strCalibFN);
     return -EFILE_ERROR;    
 }
 #endif /*0*/
 
 
-LCV_ERR LCVClbCorrectFpnPrnu( uint8* pImg)
+OSC_ERR OscClbCorrectFpnPrnu( uint8* pImg)
 {
     uint8 pix;
     uint8 offset;
@@ -469,7 +468,7 @@ LCV_ERR LCVClbCorrectFpnPrnu( uint8* pImg)
 /* ToDo for more efficient processing 
  * - Select the subset of hotpixels for the selected AOI once it changes 
  * - Try to reduce conditional tests for neighbour location. Eg. dedicated list.*/
-LCV_ERR LCVClbCorrectHotpixel(uint8* pImg)
+OSC_ERR OscClbCorrectHotpixel(uint8* pImg)
 {
     uint16 n;
     struct VEC_2D centerPos;

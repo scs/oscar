@@ -1,20 +1,19 @@
 /*! @file dma_host.c
  * @brief Memory DMA module implementation for host
  * 
- * @author Markus Berner
  */
 
-#include "framework_types_host.h"
+#include "oscar_types_host.h"
 
 #include "dma_pub.h"
 #include "dma_priv.h"
-#include "framework_intern.h"
+#include "oscar_intern.h"
 
 #include "sup/sup_pub.h"
 #include "log/log_pub.h"
 
 
-uint8 LCVDmaExtractWdSize(const uint16 dmaConfigMask)
+uint8 OscDmaExtractWdSize(const uint16 dmaConfigMask)
 {
     /* Determine source descriptor word size. */
     if(dmaConfigMask & WDSIZE_16)
@@ -32,7 +31,7 @@ uint8 LCVDmaExtractWdSize(const uint16 dmaConfigMask)
     }  
 }
 
-LCV_ERR LCVDmaChanCopy(const struct DMA_DESC *pDesc, 
+OSC_ERR OscDmaChanCopy(const struct DMA_DESC *pDesc, 
         void *pTemp, 
         const uint8 wdSize)
 {
@@ -133,15 +132,15 @@ LCV_ERR LCVDmaChanCopy(const struct DMA_DESC *pDesc,
         }  
         break;
     default:
-        LCVLog(ERROR, "%s: Invalid word size: %d\n", __func__, wdSize);
+        OscLog(ERROR, "%s: Invalid word size: %d\n", __func__, wdSize);
         return -EINVALID_PARAMETER;
     }
     return SUCCESS;
 }
 
-void LCVDmaStart(void *hChainHandle)
+void OscDmaStart(void *hChainHandle)
 {
-    LCV_ERR err;
+    OSC_ERR err;
     uint32 srcDataSize;
     uint8  srcWdSize, dstWdSize;
     uint16 move;
@@ -157,11 +156,11 @@ void LCVDmaStart(void *hChainHandle)
         pDstDesc = &pChain->aryDstDesc[move];
         
         /* Find the word sizes. */
-        srcWdSize = LCVDmaExtractWdSize(pSrcDesc->config);
-        dstWdSize = LCVDmaExtractWdSize(pDstDesc->config);
+        srcWdSize = OscDmaExtractWdSize(pSrcDesc->config);
+        dstWdSize = OscDmaExtractWdSize(pDstDesc->config);
         if(srcWdSize == 0 || dstWdSize == 0)
         {
-            LCVLog(ERROR, "%s: Invalid word sizes configured!\n",
+            OscLog(ERROR, "%s: Invalid word sizes configured!\n",
                     __func__);
             return;
         }
@@ -178,7 +177,7 @@ void LCVDmaStart(void *hChainHandle)
         pTempBuffer = (void*)malloc(srcDataSize);
         if(pTempBuffer == NULL)
         {
-            LCVLog(ERROR, "%s: Memory allocation failed!\n", __func__);
+            OscLog(ERROR, "%s: Memory allocation failed!\n", __func__);
             return;
         }
         
@@ -189,20 +188,20 @@ void LCVDmaStart(void *hChainHandle)
          * emulate this FIFO with the temporary buffer. */
         
         /* Copy all the source data to the temporary buffer. */
-        err = LCVDmaChanCopy(pSrcDesc, pTempBuffer, srcWdSize);
+        err = OscDmaChanCopy(pSrcDesc, pTempBuffer, srcWdSize);
         if(err != SUCCESS)
         {
-            LCVLog(ERROR, "%s: Source channel operation failed! (%d)\n",
+            OscLog(ERROR, "%s: Source channel operation failed! (%d)\n",
                     __func__, err);
             free(pTempBuffer);
             return;
         }
         /* Copy all the data from the temporary buffer to the destination.
          * */
-        LCVDmaChanCopy(pDstDesc, pTempBuffer, dstWdSize);
+        OscDmaChanCopy(pDstDesc, pTempBuffer, dstWdSize);
         if(err != SUCCESS)
         {
-            LCVLog(ERROR, "%s: Dest channel operation failed! (%d)\n",
+            OscLog(ERROR, "%s: Dest channel operation failed! (%d)\n",
                      __func__, err);
             
             free(pTempBuffer);
@@ -212,7 +211,7 @@ void LCVDmaStart(void *hChainHandle)
     }
 }
 
-LCV_ERR LCVDmaSync(void *hChainHandle)
+OSC_ERR OscDmaSync(void *hChainHandle)
 {
     struct DMA_CHAIN *pChain = (struct DMA_CHAIN*)hChainHandle;
     

@@ -1,32 +1,31 @@
 /*! @file bmp.c
  * @brief Vision module implementation for target and host
  * 
- * @author Markus Berner
  */
 
 #include "vis_pub.h"
 #include "../dma/dma_pub.h"
 #include "vis_priv.h"
-#include "framework_intern.h"
+#include "oscar_intern.h"
 #include <stdio.h>
 #include <string.h>
 
 /*! @brief The module singelton instance. */
-struct LCV_VIS vis;     
+struct OSC_VIS vis;     
 
 /*! @brief The dependencies of this module. */
-struct LCV_DEPENDENCY vis_deps[] = {
-        {"log", LCVLogCreate, LCVLogDestroy},
-        {"dma", LCVDmaCreate, LCVDmaDestroy}
+struct OSC_DEPENDENCY vis_deps[] = {
+        {"log", OscLogCreate, OscLogDestroy},
+        {"dma", OscDmaCreate, OscDmaDestroy}
 };
 
 
-LCV_ERR LCVVisCreate(void *hFw)
+OSC_ERR OscVisCreate(void *hFw)
 {
-    struct LCV_FRAMEWORK *pFw;
-    LCV_ERR err;
+    struct OSC_FRAMEWORK *pFw;
+    OSC_ERR err;
     
-    pFw = (struct LCV_FRAMEWORK *)hFw;
+    pFw = (struct OSC_FRAMEWORK *)hFw;
     if(pFw->vis.useCnt != 0)
     {
         pFw->vis.useCnt++;
@@ -35,9 +34,9 @@ LCV_ERR LCVVisCreate(void *hFw)
     }
     
     /* Load the module dependencies of this module. */
-    err = LCVLoadDependencies(pFw, 
+    err = OSCLoadDependencies(pFw, 
             vis_deps, 
-            sizeof(vis_deps)/sizeof(struct LCV_DEPENDENCY));
+            sizeof(vis_deps)/sizeof(struct OSC_DEPENDENCY));
     
     if(err != SUCCESS)
     {
@@ -47,7 +46,7 @@ LCV_ERR LCVVisCreate(void *hFw)
         return err;
     }
     
-    memset(&vis, 0, sizeof(struct LCV_VIS));
+    memset(&vis, 0, sizeof(struct OSC_VIS));
     
     /* Increment the use count */
     pFw->vis.hHandle = (void*)&vis;
@@ -56,11 +55,11 @@ LCV_ERR LCVVisCreate(void *hFw)
     return SUCCESS;
 }
 
-void LCVVisDestroy(void *hFw)
+void OscVisDestroy(void *hFw)
 {
-    struct LCV_FRAMEWORK *pFw;
+    struct OSC_FRAMEWORK *pFw;
         
-    pFw = (struct LCV_FRAMEWORK *)hFw;
+    pFw = (struct OSC_FRAMEWORK *)hFw;
     
     /* Check if we really need to release or whether we still 
      * have users. */
@@ -70,10 +69,10 @@ void LCVVisDestroy(void *hFw)
         return;
     }
     
-    LCVUnloadDependencies(pFw, 
+    OSCUnloadDependencies(pFw, 
             vis_deps, 
-            sizeof(vis_deps)/sizeof(struct LCV_DEPENDENCY));
+            sizeof(vis_deps)/sizeof(struct OSC_DEPENDENCY));
     
-    memset(&vis, 0, sizeof(struct LCV_VIS));
+    memset(&vis, 0, sizeof(struct OSC_VIS));
 }
 

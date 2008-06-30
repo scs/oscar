@@ -1,28 +1,27 @@
 /*! @file bmp.c
  * @brief Bitmap module implementation for target and host
  * 
- * @author Markus Berner
  */
 
 #include "bmp_pub.h"
 #include "bmp_priv.h"
-#include "framework_intern.h"
+#include "oscar_intern.h"
 
 /*! @brief The module singelton instance. */
-struct LCV_BMP bmp;     
+struct OSC_BMP bmp;     
 
 /*! @brief The dependencies of this module. */
-struct LCV_DEPENDENCY bmp_deps[] = {
-        {"log", LCVLogCreate, LCVLogDestroy}
+struct OSC_DEPENDENCY bmp_deps[] = {
+        {"log", OscLogCreate, OscLogDestroy}
 };
 
 
-LCV_ERR LCVBmpCreate(void *hFw)
+OSC_ERR OscBmpCreate(void *hFw)
 {
-    struct LCV_FRAMEWORK *pFw;
-    LCV_ERR err;
+    struct OSC_FRAMEWORK *pFw;
+    OSC_ERR err;
     
-    pFw = (struct LCV_FRAMEWORK *)hFw;
+    pFw = (struct OSC_FRAMEWORK *)hFw;
     if(pFw->bmp.useCnt != 0)
     {
         pFw->bmp.useCnt++;
@@ -31,9 +30,9 @@ LCV_ERR LCVBmpCreate(void *hFw)
     }
     
     /* Load the module dependencies of this module. */
-    err = LCVLoadDependencies(pFw, 
+    err = OSCLoadDependencies(pFw, 
             bmp_deps, 
-            sizeof(bmp_deps)/sizeof(struct LCV_DEPENDENCY));
+            sizeof(bmp_deps)/sizeof(struct OSC_DEPENDENCY));
     
     if(err != SUCCESS)
     {
@@ -43,7 +42,7 @@ LCV_ERR LCVBmpCreate(void *hFw)
         return err;
     }
     
-    memset(&bmp, 0, sizeof(struct LCV_BMP));
+    memset(&bmp, 0, sizeof(struct OSC_BMP));
     
     /* Increment the use count */
     pFw->bmp.hHandle = (void*)&bmp;
@@ -52,11 +51,11 @@ LCV_ERR LCVBmpCreate(void *hFw)
     return SUCCESS;
 }
 
-void LCVBmpDestroy(void *hFw)
+void OscBmpDestroy(void *hFw)
 {
-    struct LCV_FRAMEWORK *pFw;
+    struct OSC_FRAMEWORK *pFw;
         
-    pFw = (struct LCV_FRAMEWORK *)hFw;
+    pFw = (struct OSC_FRAMEWORK *)hFw;
     
     /* Check if we really need to release or whether we still 
      * have users. */
@@ -66,14 +65,14 @@ void LCVBmpDestroy(void *hFw)
         return;
     }
     
-    LCVUnloadDependencies(pFw, 
+    OSCUnloadDependencies(pFw, 
             bmp_deps, 
-            sizeof(bmp_deps)/sizeof(struct LCV_DEPENDENCY));
+            sizeof(bmp_deps)/sizeof(struct OSC_DEPENDENCY));
     
-    memset(&bmp, 0, sizeof(struct LCV_BMP));
+    memset(&bmp, 0, sizeof(struct OSC_BMP));
 }
 
-LCV_ERR LCVBmpRead(struct LCV_PICTURE *pPic, const char *strFileName)
+OSC_ERR OscBmpRead(struct OSC_PICTURE *pPic, const char *strFileName)
 {
     FILE            *pPicFile;
     /* Temporary buffer to store the header */
@@ -87,7 +86,7 @@ LCV_ERR LCVBmpRead(struct LCV_PICTURE *pPic, const char *strFileName)
     
     if(pPic == NULL || strFileName == NULL || strFileName[0] == '\0')
     {
-        LCVLog(ERROR, "%s(0x%x, %s): Invalid parameter.\n", 
+        OscLog(ERROR, "%s(0x%x, %s): Invalid parameter.\n", 
                 __func__, pPic, strFileName);
         return -EINVALID_PARAMETER;
     }
@@ -95,14 +94,14 @@ LCV_ERR LCVBmpRead(struct LCV_PICTURE *pPic, const char *strFileName)
     pPicFile = fopen(strFileName, "rb");
     if(pPicFile == NULL)
     {
-        LCVLog(ERROR, "%s: Unable to open picture %s!\n",
+        OscLog(ERROR, "%s: Unable to open picture %s!\n",
                 __func__, strFileName);
         return -EUNABLE_TO_OPEN_FILE;
     }
     
     /* Read in the header and extract the interesting fields */
     fread(pHeader, 1, sizeof(aryBmpHeadRGB), pPicFile);
-    LCVBmpReadHdrInfo((uint8*)pHeader, 
+    OscBmpReadHdrInfo((uint8*)pHeader, 
             &width, 
             &height, 
             &dataOffset, 
@@ -120,7 +119,7 @@ LCV_ERR LCVBmpRead(struct LCV_PICTURE *pPic, const char *strFileName)
     /* Check the header for validity */
     if(unlikely(colorDepth != 24 && colorDepth != 8))
     {
-        LCVLog(ERROR, "%s: Unsupported color depth: %d.\n", 
+        OscLog(ERROR, "%s: Unsupported color depth: %d.\n", 
                 __func__, colorDepth);
         fclose(pPicFile);
         return -EUNSUPPORTED_FORMAT;
@@ -129,7 +128,7 @@ LCV_ERR LCVBmpRead(struct LCV_PICTURE *pPic, const char *strFileName)
             dataOffset != sizeof(aryBmpHeadGrey)))
     {
         /* Only supported uncompressed headers without color table */
-        LCVLog(ERROR, "%s: Unsupported BMP header size: %d.\n",
+        OscLog(ERROR, "%s: Unsupported BMP header size: %d.\n",
                 __func__, dataOffset);
         fclose(pPicFile);
         return -EUNSUPPORTED_FORMAT;
@@ -141,7 +140,7 @@ LCV_ERR LCVBmpRead(struct LCV_PICTURE *pPic, const char *strFileName)
     if(unlikely((pPic->width != 0) && ((pPic->width != (uint32)width) ||  
                     (pPic->height != (uint32)height))))
     {
-        LCVLog(ERROR, "%s: Wrong image format. %dx%d instead of %dx%d.\n",
+        OscLog(ERROR, "%s: Wrong image format. %dx%d instead of %dx%d.\n",
                 __func__, width, height, pPic->width, pPic->height);
         fclose(pPicFile);
         return -EWRONG_IMAGE_FORMAT;
@@ -153,7 +152,7 @@ LCV_ERR LCVBmpRead(struct LCV_PICTURE *pPic, const char *strFileName)
         if(pPic->width == 0)
         {
             fclose(pPicFile);
-            LCVLog(ERROR, 
+            OscLog(ERROR, 
                     "%s: Unable to verify image format assumptions.\n",
                     __func__);
             return -EUNABLE_TO_VERIFY_IMAGE_FORMAT;
@@ -163,7 +162,7 @@ LCV_ERR LCVBmpRead(struct LCV_PICTURE *pPic, const char *strFileName)
         pPic->data = (void*)malloc(imgSize);
         if(pPic->data == NULL)
         {
-            LCVLog(ERROR, "%s: Memory allocation error!\n", __func__);
+            OscLog(ERROR, "%s: Memory allocation error!\n", __func__);
             return -EOUT_OF_MEMORY;
         }
     }
@@ -172,9 +171,9 @@ LCV_ERR LCVBmpRead(struct LCV_PICTURE *pPic, const char *strFileName)
     pPic->height = (uint32)height;
     if(colorDepth == 24)
     {
-        pPic->type = LCV_PICTURE_RGB_24;
+        pPic->type = OSC_PICTURE_RGB_24;
     } else { /* colorDepth == 8 */
-        pPic->type = LCV_PICTURE_GREYSCALE;
+        pPic->type = OSC_PICTURE_GREYSCALE;
     }
       
     /* Seek the pixel data portion of the file and read it in */
@@ -194,12 +193,12 @@ LCV_ERR LCVBmpRead(struct LCV_PICTURE *pPic, const char *strFileName)
     if(bIsReversed)
     {
         /* The row order is reversed */
-        return LCVBmpReverseRowOrder(pPic);
+        return OscBmpReverseRowOrder(pPic);
     }
     return SUCCESS;
 }
 
-LCV_ERR LCVBmpWrite(const struct LCV_PICTURE *pPic, 
+OSC_ERR OscBmpWrite(const struct OSC_PICTURE *pPic, 
         const char *strFileName)
 {
     FILE            *pPicFile;
@@ -215,17 +214,17 @@ LCV_ERR LCVBmpWrite(const struct LCV_PICTURE *pPic,
             strFileName == NULL || strFileName[0] == '\0' || 
             pPic->width == 0 || pPic->height == 0)
     {
-        LCVLog(ERROR, "%s(0x%x, %s): Invalid parameter!\n",
+        OscLog(ERROR, "%s(0x%x, %s): Invalid parameter!\n",
                 __func__, pPic, strFileName);
         return -EINVALID_PARAMETER;
     }
-    if(pPic->type == LCV_PICTURE_RGB_24)
+    if(pPic->type == OSC_PICTURE_RGB_24)
     {   
         aryBmpHead = aryBmpHeadRGB;
         bmpHeadSize = sizeof(aryBmpHeadRGB);
         colorDepth = 24;
     } 
-    else if(pPic->type == LCV_PICTURE_GREYSCALE) 
+    else if(pPic->type == OSC_PICTURE_GREYSCALE) 
     {
         aryBmpHead = aryBmpHeadGrey;
         bmpHeadSize = sizeof(aryBmpHeadGrey);
@@ -233,13 +232,13 @@ LCV_ERR LCVBmpWrite(const struct LCV_PICTURE *pPic,
     } 
     else 
     {
-        LCVLog(ERROR, "%s: Unsupported image type (%d).\n", 
+        OscLog(ERROR, "%s: Unsupported image type (%d).\n", 
                 __func__, pPic->type);
         return -EUNSUPPORTED_FORMAT;
     }
             
     /* Initialize the header */
-    LCVBmpWriteHdrInfo(aryBmpHead, 
+    OscBmpWriteHdrInfo(aryBmpHead, 
             (int32)pPic->width, 
             (int32)pPic->height, 
             colorDepth,
@@ -248,7 +247,7 @@ LCV_ERR LCVBmpWrite(const struct LCV_PICTURE *pPic,
     pPicFile = fopen(strFileName, "wb");
     if(pPicFile == NULL)
     {
-        LCVLog(ERROR, "%s: Unable to open picture %s!\n",
+        OscLog(ERROR, "%s: Unable to open picture %s!\n",
                 __func__, strFileName);
         return -EUNABLE_TO_OPEN_FILE;
     }
@@ -278,7 +277,7 @@ LCV_ERR LCVBmpWrite(const struct LCV_PICTURE *pPic,
     return SUCCESS;
 }
 
-static inline void LCVBmpReadHdrInfo(const uint8 *pHdr,
+static inline void OscBmpReadHdrInfo(const uint8 *pHdr,
         int32 * pWidth, int32 * pHeight, int32 *pDataOffset,
         int16 * pColorDepth)
 {
@@ -301,7 +300,7 @@ static inline void LCVBmpReadHdrInfo(const uint8 *pHdr,
 #endif /* CPU_LITTLE_ENDIAN */
 }
 
-static inline void LCVBmpWriteHdrInfo(uint8 *pHdr,
+static inline void OscBmpWriteHdrInfo(uint8 *pHdr,
         const int32 width, const int32 height, const int16 colorDepth,
         const int32 headerSize)
 {
@@ -337,7 +336,7 @@ static inline void LCVBmpWriteHdrInfo(uint8 *pHdr,
 #endif /* CPU_LITTLE_ENDIAN */
 }
 
-static LCV_ERR LCVBmpReverseRowOrder(struct LCV_PICTURE *pPic)
+static OSC_ERR OscBmpReverseRowOrder(struct OSC_PICTURE *pPic)
 {
     void        *pTempRow;
     uint8       bytesPerPixel;
@@ -346,10 +345,10 @@ static LCV_ERR LCVBmpReverseRowOrder(struct LCV_PICTURE *pPic)
     uint32      curFIndex, curBIndex;
     uint8       *pData = (uint8*)pPic->data;
     
-    if(pPic->type == LCV_PICTURE_RGB_24)
+    if(pPic->type == OSC_PICTURE_RGB_24)
     {
         bytesPerPixel = 3;
-    } else if(pPic->type == LCV_PICTURE_GREYSCALE) {
+    } else if(pPic->type == OSC_PICTURE_GREYSCALE) {
         bytesPerPixel = 1;
     } else {
         return -EUNSUPPORTED_FORMAT;
@@ -360,7 +359,7 @@ static LCV_ERR LCVBmpReverseRowOrder(struct LCV_PICTURE *pPic)
     pTempRow = (void*)malloc(rowLength);
     if(!pTempRow)
     {
-        LCVLog(CRITICAL, "%s: Memory allocation failed!\n", __func__);
+        OscLog(CRITICAL, "%s: Memory allocation failed!\n", __func__);
         return -EOUT_OF_MEMORY;
     }
     

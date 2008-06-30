@@ -4,7 +4,6 @@
  * Original code August 2000, published in www.embedded.com
  * State-Oriented Programming by M. Samek & P.Y. Montgomery
  * 
- * @author Samuel Zahnd
  ************************************************************************/
 #ifndef HSM_PRIV_H_
 #define HSM_PRIV_H_
@@ -14,15 +13,15 @@
 
 #include <log/log_pub.h>
 
-#ifdef LCV_HOST
-#include <framework_types_host.h>
+#ifdef OSC_HOST
+#include <oscar_types_host.h>
 #else
-#include <framework_types_target.h>
-#endif /* LCV_HOST */
+#include <oscar_types_target.h>
+#endif /* OSC_HOST */
 
 
 /*!@brief object struct */
-struct LCV_HSM
+struct OSC_HSM
 {
     bool dummy;                    /*!< @brief dummy variable */
     /* Wie genau fliess hier das HSM pattern ein? 

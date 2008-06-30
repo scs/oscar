@@ -4,27 +4,26 @@
  * Simulation is only used for host. Target implementation provides 
  * stump function definition.
  * 
- * @author Markus Berner
  */
 #ifndef SIM_PUB_H_
 #define SIM_PUB_H_
 
-#include "framework_error.h"
-#ifdef LCV_HOST
-    #include "framework_types_host.h"
-    #include "framework_host.h"
+#include "oscar_error.h"
+#ifdef OSC_HOST
+    #include "oscar_types_host.h"
+    #include "oscar_host.h"
 #else
-    #include "framework_types_target.h"
-    #include "framework_target.h"
-#endif /* LCV_HOST */
+    #include "oscar_types_target.h"
+    #include "oscar_target.h"
+#endif /* OSC_HOST */
 
 /*! @brief Module-specific error codes.
  * 
  * These are enumerated with the offset
  * assigned to each module, so a distinction over
  * all modules can be made */
-enum EnLcvSimErrors {
-    ENUM_CALLBACK_EXHAUSTED = LCV_SIM_ERROR_OFFSET
+enum EnOscSimErrors {
+    ENUM_CALLBACK_EXHAUSTED = OSC_SIM_ERROR_OFFSET
 };
 
 /*======================== API functions ===============================*/
@@ -35,14 +34,14 @@ enum EnLcvSimErrors {
  * @param hFw Pointer to the handle of the framework.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-LCV_ERR LCVSimCreate(void *hFw);
+OSC_ERR OscSimCreate(void *hFw);
 
 /*********************************************************************//*!
  * @brief Destructor
  * 
  * @param hFw Pointer to the handle of the framework.
  *//*********************************************************************/
-void LCVSimDestroy(void *hFw);
+void OscSimDestroy(void *hFw);
 
 /*********************************************************************//*!
  * @brief Initialize simulation
@@ -51,7 +50,7 @@ void LCVSimDestroy(void *hFw);
  * the simulation module. Time variable is set to 0. Callbacks to
  * stimuli reader and writer are issued to applie default signal values. 
  *//*********************************************************************/
-void LCVSimInitialize(void);
+void OscSimInitialize(void);
 
 /*********************************************************************//*!
  * @brief Increment the simulation time step. 
@@ -64,7 +63,7 @@ void LCVSimInitialize(void);
  * next cycle!) 
  * Target: Stump since simulation is only done on host.
  *//*********************************************************************/
-void LCVSimStep();
+void OscSimStep();
 
 /*********************************************************************//*!
  * @brief Get the current simulation time step.
@@ -73,7 +72,7 @@ void LCVSimStep();
  * 
  * @return The current simulation time step.
  *//*********************************************************************/
-uint32 LCVSimGetCurTimeStep();
+uint32 OscSimGetCurTimeStep();
 
 /*********************************************************************//*!
  * @brief Register a callback function to be called every new timestep.
@@ -83,6 +82,6 @@ uint32 LCVSimGetCurTimeStep();
  * @param pCallback Pointer to the function to be called.
  * @return SUCCESS or an appropriate error code.
  *//*********************************************************************/
-LCV_ERR LCVSimRegisterCycleCallback( void (*pCallback)(void));
+OSC_ERR OscSimRegisterCycleCallback( void (*pCallback)(void));
 
 #endif /*SIM_PUB_H_*/

@@ -1,7 +1,6 @@
 /*! @file cfg_priv.h
  * @brief Private configuration file module definitions with object structure
  * 
- * @author Men Muheim
  */
 #ifndef CFG_PRIV_H_
 #define CFG_PRIV_H_
@@ -11,11 +10,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef LCV_HOST
-    #include <framework_types_host.h>
+#ifdef OSC_HOST
+    #include <oscar_types_host.h>
 #else
-    #include <framework_types_target.h>
-#endif /* LCV_HOST */
+    #include <oscar_types_target.h>
+#endif /* OSC_HOST */
 
 #include <log/log_pub.h>
 
@@ -41,7 +40,7 @@ struct CFG_FILE_CONTENT {
 };
 
 /*! @brief Config File Content handels. */
-struct LCV_CFG { 
+struct OSC_CFG { 
     uint16 nrOfContents;		/*!< @brief Number of managed contents */
 	struct CFG_FILE_CONTENT contents[CONFIG_FILE_MAX_NUM];
 };
@@ -57,7 +56,7 @@ struct LCV_CFG {
  * @param all True if the whole buffer shall be written.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-LCV_ERR LCVCfgFlushContentHelper(const CFG_FILE_CONTENT_HANDLE hFileContent, bool all);
+OSC_ERR OscCfgFlushContentHelper(const CFG_FILE_CONTENT_HANDLE hFileContent, bool all);
 
 /*********************************************************************//*!
  * @brief Helper function to find the beginning of the value string in the file
@@ -67,7 +66,7 @@ LCV_ERR LCVCfgFlushContentHelper(const CFG_FILE_CONTENT_HANDLE hFileContent, boo
  * @param pPStrVal Return pointer to the value in the file.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-LCV_ERR LCVCfgGetValPtr(
+OSC_ERR OscCfgGetValPtr(
 		const unsigned int 	contentIndex, 
 		const struct CFG_KEY *pKey,
 		char **pPStrVal);
@@ -80,7 +79,7 @@ LCV_ERR LCVCfgGetValPtr(
  * @param string Pointer to string.
  * @return Pointer to char in string after subString, NULL if no subString is found
  *//*********************************************************************/
-char* LCVCfgIsSubStr(
+char* OscCfgIsSubStr(
 		const char *subString, 
 		const size_t subStringLen, 
 		const char *string);
@@ -93,7 +92,7 @@ char* LCVCfgIsSubStr(
  * @param text Pointer to text.
  * @return Pointer to char in test after label suffix, NULL if label not found
  *//*********************************************************************/
-char* LCVCfgFindNewlineLabel(
+char* OscCfgFindNewlineLabel(
 		const char* label, 
 		const char* labelSuffix, 
 		char* text);
@@ -107,7 +106,7 @@ char* LCVCfgFindNewlineLabel(
  * @param text Pointer to text.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-LCV_ERR LCVCfgReplaceStr(
+OSC_ERR OscCfgReplaceStr(
 		const unsigned int 	contentIndex, 
 		const char *oldStr, 
 		const char *newStr, 
@@ -124,7 +123,7 @@ LCV_ERR LCVCfgReplaceStr(
  * @param labelSuffix Pointer to labelSuffix.
  * @return pointer to char after labelSuffix
  *//*********************************************************************/
-char* LCVCfgAppendLabel(
+char* OscCfgAppendLabel(
 		char* text, 
 		const unsigned int maxTextLen, 
 		const char* label, 
@@ -139,6 +138,6 @@ char* LCVCfgAppendLabel(
  * @param strSize Array length of str.
  * @return index of first invalid char.
  *//*********************************************************************/
-unsigned int LCVCfgFindInvalidChar(const char *str, const unsigned int strSize);
+unsigned int OscCfgFindInvalidChar(const char *str, const unsigned int strSize);
 
 #endif /*CFG_PRIV_H_*/

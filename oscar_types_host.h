@@ -1,7 +1,6 @@
-/*! @file framework_types_host.h
+/*! @file oscar_types_host.h
  * @brief Type definitions for the host. 
  * 
- * @author Markus Berner, Samuel Zahnd
  */
 #ifndef TYPES_H_
 #define TYPES_H_
@@ -15,7 +14,7 @@
 #define int64 	long long
 #define uint64 	unsigned long long
 
-#define LCV_ERR int
+#define OSC_ERR int
 
 #define bool    int
 #define TRUE    (1==1)

@@ -1,7 +1,6 @@
-/*! @file framework_error.h
- * @brief Error declarations for LCV framework
+/*! @file oscar_error.h
+ * @brief Error declarations for OSC framework
  * 
- * @author Markus Berner, Samuel Zahnd
  * @date 22.1.2008
  * @version 1.0
  */
@@ -9,8 +8,8 @@
 #define FRAMEWORK_ERROR_H_
 
 /*! @brief Define general non-module-specific
- * error codes for the LCV framework */
-enum EnLcvErrors {
+ * error codes for the OSC framework */
+enum EnOscErrors {
 		SUCCESS = 0,
 		EOUT_OF_MEMORY,
 		ETIMEOUT,
@@ -35,32 +34,32 @@ enum EnLcvErrors {
  * define module-specific errors that do not overlap.
  */
 /*! @brief Error identifier offset of the cam module. */
-#define LCV_CAM_ERROR_OFFSET 	100
+#define OSC_CAM_ERROR_OFFSET 	100
 /*! @brief Error identifier offset of the cpld module. */
-#define LCV_CPLD_ERROR_OFFSET 	200
+#define OSC_CPLD_ERROR_OFFSET 	200
 /*! @brief Error identifier offset of the lgx module. */
-#define LCV_LGX_ERROR_OFFSET    300
+#define OSC_LGX_ERROR_OFFSET    300
 /*! @brief Error identifier offset of the log module. */
-#define LCV_LOG_ERROR_OFFSET    400
+#define OSC_LOG_ERROR_OFFSET    400
 /*! @brief Error identifier offset of the sim module. */
-#define LCV_SIM_ERROR_OFFSET    500
+#define OSC_SIM_ERROR_OFFSET    500
 /*! @brief Error identifier offset of the bmp module. */
-#define LCV_BMP_ERROR_OFFSET    600
+#define OSC_BMP_ERROR_OFFSET    600
 /*! @brief Error identifier offset of the swr module. */
-#define LCV_SWR_ERROR_OFFSET    700
+#define OSC_SWR_ERROR_OFFSET    700
 /*! @brief Error identifier offset of the srd module. */
-#define LCV_SRD_ERROR_OFFSET    800
+#define OSC_SRD_ERROR_OFFSET    800
 /*! @brief Error identifier offset of the ipc module. */
-#define LCV_IPC_ERROR_OFFSET    900
+#define OSC_IPC_ERROR_OFFSET    900
 /*! @brief Error identifier offset of the frd module. */
-#define LCV_FRD_ERROR_OFFSET    1000
+#define OSC_FRD_ERROR_OFFSET    1000
 /*! @brief Error identifier offset of the dma module. */
-#define LCV_DMA_ERROR_OFFSET    1100
+#define OSC_DMA_ERROR_OFFSET    1100
 /*! @brief Error identifier offset of the hsm module. */
-#define LCV_HSM_ERROR_OFFSET    1200
+#define OSC_HSM_ERROR_OFFSET    1200
 /*! @brief Error identifier offset of the cfg module. */
-#define LCV_CFG_ERROR_OFFSET    1300
+#define OSC_CFG_ERROR_OFFSET    1300
 /*! @brief Error identifier offset of the clb module. */
-#define LCV_CLB_ERROR_OFFSET    1400
+#define OSC_CLB_ERROR_OFFSET    1400
 
 #endif /*FRAMEWORK_ERROR_H_*/

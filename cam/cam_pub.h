@@ -1,21 +1,20 @@
 /*! @file cam_pub.h
  * @brief API definition for camera module
  * 
- * @author Markus Berner
  */
 #ifndef CAM_PUB_H_
 #define CAM_PUB_H_
 
-#include "framework_error.h"
+#include "oscar_error.h"
 #include "bayer_pub.h"
 
 /*! Module-specific error codes.
  * These are enumerated with the offset
  * assigned to each module, so a distinction over
  * all modules can be made */
-enum EnLcvCamErrors
+enum EnOscCamErrors
 {
-    ENO_VIDEO_DEVICE_FOUND = LCV_CAM_ERROR_OFFSET,
+    ENO_VIDEO_DEVICE_FOUND = OSC_CAM_ERROR_OFFSET,
     EPICTURE_TOO_OLD,
     ENO_MATCHING_PICTURE,
     ENO_CAPTURE_STARTED,
@@ -26,42 +25,42 @@ enum EnLcvCamErrors
 };
 
 /*! @brief The different trigger modes for the camera */
-enum EnLcvCamTriggerMode
+enum EnOscCamTriggerMode
 {
-    LCV_CAM_TRIGGER_MODE_EXTERNAL,
-    LCV_CAM_TRIGGER_MODE_MANUAL
+    OSC_CAM_TRIGGER_MODE_EXTERNAL,
+    OSC_CAM_TRIGGER_MODE_MANUAL
 };
 
 /*! @brief Camera perspective adaptation */
-enum EnLcvCamPerspective
+enum EnOscCamPerspective
 {
-    LCV_CAM_PERSPECTIVE_DEFAULT,
-    LCV_CAM_PERSPECTIVE_HORIZONTAL_MIRROR,
-    LCV_CAM_PERSPECTIVE_VERTICAL_MIRROR,
-    LCV_CAM_PERSPECTIVE_180DEG_ROTATE
+    OSC_CAM_PERSPECTIVE_DEFAULT,
+    OSC_CAM_PERSPECTIVE_HORIZONTAL_MIRROR,
+    OSC_CAM_PERSPECTIVE_VERTICAL_MIRROR,
+    OSC_CAM_PERSPECTIVE_180DEG_ROTATE
 };
 
 /*! @brief Configuration value string for default perspective */ 
-#define LCV_CAM_PERSPECTIVE_CFG_STR_DEFAULT              "DEFAULT"
+#define OSC_CAM_PERSPECTIVE_CFG_STR_DEFAULT              "DEFAULT"
 /*! @brief Configuration value string for horizontal mirrored perspective*/
-#define LCV_CAM_PERSPECTIVE_CFG_STR_HORIZONTAL_MIRROR    "HMIRROR"
+#define OSC_CAM_PERSPECTIVE_CFG_STR_HORIZONTAL_MIRROR    "HMIRROR"
 /*! @brief Configuration value string for vertical mirrored perspective */
-#define LCV_CAM_PERSPECTIVE_CFG_STR_VERTICAL_MIRROR      "VMIRROR"
+#define OSC_CAM_PERSPECTIVE_CFG_STR_VERTICAL_MIRROR      "VMIRROR"
 /*! @brief Configuration value string for 180deg rotated perspective */
-#define LCV_CAM_PERSPECTIVE_CFG_STR_180DEG_ROTATE        "ROT180"
+#define OSC_CAM_PERSPECTIVE_CFG_STR_180DEG_ROTATE        "ROT180"
 
 /*! @brief Specify this as frame buffer number if you want to access
  * the multi buffer. */
-#define LCV_CAM_MULTI_BUFFER 254
+#define OSC_CAM_MULTI_BUFFER 254
 /*! @brief Buffer ID of an invalid buffer. */
-#define LCV_CAM_INVALID_BUFFER_ID 255 
+#define OSC_CAM_INVALID_BUFFER_ID 255 
 
 /*! @brief The width of the biggest image that can be captured with this
  * sensor. */
-#define LCV_CAM_MAX_IMAGE_WIDTH 752
+#define OSC_CAM_MAX_IMAGE_WIDTH 752
 /*! @brief The height of the biggest image that can be captured with this
  * sensor. */
-#define LCV_CAM_MAX_IMAGE_HEIGHT 480
+#define OSC_CAM_MAX_IMAGE_HEIGHT 480
 
 /*========================== API functions =============================*/
 
@@ -73,14 +72,14 @@ enum EnLcvCamPerspective
  * @param hFw Pointer to the handle of the framework.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-LCV_ERR LCVCamCreate(void *hFw);
+OSC_ERR OscCamCreate(void *hFw);
 
 /*********************************************************************//*!
  * @brief Destructor
  * 
  * @param hFw Pointer to the handle of the framework.
  *//*********************************************************************/
-void LCVCamDestroy(void *hFw);
+void OscCamDestroy(void *hFw);
 
 /*********************************************************************//*!
  * @brief Host only: Set the file name reader the host implementation 
@@ -97,12 +96,12 @@ void LCVCamDestroy(void *hFw);
  * @param hReaderHandle The handle of the reader to be set.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-LCV_ERR LCVCamSetFileNameReader(void* hReaderHandle);
+OSC_ERR OscCamSetFileNameReader(void* hReaderHandle);
 
 /*********************************************************************//*!
  * @brief Set the rectangle read out from the CMOS sensor
  * 
- * @see LCVCamGetAreaOfInterest
+ * @see OscCamGetAreaOfInterest
  * Writes the configuration to limit the image format captured by the CMOS
  * sensor to the specified values. Becomes valid with the next image 
  * captured.
@@ -117,13 +116,13 @@ LCV_ERR LCVCamSetFileNameReader(void* hReaderHandle);
  * @param height Height of the rectangle.
  * @return SUCCESS or  an appropriate error code otherwise
  *//*********************************************************************/
-LCV_ERR LCVCamSetAreaOfInterest(const uint16 lowX, const uint16 lowY,
+OSC_ERR OscCamSetAreaOfInterest(const uint16 lowX, const uint16 lowY,
         const uint16 width, const uint16 height);
 
 /*********************************************************************//*!
  * @brief Read back the rectangle currently being read out by the sensor.
  * 
- * @see LCVCamSetAreaOfInterest
+ * @see OscCamSetAreaOfInterest
  * @param pLowX X coordinate limiting the capture rectangle on the left 
  * side
  * @param pLowY Y coordinate limiting the capture rectangle on the bottom 
@@ -132,7 +131,7 @@ LCV_ERR LCVCamSetAreaOfInterest(const uint16 lowX, const uint16 lowY,
  * @param pHeight Height of the rectangle.
  * @return SUCCESS or  an appropriate error code otherwise
  *//*********************************************************************/
-LCV_ERR LCVCamGetAreaOfInterest(uint16 *pLowX,
+OSC_ERR OscCamGetAreaOfInterest(uint16 *pLowX,
         uint16 *pLowY,
         uint16 *pWidth,
         uint16 *pHeight);
@@ -148,7 +147,7 @@ LCV_ERR LCVCamGetAreaOfInterest(uint16 *pLowX,
  * @param usecs Desired exposure time in microseconds
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-LCV_ERR LCVCamSetShutterWidth(const uint32 usecs);
+OSC_ERR OscCamSetShutterWidth(const uint32 usecs);
 
 /*********************************************************************//*!
  * @brief Get the current exposure time
@@ -160,7 +159,7 @@ LCV_ERR LCVCamSetShutterWidth(const uint32 usecs);
  * @param pResult Configured exposure time in microseconds
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-LCV_ERR LCVCamGetShutterWidth(uint32 *pResult);
+OSC_ERR OscCamGetShutterWidth(uint32 *pResult);
 
 /*********************************************************************//*!
  * @brief Set the black level offset
@@ -178,7 +177,7 @@ LCV_ERR LCVCamGetShutterWidth(uint32 *pResult);
  * @param offset Boost the sensor response by N grey levels 
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-LCV_ERR LCVCamSetBlackLevelOffset(const uint16 offset);
+OSC_ERR OscCamSetBlackLevelOffset(const uint16 offset);
 
 /*********************************************************************//*!
  * @brief Get the current black level offset
@@ -186,7 +185,7 @@ LCV_ERR LCVCamSetBlackLevelOffset(const uint16 offset);
  * @param pOffset Configured exposure time in microseconds
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-LCV_ERR LCVCamGetBlackLevelOffset(uint16 *pOffset);
+OSC_ERR OscCamGetBlackLevelOffset(uint16 *pOffset);
 
 /*********************************************************************//*!
  * @brief Set a register value.
@@ -200,7 +199,7 @@ LCV_ERR LCVCamGetBlackLevelOffset(uint16 *pOffset);
  * @param value What is to be written into reg.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-LCV_ERR LCVCamSetRegisterValue(const uint32 reg, const uint16 value);
+OSC_ERR OscCamSetRegisterValue(const uint32 reg, const uint16 value);
 
 /*********************************************************************//*!
  * @brief Read a register value
@@ -214,7 +213,7 @@ LCV_ERR LCVCamSetRegisterValue(const uint32 reg, const uint16 value);
  * @param pResult Pointer where the return value should be stored.
  * @return SUCCESS or an appropriate error code
  *//*********************************************************************/
-LCV_ERR LCVCamGetRegisterValue(const uint32 reg, uint16 *pResult);
+OSC_ERR OscCamGetRegisterValue(const uint32 reg, uint16 *pResult);
 
 /*********************************************************************//*!
  * @brief Configure multiple frame buffer to form a multi buffer.
@@ -223,28 +222,28 @@ LCV_ERR LCVCamGetRegisterValue(const uint32 reg, uint16 *pResult);
  * triple buffering. Just specify the depth of the multi buffer and the
  * frame buffer IDs forming the multi buffer. Afterwards the commands
  * requiring a frame buffer number can be supplied with 
- * LCV_CAM_MULTI_BUFFER to access the data in the automatically managed
+ * OSC_CAM_MULTI_BUFFER to access the data in the automatically managed
  * multi buffer.
  * Only one multi buffer can exist per camera module.
  * The specified frame buffers must first be configured by calls 
- * to LCVCamCreateFrameBuffer.
- * @see LCVCamCreateFrameBuffer
- * @see LCVCamDeleteMultiBuffer
+ * to OscCamCreateFrameBuffer.
+ * @see OscCamCreateFrameBuffer
+ * @see OscCamDeleteMultiBuffer
  * 
  * @param multiBufferDepth The depth of the multi buffer.
  * @param bufferIDs Array of the buffer IDs forming the multi buffer.
  * @return SUCCESS or an appropriate error code
  *//*********************************************************************/
-LCV_ERR LCVCamCreateMultiBuffer(const uint8 multiBufferDepth,
+OSC_ERR OscCamCreateMultiBuffer(const uint8 multiBufferDepth,
         const uint8 bufferIDs[]);
 
 /*********************************************************************//*!
  * @brief Delete a previously configured multi buffer
- * @see LCVCamCreateMultiBuffer
+ * @see OscCamCreateMultiBuffer
  * 
  * @return SUCCESS or an appropriate error code
  *//*********************************************************************/
-inline LCV_ERR LCVCamDeleteMultiBuffer();
+inline OSC_ERR OscCamDeleteMultiBuffer();
 
 /*********************************************************************//*!
  * @brief Set one of the frame buffers used by the camera driver
@@ -253,12 +252,12 @@ inline LCV_ERR LCVCamDeleteMultiBuffer();
  * location pointed to by pData needs to provide enough
  * space for the selected image size. When multiple framebuffers
  * are specified, they can be configured as a multi buffer with
- * LCVCamCreateMultiBuffer.
+ * OscCamCreateMultiBuffer.
  * A frame buffer is unregistered by specifying NULL for pData and
  * a size of zero.
  * Double-Buffering is therefore easily implemented by just 
  * specifying 2 framebuffers.
- * @see LCVCamCreateMultiBuffer
+ * @see OscCamCreateMultiBuffer
  * 
  * @param fbID ID of the frame buffer
  * @param uSize Size of the frame buffer
@@ -266,50 +265,50 @@ inline LCV_ERR LCVCamDeleteMultiBuffer();
  * @param bCached True if memory location is cached, false otherwise
  * @return SUCCESS or an appropriate error code
  *//*********************************************************************/
-LCV_ERR LCVCamSetFrameBuffer(const uint8 fbID, const uint32 uSize,
+OSC_ERR OscCamSetFrameBuffer(const uint8 fbID, const uint32 uSize,
         const void * pData, const int bCached);
 
 /*********************************************************************//*!
  * @brief Prepare the capture of a new picture
  * 
- * This method needs to be called before LCVCamReadPicture(). It does not
+ * This method needs to be called before OscCamReadPicture(). It does not
  * block. 
- * When specifying LCV_CAM_TRIGGER_MODE_EXTERNAL the driver is
+ * When specifying OSC_CAM_TRIGGER_MODE_EXTERNAL the driver is
  * configured in a way that an incoming picture triggered by an external
  * trigger is automatically stored in the next frame-buffer in the RAM.
  * This means of course that the call to this method needs to take place
  * before the external trigger.
- * If LCV_CAM_TRIGGER_MODE_EXTERNAL is specified, the camera is triggered
+ * If OSC_CAM_TRIGGER_MODE_EXTERNAL is specified, the camera is triggered
  * manually in addition to above actions.
- * @see LCVCamReadPicture
- * @see LCVCamCancelCapture
+ * @see OscCamReadPicture
+ * @see OscCamCancelCapture
  * 
  * @param fbID ID of the frame buffer to capture to.
  * @param tMode The trigger mode of this capture.
  * @return SUCCESS or an appropriate error code
  *//*********************************************************************/
-LCV_ERR LCVCamSetupCapture(uint8 fbID, 
-        const enum EnLcvCamTriggerMode tMode);
+OSC_ERR OscCamSetupCapture(uint8 fbID, 
+        const enum EnOscCamTriggerMode tMode);
 
 /*********************************************************************//*!
  * @brief Cancel the capture of a picture
  * 
- * Cancels a previous call to LCVCamSetupCapture if the picture
+ * Cancels a previous call to OscCamSetupCapture if the picture
  * is not yet in the frame-buffer. In case the 
  * picture is currently being captured, this action will be 
  * cancelled, resulting in a corrupted picture in the frame 
  * buffer.
  * Does not block. 
- * @see LCVCamSetupCapture
+ * @see OscCamSetupCapture
  * 
  * @return SUCCESS or an appropriate error code
  *//*********************************************************************/
-LCV_ERR LCVCamCancelCapture();
+OSC_ERR OscCamCancelCapture();
 
 /*********************************************************************//*!
  * @brief Reads a new picture from the camera.
  * 
- * Blocks until the picture from a previous call to LCVCamSetupCapture
+ * Blocks until the picture from a previous call to OscCamSetupCapture
  * is stored fully in RAM (the frame-buffer). It then supplies the 
  * pointer of the frame-buffer that contains the image. To prevent
  * an infinite blocking on this function a timeout can be supplied.
@@ -320,7 +319,7 @@ LCV_ERR LCVCamCancelCapture();
  * No image processing is performed, which means that when reading a
  * picture from a color CMOS sensor, Bayer pattern filtering has to be
  * done before being able to use the color content of the picture.
- * @see LCVCamSetupCapture
+ * @see OscCamSetupCapture
  * 
  * Host: Implementation does not currently support image age or
  * timeout. The trigger mode is also not relevant as the picture
@@ -335,7 +334,7 @@ LCV_ERR LCVCamCancelCapture();
  * @param timeout Timeout in milliseconds. 0 means no timeout.
  * @return SUCCESS or an appropriate error code.
  *//*********************************************************************/
-LCV_ERR LCVCamReadPicture(const uint8 fbID, void ** ppPic, 
+OSC_ERR OscCamReadPicture(const uint8 fbID, void ** ppPic, 
         const uint16 maxAge, const uint16 timeout);
 
 /*********************************************************************//*!
@@ -347,13 +346,13 @@ LCV_ERR LCVCamReadPicture(const uint8 fbID, void ** ppPic,
  * @param ppPic Location where to save the pointer to the frame-buffer
  * @return SUCCESS or an appropriate error code
  *//*********************************************************************/
-LCV_ERR LCVCamReadLatestPicture(uint8 ** ppPic);
+OSC_ERR OscCamReadLatestPicture(uint8 ** ppPic);
 
 /*********************************************************************//*!
  * @brief Register a callback function for image correction
  * 
  * ReadPicture calls this registered function at the very end. Depending 
- * on the configured noise removal methods (LCVClbSetupCalibrate) the 
+ * on the configured noise removal methods (OscClbSetupCalibrate) the 
  * image is corrected in place.
  * 
  * Host: No effect
@@ -361,7 +360,7 @@ LCV_ERR LCVCamReadLatestPicture(uint8 ** ppPic);
  * @param pCallback Pointer to the function to be called.
  * @return SUCCESS or an appropriate error code.
  *//*********************************************************************/
-LCV_ERR LCVCamRegisterCorretionCallback( 
+OSC_ERR OscCamRegisterCorretionCallback( 
         int (*pCallback)(
                 uint8 *pImg, 
                 const uint16 lowX, 
@@ -381,7 +380,7 @@ LCV_ERR LCVCamRegisterCorretionCallback(
  * @param perspective Identifier of the desired camera perspective.
  * @return SUCCESS or an appropriate error code
  *//*********************************************************************/
-LCV_ERR LCVCamSetupPerspective(const enum EnLcvCamPerspective perspective);
+OSC_ERR OscCamSetupPerspective(const enum EnOscCamPerspective perspective);
 
 /*********************************************************************//*!
  * @brief Convert a string identifying a perspective to the corresponding
@@ -391,15 +390,15 @@ LCV_ERR LCVCamSetupPerspective(const enum EnLcvCamPerspective perspective);
  * @param per Returned perspective identifier
  * @return SUCCESS or an appropriate error code
  *//*********************************************************************/
-LCV_ERR PerspectiveCfgStr2Enum(const char *str, 
-        enum EnLcvCamPerspective *per );
+OSC_ERR PerspectiveCfgStr2Enum(const char *str, 
+        enum EnOscCamPerspective *per );
 
 /*********************************************************************//*!
  * @brief Host only: Set image sensor registers to standard configuration.
  * 
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-LCV_ERR LCVCamPresetRegs();  
+OSC_ERR OscCamPresetRegs();  
 
 /*********************************************************************//*!
  * @brief Returns an identifier describing the order of the bayer colors
@@ -408,7 +407,7 @@ LCV_ERR LCVCamPresetRegs();
  * This does !NOT! depend on the configured perspective, since the sensor
  * automatically adjusts so the readout always starts at the same color. It
  * does however depend on the area of interest configured.
- * @see LCVCamSetAreaOfInterest
+ * @see OscCamSetAreaOfInterest
  * 
  * Only on hardware with color sensor.
  * 
@@ -417,7 +416,7 @@ LCV_ERR LCVCamPresetRegs();
  * @param yPos Y-Position of the row.
  * @return SUCCESS or an appropriate error code.
  *//*********************************************************************/
-LCV_ERR LCVCamGetBayerOrder(enum EnBayerOrder *pBayerOrderFirstRow,
+OSC_ERR OscCamGetBayerOrder(enum EnBayerOrder *pBayerOrderFirstRow,
 							const uint16 xPos,
 							const uint16 yPos);
 

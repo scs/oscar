@@ -1,7 +1,6 @@
 /*! @file mainstate.h
  * @brief Definitions for main state machine
  * 
- * @author Samuel Zahnd
  ************************************************************************/
 #ifndef MAINSTATE_H
 #define MAINSTATE_H

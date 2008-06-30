@@ -6,27 +6,26 @@
  * supplied when allocating a channel, communication can be blocking or
  * non-blocking.
  * 
- * @author Markus Berner
  */
 #ifndef IPC_PUB_H_
 #define IPC_PUB_H_
 
-#include "framework_error.h"
-#ifdef LCV_HOST
-    #include "framework_types_host.h"
-    #include "framework_host.h"
+#include "oscar_error.h"
+#ifdef OSC_HOST
+    #include "oscar_types_host.h"
+    #include "oscar_host.h"
 #else
-    #include "framework_types_target.h"
-    #include "framework_target.h"
-#endif /* LCV_HOST */
+    #include "oscar_types_target.h"
+    #include "oscar_target.h"
+#endif /* OSC_HOST */
 
 /*! @brief Module-specific error codes.
  * These are enumerated with the offset
  * assigned to each module, so a distinction over
  * all modules can be made */
-enum EnLcvIpcErrors 
+enum EnOscIpcErrors 
 {
-    ESOCKET = LCV_IPC_ERROR_OFFSET,
+    ESOCKET = OSC_IPC_ERROR_OFFSET,
     ENO_MSG_AVAIL,
     EBLOCKING_MODE_ONLY,
     ENEGATIVE_ACKNOWLEDGE
@@ -49,7 +48,7 @@ enum EnChannelFlags
 };
 
 /*! @brief Represents an IPC request. */
-struct LCV_IPC_REQUEST 
+struct OSC_IPC_REQUEST 
 {
     /*! @brief The type of this request. */
     enum EnRequestType enType;
@@ -61,7 +60,7 @@ struct LCV_IPC_REQUEST
 };
 
 /*! The data type for an IPC channel Identifier */
-#define LCV_IPC_CHAN_ID uint8
+#define OSC_IPC_CHAN_ID uint8
 
 /*=========================== API functions ============================*/
 
@@ -71,14 +70,14 @@ struct LCV_IPC_REQUEST
  * @param hFw Pointer to the handle of the framework.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-LCV_ERR LCVIpcCreate(void *hFw);
+OSC_ERR OscIpcCreate(void *hFw);
 
 /*********************************************************************//*!
  * @brief Destructor
  * 
  * @param hFw Pointer to the handle of the framework.
  *//*********************************************************************/
-void LCVIpcDestroy(void *hFw);
+void OscIpcDestroy(void *hFw);
 
 /*********************************************************************//*!
  * @brief Register an IPC channel for future message communication
@@ -92,7 +91,7 @@ void LCVIpcDestroy(void *hFw);
  * or any client trying to connect will fail.  When
  * not setting the blocking option, operations will always return 
  * immediately.
- * @see LCVIpcUnregisterChannel
+ * @see OscIpcUnregisterChannel
  * 
  * @param pIpcChan Pointer where the channel ID of the allocated IPC
  * channel is stored on success.
@@ -103,19 +102,19 @@ void LCVIpcDestroy(void *hFw);
  * F_IPC_NONBLOCKING)
  * @return SUCCESS on success or an appropriate error code otherwise.
  *//*********************************************************************/
-LCV_ERR LCVIpcRegisterChannel(
-		LCV_IPC_CHAN_ID * pIpcChan,
+OSC_ERR OscIpcRegisterChannel(
+		OSC_IPC_CHAN_ID * pIpcChan,
         const char *strSocketPath,
         const int flags);
 
 /*********************************************************************//*!
  * @brief Unregister a previously allocated IPC channel.
- * @see LCVIpcRegisterChannel
+ * @see OscIpcRegisterChannel
  * 
  * @param chanID Channel ID of the channel to be unregistered.
  * @return SUCCESS on success or an appropriate error code otherwise.
  *//*********************************************************************/
-LCV_ERR LCVIpcUnregisterChannel(const LCV_IPC_CHAN_ID chanID);
+OSC_ERR OscIpcUnregisterChannel(const OSC_IPC_CHAN_ID chanID);
 
 /*********************************************************************//*!
  * @brief Read the value of a parameter from the server over IPC.
@@ -129,8 +128,8 @@ LCV_ERR LCVIpcUnregisterChannel(const LCV_IPC_CHAN_ID chanID);
  * 
  * Only to be called by the client side of an IPC channel.
  * 
- * @see LCVIpcSetParam
- * @see LCVIpcRegisterChannel
+ * @see OscIpcSetParam
+ * @see OscIpcRegisterChannel
  * 
  * @param chanID Channel ID of the channel to be used.
  * @param pData Where to write the data read from the remote process.
@@ -139,7 +138,7 @@ LCV_ERR LCVIpcUnregisterChannel(const LCV_IPC_CHAN_ID chanID);
  * @param paramSize The length of above data field.
  * @return SUCCESS on success or an appropriate error code otherwise.
  *//*********************************************************************/
-LCV_ERR LCVIpcGetParam(const LCV_IPC_CHAN_ID chanID,
+OSC_ERR OscIpcGetParam(const OSC_IPC_CHAN_ID chanID,
         void *pData, 
         const uint32 paramID, 
         const uint32 paramSize);
@@ -156,8 +155,8 @@ LCV_ERR LCVIpcGetParam(const LCV_IPC_CHAN_ID chanID,
  * 
  * Only to be called by the client side of an IPC channel.
  * 
- * @see LCVIpcSetParam
- * @see LCVIpcRegisterChannel
+ * @see OscIpcSetParam
+ * @see OscIpcRegisterChannel
  * 
  * @param chanID Channel ID of the channel to be used.
  * @param pData Pointer to data to write to remote process.
@@ -166,7 +165,7 @@ LCV_ERR LCVIpcGetParam(const LCV_IPC_CHAN_ID chanID,
  * @param paramSize The length of above data field.
  * @return SUCCESS on success or an appropriate error code otherwise.
  *//*********************************************************************/
-LCV_ERR LCVIpcSetParam(const LCV_IPC_CHAN_ID chanID,
+OSC_ERR OscIpcSetParam(const OSC_IPC_CHAN_ID chanID,
         void *pData, 
         const uint32 paramID, 
         const uint32 paramSize);
@@ -177,38 +176,38 @@ LCV_ERR LCVIpcSetParam(const LCV_IPC_CHAN_ID chanID,
  * See if there is a new IPC request to be handled. If yes the request
  * is returned in pRequest. Otherwise -ENO_MSG_AVAIL is returned.
  * All requests received in this way must be acknowledged by calling
- * LCVIpcAckRequest.
+ * OscIpcAckRequest.
  * 
  * Only to be called by the server side of an IPC channel.
  * 
- * @see LCVIpcAckRequest
- * @see LCVIpcRegisterChannel
+ * @see OscIpcAckRequest
+ * @see OscIpcRegisterChannel
  * 
  * @param chanID Channel ID of the channel to be used.
  * @param pRequest The returned request.
  * @return SUCCESS on success or an appropriate error code otherwise.
  *//*********************************************************************/
-LCV_ERR LCVIpcGetRequest(const LCV_IPC_CHAN_ID chanID,
-        struct LCV_IPC_REQUEST *pRequest);
+OSC_ERR OscIpcGetRequest(const OSC_IPC_CHAN_ID chanID,
+        struct OSC_IPC_REQUEST *pRequest);
 
 /*********************************************************************//*!
  * @brief Acknowledge the execution of an IPC request.
  * 
- * Acknowledge a request previously received by LCVIpcGetRequest
+ * Acknowledge a request previously received by OscIpcGetRequest
  * depending on the success of the execution.
  * 
  * Only to be called by the server side of an IPC channel.
  * 
- * @see LCVIpcGetRequest
- * @see LCVIpcRegisterChannel
+ * @see OscIpcGetRequest
+ * @see OscIpcRegisterChannel
  * 
  * @param chanID Channel ID of the channel to be used.
  * @param pRequest The request to be acknowledged.
  * @param bSucceeded True if the request was executed successfully.
  * @return SUCCESS on success or an appropriate error code otherwise.
  *//*********************************************************************/
-LCV_ERR LCVIpcAckRequest(const LCV_IPC_CHAN_ID chanID,
-        const struct LCV_IPC_REQUEST *pRequest,
+OSC_ERR OscIpcAckRequest(const OSC_IPC_CHAN_ID chanID,
+        const struct OSC_IPC_REQUEST *pRequest,
         const bool bSucceeded);
 
 #endif /*IPC_PUB_H_*/

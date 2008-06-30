@@ -1,26 +1,25 @@
 /*! @file hsm.c
  * @brief HSM implementation for host and target.
  * 
- * @author Samuel Zahnd
  ************************************************************************/
 
 #include "hsm_pub.h"
 #include "hsm_priv.h"
-#include "framework_intern.h"
+#include "oscar_intern.h"
 
-struct LCV_HSM hsm; /*!< Module singelton instance */
+struct OSC_HSM hsm; /*!< Module singelton instance */
 
 /*! The dependencies of this module. */
-struct LCV_DEPENDENCY hsm_deps[] = {
-        {"log", LCVLogCreate, LCVLogDestroy}
+struct OSC_DEPENDENCY hsm_deps[] = {
+        {"log", OscLogCreate, OscLogDestroy}
 };
 
-LCV_ERR LCVHsmCreate(void *hFw)
+OSC_ERR OscHsmCreate(void *hFw)
 {
-    struct LCV_FRAMEWORK *pFw;
-    LCV_ERR err;
+    struct OSC_FRAMEWORK *pFw;
+    OSC_ERR err;
 
-    pFw = (struct LCV_FRAMEWORK *)hFw;
+    pFw = (struct OSC_FRAMEWORK *)hFw;
     if(pFw->hsm.useCnt != 0)
     {
         pFw->hsm.useCnt++;
@@ -29,9 +28,9 @@ LCV_ERR LCVHsmCreate(void *hFw)
     }
 
     /* Load the module hsm_deps of this module. */
-    err = LCVLoadDependencies(pFw, 
+    err = OSCLoadDependencies(pFw, 
             hsm_deps, 
-            sizeof(hsm_deps)/sizeof(struct LCV_DEPENDENCY));
+            sizeof(hsm_deps)/sizeof(struct OSC_DEPENDENCY));
     
     if(err != SUCCESS)
     {
@@ -41,7 +40,7 @@ LCV_ERR LCVHsmCreate(void *hFw)
         return err;
     }
     
-    memset(&hsm, 0, sizeof(struct LCV_HSM));
+    memset(&hsm, 0, sizeof(struct OSC_HSM));
     
     
     /* Increment the use count */
@@ -51,11 +50,11 @@ LCV_ERR LCVHsmCreate(void *hFw)
     return SUCCESS;
 }
 
-void LCVHsmDestroy(void *hFw)
+void OscHsmDestroy(void *hFw)
 {
-    struct LCV_FRAMEWORK *pFw;
+    struct OSC_FRAMEWORK *pFw;
         
-    pFw = (struct LCV_FRAMEWORK *)hFw; 
+    pFw = (struct OSC_FRAMEWORK *)hFw; 
     /* Check if we really need to release or whether we still 
      * have users. */
     pFw->hsm.useCnt--;
@@ -64,12 +63,12 @@ void LCVHsmDestroy(void *hFw)
         return;
     }
     
-    LCVUnloadDependencies(pFw, 
+    OSCUnloadDependencies(pFw, 
             hsm_deps, 
-            sizeof(hsm_deps)/sizeof(struct LCV_DEPENDENCY));
+            sizeof(hsm_deps)/sizeof(struct OSC_DEPENDENCY));
     
     
-    memset(&hsm, 0, sizeof(struct LCV_HSM));
+    memset(&hsm, 0, sizeof(struct OSC_HSM));
 }
 
 

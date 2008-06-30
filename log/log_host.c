@@ -1,29 +1,28 @@
 /*! @file log_host.c
  * @brief Logging module implementation for host 
  * 
- * @author Markus Berner
  */
 
-#include "framework_types_host.h"
+#include "oscar_types_host.h"
 
 #include "log_pub.h"
 #include "log_priv.h"
-#include "framework_intern.h"
+#include "oscar_intern.h"
 #include <unistd.h>
 
 /*! @brief The module singelton instance. 
  * 
- * This is called lcv_log
+ * This is called osc_log
  * instead of log because log is a internal function of the C
  * library */
-struct LCV_LOG lcv_log;		
+struct OSC_LOG osc_log;		
 
 
-LCV_ERR LCVLogCreate(void *hFw)
+OSC_ERR OscLogCreate(void *hFw)
 {
-    struct LCV_FRAMEWORK *pFw;
+    struct OSC_FRAMEWORK *pFw;
 
-    pFw = (struct LCV_FRAMEWORK *)hFw;
+    pFw = (struct OSC_FRAMEWORK *)hFw;
     if(pFw->log.useCnt != 0)
     {
         pFw->log.useCnt++;
@@ -31,38 +30,38 @@ LCV_ERR LCVLogCreate(void *hFw)
         return SUCCESS;
     }    
         
-	memset(&lcv_log, 0, sizeof(struct LCV_LOG));
+	memset(&osc_log, 0, sizeof(struct OSC_LOG));
     /* Set log levels to defaults. */
-    lcv_log.consoleLogLevel = DEFAULT_CONSOLE_LOGLEVEL;
-    lcv_log.fileLogLevel = DEFAULT_FILE_LOGLEVEL;
+    osc_log.consoleLogLevel = DEFAULT_CONSOLE_LOGLEVEL;
+    osc_log.fileLogLevel = DEFAULT_FILE_LOGLEVEL;
     
-	lcv_log.pLogF = fopen(LOG_FILE_NAME, "a");
-	if(lcv_log.pLogF == NULL)
+	osc_log.pLogF = fopen(LOG_FILE_NAME, "a");
+	if(osc_log.pLogF == NULL)
 	{
 		printf("Error: Unable to open log file: %s\n", LOG_FILE_NAME);
 		return -EUNABLE_TO_OPEN_FILE;
 	}
 	
-	lcv_log.pSimLogF = fopen(SIM_LOG_FILE_NAME, "a");
-	if(lcv_log.pSimLogF == NULL)
+	osc_log.pSimLogF = fopen(SIM_LOG_FILE_NAME, "a");
+	if(osc_log.pSimLogF == NULL)
 	{
 		printf("Error: Unable to open log file: %s\n", LOG_FILE_NAME);
-		fclose(lcv_log.pLogF);
+		fclose(osc_log.pLogF);
 		return -EUNABLE_TO_OPEN_FILE;
 	}
 		
     /* Increment the use count */
-    pFw->log.hHandle = (void*)&lcv_log;
+    pFw->log.hHandle = (void*)&osc_log;
     pFw->log.useCnt++;    
 
 	return SUCCESS;
 }
 
-void LCVLogDestroy(void *hFw)
+void OscLogDestroy(void *hFw)
 {
-    struct LCV_FRAMEWORK *pFw;
+    struct OSC_FRAMEWORK *pFw;
         
-    pFw = (struct LCV_FRAMEWORK *)hFw; 
+    pFw = (struct OSC_FRAMEWORK *)hFw; 
     /* Check if we really need to release or whether we still 
      * have users. */
     pFw->log.useCnt--;
@@ -71,30 +70,30 @@ void LCVLogDestroy(void *hFw)
         return;
     }
     
-	fclose(lcv_log.pLogF);
-	fclose(lcv_log.pSimLogF);
+	fclose(osc_log.pLogF);
+	fclose(osc_log.pSimLogF);
 	
-	memset(&lcv_log, 0, sizeof(struct LCV_LOG));
+	memset(&osc_log, 0, sizeof(struct OSC_LOG));
 }
 
-inline void LCVLogSetConsoleLogLevel(const enum EnLcvLogLevel level)
+inline void OscLogSetConsoleLogLevel(const enum EnOscLogLevel level)
 {
-	lcv_log.consoleLogLevel = level;
+	osc_log.consoleLogLevel = level;
 }
 
-inline void LCVLogSetFileLogLevel(const enum EnLcvLogLevel level)
+inline void OscLogSetFileLogLevel(const enum EnOscLogLevel level)
 {
-	lcv_log.fileLogLevel = level;
+	osc_log.fileLogLevel = level;
 }
 
-void LCVLog(const enum EnLcvLogLevel level, const char * strFormat, ...)
+void OscLog(const enum EnOscLogLevel level, const char * strFormat, ...)
 {
 	char strTemp[256];
 	va_list ap;			/*< The dynamic argument list */
 	
 	strTemp[0] = 0;	/* Mark the string as empty */
 	
-	if(level <= lcv_log.consoleLogLevel)
+	if(level <= osc_log.consoleLogLevel)
 	{
 		/* Log to console if the current log level is high enough */
 		
@@ -105,26 +104,26 @@ void LCVLog(const enum EnLcvLogLevel level, const char * strFormat, ...)
 		va_end(ap);
 	}
 	
-	if(level <= lcv_log.fileLogLevel)
+	if(level <= osc_log.fileLogLevel)
 	{
-		if(lcv_log.pLogF == NULL)
+		if(osc_log.pLogF == NULL)
 			return;
 		
 		/* Log to the log file if the current log level is high enough */
 		va_start(ap, strFormat);
-		vfprintf(lcv_log.pLogF, strFormat, ap);
+		vfprintf(osc_log.pLogF, strFormat, ap);
 		va_end(ap);
-		fflush(lcv_log.pLogF); /* Flush! */
+		fflush(osc_log.pLogF); /* Flush! */
 	}
 	
 	if(level == SIMULATION)
 	{
-		if(lcv_log.pSimLogF == NULL)
+		if(osc_log.pSimLogF == NULL)
 			return;
 		
 		/* Log to the simulation log. */
 		va_start(ap, strFormat);
-		vfprintf(lcv_log.pSimLogF, strFormat, ap);
+		vfprintf(osc_log.pSimLogF, strFormat, ap);
 		va_end(ap);		
 	}
 }

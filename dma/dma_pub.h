@@ -1,26 +1,25 @@
 /*! @file dma_pub.h
  * @brief API definition for Memory DMA module
  * 
- * @author Markus Berner
  */
 #ifndef DMA_PUB_H_
 #define DMA_PUB_H_
 
-#include "framework_error.h"
-#ifdef LCV_HOST
-    #include "framework_types_host.h"
-    #include "framework_host.h"
+#include "oscar_error.h"
+#ifdef OSC_HOST
+    #include "oscar_types_host.h"
+    #include "oscar_host.h"
 #else
-    #include "framework_types_target.h"
-    #include "framework_target.h"
-#endif /* LCV_HOST */
+    #include "oscar_types_target.h"
+    #include "oscar_target.h"
+#endif /* OSC_HOST */
 
 /*! Module-specific error codes.
  * These are enumerated with the offset
  * assigned to each module, so a distinction over
  * all modules can be made */
-enum EnLcvDmaErrors {
-	EDMA_NO_MORE_CHAINS_AVAILABLE = LCV_DMA_ERROR_OFFSET
+enum EnOscDmaErrors {
+	EDMA_NO_MORE_CHAINS_AVAILABLE = OSC_DMA_ERROR_OFFSET
 };
 
 /*! @brief The number of bits the DMA transfers with one operation. */
@@ -42,14 +41,14 @@ enum EnDmaWdSize
  * @param hFw Pointer to the handle of the framework.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-LCV_ERR LCVDmaCreate(void *hFw);
+OSC_ERR OscDmaCreate(void *hFw);
 
 /*********************************************************************//*!
  * @brief Destructor
  * 
  * @param hFw Pointer to the handle of the framework.
  *//*********************************************************************/
-void LCVDmaDestroy(void *hFw);
+void OscDmaDestroy(void *hFw);
 
 /*********************************************************************//*!
  * @brief Allocate a new, re-usable DMA chain handle.
@@ -58,14 +57,14 @@ void LCVDmaDestroy(void *hFw);
  * returned.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-LCV_ERR LCVDmaAllocChain(void **phChainHandle);
+OSC_ERR OscDmaAllocChain(void **phChainHandle);
 
 /*********************************************************************//*!
  * @brief Reset a DMA chain (delete all moves pending).
  * 
  * @param hChainHandle Handle to the DMA chain to be reset.
  *//*********************************************************************/
-inline void LCVDmaResetChain(void *hChainHandle);
+inline void OscDmaResetChain(void *hChainHandle);
 
 /*********************************************************************//*!
  * @brief Add a 2D memory move to a DMA chain.
@@ -73,9 +72,9 @@ inline void LCVDmaResetChain(void *hChainHandle);
  * This schedules the move of a 2D memory block in the DMA chain. If
  * the DMA chain already contains moves, it will be appended. There is
  * a limited number of moves supported in a chain. The transfer will not
- * start until LCVDmaStart() has been called.
+ * start until OscDmaStart() has been called.
  * All moves in a chain must have the same word size!
- * @see LCVDmaStart
+ * @see OscDmaStart
  * 
  * @param hChainHandle Handle to the DMA chain to add this move to.
  * @param pDstAddr The starting address at which writing will begin.
@@ -102,7 +101,7 @@ inline void LCVDmaResetChain(void *hChainHandle);
  * after each line.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-LCV_ERR LCVDmaAdd2DMove(void *hChainHandle,
+OSC_ERR OscDmaAdd2DMove(void *hChainHandle,
         const void *pDstAddr, 
         const enum EnDmaWdSize enDstWdSize,
         const uint16 dstXCount, const int32 dstXModify, 
@@ -118,9 +117,9 @@ LCV_ERR LCVDmaAdd2DMove(void *hChainHandle,
  * This schedules the move of a 1D memory block in the DMA chain. If
  * the DMA chain already contains moves, it will be appended. There is
  * a limited number of moves supported in a chain. The transfer will not
- * start until LCVDmaStart() has been called.
+ * start until OscDmaStart() has been called.
  * All moves in a chain must have the same word size!
- * @see LCVDmaStart
+ * @see OscDmaStart
  * 
  * @param hChainHandle Handle to the DMA chain to add this move to.
  * @param pDstAddr The starting address at which writing will begin.
@@ -139,7 +138,7 @@ LCV_ERR LCVDmaAdd2DMove(void *hChainHandle,
  * after each word.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-inline LCV_ERR LCVDmaAdd1DMove(void *hChainHandle,
+inline OSC_ERR OscDmaAdd1DMove(void *hChainHandle,
         const void *pDstAddr, 
         const enum EnDmaWdSize enDstWdSize,
         const uint16 dstCount, const int32 dstModify, 
@@ -156,36 +155,36 @@ inline LCV_ERR LCVDmaAdd1DMove(void *hChainHandle,
  * A synchronization point is usually added to the end of a DMA chain
  * to be able to find out when it is finished. Behaviour is undefined
  * if no sync point is added to the end of a DMA chain.
- * @see LCVDmaSync
+ * @see OscDmaSync
  * 
  * @param hChainHandle Handle to the DMA chain.
  * @return SUCCESS or an appropriate error code.
  *//*********************************************************************/
-LCV_ERR LCVDmaAddSyncPoint(void *hChainHandle);
+OSC_ERR OscDmaAddSyncPoint(void *hChainHandle);
 
 /*********************************************************************//*!
  * @brief Start the moves associated with a previously prepared DMA chain.
  * 
  * Starts the actual transfer. If a synchronization point has been added,
- * one can wait for the transfer to be finished by calling LCVDmaSync.
+ * one can wait for the transfer to be finished by calling OscDmaSync.
  * 
  * Host: DMA transfer is emulated in software and happens in this function
  * call.
  * 
- * @see LCVDmaAddSyncPoint
- * @see LCVDmaSync
+ * @see OscDmaAddSyncPoint
+ * @see OscDmaSync
  * 
  * @param hChainHandle Handle to the DMA chain.
  * @return SUCCESS or an appropriate error code.
  *//*********************************************************************/
-void LCVDmaStart(void *hChainHandle);
+void OscDmaStart(void *hChainHandle);
 
 /*********************************************************************//*!
  * @brief Synchronize to the end of a DMA move chain.
  * 
  * Waits until the DMA has finished a previously started move chain. This
  * only works if a synchronization point has been added to the end of 
- * the chain with LCVDmaAddSyncPoint. To prevent total lockups due to
+ * the chain with OscDmaAddSyncPoint. To prevent total lockups due to
  * a DMA malfunction, an improvised timeout was added. The polling loop
  * is only cycled a predefined number of times after which the function
  * returns with -ETIMEOUT (> 8 seconds).
@@ -194,12 +193,12 @@ void LCVDmaStart(void *hChainHandle);
  * 
  * Host: Nothing to wait on, just check whether it has been successful.
  * 
- * @see LCVDmaAddSyncPoint
+ * @see OscDmaAddSyncPoint
  * 
  * @param hChainHandle Handle to the DMA chain.
  * @return SUCCESS or -ETIMEOUT.
  *//*********************************************************************/
-LCV_ERR LCVDmaSync(void *hChainHandle);
+OSC_ERR OscDmaSync(void *hChainHandle);
 
 /*********************************************************************//*!
  * @brief Copy a memory area but do not wait for completion.
@@ -212,7 +211,7 @@ LCV_ERR LCVDmaSync(void *hChainHandle);
  * @param len Length of the data to be copied. Must be multiple of 4.
  * @return SUCCESS or an appropriate error code.
  *//*********************************************************************/
-LCV_ERR LCVDmaMemCpy(void *hChainHandle,
+OSC_ERR OscDmaMemCpy(void *hChainHandle,
         void *pDstAddr,
         void *pSrcAddr,
         uint32 len);
@@ -229,7 +228,7 @@ LCV_ERR LCVDmaMemCpy(void *hChainHandle,
  * @param len Length of the data to be copied. Must be multiple of 4.
  * @return SUCCESS or an appropriate error code.
  *//*********************************************************************/
-LCV_ERR LCVDmaMemCpySync(void *hChainHandle,
+OSC_ERR OscDmaMemCpySync(void *hChainHandle,
         void *pDstAddr,
         void *pSrcAddr,
         uint32 len);

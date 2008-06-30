@@ -1,14 +1,13 @@
 /*! @file cpld_target.c
  * @brief Cpld module implementation for target.
  * 
- * @author Samuel Zahnd
  ************************************************************************/
 
-#include "framework_types_target.h"
+#include "oscar_types_target.h"
 
 #include "cpld_pub.h"
 #include "cpld_priv.h"
-#include "framework_intern.h"
+#include "oscar_intern.h"
 #include <sys/ioctl.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -16,21 +15,21 @@
 #include <sys/mman.h>
 
 
-struct LCV_CPLD cpld;		/*!< The cpld module singelton instance */
+struct OSC_CPLD cpld;		/*!< The cpld module singelton instance */
 
 /*! The dependencies of this module. */
-struct LCV_DEPENDENCY cpld_deps[] = {
-        {"log", LCVLogCreate, LCVLogDestroy}
+struct OSC_DEPENDENCY cpld_deps[] = {
+        {"log", OscLogCreate, OscLogDestroy}
 };
 
 
-LCV_ERR LCVCpldCreate(void *hFw)
+OSC_ERR OscCpldCreate(void *hFw)
 {
-#ifdef TARGET_TYPE_LCV_IND
-    struct LCV_FRAMEWORK *pFw;
-    LCV_ERR err;
+#ifdef TARGET_TYPE_INDXCAM
+    struct OSC_FRAMEWORK *pFw;
+    OSC_ERR err;
     
-    pFw = (struct LCV_FRAMEWORK *)hFw;
+    pFw = (struct OSC_FRAMEWORK *)hFw;
     if(pFw->cpld.useCnt != 0)
     {
         pFw->cpld.useCnt++;
@@ -39,35 +38,35 @@ LCV_ERR LCVCpldCreate(void *hFw)
     }
     
     /* Load the module cpld_deps of this module. */
-    err = LCVLoadDependencies(pFw, 
+    err = OSCLoadDependencies(pFw, 
             cpld_deps, 
-            sizeof(cpld_deps)/sizeof(struct LCV_DEPENDENCY));
+            sizeof(cpld_deps)/sizeof(struct OSC_DEPENDENCY));
     if(err != SUCCESS)
     {
-        LCVLog(ERROR, "%s: Unable to load cpld_deps! (%d)\n",
+        OscLog(ERROR, "%s: Unable to load cpld_deps! (%d)\n",
                 __func__, 
                 err);
         return err;
     }
         
- 	memset(&cpld, 0, sizeof(struct LCV_CPLD));
+ 	memset(&cpld, 0, sizeof(struct OSC_CPLD));
 
     /* Open cpld device driver */ 
-    cpld.file = fopen( LCV_CPLD_DRIVER_FILE, "rw+");
+    cpld.file = fopen( OSC_CPLD_DRIVER_FILE, "rw+");
     if( unlikely( cpld.file == 0))
     {
-        LCVLog(ERROR, "%s: Unable to open cpld device file %s.\n",
+        OscLog(ERROR, "%s: Unable to open cpld device file %s.\n",
                 __func__, 
-                LCV_CPLD_DRIVER_FILE);
+                OSC_CPLD_DRIVER_FILE);
         return -ENO_CPLD_DEVICE_FOUND;
     }
 
     /* Map cpld register space as memory device */
-    cpld.addr = mmap(NULL, LCV_CPLD_MAX_REGISTER_NR, 
+    cpld.addr = mmap(NULL, OSC_CPLD_MAX_REGISTER_NR, 
             PROT_READ|PROT_WRITE, MAP_PRIVATE, fileno( cpld.file), 0);    
     if( unlikely( MAP_FAILED == cpld.addr))
     {
-        LCVLog(ERROR, "%s: Failed to perform mmap operation (errno: %s).\n",
+        OscLog(ERROR, "%s: Failed to perform mmap operation (errno: %s).\n",
                 __func__,
                 strerror(errno));
         return -ENO_CPLD_DEVICE_FOUND;        
@@ -79,17 +78,17 @@ LCV_ERR LCVCpldCreate(void *hFw)
     
     return SUCCESS;
 #else
-    LCVLog(ERROR, "%s: No CPLD available on this hardware platform!\n",
+    OscLog(ERROR, "%s: No CPLD available on this hardware platform!\n",
             __func__);
     return -ENO_SUCH_DEVICE;
-#endif /* TARGET_TYPE_LCV_IND */
+#endif /* TARGET_TYPE_INDXCAM */
 }
 
-void LCVCpldDestroy(void *hFw)
+void OscCpldDestroy(void *hFw)
 {
-    struct LCV_FRAMEWORK *pFw;
+    struct OSC_FRAMEWORK *pFw;
 
-    pFw = (struct LCV_FRAMEWORK *)hFw; 
+    pFw = (struct OSC_FRAMEWORK *)hFw; 
     /* Check if we really need to release or whether we still 
      * have users. */
     pFw->cpld.useCnt--;
@@ -98,19 +97,19 @@ void LCVCpldDestroy(void *hFw)
         return;
     }
         
-    LCVUnloadDependencies(pFw, 
+    OSCUnloadDependencies(pFw, 
             cpld_deps, 
-            sizeof(cpld_deps)/sizeof(struct LCV_DEPENDENCY));
+            sizeof(cpld_deps)/sizeof(struct OSC_DEPENDENCY));
     
     if(cpld.file != NULL)
     {
         fclose(cpld.file);
     }
-	memset(&cpld, 0, sizeof(struct LCV_CPLD));
+	memset(&cpld, 0, sizeof(struct OSC_CPLD));
 }
 
-#ifdef TARGET_TYPE_LCV_IND
-LCV_ERR LCVCpldRset( 
+#ifdef TARGET_TYPE_INDXCAM
+OSC_ERR OscCpldRset( 
         const uint16 regId, 
         const uint8 val)
 {
@@ -119,16 +118,16 @@ LCV_ERR LCVCpldRset(
     return SUCCESS;
 }
 #else
-LCV_ERR LCVCpldRset( 
+OSC_ERR OscCpldRset( 
         const uint16 regId, 
         const uint8 val)
 {
     return -ENO_SUCH_DEVICE;
 }
-#endif /* TARGET_TYPE_LCV_IND */
+#endif /* TARGET_TYPE_INDXCAM */
 
-#ifdef TARGET_TYPE_LCV_IND
-LCV_ERR LCVCpldFset( 
+#ifdef TARGET_TYPE_INDXCAM
+OSC_ERR OscCpldFset( 
         uint16 regId, 
         uint8 field, 
         uint8 val)
@@ -148,17 +147,17 @@ LCV_ERR LCVCpldFset(
     return SUCCESS;
 }
 #else
-LCV_ERR LCVCpldFset( 
+OSC_ERR OscCpldFset( 
         uint16 regId, 
         uint8 field, 
         uint8 val)
 {
     return -ENO_SUCH_DEVICE;
 }
-#endif /* TARGET_TYPE_LCV_IND */
+#endif /* TARGET_TYPE_INDXCAM */
 
-#ifdef TARGET_TYPE_LCV_IND
-LCV_ERR LCVCpldRget( 
+#ifdef TARGET_TYPE_INDXCAM
+OSC_ERR OscCpldRget( 
         const uint16 regId,
         uint8* val)
 {
@@ -166,16 +165,16 @@ LCV_ERR LCVCpldRget(
     return SUCCESS;
 }
 #else
-LCV_ERR LCVCpldRget( 
+OSC_ERR OscCpldRget( 
         const uint16 regId,
         uint8* val)
 {
     return -ENO_SUCH_DEVICE;
 }
-#endif /* TARGET_TYPE_LCV_IND */
+#endif /* TARGET_TYPE_INDXCAM */
 
-#ifdef TARGET_TYPE_LCV_IND
-LCV_ERR LCVCpldFget( 
+#ifdef TARGET_TYPE_INDXCAM
+OSC_ERR OscCpldFget( 
         const uint16 regId, 
         const uint8 field, 
         uint8* val)
@@ -192,11 +191,11 @@ LCV_ERR LCVCpldFget(
     return SUCCESS;
 }
 #else
-LCV_ERR LCVCpldFget( 
+OSC_ERR OscCpldFget( 
         const uint16 regId, 
         const uint8 field, 
         uint8* val)
 {
     return -ENO_SUCH_DEVICE;
 }
-#endif /* TARGET_TYPE_LCV_IND */
+#endif /* TARGET_TYPE_INDXCAM */

@@ -1,37 +1,36 @@
 /*! @file frd.c
  * @brief Filename reader module implementation.
  * 
- * @author Markus Berner
  ************************************************************************/
-#ifdef LCV_HOST
-#include "framework_types_host.h"
+#ifdef OSC_HOST
+#include "oscar_types_host.h"
 #endif
 
-#ifdef LCV_TARGET
-#include "framework_types_target.h"
+#ifdef OSC_TARGET
+#include "oscar_types_target.h"
 #endif
 
 #include "frd_pub.h"
 #include "frd_priv.h"
-#include "framework_intern.h"
+#include "oscar_intern.h"
 #include <errno.h>
 
 #include <sim/sim_pub.h>
 
-struct LCV_FRD frd; /*!< Module singelton instance */
+struct OSC_FRD frd; /*!< Module singelton instance */
 
 /*! The dependencies of this module. */
-struct LCV_DEPENDENCY frd_deps[] = {
-        {"log", LCVLogCreate, LCVLogDestroy},
-        {"sim", LCVSimCreate, LCVSimDestroy}
+struct OSC_DEPENDENCY frd_deps[] = {
+        {"log", OscLogCreate, OscLogDestroy},
+        {"sim", OscSimCreate, OscSimDestroy}
 };
 
-LCV_ERR LCVFrdCreate(void *hFw)
+OSC_ERR OscFrdCreate(void *hFw)
 {
-    struct LCV_FRAMEWORK *pFw;
-    LCV_ERR err;
+    struct OSC_FRAMEWORK *pFw;
+    OSC_ERR err;
 
-    pFw = (struct LCV_FRAMEWORK *)hFw;
+    pFw = (struct OSC_FRAMEWORK *)hFw;
     if(pFw->frd.useCnt != 0)
     {
         pFw->frd.useCnt++;
@@ -40,9 +39,9 @@ LCV_ERR LCVFrdCreate(void *hFw)
     }
 
     /* Load the module frd_deps of this module. */
-    err = LCVLoadDependencies(pFw, 
+    err = OSCLoadDependencies(pFw, 
             frd_deps, 
-            sizeof(frd_deps)/sizeof(struct LCV_DEPENDENCY));
+            sizeof(frd_deps)/sizeof(struct OSC_DEPENDENCY));
     
     if(err != SUCCESS)
     {
@@ -52,14 +51,14 @@ LCV_ERR LCVFrdCreate(void *hFw)
         return err;
     }
     
-    memset(&frd, 0, sizeof(struct LCV_FRD)); 
+    memset(&frd, 0, sizeof(struct OSC_FRD)); 
 
     /* Register a callback to be invoked every simulation cycle
      * to be able to fetch the next file name from the list. */
-    err = LCVSimRegisterCycleCallback(LCVFrdSimCycleCallback);
+    err = OscSimRegisterCycleCallback(OscFrdSimCycleCallback);
     if(err != SUCCESS)
     {
-    	LCVLog(ERROR, "%s: Unable to register cycle callback (%d)\n",
+    	OscLog(ERROR, "%s: Unable to register cycle callback (%d)\n",
     			__func__, err);
     	return err;
     }
@@ -71,13 +70,13 @@ LCV_ERR LCVFrdCreate(void *hFw)
     return SUCCESS;
 }
 
-void LCVFrdDestroy(void *hFw)
+void OscFrdDestroy(void *hFw)
 {
-    struct LCV_FRAMEWORK *pFw;
-    struct LCV_FRD_READER *pReader;
+    struct OSC_FRAMEWORK *pFw;
+    struct OSC_FRD_READER *pReader;
     uint32 rd;
         
-    pFw = (struct LCV_FRAMEWORK *)hFw; 
+    pFw = (struct OSC_FRAMEWORK *)hFw; 
     /* Check if we really need to release or whether we still 
      * have users. */
     pFw->frd.useCnt--;
@@ -100,40 +99,40 @@ void LCVFrdDestroy(void *hFw)
 			/* No operation necessary reader. */
 			break;
 		default:
-			LCVLog(ERROR, 
+			OscLog(ERROR, 
 					"%s: Unsupported reader type configured (%d)!\n",
 					__func__, pReader->enType);
 		}
     }
-    LCVUnloadDependencies(pFw, 
+    OSCUnloadDependencies(pFw, 
             frd_deps, 
-            sizeof(frd_deps)/sizeof(struct LCV_DEPENDENCY));
+            sizeof(frd_deps)/sizeof(struct OSC_DEPENDENCY));
     
     
-    memset(&frd, 0, sizeof(struct LCV_FRD));
+    memset(&frd, 0, sizeof(struct OSC_FRD));
 }
 
-LCV_ERR LCVFrdCreateReader(void ** phReaderHandle, 
+OSC_ERR OscFrdCreateReader(void ** phReaderHandle, 
         const char strReaderConfigFile[])
 {
     FILE                        *pConfigF;
-    struct LCV_FRD_READER       	*pReader;
+    struct OSC_FRD_READER       	*pReader;
     int                         assigned;
-    LCV_ERR                     err;
+    OSC_ERR                     err;
     char						strTemp[1024];
     
     if(unlikely((strReaderConfigFile == NULL) || 
             (strReaderConfigFile[0] == '\0') ||
             (phReaderHandle == NULL)))
     {
-        LCVLog(ERROR, "%s(0x%x, 0x%x): Invalid parameter!\n",
+        OscLog(ERROR, "%s(0x%x, 0x%x): Invalid parameter!\n",
         		__func__, phReaderHandle, strReaderConfigFile);
         return -EINVALID_PARAMETER;
     }
     
     if(unlikely(frd.nrOfReaders >= MAX_NR_READERS))
     {
-        LCVLog(ERROR, "%s: Maximum number of readers reached!\n",
+        OscLog(ERROR, "%s: Maximum number of readers reached!\n",
         		__func__);
         return -EFRD_MAX_NR_READERS_REACHED;
     }
@@ -161,12 +160,12 @@ LCV_ERR LCVFrdCreateReader(void ** phReaderHandle,
     if(strcmp(strTemp, "FRD_FILELIST_READER") == 0)
     {
     	/* File List Reader. */
-    	err = LCVFrdParseListReader(pConfigF,
+    	err = OscFrdParseListReader(pConfigF,
     			&pReader->reader.list);
     	
     	if(err != SUCCESS)
     	{
-    		LCVLog(ERROR, "%s: Error parsing list reader config"
+    		OscLog(ERROR, "%s: Error parsing list reader config"
     				"(%d)!\n", __func__, err);
     		goto exit_fail;
     	}
@@ -175,11 +174,11 @@ LCV_ERR LCVFrdCreateReader(void ** phReaderHandle,
     else if(strcmp(strTemp, "FRD_SEQUENCE_READER") == 0)
     {
     	/* Sequential Reader. */
-    	err = LCVFrdParseSequentialReader(pConfigF, 
+    	err = OscFrdParseSequentialReader(pConfigF, 
     			&pReader->reader.seq);
     	if(err != SUCCESS)
     	{
-    		LCVLog(ERROR, "%s: Error parsing sequential reader config"
+    		OscLog(ERROR, "%s: Error parsing sequential reader config"
     				"(%d)!\n", __func__, err);
     		goto exit_fail;
     	}
@@ -187,11 +186,11 @@ LCV_ERR LCVFrdCreateReader(void ** phReaderHandle,
     } else if(strcmp(strTemp, "FRD_CONSTANT_READER") == 0)
     {
     	/* Constant Reader. */
-    	err = LCVFrdParseConstantReader(pConfigF,
+    	err = OscFrdParseConstantReader(pConfigF,
     			&pReader->reader.constant);
     	if(err != SUCCESS)
     	{
-    		LCVLog(ERROR, "%s: Error parsing constant reader config"
+    		OscLog(ERROR, "%s: Error parsing constant reader config"
     				"(%d)!\n", __func__, err);
     		goto exit_fail;
     	}
@@ -207,33 +206,33 @@ exit_fail:
     return err;
 }
 
-LCV_ERR LCVFrdGetCurrentFileName(const void *hReaderHandle, 
+OSC_ERR OscFrdGetCurrentFileName(const void *hReaderHandle, 
         char strCurName[])
 {
-    struct LCV_FRD_READER *pReader;
+    struct OSC_FRD_READER *pReader;
     
     /* Input validation. */
     if(unlikely((hReaderHandle == NULL) || (strCurName == NULL)))
     {
-        LCVLog(ERROR, "%s(0x%x, 0x%x): Invalid parameter!\n",
+        OscLog(ERROR, "%s(0x%x, 0x%x): Invalid parameter!\n",
                 __func__, hReaderHandle, strCurName);
         return -EINVALID_PARAMETER;
     }
-    pReader = (struct LCV_FRD_READER*)hReaderHandle;
+    pReader = (struct OSC_FRD_READER*)hReaderHandle;
 
     switch(pReader->enType)
     {
     case FRD_READER_TYPE_LIST:
-    	LCVFrdListGetCurrentFileName(&pReader->reader.list, strCurName);
+    	OscFrdListGetCurrentFileName(&pReader->reader.list, strCurName);
     	break;
     case FRD_READER_TYPE_SEQUENCE:
-    	LCVFrdSeqGetCurrentFileName(&pReader->reader.seq, strCurName);
+    	OscFrdSeqGetCurrentFileName(&pReader->reader.seq, strCurName);
     	break;
     case FRD_READER_TYPE_CONSTANT:
-    	LCVFrdConstGetCurrentFileName(&pReader->reader.constant, strCurName);
+    	OscFrdConstGetCurrentFileName(&pReader->reader.constant, strCurName);
     	break;
     default:
-    	LCVLog(ERROR, "%s: Unsupported reader type configured (%d)!\n",
+    	OscLog(ERROR, "%s: Unsupported reader type configured (%d)!\n",
     			__func__, pReader->enType);
     	return -EFRD_INVALID_VALUES_CONFIGURED;
     }
@@ -241,10 +240,10 @@ LCV_ERR LCVFrdGetCurrentFileName(const void *hReaderHandle,
     return SUCCESS;
 }
 
-static void LCVFrdSimCycleCallback()
+static void OscFrdSimCycleCallback()
 {
 	int rd;
-	struct LCV_FRD_READER *pReader;
+	struct OSC_FRD_READER *pReader;
 	
 	/* Go through all readers and execute the necessary actions
 	 * depending on their type. */
@@ -255,14 +254,14 @@ static void LCVFrdSimCycleCallback()
 		switch(pReader->enType)
 		{
 		case FRD_READER_TYPE_LIST:
-			LCVFrdListFetchNextFileName(&pReader->reader.list);
+			OscFrdListFetchNextFileName(&pReader->reader.list);
 			break;
 		case FRD_READER_TYPE_SEQUENCE:
 		case FRD_READER_TYPE_CONSTANT:
 			/* No operation necessary. */
 			break;
 		default:
-			LCVLog(ERROR, 
+			OscLog(ERROR, 
 					"%s: Unsupported reader type configured (%d)!\n",
 					__func__, pReader->enType);
 		}
@@ -271,8 +270,8 @@ static void LCVFrdSimCycleCallback()
 
 /* ------------------------ Sequential reader -----------------------------*/
 
-static LCV_ERR LCVFrdParseSequentialReader(FILE *pConfigF, 
-		struct LCV_FRD_SEQUENCE_READER * pReader)
+static OSC_ERR OscFrdParseSequentialReader(FILE *pConfigF, 
+		struct OSC_FRD_SEQUENCE_READER * pReader)
 {
     int                         assigned;
     
@@ -309,13 +308,13 @@ static LCV_ERR LCVFrdParseSequentialReader(FILE *pConfigF,
     return SUCCESS;
 }
 
-LCV_ERR LCVFrdCreateSequenceReader(void **phReaderHandle,
+OSC_ERR OscFrdCreateSequenceReader(void **phReaderHandle,
         char strPrefix[], 
         int seqNrDigits,
         char strSuffix[])
 {
-    struct LCV_FRD_READER           *pReader;
-    struct LCV_FRD_SEQUENCE_READER  *pSeqReader;
+    struct OSC_FRD_READER           *pReader;
+    struct OSC_FRD_SEQUENCE_READER  *pSeqReader;
     
     /* Input validation. */
     if(unlikely(phReaderHandle == NULL || 
@@ -323,7 +322,7 @@ LCV_ERR LCVFrdCreateSequenceReader(void **phReaderHandle,
             strSuffix == NULL ||
             seqNrDigits < 1 || seqNrDigits > 10))
     {
-        LCVLog(ERROR, 
+        OscLog(ERROR, 
                 "%s(0x%x, 0x%x, %d, 0x%x): "
                 "Invalid parameter!\n", __func__, 
                 (uint32)phReaderHandle, strPrefix,
@@ -333,7 +332,7 @@ LCV_ERR LCVFrdCreateSequenceReader(void **phReaderHandle,
 
     if(unlikely(frd.nrOfReaders >= MAX_NR_READERS))
     {
-        LCVLog(ERROR, "%s: Maximum number of readers reached!\n",
+        OscLog(ERROR, "%s: Maximum number of readers reached!\n",
                 __func__);
         return -EFRD_MAX_NR_READERS_REACHED;
     }
@@ -353,8 +352,8 @@ LCV_ERR LCVFrdCreateSequenceReader(void **phReaderHandle,
     return SUCCESS;    
 }
 
-static void LCVFrdSeqGetCurrentFileName(
-		const struct LCV_FRD_SEQUENCE_READER *pReader, 
+static void OscFrdSeqGetCurrentFileName(
+		const struct OSC_FRD_SEQUENCE_READER *pReader, 
         char strCurName[])
 {
     char        strFormat[16];
@@ -362,7 +361,7 @@ static void LCVFrdSeqGetCurrentFileName(
     uint32      curSeqNr;
     
     /* Get the current time step from the simulation module. */
-    curSeqNr = LCVSimGetCurTimeStep();
+    curSeqNr = OscSimGetCurTimeStep();
     
     /* Customize the format string then use it to stringify the
      * sequence number afterwards. ("%<x>u", where <x> is the number
@@ -377,8 +376,8 @@ static void LCVFrdSeqGetCurrentFileName(
 }
 
 /* ---------------------------- List reader -------------------------------*/
-static LCV_ERR LCVFrdParseListReader(FILE *pConfigF, 
-		struct LCV_FRD_FILELIST_READER * pReader)
+static OSC_ERR OscFrdParseListReader(FILE *pConfigF, 
+		struct OSC_FRD_FILELIST_READER * pReader)
 {
 	char 						strTemp[1024];
     int                         assigned;
@@ -394,7 +393,7 @@ static LCV_ERR LCVFrdParseListReader(FILE *pConfigF,
     pReader->pFList = fopen(strTemp, "r");
     if(pReader->pFList == NULL)
     {
-    	LCVLog(ERROR, "%s: Unable to open file list (%s)! Errno: %s\n",
+    	OscLog(ERROR, "%s: Unable to open file list (%s)! Errno: %s\n",
     			__func__, strTemp, strerror(errno));
     	return -EUNABLE_TO_OPEN_FILE;
     }
@@ -404,23 +403,23 @@ static LCV_ERR LCVFrdParseListReader(FILE *pConfigF,
     return SUCCESS;
 }
 
-LCV_ERR LCVFrdCreateFileListReader(void **phReaderHandle,
+OSC_ERR OscFrdCreateFileListReader(void **phReaderHandle,
         const char strFileList[])
 {
-    struct LCV_FRD_READER           *pReader;
-    struct LCV_FRD_FILELIST_READER  *pFLReader;
+    struct OSC_FRD_READER           *pReader;
+    struct OSC_FRD_FILELIST_READER  *pFLReader;
     /* Input validation. */
     if(unlikely(phReaderHandle == NULL || strFileList == NULL ||
             strFileList[0] == '\0'))
     {
-        LCVLog(ERROR, "%s(0x%x, %s): Invalid parameter!\n",
+        OscLog(ERROR, "%s(0x%x, %s): Invalid parameter!\n",
                 __func__, (uint32)phReaderHandle, strFileList);
         return -EINVALID_PARAMETER;
     }
     
     if(unlikely(frd.nrOfReaders >= MAX_NR_READERS))
     {
-        LCVLog(ERROR, "%s: Maximum number of readers reached!\n",
+        OscLog(ERROR, "%s: Maximum number of readers reached!\n",
                 __func__);
         return -EFRD_MAX_NR_READERS_REACHED;
     }
@@ -432,7 +431,7 @@ LCV_ERR LCVFrdCreateFileListReader(void **phReaderHandle,
     pFLReader->pFList = fopen(strFileList, "r");
     if(pFLReader->pFList == NULL)
     {
-        LCVLog(ERROR, "%s: Unable to open file list! (%s)\n",
+        OscLog(ERROR, "%s: Unable to open file list! (%s)\n",
                 __func__, strFileList);
         return -EUNABLE_TO_OPEN_FILE;
     }
@@ -446,21 +445,21 @@ LCV_ERR LCVFrdCreateFileListReader(void **phReaderHandle,
     return SUCCESS;
 }
 
-static inline void LCVFrdListGetCurrentFileName(
-		const struct LCV_FRD_FILELIST_READER *pReader, 
+static inline void OscFrdListGetCurrentFileName(
+		const struct OSC_FRD_FILELIST_READER *pReader, 
         char strCurName[])
 {
 	strcpy(strCurName, pReader->curFileName); 
 }
 
-static void LCVFrdListFetchNextFileName(
-		struct LCV_FRD_FILELIST_READER *pReader)
+static void OscFrdListFetchNextFileName(
+		struct OSC_FRD_FILELIST_READER *pReader)
 {
 	int assigned;
 	
 	if(unlikely(pReader->pFList == NULL))
 	{
-		LCVLog(ERROR, "%s: No file list open!\n", __func__);
+		OscLog(ERROR, "%s: No file list open!\n", __func__);
 		return;
 	}
 	
@@ -471,10 +470,10 @@ static void LCVFrdListFetchNextFileName(
 	{
 		if(assigned == EOF)
 		{
-			LCVLog(WARN, "%s: Parse error: End of File! (%s)\n",
+			OscLog(WARN, "%s: Parse error: End of File! (%s)\n",
 					__func__, pReader->strFileList);
 		} else {
-			LCVLog(ERROR, "%s: Parse error: Unable to parse next "
+			OscLog(ERROR, "%s: Parse error: Unable to parse next "
 					"file name! (%s)\n", __func__, 
 					pReader->strFileList);
 		}
@@ -483,15 +482,15 @@ static void LCVFrdListFetchNextFileName(
 		/* Sanity checks */
 		if(unlikely(pReader->curFileName[0] == '\0'))
 		{
-			LCVLog(WARN, "%s: Next file name is empty string! "
+			OscLog(WARN, "%s: Next file name is empty string! "
 					"Probably not intended.\n", __func__);
 		}
 	}
 }
 
 /* -------------------------- Constant reader ------------------------------*/
-static LCV_ERR LCVFrdParseConstantReader(FILE *pConfigF, 
-		struct LCV_FRD_CONSTANT_READER * pReader)
+static OSC_ERR OscFrdParseConstantReader(FILE *pConfigF, 
+		struct OSC_FRD_CONSTANT_READER * pReader)
 {
 	int 						assigned;
 		
@@ -506,24 +505,24 @@ static LCV_ERR LCVFrdParseConstantReader(FILE *pConfigF,
 	return SUCCESS;
 }
 
-LCV_ERR LCVFrdCreateConstantReader(void **phReaderHandle, char strFN[])
+OSC_ERR OscFrdCreateConstantReader(void **phReaderHandle, char strFN[])
 {
-	struct LCV_FRD_READER			*pReader;
-	struct LCV_FRD_CONSTANT_READER	*pConstReader;
+	struct OSC_FRD_READER			*pReader;
+	struct OSC_FRD_CONSTANT_READER	*pConstReader;
 	
 	/* Input validation */
 	if(unlikely((phReaderHandle == NULL) ||
 				(strFN == NULL) ||
 				(*strFN == '\0')))
 	{
-		LCVLog(ERROR, "%s(0x%x, 0x%x): Invalid parameter!\n",
+		OscLog(ERROR, "%s(0x%x, 0x%x): Invalid parameter!\n",
 					__func__, phReaderHandle, strFN);
 		return -EINVALID_PARAMETER;
 	}
 	
 	if(unlikely(frd.nrOfReaders >= MAX_NR_READERS))
     {
-        LCVLog(ERROR, "%s: Maximum number of readers reached!\n",
+        OscLog(ERROR, "%s: Maximum number of readers reached!\n",
                 __func__);
         return -EFRD_MAX_NR_READERS_REACHED;
     }
@@ -541,8 +540,8 @@ LCV_ERR LCVFrdCreateConstantReader(void **phReaderHandle, char strFN[])
     return SUCCESS;
 }
 
-static void LCVFrdConstGetCurrentFileName(
-		const struct LCV_FRD_CONSTANT_READER *pReader, 
+static void OscFrdConstGetCurrentFileName(
+		const struct OSC_FRD_CONSTANT_READER *pReader, 
         char strCurName[])
 {
 	/* Simply copy the constant file name. */

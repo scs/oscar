@@ -18,47 +18,46 @@
  * 	   int16 tmpInt = 0;@n
  * 	   
  * 	   // register file and read it to memory@n
- * 	   LCVCfgRegisterFile(&hCfgHandle, fileName, 256);@n 
+ * 	   OscCfgRegisterFile(&hCfgHandle, fileName, 256);@n 
  * 	   
  * 	   // read out string@n
  * 	   key.strSection = NULL;@n
  * 	   key.strTag = "IP";@n
- * 	   LCVCfgGetStr(hCfgHandle, &key, &val);@n
+ * 	   OscCfgGetStr(hCfgHandle, &key, &val);@n
  * 	   
  * 	   // read int@n
  * 	   key.strSection = NULL;@n
  * 	   key.strTag = "DEL";@n
- * 	   LCVCfgGetInt(hCfgHandle, &key, &tmpInt);@n
+ * 	   OscCfgGetInt(hCfgHandle, &key, &tmpInt);@n
  * 	   
  * 	   // set new string value@n
  * 	   key.strSection = NULL;@n
  * 	   key.strTag = "MAC";@n
- * 	   LCVCfgSetStr(hCfgHandle, &key, "00:20:e3:22:00:01");@n
+ * 	   OscCfgSetStr(hCfgHandle, &key, "00:20:e3:22:00:01");@n
  * 	   
  * 	   // flush the file to disk@n
- * 	   LCVCfgFlushContent(hCfgHandle);@n
+ * 	   OscCfgFlushContent(hCfgHandle);@n
  * 
- * @author Men Muheim
  */
 #ifndef CFG_PUB_H_
 #define CFG_PUB_H_
 
-#include "framework_error.h"
-#ifdef LCV_HOST
-    #include "framework_types_host.h"
-    #include "framework_host.h"
+#include "oscar_error.h"
+#ifdef OSC_HOST
+    #include "oscar_types_host.h"
+    #include "oscar_host.h"
 #else
-    #include "framework_types_target.h"
-    #include "framework_target.h"
-#endif /* LCV_HOST */
+    #include "oscar_types_target.h"
+    #include "oscar_target.h"
+#endif /* OSC_HOST */
 
 /*! @brief Module-specific error codes.
  * 
  * These are enumerated with the offset
  * assigned to each module, so a distinction over
  * all modules can be made */
-enum EnLcvCfgErrors {
-    ECFG_UNSUPPORTED_FORMAT = LCV_CFG_ERROR_OFFSET,
+enum EnOscCfgErrors {
+    ECFG_UNSUPPORTED_FORMAT = OSC_CFG_ERROR_OFFSET,
     ECFG_INVALID_RANGE,
     ECFG_INVALID_VAL,
     ECFG_INVALID_KEY,
@@ -95,14 +94,14 @@ struct CFG_VAL_STR {
  * @param hFw Pointer to the handle of the framework.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-LCV_ERR LCVCfgCreate(void *hFw);
+OSC_ERR OscCfgCreate(void *hFw);
 
 /*********************************************************************//*!
  * @brief Destructor
  * 
  * @param hFw Pointer to the handle of the framework.
  *//*********************************************************************/
-void LCVCfgDestroy(void *hFw);
+void OscCfgDestroy(void *hFw);
 
 /*********************************************************************//*!
  * @brief Opens a new file and reads its content to the file content structure
@@ -112,7 +111,7 @@ void LCVCfgDestroy(void *hFw);
  * @param maxFileSize maximal file length.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-LCV_ERR LCVCfgRegisterFile(
+OSC_ERR OscCfgRegisterFile(
 		CFG_FILE_CONTENT_HANDLE* pFileContentHandle, 
 		const char *strFileName,
 		const unsigned int maxFileSize);
@@ -122,7 +121,7 @@ LCV_ERR LCVCfgRegisterFile(
  * 
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-LCV_ERR LCVCfgDeleteAll( void);
+OSC_ERR OscCfgDeleteAll( void);
 
 /*********************************************************************//*!
  * @brief Writes content to the file content structure
@@ -130,7 +129,7 @@ LCV_ERR LCVCfgDeleteAll( void);
  * @param hFileContent Handle to the File content.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-LCV_ERR LCVCfgFlushContent(const CFG_FILE_CONTENT_HANDLE hFileContent);
+OSC_ERR OscCfgFlushContent(const CFG_FILE_CONTENT_HANDLE hFileContent);
 
 /*********************************************************************//*!
  * @brief Writes content of the whole allocated buffer to the file.
@@ -140,7 +139,7 @@ LCV_ERR LCVCfgFlushContent(const CFG_FILE_CONTENT_HANDLE hFileContent);
  * @param hFileContent Handle to the File content.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-LCV_ERR LCVCfgFlushContentAll(const CFG_FILE_CONTENT_HANDLE hFileContent);
+OSC_ERR OscCfgFlushContentAll(const CFG_FILE_CONTENT_HANDLE hFileContent);
 
 /*********************************************************************//*!
  * @brief Read string from content structure
@@ -150,7 +149,7 @@ LCV_ERR LCVCfgFlushContentAll(const CFG_FILE_CONTENT_HANDLE hFileContent);
  * @param pVal Return value (string).
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-LCV_ERR LCVCfgGetStr(
+OSC_ERR OscCfgGetStr(
 		const CFG_FILE_CONTENT_HANDLE hFileContent,
 		const struct CFG_KEY *pKey,
 		struct CFG_VAL_STR *pVal);
@@ -163,7 +162,7 @@ LCV_ERR LCVCfgGetStr(
  * @param strNewVal Write value (string).
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-LCV_ERR LCVCfgSetStr(
+OSC_ERR OscCfgSetStr(
 		const CFG_FILE_CONTENT_HANDLE hFileContent, 
 		const struct CFG_KEY *pKey,
 		const char *strNewVal);
@@ -176,7 +175,7 @@ LCV_ERR LCVCfgSetStr(
  * @param iVal Return value.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-LCV_ERR LCVCfgGetUInt8(
+OSC_ERR OscCfgGetUInt8(
         const CFG_FILE_CONTENT_HANDLE hFileContent, 
         const struct CFG_KEY *pKey,
         uint8 *iVal);
@@ -189,7 +188,7 @@ LCV_ERR LCVCfgGetUInt8(
  * @param iVal Return value.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-LCV_ERR LCVCfgGetInt(
+OSC_ERR OscCfgGetInt(
 		const CFG_FILE_CONTENT_HANDLE hFileContent, 
 		const struct CFG_KEY *pKey,
 		int16 *iVal);
@@ -202,7 +201,7 @@ LCV_ERR LCVCfgGetInt(
  * @param iVal Return value.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-LCV_ERR LCVCfgGetInt32(
+OSC_ERR OscCfgGetInt32(
         const CFG_FILE_CONTENT_HANDLE hFileContent, 
         const struct CFG_KEY *pKey,
         int32 *iVal);
@@ -215,7 +214,7 @@ LCV_ERR LCVCfgGetInt32(
  * @param iVal Return value.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-LCV_ERR LCVCfgGetUInt32(
+OSC_ERR OscCfgGetUInt32(
         const CFG_FILE_CONTENT_HANDLE hFileContent, 
         const struct CFG_KEY *pKey,
         uint32 *iVal);
@@ -230,7 +229,7 @@ LCV_ERR LCVCfgGetUInt32(
  * @param max Max value for range check. Ignored if -1.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-LCV_ERR LCVCfgGetIntRange(
+OSC_ERR OscCfgGetIntRange(
 		const CFG_FILE_CONTENT_HANDLE hFileContent, 
 		const struct CFG_KEY *pKey,
 		int16 *iVal, 
@@ -247,7 +246,7 @@ LCV_ERR LCVCfgGetIntRange(
  * @param max Max value for range check. Ignored if -1.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-LCV_ERR LCVCfgGetUInt16Range(
+OSC_ERR OscCfgGetUInt16Range(
         const CFG_FILE_CONTENT_HANDLE hFileContent, 
         const struct CFG_KEY *pKey,
         uint16 *iVal, 
@@ -264,7 +263,7 @@ LCV_ERR LCVCfgGetUInt16Range(
  * @param max Max value for range check. Ignored if -1.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-LCV_ERR LCVCfgGetInt32Range(
+OSC_ERR OscCfgGetInt32Range(
         const CFG_FILE_CONTENT_HANDLE hFileContent, 
         const struct CFG_KEY *pKey,
         int32 *iVal, 
@@ -281,7 +280,7 @@ LCV_ERR LCVCfgGetInt32Range(
  * @param max Max value for range check. Ignored if -1.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-LCV_ERR LCVCfgGetUInt32Range(
+OSC_ERR OscCfgGetUInt32Range(
         const CFG_FILE_CONTENT_HANDLE hFileContent, 
         const struct CFG_KEY *pKey,
         uint32 *iVal, 

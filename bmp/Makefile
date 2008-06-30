@@ -1,14 +1,13 @@
 ############################################################################
 #
-# Makefile for the bitmap Module of the LCV Framework
+# Makefile for the bitmap Module of the OSC Framework
 #
-# Author: Markus Berner
 # 
 ############################################################################
 
 # Defines for C files
-TARGET_FEATURES += -DLCV_TARGET
-HOST_FEATURES += -DLCV_HOST
+TARGET_FEATURES += -DOSC_TARGET
+HOST_FEATURES += -DOSC_HOST
 
 # Host-Compiler executables and flags
 HOST_CC = gcc 
