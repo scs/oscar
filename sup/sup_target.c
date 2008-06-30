@@ -43,7 +43,7 @@ OSC_ERR OscSupCreate(void *hFw)
     }
     
     /* Load the module dependencies of this module. */
-    err = OSCLoadDependencies(pFw, 
+    err = OscLoadDependencies(pFw, 
             sup_deps, 
             DEP_LEN);
     
@@ -91,7 +91,7 @@ void OscSupDestroy(void *hFw)
     }
 #endif
     
-    OSCUnloadDependencies(pFw, 
+    OscUnloadDependencies(pFw, 
             sup_deps, 
             DEP_LEN);
     

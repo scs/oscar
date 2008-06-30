@@ -39,7 +39,7 @@ OSC_ERR OscFrdCreate(void *hFw)
     }
 
     /* Load the module frd_deps of this module. */
-    err = OSCLoadDependencies(pFw, 
+    err = OscLoadDependencies(pFw, 
             frd_deps, 
             sizeof(frd_deps)/sizeof(struct OSC_DEPENDENCY));
     
@@ -104,7 +104,7 @@ void OscFrdDestroy(void *hFw)
 					__func__, pReader->enType);
 		}
     }
-    OSCUnloadDependencies(pFw, 
+    OscUnloadDependencies(pFw, 
             frd_deps, 
             sizeof(frd_deps)/sizeof(struct OSC_DEPENDENCY));
     

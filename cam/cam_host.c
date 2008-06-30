@@ -276,7 +276,7 @@ OSC_ERR OscCamCreate(void *hFw)
     }  
 
     /* Load the module cam_deps of this module. */
-    err = OSCLoadDependencies(pFw, 
+    err = OscLoadDependencies(pFw, 
             cam_deps, 
             sizeof(cam_deps)/sizeof(struct OSC_DEPENDENCY));
     if(err != SUCCESS)
@@ -341,7 +341,7 @@ void OscCamDestroy(void *hFw)
         return;
     }
         
-    OSCUnloadDependencies(pFw, 
+    OscUnloadDependencies(pFw, 
             cam_deps, 
             sizeof(cam_deps)/sizeof(struct OSC_DEPENDENCY));
     

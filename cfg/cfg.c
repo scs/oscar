@@ -29,7 +29,7 @@ OSC_ERR OscCfgCreate(void *hFw)
     }
     
     /* Load the module dependencies of this module. */
-    err = OSCLoadDependencies(pFw, 
+    err = OscLoadDependencies(pFw, 
             cfg_deps, 
             sizeof(cfg_deps)/sizeof(struct OSC_DEPENDENCY));
     
@@ -71,7 +71,7 @@ void OscCfgDestroy(void *hFw)
     	free(cfg.contents[i].data);
     }
 
-    OSCUnloadDependencies(pFw, 
+    OscUnloadDependencies(pFw, 
             cfg_deps, 
             sizeof(cfg_deps)/sizeof(struct OSC_DEPENDENCY));
     

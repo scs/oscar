@@ -69,7 +69,7 @@ void OscCpldDestroy(void *hFw)
         return;
     }
     
-    OSCUnloadDependencies(pFw, 
+    OscUnloadDependencies(pFw, 
             cpld_deps, 
             sizeof(cpld_deps)/sizeof(struct OSC_DEPENDENCY));
     

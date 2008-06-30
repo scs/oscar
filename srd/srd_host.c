@@ -37,7 +37,7 @@ OSC_ERR OscSrdCreate(void *hFw)
     }
 
     /* Load the module srd_deps of this module. */
-    err = OSCLoadDependencies(pFw, 
+    err = OscLoadDependencies(pFw, 
             srd_deps, 
             sizeof(srd_deps)/sizeof(struct OSC_DEPENDENCY));
     
@@ -73,7 +73,7 @@ void OscSrdDestroy(void *hFw)
         return;
     }
     
-    OSCUnloadDependencies(pFw, 
+    OscUnloadDependencies(pFw, 
             srd_deps, 
             sizeof(srd_deps)/sizeof(struct OSC_DEPENDENCY));
     

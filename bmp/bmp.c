@@ -30,7 +30,7 @@ OSC_ERR OscBmpCreate(void *hFw)
     }
     
     /* Load the module dependencies of this module. */
-    err = OSCLoadDependencies(pFw, 
+    err = OscLoadDependencies(pFw, 
             bmp_deps, 
             sizeof(bmp_deps)/sizeof(struct OSC_DEPENDENCY));
     
@@ -65,7 +65,7 @@ void OscBmpDestroy(void *hFw)
         return;
     }
     
-    OSCUnloadDependencies(pFw, 
+    OscUnloadDependencies(pFw, 
             bmp_deps, 
             sizeof(bmp_deps)/sizeof(struct OSC_DEPENDENCY));
     
