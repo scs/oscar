@@ -45,7 +45,7 @@ OSC_ERR OscDmaCreate(void *hFw)
     }  
     
     /* Load the module dependencies of this module. */
-    err = OSCLoadDependencies(pFw, 
+    err = OscLoadDependencies(pFw, 
             dma_deps, 
             sizeof(dma_deps)/sizeof(struct OSC_DEPENDENCY));
     
@@ -79,7 +79,7 @@ void OscDmaDestroy(void *hFw)
         return;
     }
        
-    OSCUnloadDependencies(pFw, 
+    OscUnloadDependencies(pFw, 
             dma_deps, 
             sizeof(dma_deps)/sizeof(struct OSC_DEPENDENCY));
     

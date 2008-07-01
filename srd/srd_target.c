@@ -64,7 +64,7 @@ void OscSrdDestroy(void *hFw)
         return;
     }
     
-    OSCUnloadDependencies(pFw, 
+    OscUnloadDependencies(pFw, 
             srd_deps, 
             sizeof(srd_deps)/sizeof(struct OSC_DEPENDENCY));
     

@@ -31,7 +31,7 @@ OSC_ERR OscCpldCreate(void *hFw)
     }
     
     /* Load the module cpld_deps of this module. */
-    err = OSCLoadDependencies(pFw, 
+    err = OscLoadDependencies(pFw, 
             cpld_deps, 
             sizeof(cpld_deps)/sizeof(struct OSC_DEPENDENCY));
     if(err != SUCCESS)

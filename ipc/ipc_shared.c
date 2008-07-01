@@ -44,7 +44,7 @@ OSC_ERR OscIpcCreate(void *hFw)
     }
 
     /* Load the module ipc_deps of this module. */
-    err = OSCLoadDependencies(pFw, 
+    err = OscLoadDependencies(pFw, 
             ipc_deps, 
             sizeof(ipc_deps)/sizeof(struct OSC_DEPENDENCY));
     
@@ -91,7 +91,7 @@ void OscIpcDestroy(void *hFw)
         }
     }
 
-    OSCUnloadDependencies(pFw, 
+    OscUnloadDependencies(pFw, 
             ipc_deps, 
             sizeof(ipc_deps)/sizeof(struct OSC_DEPENDENCY));    
 

@@ -32,7 +32,7 @@ struct OSC_DEPENDENCY
  * @param nDeps Length of the dependency array.
  * @return SUCCESS or an appropriate error code.
  *//*********************************************************************/
-OSC_ERR OSCLoadDependencies(void *pFw,
+OSC_ERR OscLoadDependencies(void *pFw,
         const struct OSC_DEPENDENCY aryDeps[], 
         const uint32 nDeps);
 
@@ -46,7 +46,7 @@ OSC_ERR OSCLoadDependencies(void *pFw,
  * @param aryDeps Array of Dependencies to be unloaded.
  * @param nDeps Length of the dependency array.
  *//*********************************************************************/
-void OSCUnloadDependencies(void *pFw,
+void OscUnloadDependencies(void *pFw,
         const struct OSC_DEPENDENCY aryDeps[], 
         const uint32 nDeps);
 #endif /*OSCAR_DEPENDENCIES_H_*/

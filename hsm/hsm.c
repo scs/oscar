@@ -28,7 +28,7 @@ OSC_ERR OscHsmCreate(void *hFw)
     }
 
     /* Load the module hsm_deps of this module. */
-    err = OSCLoadDependencies(pFw, 
+    err = OscLoadDependencies(pFw, 
             hsm_deps, 
             sizeof(hsm_deps)/sizeof(struct OSC_DEPENDENCY));
     
@@ -63,7 +63,7 @@ void OscHsmDestroy(void *hFw)
         return;
     }
     
-    OSCUnloadDependencies(pFw, 
+    OscUnloadDependencies(pFw, 
             hsm_deps, 
             sizeof(hsm_deps)/sizeof(struct OSC_DEPENDENCY));
     

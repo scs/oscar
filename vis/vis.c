@@ -34,7 +34,7 @@ OSC_ERR OscVisCreate(void *hFw)
     }
     
     /* Load the module dependencies of this module. */
-    err = OSCLoadDependencies(pFw, 
+    err = OscLoadDependencies(pFw, 
             vis_deps, 
             sizeof(vis_deps)/sizeof(struct OSC_DEPENDENCY));
     
@@ -69,7 +69,7 @@ void OscVisDestroy(void *hFw)
         return;
     }
     
-    OSCUnloadDependencies(pFw, 
+    OscUnloadDependencies(pFw, 
             vis_deps, 
             sizeof(vis_deps)/sizeof(struct OSC_DEPENDENCY));
     
