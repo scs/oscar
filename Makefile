@@ -15,53 +15,62 @@ TARGET_SIM_SUFFIX = _target_sim.a
 MAKEFLAGS += -r
 
 # this includes the framework configuration
-include .config
+# MAKEFILES += .config
+-include .config
 
-# The type of the hardware platform. Must be either of the following:
-# TARGET_TYPE_INDXCAM		Industrial OpenSourceCamera Platform
-# TARGET_TYPE_LEANXCAM		Original OpenSourceCamera Platform
-
-# Prevent using a cpld firmware when compiling for the LEANXCAM target
-ifeq ($(CONFIG_BOARD), LEANXCAM)
-  CONFIG_FIRMWARE =
-endif
-
-ifeq ($(CONFIG_BOARD), INDXCAM)
-  TARGET_TYPE = TARGET_TYPE_INDXCAM
-else ifeq ($(CONFIG_BOARD), LEANXCAM)
-  TARGET_TYPE = TARGET_TYPE_LEANXCAM
-else ifneq ($(filter .config,$(MAKEFILE_LIST)), ) # this allows the makefile to run without a .config file
-  $(error Neither INDXCAM nor LEANXCAM has been configured as target)
-endif
-
-# The names of the subfolders with the modules
-MODULES = cam
-MODULES += log
-MODULES += cpld
-MODULES += sim
-MODULES += bmp
-MODULES += swr
-MODULES += srd
-MODULES += ipc
-MODULES += sup
-MODULES += frd
-MODULES += dspl
-MODULES += dma
-MODULES += hsm
-MODULES += cfg
-MODULES += clb
-MODULES += vis
-
-# This may need to be generalized by a board-to-feature-mapping table
-ifeq ($(CONFIG_BOARD), INDXCAM)
-  ifeq ($(CONFIG_FIRMWARE), )
-    $(error The INDXCAM target requires a firmware.)
+# decide whether we are building or dooing something other like cleaning or configuring
+ifeq ($(filter $(MAKECMDGOALS), clean distclean config), )
+  # check whether a .config file has been found
+  $(info $(MAKEFILE_LIST))
+  ifeq ($(filter .config,$(MAKEFILE_LIST)), )
+    $(error "Cannot make the target '$(MAKECMDGOALS)' without configuring the framework. Please run make config to do this.")
   endif
-endif
-
-# The lgx module may be configured to not being used, so it needs special treatment
-ifneq ($(CONFIG_FIRMWARE), )
-  MODULES += lgx
+  
+# Prevent using a cpld firmware when compiling for the LEANXCAM target
+  ifeq ($(CONFIG_BOARD), LEANXCAM)
+    CONFIG_FIRMWARE =
+  endif
+  
+  # The type of the hardware platform. Must be either of the following:
+  # TARGET_TYPE_INDXCAM		Industrial OpenSourceCamera Platform
+  # TARGET_TYPE_LEANXCAM		Original OpenSourceCamera Platform
+  ifeq ($(CONFIG_BOARD), INDXCAM)
+    TARGET_TYPE = TARGET_TYPE_INDXCAM
+  else ifeq ($(CONFIG_BOARD), LEANXCAM)
+    TARGET_TYPE = TARGET_TYPE_LEANXCAM
+  else
+    $(error Neither INDXCAM nor LEANXCAM has been configured as target)
+  endif
+  
+  # The names of the subfolders with the modules
+  MODULES = cam
+  MODULES += log
+  MODULES += cpld
+  MODULES += sim
+  MODULES += bmp
+  MODULES += swr
+  MODULES += srd
+  MODULES += ipc
+  MODULES += sup
+  MODULES += frd
+  MODULES += dspl
+  MODULES += dma
+  MODULES += hsm
+  MODULES += cfg
+  MODULES += clb
+  MODULES += vis
+  
+  # This may need to be generalized by a board-to-feature-mapping table
+  ifeq ($(CONFIG_BOARD), INDXCAM)
+    ifeq ($(CONFIG_FIRMWARE), )
+      $(error The INDXCAM target requires a firmware.)
+    endif
+  endif
+  
+  # The lgx module may be configured to not being used, so it needs special treatment
+  ifneq ($(CONFIG_FIRMWARE), )
+    MODULES += lgx
+  endif
 endif
 
 # Directories where the library and header files are placed after 
@@ -153,13 +162,13 @@ oscar_target: $(SOURCES) oscar.h oscar_priv.h
 	$(TARGET_CC) $(TARGET_CFLAGS) -c $(SOURCES) -o oscar_target.o
 	
 # Compile the modules
-modules_target: .config
+modules_target:
 	for i in $(MODULES) ; do  make target EXTRA_CFLAGS="-D$(TARGET_TYPE)" -C $$i  || exit $? ; done
 	
-modules_target_sim: .config
+modules_target_sim:
 	for i in $(MODULES) ; do  make target EXTRA_CFLAGS="-D$(TARGET_TYPE)" -C $$i || exit $? ; done
 
-modules_host: .config
+modules_host:
 	for i in $(MODULES) ; do  make host EXTRA_CFLAGS="-D$(TARGET_TYPE)" -C $$i || exit $? ; done
 	
 # Create the library
@@ -194,10 +203,10 @@ config :
 	@ $(MAKE) --no-print-directory get_lgx
 
 # Target to implicitly start the configuration process
-.config :
-	@ echo "The framework has not been configured, ./configure will be started now."
-	@ ./configure
-	@ $(MAKE) --no-print-directory get_lgx
+#.config :
+#	@ echo "No config file has been found. Starting the configuration process now:"
+#	@ ./configure
+#	@ $(MAKE) --no-print-directory get_lgx
 
 # Target to get the lgx framework explicitly
 .PHONY : get_lgx
@@ -226,4 +235,5 @@ clean:
 # Cleans everything not intended for source distribution
 .PHONY : distclean
 distclean : clean
-	rm .config
+	rm -f .config
+	rm -rf lgx
