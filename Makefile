@@ -26,7 +26,6 @@ ifeq ($(CONFIG_BOARD), LEANXCAM)
   CONFIG_FIRMWARE =
 endif
 
-
 ifeq ($(CONFIG_BOARD), INDXCAM)
   TARGET_TYPE = TARGET_TYPE_INDXCAM
 else ifeq ($(CONFIG_BOARD), LEANXCAM)
@@ -207,8 +206,8 @@ ifeq ($(CONFIG_FIRMWARE), )
 	@ echo "No firmware has been configured."
 else
 	@ echo "Copying the lgx firmware from $(CONFIG_FIRMWARE)"
-	@ [ -e "lgx" ] && rm -rf "lgx"
-	@ cp $(CONFIG_FIRMWARE) ./lgx
+	@ [ -e "lgx" ] && rm -rf "lgx"; exit 0
+	@ cp -r $(CONFIG_FIRMWARE)/lgx .
 endif
 
 ## Target to get the lgx framework implicitly
