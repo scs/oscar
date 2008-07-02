@@ -6,3 +6,6 @@ staging
 doc
 .metadata
 lgx
+
+# Mac OS X meta data on filesystems that do not support it
+._*

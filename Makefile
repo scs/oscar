@@ -5,16 +5,44 @@
 # 
 ############################################################################
 
+# Target to explicitly start the configuration process
+.PHONY : config
+config :
+	./configure
+	$(MAKE) get_lgx
+
+# Target to implicitly start the configuration process
+.config :
+	@ echo "The framework has not been configured, ./configure will be started now."
+	@ ./configure
+	$(MAKE) get_lgx
+
 # The Library name is suffix depending on the target
 OUT = libosc
 HOST_SUFFIX = _host.a
 TARGET_SUFFIX = _target.a
 TARGET_SIM_SUFFIX = _target_sim.a
 
+# this includes the framework configuration
+include .config
+
 # The type of the hardware platform. Must be either of the following:
 # TARGET_TYPE_INDXCAM		Industrial OpenSourceCamera Platform
 # TARGET_TYPE_LEANXCAM		Original OpenSourceCamera Platform
-TARGET_TYPE = TARGET_TYPE_LEANXCAM
+
+# Prevent using a cpld firmware when compiling for the LEANXCAM target
+ifeq ($(CONFIG_BOARD), LEANXCAM)
+  CONFIG_FIRMWARE =
+endif
+
+
+ifeq ($(CONFIG_BOARD), INDXCAM)
+  TARGET_TYPE = TARGET_TYPE_INDXCAM
+else ifeq ($(CONFIG_BOARD), LEANXCAM)
+  TARGET_TYPE = TARGET_TYPE_LEANXCAM
+else
+  $(error Neither INDXCAM nor LEANXCAM has been configured as target)
+endif
 
 # The names of the subfolders with the modules
 MODULES = cam
@@ -22,7 +50,6 @@ MODULES += log
 MODULES += cpld
 MODULES += sim
 MODULES += bmp
-MODULES += lgx
 MODULES += swr
 MODULES += srd
 MODULES += ipc
@@ -34,6 +61,18 @@ MODULES += hsm
 MODULES += cfg
 MODULES += clb
 MODULES += vis
+
+# This may need to be generalized by a board-to-feature-mapping table
+ifeq ($(CONFIG_BOARD), INDXCAM)
+  ifeq ($(CONFIG_FIRMWARE), )
+    $(error The INDXCAM target requires a firmware.)
+  endif
+endif
+
+# The lgx module may be configured to not being used, so it needs special treatment
+ifneq ($(CONFIG_FIRMWARE), )
+  MODULES += lgx
+endif
 
 # Directories where the library and header files are placed after 
 # compilation
@@ -124,10 +163,10 @@ oscar_target: $(SOURCES) oscar.h oscar_priv.h
 	$(TARGET_CC) $(TARGET_CFLAGS) -c $(SOURCES) -o oscar_target.o
 	
 # Compile the modules
-modules_target: 
+modules_target:
 	for i in $(MODULES) ; do  make target EXTRA_CFLAGS="-D$(TARGET_TYPE)" -C $$i  || exit $? ; done
 	
-modules_target_sim: 
+modules_target_sim:
 	for i in $(MODULES) ; do  make target EXTRA_CFLAGS="-D$(TARGET_TYPE)" -C $$i || exit $? ; done
 
 modules_host:
@@ -157,8 +196,24 @@ lib_host:
 		exit $? ; \
 	done
 	@echo "Library for Host created"
-	
+
+# Target to get the lgx framework explicitly
+.PHONY : get_lgx
+get_lgx : .config
+ifeq ($(CONFIG_FIRMWARE), )
+	@ echo "Copying the lgx firmware from $(CONFIG_FIRMWARE)"
+	@ [ -e "lgx" ] && rm -rf "lgx"
+	@ cp $(CONFIG_FIRMWARE) ./lgx
+else
+	@ echo "Firmware not configured."
+endif
+
+## Target to get the lgx framework implicitly
+#lgx : 
+#	$(MAKE) get_lgx
+
 # Cleanup
+.PHONY : clean
 clean:	
 	for i in $(MODULES) ; do  make clean -C $$i || exit $? ; done
 	rm -f $(OUT)$(HOST_SUFFIX) $(OUT)$(TARGET_SUFFIX)
@@ -166,4 +221,7 @@ clean:
 	rm -f *.o
 	@echo "Directory cleaned"
 
-	
+# Cleans everything not intended for source distribution
+.PHONY : distclean
+distclean : clean
+	rm .config
