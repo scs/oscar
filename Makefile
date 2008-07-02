@@ -5,23 +5,14 @@
 # 
 ############################################################################
 
-# Target to explicitly start the configuration process
-.PHONY : config
-config :
-	./configure
-	$(MAKE) get_lgx
-
-# Target to implicitly start the configuration process
-.config :
-	@ echo "The framework has not been configured, ./configure will be started now."
-	@ ./configure
-	$(MAKE) get_lgx
-
 # The Library name is suffix depending on the target
 OUT = libosc
 HOST_SUFFIX = _host.a
 TARGET_SUFFIX = _target.a
 TARGET_SIM_SUFFIX = _target_sim.a
+
+# Disable make's built-in rules
+MAKEFLAGS += -r
 
 # this includes the framework configuration
 include .config
@@ -40,7 +31,7 @@ ifeq ($(CONFIG_BOARD), INDXCAM)
   TARGET_TYPE = TARGET_TYPE_INDXCAM
 else ifeq ($(CONFIG_BOARD), LEANXCAM)
   TARGET_TYPE = TARGET_TYPE_LEANXCAM
-else
+else ifneq ($(filter .config,$(MAKEFILE_LIST)), ) # this allows the makefile to run without a .config file
   $(error Neither INDXCAM nor LEANXCAM has been configured as target)
 endif
 
@@ -163,13 +154,13 @@ oscar_target: $(SOURCES) oscar.h oscar_priv.h
 	$(TARGET_CC) $(TARGET_CFLAGS) -c $(SOURCES) -o oscar_target.o
 	
 # Compile the modules
-modules_target:
+modules_target: .config
 	for i in $(MODULES) ; do  make target EXTRA_CFLAGS="-D$(TARGET_TYPE)" -C $$i  || exit $? ; done
 	
-modules_target_sim:
+modules_target_sim: .config
 	for i in $(MODULES) ; do  make target EXTRA_CFLAGS="-D$(TARGET_TYPE)" -C $$i || exit $? ; done
 
-modules_host:
+modules_host: .config
 	for i in $(MODULES) ; do  make host EXTRA_CFLAGS="-D$(TARGET_TYPE)" -C $$i || exit $? ; done
 	
 # Create the library
@@ -197,15 +188,27 @@ lib_host:
 	done
 	@echo "Library for Host created"
 
+# Target to explicitly start the configuration process
+.PHONY : config
+config :
+	@ ./configure
+	@ $(MAKE) --no-print-directory get_lgx
+
+# Target to implicitly start the configuration process
+.config :
+	@ echo "The framework has not been configured, ./configure will be started now."
+	@ ./configure
+	@ $(MAKE) --no-print-directory get_lgx
+
 # Target to get the lgx framework explicitly
 .PHONY : get_lgx
 get_lgx : .config
 ifeq ($(CONFIG_FIRMWARE), )
+	@ echo "No firmware has been configured."
+else
 	@ echo "Copying the lgx firmware from $(CONFIG_FIRMWARE)"
 	@ [ -e "lgx" ] && rm -rf "lgx"
 	@ cp $(CONFIG_FIRMWARE) ./lgx
-else
-	@ echo "Firmware not configured."
 endif
 
 ## Target to get the lgx framework implicitly
