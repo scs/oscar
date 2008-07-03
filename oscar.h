@@ -48,7 +48,9 @@ OSC_ERR OscDestroy(void *hFw);
 #include "log_pub.h"
 #include "cam_pub.h"
 #include "cpld_pub.h"
-#include "lgx_pub.h"
+#ifdef TARGET_TYPE_INDXCAM
+	#include "lgx_pub.h"
+#endif
 #include "sim_pub.h"
 #include "bmp_pub.h"
 #include "swr_pub.h"
