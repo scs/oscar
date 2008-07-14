@@ -105,9 +105,9 @@ OSC_ERR OscVisDebayer(const uint8* pRaw,
  * @param enBayerOrderFirstRow The order of the bayer pattern colors
  * in the first row of the image to be debayered. Can be queried by
  * OscCamGetBayerOrder().
- * @param pOut Pointer to the BGR output image.
+ * @param pOut Pointer to the grayscale output image.
  * @return SUCCESS or an appropriate error code otherwise
  */
-OSC_ERR OscVisDebayerGrayscaleHalfSize(uint8 * const pRaw, uint16 const width, uint16 const height, enum EnBayerOrder const enBayerOrderFirstRow, uint8 * const pOut);
+OSC_ERR OscVisDebayerGrayscaleHalfSize(uint8 const * const pRaw, uint16 const width, uint16 const height, enum EnBayerOrder const enBayerOrderFirstRow, uint8 * const pOut);
 
 #endif /*VIS_PUB_H_*/

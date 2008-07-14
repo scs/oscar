@@ -853,7 +853,7 @@ OSC_ERR OscVisDebayer(const uint8* pRaw,
 	return SUCCESS;
 }
 
-OSC_ERR OscVisDebayerGrayscaleHalfSize(uint8 * const pRaw, uint16 const width, uint16 const height, enum EnBayerOrder const enBayerOrderFirstRow, uint8 * const pOut)
+OSC_ERR OscVisDebayerGrayscaleHalfSize(uint8 const * const pRaw, uint16 const width, uint16 const height, enum EnBayerOrder const enBayerOrderFirstRow, uint8 * const pOut)
 {
 	bool bTopLeftIsGreen, bTopRowIsRed, bFirstPixIsGreen, bRowIsRed;
 	uint8 * pOutPix, * pOutRow, * pOutPrefetch;
@@ -902,7 +902,8 @@ OSC_ERR OscVisDebayerGrayscaleHalfSize(uint8 * const pRaw, uint16 const width, u
 		row = outRow * 2;
 		for(outCol = 0; outCol < outWidth; outCol += 1)
 		{
-			uint8 cellRed, cellGreen1, cellGreen2, cellBlue, gray;
+			uint8 cellRed, cellGreen1, cellGreen2, cellBlue;
+			uint16 gray;
 			
 			col = outCol * 2;
 			
@@ -921,8 +922,8 @@ OSC_ERR OscVisDebayerGrayscaleHalfSize(uint8 * const pRaw, uint16 const width, u
 				cellBlue = pRaw[(row + 1) * width + col + 1];
 			}
 			
-			gray = cellRed / 3 + cellGreen1 / 6 + cellGreen2 / 6 + cellBlue / 3;
-			pOut[outRow * outHeight + outCol] = gray;
+			gray = cellRed * 2 + cellGreen1 + cellGreen2 + cellBlue * 2;
+			pOut[outRow * outWidth + outCol] = gray / 6;
 		}
 	}
 	
