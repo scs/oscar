@@ -852,3 +852,79 @@ OSC_ERR OscVisDebayer(const uint8* pRaw,
 	BENCH_STOP("RedBlue_Border", startCyc);
 	return SUCCESS;
 }
+
+OSC_ERR OscVisDebayerGrayscaleHalfSize(uint8 * const pRaw, uint16 const width, uint16 const height, enum EnBayerOrder const enBayerOrderFirstRow, uint8 * const pOut)
+{
+	bool bTopLeftIsGreen, bTopRowIsRed, bFirstPixIsGreen, bRowIsRed;
+	uint8 * pOutPix, * pOutRow, * pOutPrefetch;
+	uint8 const * pRawPix, * pRawRow, * pRawPrefetch;
+	uint16 col, row, outCol, outRow, outWidth, outHeight;
+	
+	/*---------------------- Input validation. -------------------- */
+	if((pRaw == NULL) || (pOut == NULL))
+	{
+		OscLog(ERROR, "%s(0x%x, %d, %d, %d 0x%x): Invalid arguments!",
+				__func__, pRaw, width, height, enBayerOrderFirstRow, pOut);
+		return -EINVALID_PARAMETER;
+	}
+	
+	if((!IS_EVEN(width)) || (!IS_EVEN(height)) || (width < 2) || (height < 2))
+	{
+		OscLog(ERROR, "%s: Invalid parameter! Width: %d Height: %d\n"
+				"Width must be even and >=2 and height must be >=2.\n",
+				__func__, width, height);
+		return -EINVALID_PARAMETER;
+	}
+	
+	bTopLeftIsGreen = (enBayerOrderFirstRow == ROW_GBGB) || (enBayerOrderFirstRow == ROW_GRGR);
+	bTopRowIsRed = (enBayerOrderFirstRow == ROW_RGRG) || (enBayerOrderFirstRow == ROW_GRGR);
+	
+	outWidth = width / 2;
+	outHeight = height / 2;
+	
+	/* -------------- Interpolate all green pixels. -----------------*/
+	
+	/* The first and last two rows must be treated specially. */
+	
+/*	pRawPix = &pRaw[2*width];
+	pRawPrefetch = &pRawPix[2*width];
+	pOutPix = &pOut[2*BYTES_PER_PIX*width];
+	pOutPrefetch = &pOutPix[2*width];
+	bFirstPixIsGreen = bTopLeftIsGreen;
+	
+	BENCH_START(startCyc);
+	PREFETCH(pRawPrefetch);
+	PREFETCH(pOutPrefetch);
+*/
+
+	for(outRow = 0; outRow < outHeight; outRow += 1)
+	{
+		row = outRow * 2;
+		for(outCol = 0; outCol < outWidth; outCol += 1)
+		{
+			uint8 cellRed, cellGreen1, cellGreen2, cellBlue, gray;
+			
+			col = outCol * 2;
+			
+			if (bTopLeftIsGreen)
+			{
+				cellGreen1 = pRaw[row * width + col];
+				cellRed = pRaw[row * width + col + 1];
+				cellBlue = pRaw[(row + 1) * width + col];
+				cellGreen2 = pRaw[(row + 1) * width + col + 1];
+			}
+			else
+			{
+				cellRed = pRaw[row * width + col];
+				cellGreen1 = pRaw[row * width + col + 1];
+				cellGreen2 = pRaw[(row + 1) * width + col];
+				cellBlue = pRaw[(row + 1) * width + col + 1];
+			}
+			
+			gray = cellRed / 3 + cellGreen1 / 6 + cellGreen2 / 6 + cellBlue / 3;
+			pOut[outRow * outHeight + outCol] = gray;
+		}
+	}
+	
+	return SUCCESS;
+}
