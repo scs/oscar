@@ -108,6 +108,25 @@ OSC_ERR OscVisDebayer(const uint8* pRaw,
  * @param pOut Pointer to the grayscale output image.
  * @return SUCCESS or an appropriate error code otherwise
  */
-OSC_ERR OscVisDebayerGrayscaleHalfSize(uint8 const * const pRaw, uint16 const width, uint16 const height, enum EnBayerOrder const enBayerOrderFirstRow, uint8 * const pOut);
+OSC_ERR OscVisDebayerGrayscaleHalfSize(uint8 const * const pRaw, uint16 const width, uint16 const height, enum EnBayerOrder const enBayerOrderFirstRow, uint8 * const color);
+
+/*!
+ * @brief Debayers an image at one spot and gives its mean color.
+ * 
+ * ! Only even size is supported !
+ * 
+ * The output picture has 8 bit grayscale cells with halve the with and height of the original image.
+ * 
+ * @param pRaw Pointer to the raw input picture of size width x height.
+ * @param width Width of the input and output image.
+ * @param height Height of the input and output image.
+ * @param enBayerOrderFirstRow The order of the bayer pattern colors in the first row of the image to be debayered. Can be queried by OscCamGetBayerOrder().
+ * @param xPos Left border of the spot.
+ * @param yPos Upper boder of the spot.
+ * @param size Size of the sport in pixles, this must be an even value.
+ * @param color Pointer to a 3-element field where the color is written.
+ * @return SUCCESS or an appropriate error code otherwise
+ */
+OSC_ERR OscVisDebayerSpot(uint8 const * const pRaw, uint16 const width, uint16 const height, enum EnBayerOrder enBayerOrderFirstRow, uint16 const xPos, uint16 const yPos, uint16 const size, uint8 * color);
 
 #endif /*VIS_PUB_H_*/
