@@ -922,7 +922,7 @@ OSC_ERR OscVisDebayerGrayscaleHalfSize(uint8 const * const pRaw, uint16 const wi
 				cellBlue = pRaw[(row + 1) * width + col + 1];
 			}
 			
-			gray = cellRed * 2 + cellGreen1 + cellGreen2 + cellBlue * 2;
+			gray = (uint16)cellRed * 2 + (uint16)cellGreen1 + (uint16)cellGreen2 + (uint16)cellBlue * 2;
 			pOut[outRow * outWidth + outCol] = gray / 6;
 		}
 	}
