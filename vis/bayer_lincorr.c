@@ -933,12 +933,12 @@ OSC_ERR OscVisDebayerGrayscaleHalfSize(uint8 const * const pRaw, uint16 const wi
 	return SUCCESS;
 }
 
-OSC_ERR OscVisDebayerSpot(uint8 const * const pRaw, uint16 const width, uint16 const height, enum EnBayerOrder enBayerOrderFirstRow, uint16 const xPos, uint16 const yPos, uint16 const size, uint8 * color)
+OSC_ERR OscVisDebayerSpot(uint8 const * const pRaw, uint16 const width, uint16 const height, enum EnBayerOrder const enBayerOrderFirstRow, uint16 const xPos, uint16 const yPos, uint16 const size, uint8 * color)
 {
 	bool bTopLeftIsGreen, bTopRowIsRed;
 	uint16 ix, iy;
 	uint32 sumRed = 0, sumGreen = 0, sumBlue = 0;
-	uint32 sizeSq = size * size;
+	uint32 const sizeSq = size * size;
 	
 	/*---------------------- Input validation. -------------------- */
 	if(pRaw == NULL)
@@ -958,11 +958,9 @@ OSC_ERR OscVisDebayerSpot(uint8 const * const pRaw, uint16 const width, uint16 c
 	
 	
 	/* Adjust pattern for a unaligned spot */
-	enBayerOrderFirstRow ^= IS_EVEN(xPos) ? 0 : 2;
-	enBayerOrderFirstRow ^= IS_EVEN(yPos) ? 0 : 1;
 	
-	bTopLeftIsGreen = (enBayerOrderFirstRow == ROW_GBGB) || (enBayerOrderFirstRow == ROW_GRGR);
-	bTopRowIsRed = (enBayerOrderFirstRow == ROW_RGRG) || (enBayerOrderFirstRow == ROW_GRGR);
+	bTopLeftIsGreen = (enBayerOrderFirstRow == ROW_GBGB || enBayerOrderFirstRow == ROW_GRGR) == IS_EVEN(xPos) == IS_EVEN(yPos);
+	bTopRowIsRed = (enBayerOrderFirstRow == ROW_RGRG || enBayerOrderFirstRow == ROW_GRGR) == IS_EVEN(yPos);
 	
 	if (bTopLeftIsGreen)
 		if (bTopRowIsRed)
@@ -1006,6 +1004,6 @@ OSC_ERR OscVisDebayerSpot(uint8 const * const pRaw, uint16 const width, uint16 c
 	color[0] = sumRed * 4 / sizeSq;
 	color[1] = sumGreen * 2 / sizeSq;
 	color[2] = sumBlue * 4 / sizeSq;
-	
+		
 	return SUCCESS;
 }
