@@ -875,21 +875,6 @@ OSC_ERR OscVisDebayerGreyscaleHalfSize(uint8 const * const pRaw, uint16 const wi
 	}
 	
 	bTopLeftIsGreen = (enBayerOrderFirstRow == ROW_GBGB) || (enBayerOrderFirstRow == ROW_GRGR);
-	
-	/* -------------- Interpolate all green pixels. -----------------*/
-	
-	/* The first and last two rows must be treated specially. */
-	
-/*	pRawPix = &pRaw[2*width];
-	pRawPrefetch = &pRawPix[2*width];
-	pOutPix = &pOut[2*BYTES_PER_PIX*width];
-	pOutPrefetch = &pOutPix[2*width];
-	bFirstPixIsGreen = bTopLeftIsGreen;
-	
-	BENCH_START(startCyc);
-	PREFETCH(pRawPrefetch);
-	PREFETCH(pOutPrefetch);
-*/
 
 	if (bTopLeftIsGreen)
 		for(iy = 0; iy < outHeight; iy += 1)
@@ -933,6 +918,116 @@ OSC_ERR OscVisDebayerGreyscaleHalfSize(uint8 const * const pRaw, uint16 const wi
 	return SUCCESS;
 }
 
+OSC_ERR OscVisDebayerHalfSize(uint8 const * const pRaw, uint16 const width, uint16 const height, enum EnBayerOrder const enBayerOrderFirstRow, uint8 * const pOut)
+{
+	bool bTopLeftIsGreen, bTopRowIsRed;
+	uint16 ix, iy, outWidth = width / 2, outHeight = height / 2;
+	
+	/*---------------------- Input validation. -------------------- */
+	if((pRaw == NULL) || (pOut == NULL))
+	{
+		OscLog(ERROR, "%s(0x%x, %d, %d, %d 0x%x): Invalid arguments!",
+				__func__, pRaw, width, height, enBayerOrderFirstRow, pOut);
+		return -EINVALID_PARAMETER;
+	}
+	
+	if((!IS_EVEN(width)) || (!IS_EVEN(height)) || (width < 2) || (height < 2))
+	{
+		OscLog(ERROR, "%s: Invalid parameter! Width: %d Height: %d\n"
+				"Width must be even and >=2 and height must be >=2.\n",
+				__func__, width, height);
+		return -EINVALID_PARAMETER;
+	}
+	
+	bTopLeftIsGreen = enBayerOrderFirstRow == ROW_GBGB || enBayerOrderFirstRow == ROW_GRGR;
+	bTopRowIsRed = enBayerOrderFirstRow == ROW_RGRG || enBayerOrderFirstRow == ROW_GRGR;
+
+	if (bTopLeftIsGreen)
+		if (bTopRowIsRed)
+			for(iy = 0; iy < outHeight; iy += 1)
+			{
+				uint16 iyRaw = iy * 2;
+				for(ix = 0; ix < outWidth; ix += 1)
+				{
+					uint8 cellRed, cellBlue;
+					uint16 cellGreen;
+					uint16 ixRaw = ix * 2;
+					
+					cellGreen = pRaw[iyRaw * width + ixRaw];
+					cellRed = pRaw[iyRaw * width + ixRaw + 1];
+					cellBlue = pRaw[(iyRaw + 1) * width + ixRaw];
+					cellGreen += pRaw[(iyRaw + 1) * width + ixRaw + 1];
+					
+					pOut[(iy * outWidth + ix) * 3] = cellRed;
+					pOut[(iy * outWidth + ix) * 3 + 1] = cellGreen / 2;
+					pOut[(iy * outWidth + ix) * 3 + 2] = cellBlue;
+				}
+			}
+		else
+			for(iy = 0; iy < outHeight; iy += 1)
+			{
+				uint16 iyRaw = iy * 2;
+				for(ix = 0; ix < outWidth; ix += 1)
+				{
+					uint8 cellRed, cellBlue;
+					uint16 cellGreen;
+					uint16 ixRaw = ix * 2;
+					
+					cellGreen = pRaw[iyRaw * width + ixRaw];
+					cellBlue = pRaw[iyRaw * width + ixRaw + 1];
+					cellRed = pRaw[(iyRaw + 1) * width + ixRaw];
+					cellGreen += pRaw[(iyRaw + 1) * width + ixRaw + 1];
+					
+					pOut[(iy * outWidth + ix) * 3] = cellRed;
+					pOut[(iy * outWidth + ix) * 3 + 1] = cellGreen / 2;
+					pOut[(iy * outWidth + ix) * 3 + 2] = cellBlue;
+				}
+			}
+	else
+		if (bTopRowIsRed)
+			for(iy = 0; iy < outHeight; iy += 1)
+			{
+				uint16 iyRaw = iy * 2;
+				for(ix = 0; ix < outWidth; ix += 1)
+				{
+					uint8 cellRed, cellBlue;
+					uint16 cellGreen;
+					uint16 ixRaw = ix * 2;
+					
+					cellRed = pRaw[iyRaw * width + ixRaw];
+					cellGreen = pRaw[iyRaw * width + ixRaw + 1];
+					cellGreen += pRaw[(iyRaw + 1) * width + ixRaw];
+					cellBlue = pRaw[(iyRaw + 1) * width + ixRaw + 1];
+					
+					pOut[(iy * outWidth + ix) * 3] = cellRed;
+					pOut[(iy * outWidth + ix) * 3 + 1] = cellGreen / 2;
+					pOut[(iy * outWidth + ix) * 3 + 2] = cellBlue;
+				}
+			}
+		else
+			for(iy = 0; iy < outHeight; iy += 1)
+			{
+				uint16 iyRaw = iy * 2;
+				for(ix = 0; ix < outWidth; ix += 1)
+				{
+					uint8 cellRed, cellBlue;
+					uint16 cellGreen;
+					uint16 ixRaw = ix * 2;
+					
+					cellBlue = pRaw[iyRaw * width + ixRaw];
+					cellGreen = pRaw[iyRaw * width + ixRaw + 1];
+					cellGreen += pRaw[(iyRaw + 1) * width + ixRaw];
+					cellRed = pRaw[(iyRaw + 1) * width + ixRaw + 1];
+					
+					pOut[(iy * outWidth + ix) * 3] = cellRed;
+					pOut[(iy * outWidth + ix) * 3 + 1] = cellGreen / 2;
+					pOut[(iy * outWidth + ix) * 3 + 2] = cellBlue;
+				}
+			}
+	
+	return SUCCESS;
+}
+
 OSC_ERR OscVisDebayerSpot(uint8 const * const pRaw, uint16 const width, uint16 const height, enum EnBayerOrder const enBayerOrderFirstRow, uint16 const xPos, uint16 const yPos, uint16 const size, uint8 * color)
 {
 	bool bTopLeftIsGreen, bTopRowIsRed;
@@ -957,7 +1052,7 @@ OSC_ERR OscVisDebayerSpot(uint8 const * const pRaw, uint16 const width, uint16 c
 	}
 	
 	
-	/* Adjust pattern for a unaligned spot */
+	/* Adjust pattern for an unaligned spot. */
 	
 	bTopLeftIsGreen = (enBayerOrderFirstRow == ROW_GBGB || enBayerOrderFirstRow == ROW_GRGR) == IS_EVEN(xPos) == IS_EVEN(yPos);
 	bTopRowIsRed = (enBayerOrderFirstRow == ROW_RGRG || enBayerOrderFirstRow == ROW_GRGR) == IS_EVEN(yPos);
