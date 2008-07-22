@@ -89,15 +89,15 @@ OSC_ERR OscVisDebayer(const uint8* pRaw,
 		uint8 *const pOut);
 
 /*!
- * @brief Convert a raw image captured by a camera sensor with bayer filter to a grayscale output image with halvened dimensions.
+ * @brief Convert a raw image captured by a camera sensor with bayer filter to a greyscale output image with halvened dimensions.
  * 
- * Debayering calculates the missing color values by averaging over four colored cells. 2 green and one red and blue cell are weightened averaged to form a single grayscale cell.
+ * Debayering calculates the missing color values by averaging over four colored cells. 2 green and one red and blue cell are weightened averaged to form a single greyscale cell.
  * 
  * The bayer pattern color order of the first row is specified with an identifier.
  * 
  * ! Only even widths and heights are supported !
  * 
- * The output picture has 8 bit grayscale cells with halve the with and height of the original image.
+ * The output picture has 8 bit greyscale cells with halve the with and height of the original image.
  * 
  * @param pRaw Pointer to the raw input picture of size width x height.
  * @param width Width of the input and output image.
@@ -105,17 +105,15 @@ OSC_ERR OscVisDebayer(const uint8* pRaw,
  * @param enBayerOrderFirstRow The order of the bayer pattern colors
  * in the first row of the image to be debayered. Can be queried by
  * OscCamGetBayerOrder().
- * @param pOut Pointer to the grayscale output image.
+ * @param pOut Pointer to the greyscale output image.
  * @return SUCCESS or an appropriate error code otherwise
  */
-OSC_ERR OscVisDebayerGrayscaleHalfSize(uint8 const * const pRaw, uint16 const width, uint16 const height, enum EnBayerOrder const enBayerOrderFirstRow, uint8 * const color);
+OSC_ERR OscVisDebayerGreyscaleHalfSize(uint8 const * const pRaw, uint16 const width, uint16 const height, enum EnBayerOrder const enBayerOrderFirstRow, uint8 * const color);
 
 /*!
  * @brief Debayers an image at one spot and gives its mean color.
  * 
  * ! Only even size is supported !
- * 
- * The output picture has 8 bit grayscale cells with halve the with and height of the original image.
  * 
  * @param pRaw Pointer to the raw input picture of size width x height.
  * @param width Width of the input and output image.

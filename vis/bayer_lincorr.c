@@ -853,7 +853,7 @@ OSC_ERR OscVisDebayer(const uint8* pRaw,
 	return SUCCESS;
 }
 
-OSC_ERR OscVisDebayerGrayscaleHalfSize(uint8 const * const pRaw, uint16 const width, uint16 const height, enum EnBayerOrder const enBayerOrderFirstRow, uint8 * const pOut)
+OSC_ERR OscVisDebayerGreyscaleHalfSize(uint8 const * const pRaw, uint16 const width, uint16 const height, enum EnBayerOrder const enBayerOrderFirstRow, uint8 * const pOut)
 {
 	bool bTopLeftIsGreen;
 	uint16 ix, iy, outWidth = width / 2, outHeight = height / 2;
@@ -899,15 +899,15 @@ OSC_ERR OscVisDebayerGrayscaleHalfSize(uint8 const * const pRaw, uint16 const wi
 			{
 				uint8 cellRed, cellGreen1, cellGreen2, cellBlue;
 				uint16 ixRaw = ix * 2;
-				uint16 gray;
+				uint16 grey;
 				
 				cellGreen1 = pRaw[iyRaw * width + ixRaw];
 				cellRed = pRaw[iyRaw * width + ixRaw + 1];
 				cellBlue = pRaw[(iyRaw + 1) * width + ixRaw];
 				cellGreen2 = pRaw[(iyRaw + 1) * width + ixRaw + 1];
 				
-				gray = (uint16)cellRed * 2 + (uint16)cellGreen1 + (uint16)cellGreen2 + (uint16)cellBlue * 2;
-				pOut[iy * outWidth + ix] = gray / 6;
+				grey = (uint16)cellRed * 2 + (uint16)cellGreen1 + (uint16)cellGreen2 + (uint16)cellBlue * 2;
+				pOut[iy * outWidth + ix] = grey / 6;
 			}
 		}
 	else
@@ -918,15 +918,15 @@ OSC_ERR OscVisDebayerGrayscaleHalfSize(uint8 const * const pRaw, uint16 const wi
 			{
 				uint8 cellRed, cellGreen1, cellGreen2, cellBlue;
 				uint16 ixRaw = ix * 2;
-				uint16 gray;;
+				uint16 grey;;
 				
 				cellRed = pRaw[iyRaw * width + ixRaw];
 				cellGreen1 = pRaw[iyRaw * width + ixRaw + 1];
 				cellGreen2 = pRaw[(iyRaw + 1) * width + ixRaw];
 				cellBlue = pRaw[(iyRaw + 1) * width + ixRaw + 1];
 				
-				gray = (uint16)cellRed * 2 + (uint16)cellGreen1 + (uint16)cellGreen2 + (uint16)cellBlue * 2;
-				pOut[iy * outWidth + ix] = gray / 6;
+				grey = (uint16)cellRed * 2 + (uint16)cellGreen1 + (uint16)cellGreen2 + (uint16)cellBlue * 2;
+				pOut[iy * outWidth + ix] = grey / 6;
 			}
 		}
 	
