@@ -638,9 +638,9 @@ OSC_ERR OscCamCancelCapture()
 }
 
 OSC_ERR OscCamReadPicture(const uint8 fbID,
-		void ** ppPic,
-		const uint16 maxAge,
-		const uint16 timeout)
+        uint8 ** ppPic,
+        const uint16 maxAge,
+        const uint16 timeout)
 {
 	OSC_ERR             err = SUCCESS;
 	uint8               fb;
