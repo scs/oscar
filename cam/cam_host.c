@@ -302,9 +302,16 @@ OSC_ERR OscCamCreate(void *hFw)
     
     cam.lastValidID = OSC_CAM_INVALID_BUFFER_ID;
     
+    err = SUCCESS;
+#ifdef TARGET_TYPE_LEANXCAM
+	/* Disable LED_OUT on leanXcam so the GPIOs can function correctly.
+	 * This output is or'ed with GPIO_OUT2_N. */
+	err |=	OscCamSetRegisterValue(CAM_REG_LED_OUT_CONTROL, 0x01);
+#endif /* TARGET_TYPE_LEANXCAM */
+
     /* Read the current camera register values and build a model of the
      * current state from them. */
-    err = OscCamGetShutterWidth(&cam.curExpTime);
+    err |= OscCamGetShutterWidth(&cam.curExpTime);
     err |= OscCamGetRegisterValue(CAM_REG_HORIZ_BLANK, 
             &cam.curHorizBlank);
     /* Read back the area of interest to implicitely update 

@@ -55,6 +55,7 @@
 #define CAM_REG_ROW_START       0x02
 #define CAM_REG_WIN_HEIGHT      0x03
 #define CAM_REG_WIN_WIDTH       0x04
+#define CAM_REG_LED_OUT_CONTROL 0x1B
 
 /*! @brief The minimum row time of the mt9v032 sensor in pixel clocks. 
  * Used for shutter width calculations. */

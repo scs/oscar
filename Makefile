@@ -59,6 +59,7 @@ ifeq ($(filter $(MAKECMDGOALS), clean distclean config), )
   MODULES += cfg
   MODULES += clb
   MODULES += vis
+  MODULES += gpio
   
   # This may need to be generalized by a board-to-feature-mapping table
   ifeq ($(CONFIG_BOARD), INDXCAM)

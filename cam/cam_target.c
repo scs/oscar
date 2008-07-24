@@ -64,9 +64,16 @@ OSC_ERR OscCamCreate(void *hFw)
 		return -ENO_VIDEO_DEVICE_FOUND;
 	}   
 	
+	err = SUCCESS;
+#ifdef TARGET_TYPE_LEANXCAM
+	/* Disable LED_OUT on leanXcam so the GPIOs can function correctly.
+	 * This output is or'ed with GPIO_OUT2_N. */
+	err |=	OscCamSetRegisterValue(CAM_REG_LED_OUT_CONTROL, 0x01);
+#endif /* TARGET_TYPE_LEANXCAM */
+
 	/* Read the current camera register values and build a model of the
 	 * current state from them. */
-	err = OscCamGetShutterWidth(&cam.curExpTime);
+	err |= OscCamGetShutterWidth(&cam.curExpTime);
 	err |= OscCamGetRegisterValue(CAM_REG_HORIZ_BLANK, 
 	        &cam.curHorizBlank);
 	/* Read back the area of interest to implicitely update 
@@ -225,6 +232,17 @@ OSC_ERR OscCamSetRegisterValue(const uint32 reg, const uint16 value)
 	reg_info.addr = reg;
 	reg_info.value = value;
 	
+#ifdef TARGET_TYPE_LEANXCAM
+	/* On the leanXcam, the LED_OUT_CONTROL register must not be changed
+	 * manually, because it has an effect on the GPIO outputs. */
+	 if(unlikely(reg == CAM_REG_LED_OUT_CONTROL))
+	 {
+	 	OscLog(WARN, "%s: Not allowed to set register LED_OUT_CONTROL manually. "
+	 	"Use OscCamConfigSensorLedOut instead!\n", __func__);
+	 	return -EINVALID_PARAMETER;
+	 }
+#endif /* TARGET_TYPE_LEANXCAM */
+
 	/* Communicate the desired register value to the driver.
 	 * No input validation is done to retain flexibility */
 	ret = ioctl(cam.vidDev, CAM_SCAMREG, &reg_info);
@@ -623,6 +641,29 @@ OSC_ERR OscCamRegisterCorretionCallback(
     return SUCCESS;   
 }
 
+#ifdef TARGET_TYPE_LEANXCAM
 
+OSC_ERR OscCamConfigSensorLedOut(bool bSensorLedOut, bool bInvert)
+{
+	OSC_ERR err;
+	
+	if(bSensorLedOut)
+	{
+		if(bInvert)
+		{
+			/* Enable and invert the LED_OUT pin of the CMOS sensor. */
+			err = OscCamSetRegisterValue(CAM_REG_LED_OUT_CONTROL, 0x02);
+		} else {
+			/* Enable the LED_OUT pin of the CMOS sensor. */
+			err = OscCamSetRegisterValue(CAM_REG_LED_OUT_CONTROL, 0x00);
+		}
+	} else {
+		/* Disable the LED_OUT pin of the CMOS sensor. */
+		err = OscCamSetRegisterValue(CAM_REG_LED_OUT_CONTROL, 0x01);
+	}
+	return err;
+}
+
+#endif /* TARGET_TYPE_LEANXCAM */
 
 

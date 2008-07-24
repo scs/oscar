@@ -274,6 +274,9 @@ OSC_ERR OscCamPresetRegs()
     #ifdef TARGET_TYPE_INDXCAM  
     /* monochrone, linear */
     err |= OscCamSetRegisterValue( CAM_REG_PIXEL_OP_MODE, 0x0011); 
+    /* Disable LED_OUT on leanXcam so the GPIOs can function correctly.
+	 * This output is or'ed with GPIO_OUT2_N. */
+	err |=	OscCamSetRegisterValue(CAM_REG_LED_OUT_CONTROL, 0x03);
     #endif /*TARGET_TYPE_INDXCAM*/    
     #ifdef TARGET_TYPE_LEANXCAM 
     /* color, linear */

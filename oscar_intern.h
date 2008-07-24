@@ -47,7 +47,8 @@ struct OSC_FRAMEWORK
     struct OSC_MODULE hsm;     /*!< @brief hierarchical state machine*/
     struct OSC_MODULE cfg;     /*!< @brief configuration file reader and writer*/
     struct OSC_MODULE clb;     /*!< @brief camera calibration*/    
-    struct OSC_MODULE vis;     /*!< @brief Vision library*/    
+    struct OSC_MODULE vis;     /*!< @brief Vision library*/   
+    struct OSC_MODULE gpio;	   /*!< @brief GPIO */ 
 };
 
 #endif /* OSCAR_INTER_H_ */

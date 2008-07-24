@@ -419,5 +419,33 @@ OSC_ERR OscCamPresetRegs();
 OSC_ERR OscCamGetBayerOrder(enum EnBayerOrder *pBayerOrderFirstRow,
 							const uint16 xPos,
 							const uint16 yPos);
+							
+#ifdef TARGET_TYPE_LEANXCAM
+
+/*********************************************************************//*!
+ * @brief Configure whether the LED_OUT pin from the image sensor is routed
+ * to OUT2 or whether it can be used as a GPIO.
+ * 
+ * On the leanXcam hardware, the output OUT2 is a logical OR between the
+ * corresponding DSP pin and the LED_OUT pin from the image sensor. This 
+ * means that if one wants to use it as a GPIO, the LED_OUT from the
+ * sensor has to be disabled (done by this function) and in the 
+ * opposite case, where OUT2 should be assigned to LED_OUT, the DSP pin 
+ * has to be wired to zero (done by OscGpioConfigSensorLedOut).
+ * 
+ * ! Must also call OscGpioConfigSensorLedOut !
+ * 
+ * @see OscGpioConfigSensorLedOut
+ * 
+ * leanXcam only.
+ * 
+ * @param bSensorLedOut If TRUE, the sensor LED out is routed to OUT2 and
+ * it cannot be used as GPIO anymore.
+ * @param bInvert Invert the output of LED_OUT.
+ * @return SUCCESS or an appropriate error code.
+ *//*********************************************************************/
+OSC_ERR OscCamConfigSensorLedOut(bool bSensorLedOut, bool bInvert);
+
+#endif /* TARGET_TYPE_LEANXCAM */
 
 #endif /*CAM_PUB_H_*/

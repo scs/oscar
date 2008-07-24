@@ -21,7 +21,11 @@
     
     
     
+    
+    
     <item id="scannerConfiguration">
+      
+      
       
       
       
@@ -59,6 +63,8 @@
       
       
       
+      
+      
       <profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
         
         
@@ -78,7 +84,11 @@
         
         
         
+        
+        
         <buildOutputProvider>
+          
+          
           
           
           
@@ -116,6 +126,8 @@
           
           
           
+          
+          
           <parser enabled="true"/>
           
           
@@ -126,6 +138,8 @@
           
           
           
+          
+        
         
         
         
@@ -136,6 +150,8 @@
         
         
         </buildOutputProvider>
+        
+        
         
         
         
@@ -173,7 +189,11 @@
           
           
           
+          
+          
           <runAction useDefault="true" command="gcc" arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}"/>
+          
+          
           
           
           
@@ -202,6 +222,8 @@
           
           
           
+          
+        
         
         
         
@@ -221,6 +243,8 @@
         
         
         
+        
+      
       
       
       
@@ -231,6 +255,8 @@
       
       
       </profile>
+      
+      
       
       
       
@@ -268,7 +294,11 @@
         
         
         
+        
+        
         <buildOutputProvider>
+          
+          
           
           
           
@@ -306,6 +336,8 @@
           
           
           
+          
+          
           <parser enabled="true"/>
           
           
@@ -316,6 +348,8 @@
           
           
           
+          
+        
         
         
         
@@ -326,6 +360,8 @@
         
         
         </buildOutputProvider>
+        
+        
         
         
         
@@ -363,7 +399,11 @@
           
           
           
+          
+          
           <runAction useDefault="true" command="gcc" arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}"/>
+          
+          
           
           
           
@@ -392,6 +432,8 @@
           
           
           
+          
+        
         
         
         
@@ -411,6 +453,8 @@
         
         
         
+        
+      
       
       
       
@@ -421,6 +465,8 @@
       
       
       </profile>
+      
+      
       
       
       
@@ -458,7 +504,11 @@
         
         
         
+        
+        
         <buildOutputProvider>
+          
+          
           
           
           
@@ -496,6 +546,8 @@
           
           
           
+          
+          
           <parser enabled="true"/>
           
           
@@ -506,6 +558,8 @@
           
           
           
+          
+        
         
         
         
@@ -516,6 +570,8 @@
         
         
         </buildOutputProvider>
+        
+        
         
         
         
@@ -553,7 +609,11 @@
           
           
           
+          
+          
           <runAction useDefault="true" command="gcc" arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}"/>
+          
+          
           
           
           
@@ -582,6 +642,8 @@
           
           
           
+          
+        
         
         
         
@@ -601,6 +663,8 @@
         
         
         
+        
+      
       
       
       
@@ -611,6 +675,8 @@
       
       
       </profile>
+      
+      
       
       
       
@@ -648,7 +714,11 @@
         
         
         
+        
+        
         <buildOutputProvider>
+          
+          
           
           
           
@@ -686,6 +756,8 @@
           
           
           
+          
+          
           <parser enabled="true"/>
           
           
@@ -696,6 +768,8 @@
           
           
           
+          
+        
         
         
         
@@ -706,6 +780,8 @@
         
         
         </buildOutputProvider>
+        
+        
         
         
         
@@ -743,7 +819,11 @@
           
           
           
+          
+          
           <runAction useDefault="true" command="make" arguments="-f ${project_name}_scd.mk"/>
+          
+          
           
           
           
@@ -772,6 +852,8 @@
           
           
           
+          
+        
         
         
         
@@ -791,6 +873,8 @@
         
         
         
+        
+      
       
       
       
@@ -810,6 +894,8 @@
       
       
       
+      
+    
     
     
     
@@ -820,6 +906,8 @@
     
     
     </item>
+    
+    
     
     
     
@@ -857,7 +945,11 @@
       
       
       
+      
+      
       <pathentry kind="src" path=""/>
+      
+      
       
       
       
@@ -895,6 +987,8 @@
       
       
       
+      
+      
       <pathentry kind="con" path="org.eclipse.cdt.make.core.DISCOVERED_SCANNER_INFO"/>
       
       
@@ -905,6 +999,8 @@
       
       
       
+      
+    
     
     
     
@@ -915,6 +1011,7 @@
     
     
     </item>
+    
     
     
     
@@ -933,37 +1030,100 @@
     
     
     
+    
     <item id="org.eclipse.cdt.make.core.buildtargets">
+      
+      
       <buildTargets>
+        
+        
         <target name="all" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="">
+          
+          
           <buildCommand>make</buildCommand>
-          <buildArguments></buildArguments>
+          
+          
+          <buildArguments/>
+          
+          
           <buildTarget>all</buildTarget>
+          
+          
           <stopOnError>false</stopOnError>
+          
+          
           <useDefaultCommand>false</useDefaultCommand>
+          
+        
         </target>
+        
+        
         <target name="target" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="">
+          
+          
           <buildCommand>make</buildCommand>
-          <buildArguments></buildArguments>
+          
+          
+          <buildArguments/>
+          
+          
           <buildTarget>target</buildTarget>
+          
+          
           <stopOnError>false</stopOnError>
+          
+          
           <useDefaultCommand>false</useDefaultCommand>
+          
+        
         </target>
+        
+        
         <target name="host" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="">
+          
+          
           <buildCommand>make</buildCommand>
-          <buildArguments></buildArguments>
+          
+          
+          <buildArguments/>
+          
+          
           <buildTarget>host</buildTarget>
+          
+          
           <stopOnError>false</stopOnError>
+          
+          
           <useDefaultCommand>false</useDefaultCommand>
+          
+        
         </target>
+        
+        
         <target name="clean" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="">
+          
+          
           <buildCommand>make</buildCommand>
-          <buildArguments></buildArguments>
+          
+          
+          <buildArguments/>
+          
+          
           <buildTarget>clean</buildTarget>
+          
+          
           <stopOnError>false</stopOnError>
+          
+          
           <useDefaultCommand>false</useDefaultCommand>
+          
+        
         </target>
+        
+      
       </buildTargets>
+      
+    
     </item>
     
     
@@ -973,6 +1133,8 @@
     
     
     
+    
+  
   
   
   
