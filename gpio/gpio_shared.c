@@ -14,7 +14,7 @@
 #include "gpio_priv.h"
 #include "oscar_intern.h"
 
-#ifdef OSC_HOST
+#if defined(OSC_HOST) || defined(OSC_SIM)
 #include "../srd/srd_pub.h"
 #include "../swr/swr_pub.h"
 #endif
@@ -35,7 +35,8 @@ struct OSC_DEPENDENCY gpio_deps[] = {
 #define DEP_LEN (sizeof(gpio_deps)/sizeof(struct OSC_DEPENDENCY))
 
 #ifdef TARGET_TYPE_LEANXCAM
-/*! @brief Array with the default config of all the pins used on the indXcam. 
+/*! @brief Array with the default config of all the pins used on the 
+ * leanXcam. 
  * All I/Os are configured to be high active at the actual plug. */
 struct GPIO_PIN_CONFIG aryPinConfig[] = {
 	/* {pinNr, defaultFlags, name, defaultState} */
@@ -47,6 +48,17 @@ struct GPIO_PIN_CONFIG aryPinConfig[] = {
 	{PIN_FN_EX_TRIGGER_N, (DIR_OUTPUT | POL_LOWACTIVE | SEN_LEVEL  | FUN_RESERVED), "FN_EX_TRIGGER", FALSE},
 	{PIN_TESTLED_R_N, (DIR_OUTPUT | POL_LOWACTIVE | SEN_LEVEL  | FUN_RESERVED), "TESTLED_RED", FALSE},
 	{PIN_TESTLED_G_N, (DIR_OUTPUT | POL_LOWACTIVE | SEN_LEVEL  | FUN_RESERVED), "TESTLED_GREEN", FALSE}
+};
+#endif /* TARGET_TYPE_LEANXCAM */
+
+#ifdef TARGET_TYPE_INDXCAM
+/*! @brief Array with the default config of all the pins used on the 
+ * indXcam. 
+ * All I/Os are configured to be high active at the actual plug. */
+struct GPIO_PIN_CONFIG aryPinConfig[] = {
+	/* {pinNr, defaultFlags, name, defaultState} */
+	{PIN_TESTLED_N, (DIR_OUTPUT | POL_LOWACTIVE | SEN_LEVEL | FUN_RESERVED), "TESTLED", FALSE},
+	{PIN_EXPOSURE, (DIR_OUTPUT | POL_HIGHACTIVE | SEN_LEVEL | FUN_RESERVED), "EXPOSURE", FALSE}
 };
 #endif /* TARGET_TYPE_INDXCAM */
 

@@ -64,5 +64,6 @@ OSC_ERR OscDestroy(void *hFw);
 #include "cfg_pub.h"
 #include "clb_pub.h"
 #include "vis_pub.h"
+#include "gpio_pub.h"
 
 #endif /*OSCAR_H_*/

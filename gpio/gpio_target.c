@@ -59,6 +59,14 @@ OSC_ERR OscGpioWrite(enum EnGpios enGpio, bool bState)
 	struct GPIO_PIN 	*pPin = &gpio.pins[enGpio];
 	int 				ret;
 	
+	if(unlikely(!pPin->fd))
+	{
+		OscLog(ERROR, "%s: No file descriptor for pin %d found. "
+				"This probably "
+				"means that this GPIO is not available on your "
+				"hardware platform.", __func__, enGpio);
+		return -EINVALID_PARAMETER;
+	}
 	/* Sanity check */
 	if(unlikely(!(pPin->flags & DIR_OUTPUT)))
 	{
@@ -98,6 +106,15 @@ OSC_ERR OscGpioRead(enum EnGpios enGpio, bool *pbState)
 	char				buf[2];
 	int 				ret;
 	
+	if(unlikely(!pPin->fd))
+	{
+		OscLog(ERROR, "%s: No file descriptor for pin %d found. "
+				"This probably "
+				"means that this GPIO is not available on your "
+				"hardware platform.", __func__, enGpio);
+		return -EINVALID_PARAMETER;
+	}
+	
 	if(pPin->flags & FUN_RESERVED)
 	{
 		OscLog(WARN, "%s: Pin %s is reserved internally and can not "
@@ -125,6 +142,41 @@ OSC_ERR OscGpioRead(enum EnGpios enGpio, bool *pbState)
 	return SUCCESS;	
 }
 
+#ifdef TARGET_TYPE_INDXCAM
+OSC_ERR OscGpioSetTestLed(bool bOn)
+{
+	int ret;
+	struct GPIO_PIN		*pPin = &gpio.pins[PIN_TESTLED_N];
+	
+	ret = write(pPin->fd, (bOn ? "1" : "0"), 2);
+	
+	if(ret < 0)
+	{
+		OscLog(ERROR, "%s: Unable to set LED (%s)\n",
+				__func__, strerror(errno));
+		return -EDEVICE;
+	}
+	return SUCCESS;
+}
+
+OSC_ERR OscGpioToggleTestLed()
+{
+	int ret;
+	struct GPIO_PIN		*pPin = &gpio.pins[PIN_TESTLED_N];
+	
+	ret = write(pPin->fd, "T", 2);
+	
+	if(ret < 0)
+	{
+		OscLog(ERROR, "%s: Unable to toggle LED (%s)\n",
+				__func__, strerror(errno));
+		return -EDEVICE;
+	}
+	return SUCCESS;
+}
+#endif /* TARGET_TYPE_INDXCAM */
+
+#ifdef TARGET_TYPE_LEANXCAM
 OSC_ERR OscGpioSetTestLed(bool bOn)
 {
 	int ret;
@@ -160,6 +212,7 @@ OSC_ERR OscGpioToggleTestLed()
 	}
 	return SUCCESS;
 }
+#endif /* TARGET_TYPE_LEANXCAM */
 
 OSC_ERR OscGpioTriggerImage()
 {
@@ -174,6 +227,7 @@ OSC_ERR OscGpioTriggerImage()
 	{
 		goto exit_fail;
 	}
+
 	ret = write(pPin->fd, "0", 2); /* Falling flank */
 	if(unlikely(ret < 0))
 	{

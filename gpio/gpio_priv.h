@@ -100,15 +100,21 @@ struct GPIO_PIN
 		
 #endif /* TARGET_TYPE_INDXCAM */
 
-#ifdef OSC_HOST
+#ifdef TARGET_TYPE_INDXCAM
+	/* Pin mapping */
+	#define PIN_TESTLED_N		27
+	#define PIN_EXPOSURE		3
+#endif /* TARGET_TYPE_INDXCAM */
+
+#if defined(OSC_HOST) || defined(OSC_SIM)
 	/*! @brief True if pins reserved for internal use are to be logged
 	 * as well. */
-	#define OSC_GPIO_LOG_RESERVED_PINS FALSE
+	/*#define OSC_GPIO_LOG_RESERVED_PINS*/
 	/*! @brief File where the output signals will be written to. */
 	#define OSC_GPIO_WRITER_FILE "gpio_out.txt"
 	/*! @brief File from where the input stimuli are read. */
 	#define OSC_GPIO_READER_FILE "gpio_in.txt"
-#endif /* OSC_HOST */
+#endif /* OSC_HOST or OSC_SIM */
 
 /*! @brief The object struct of the GPIO module */
 struct OSC_GPIO

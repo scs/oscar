@@ -16,9 +16,11 @@
     #include "oscar_target.h"
 #endif /* OSC_HOST */
 
-#ifdef TARGET_TYPE_LEANXCAM
+
 /*! @brief The GPIO pins that can be accessed from the application. 
  * 
+ * This is a list of all the GPIO names on all the supported hardware
+ * platforms. Not all listed here may be available on your platform.
  * These are assigned to the same identifier as the corresponding pflags pin
  * driving them. */
 enum EnGpios
@@ -30,7 +32,9 @@ enum EnGpios
 };
 
 /*! @brief Defines whether the image trigger of the camera sensor is activated
- * internally from the camera module or from externally over an input */
+ * internally from the camera module or from externally over an input 
+ * 
+ * leanXcam only */
 enum EnTriggerConfig
 {
 	/*! @brief Default: Internal triggering. */
@@ -39,7 +43,7 @@ enum EnTriggerConfig
 	TRIGGER_EXTERNAL_IN2	
 };
 
-#endif /* TARGET_TYPE_LEANXCAM */
+
 /*======================== API functions ===============================*/
 
 /*********************************************************************//*!

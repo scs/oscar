@@ -42,6 +42,15 @@ OSC_ERR OscGpioWrite(enum EnGpios enGpio, bool bState)
 {
 	struct GPIO_PIN 	*pPin = &gpio.pins[enGpio];
 	
+	if(unlikely(!pPin->fd))
+	{
+		OscLog(ERROR, "%s: No file descriptor for pin %d found. "
+				"This probably "
+				"means that this GPIO is not available on your "
+				"hardware platform.", __func__, enGpio);
+		return -EINVALID_PARAMETER;
+	}
+	
 	/* Sanity check */
 	if(unlikely(!(pPin->flags & DIR_OUTPUT)))
 	{
@@ -73,6 +82,15 @@ OSC_ERR OscGpioRead(enum EnGpios enGpio, bool *pbState)
 {
 	struct GPIO_PIN 	*pPin = &gpio.pins[enGpio];
 	
+	if(unlikely(!pPin->fd))
+	{
+		OscLog(ERROR, "%s: No file descriptor for pin %d found. "
+				"This probably "
+				"means that this GPIO is not available on your "
+				"hardware platform.", __func__, enGpio);
+		return -EINVALID_PARAMETER;
+	}
+	
 	if(pPin->flags & FUN_RESERVED)
 	{
 		OscLog(WARN, "%s: Pin %s is reserved internally and can not "
@@ -86,6 +104,40 @@ OSC_ERR OscGpioRead(enum EnGpios enGpio, bool *pbState)
 	return SUCCESS;	
 }
 
+#ifdef TARGET_TYPE_INDXCAM
+OSC_ERR OscGpioSetTestLed(bool bOn)
+{
+	OSC_ERR 			err = SUCCESS;
+	struct GPIO_PIN		*pPin = &gpio.pins[PIN_TESTLED_N];
+	
+	pPin->bState = bOn;
+
+#ifdef OSC_GPIO_LOG_RESERVED_PINS
+		bOn = (pPin->flags & POL_LOWACTIVE) ? !pPin->bState : pPin->bState;
+		err = OscSwrUpdateSignal(gpio.phSignalOut[PIN_TESTLED_N], &bOn);
+#endif /* OSC_GPIO_LOG_RESERVED_PINS */	
+	return err;
+}
+
+OSC_ERR OscGpioToggleTestLed()
+{
+	OSC_ERR				err = SUCCESS;
+	struct GPIO_PIN		*pPin = &gpio.pins[PIN_TESTLED_N];
+#ifdef OSC_GPIO_LOG_RESERVED_PINS
+	bool				bOn;
+#endif /* OSC_GPIO_LOG_RESERVED_PINS */	
+	
+	pPin->bState = !pPin->bState;
+
+#ifdef OSC_GPIO_LOG_RESERVED_PINS
+	bOn = (pPin->flags & POL_LOWACTIVE) ? !pPin->bState : pPin->bState;
+	err = OscSwrUpdateSignal(gpio.phSignalOut[PIN_TESTLED_N], &bOn);
+#endif /* OSC_GPIO_LOG_RESERVED_PINS */	
+	return err;
+}
+#endif /* TARGET_TYPE_INDXCAM */
+
+#ifdef TARGET_TYPE_LEANXCAM
 OSC_ERR OscGpioSetTestLed(bool bOn)
 {
 	OSC_ERR 			err = SUCCESS;
@@ -123,6 +175,7 @@ OSC_ERR OscGpioToggleTestLed()
 #endif /* OSC_GPIO_LOG_RESERVED_PINS */	
 	return err;
 }
+#endif /* TARGET_TYPE_LEANXCAM */
 
 OSC_ERR OscGpioTriggerImage()
 {
@@ -181,28 +234,8 @@ OSC_ERR OscGpioInitPins()
 	struct GPIO_PIN_CONFIG* pPinConfig;
 	uint32		defaultValue;
 	OSC_ERR		err;
-
-	/* Create a writer for the outputs */
-	err = OscSwrCreateWriter( 
-			&gpio.hWriter, OSC_GPIO_WRITER_FILE,
-			TRUE, TRUE); /*report property: time, cyclic */
-	if(err != SUCCESS)
-	{
-		OscLog(ERROR, "%s: Unable to create stimuli writer! (%d)\n",
-				__func__, err);
-		return err;
-	}
-
-	/* Create a stimuli reader for the inputs */
-	err = OscSrdCreateReader( OSC_GPIO_READER_FILE, 
-			&OscGpioReaderCallback, 
-			&gpio.hReader);
-	if(err != SUCCESS)
-	{
-		OscLog(ERROR, "%s: Unable to create stimuli reader! (%d)\n",
-				__func__, err);
-		return err;
-	}
+	bool		bReaderCreated = FALSE;
+	bool		bWriterCreated = FALSE;
 
 	for(pin = 0; pin < nrOfPins; pin++)
 	{
@@ -221,22 +254,54 @@ OSC_ERR OscGpioInitPins()
 		/***************** Register the pin signals. ******************/
 		if(pPinConfig->defaultFlags & DIR_OUTPUT)
 		{
-			if(OSC_GPIO_LOG_RESERVED_PINS || 
-					!(pPinConfig->defaultFlags & FUN_RESERVED))
+#ifndef OSC_GPIO_LOG_RESERVED_PINS
+			if(!(pPinConfig->defaultFlags & FUN_RESERVED))
 			{
-				defaultValue = pPinConfig->defaultState ? 1 : 0; 
-				err = OscSwrRegisterSignal(&gpio.phSignalOut[pinNr], 
-						gpio.hWriter, 
-						pPinConfig->name, 
-						SWR_INTEGER, 
-						&defaultValue, 
-						"%d");
+				err = SUCCESS;
+				goto skip_logging;
+			} 
+#endif
+			if(!bWriterCreated)
+			{
+				/* Create a writer for the outputs */
+				err = OscSwrCreateWriter( 
+						&gpio.hWriter, OSC_GPIO_WRITER_FILE,
+						TRUE, TRUE); /*report property: time, cyclic */
+				if(err != SUCCESS)
+				{
+					OscLog(ERROR, "%s: Unable to create stimuli writer! (%d)\n",
+							__func__, err);
+					return err;
+				}
+				bWriterCreated = TRUE;
 			}
+			defaultValue = pPinConfig->defaultState ? 1 : 0; 
+			err = OscSwrRegisterSignal(&gpio.phSignalOut[pinNr], 
+					gpio.hWriter, 
+					pPinConfig->name, 
+					SWR_INTEGER, 
+					&defaultValue, 
+					"%d");
 		} else {
+			if(!bReaderCreated)
+			{
+				/* Create a stimuli reader for the inputs */
+				err = OscSrdCreateReader( OSC_GPIO_READER_FILE, 
+						&OscGpioReaderCallback, 
+						&gpio.hReader);
+				if(err != SUCCESS)
+				{
+					OscLog(ERROR, "%s: Unable to create stimuli reader! (%d)\n",
+							__func__, err);
+					return err;
+				}
+				bReaderCreated = TRUE;
+			}
 			err = OscSrdRegisterSignal( gpio.hReader, 
 					pPinConfig->name, 
 					&gpio.phSignalIn[pinNr]);
 		}
+skip_logging:
 		if(unlikely(err != SUCCESS))
 		{
 			OscLog(ERROR, "%s: Error registering signal %s! (%d)\n",
