@@ -373,8 +373,7 @@ OSC_ERR OscCamSetFrameBuffer(const uint8 fbID,
 	return SUCCESS;
 }
 
-OSC_ERR OscCamSetupCapture(uint8 fbID, 
-		const enum EnOscCamTriggerMode tMode)
+OSC_ERR OscCamSetupCapture(uint8 fbID)
 {
 	struct capture_param   cp;
 	int                    ret;
@@ -393,17 +392,7 @@ OSC_ERR OscCamSetupCapture(uint8 fbID,
 	    return -ENO_AREA_OF_INTEREST_SET;
 	}
 	
-	switch(tMode)
-	{
-	case OSC_CAM_TRIGGER_MODE_EXTERNAL:
-		cp.trigger_mode = TRIGGER_MODE_EXTERNAL;
-		break;
-	case OSC_CAM_TRIGGER_MODE_MANUAL:
-		cp.trigger_mode = TRIGGER_MODE_MANUAL;
-		break;
-	default:
-		return -EINVALID_PARAMETER;
-	}
+	cp.trigger_mode = TRIGGER_MODE_EXTERNAL;
 	
 	/* If the caller is using automatic multibuffer management,
 	 * get the correct frame buffer. */
@@ -432,8 +421,8 @@ OSC_ERR OscCamSetupCapture(uint8 fbID,
         switch(errno)
         {
         case EINVAL:  /* Invalid parameter */
-            OscLog(ERROR, "%s(%u, %d): Invalid parameter!\n",
-                    __func__, fbID, tMode);
+            OscLog(ERROR, "%s(%u): Invalid parameter!\n",
+                    __func__, fbID);
             return -EINVALID_PARAMETER;
             break;
         case EBUSY:

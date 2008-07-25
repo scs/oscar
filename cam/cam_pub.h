@@ -24,13 +24,6 @@ enum EnOscCamErrors
     ENO_COLOR_SENSOR
 };
 
-/*! @brief The different trigger modes for the camera */
-enum EnOscCamTriggerMode
-{
-    OSC_CAM_TRIGGER_MODE_EXTERNAL,
-    OSC_CAM_TRIGGER_MODE_MANUAL
-};
-
 /*! @brief Camera perspective adaptation */
 enum EnOscCamPerspective
 {
@@ -273,22 +266,16 @@ OSC_ERR OscCamSetFrameBuffer(const uint8 fbID, const uint32 uSize,
  * 
  * This method needs to be called before OscCamReadPicture(). It does not
  * block. 
- * When specifying OSC_CAM_TRIGGER_MODE_EXTERNAL the driver is
- * configured in a way that an incoming picture triggered by an external
- * trigger is automatically stored in the next frame-buffer in the RAM.
- * This means of course that the call to this method needs to take place
- * before the external trigger.
- * If OSC_CAM_TRIGGER_MODE_EXTERNAL is specified, the camera is triggered
- * manually in addition to above actions.
+ * The camera sensor must be triggered either through an external trigger
+ * signal or over the GPIOs, respectively CPLD, depending on the hardware
+ * platform.
  * @see OscCamReadPicture
  * @see OscCamCancelCapture
  * 
  * @param fbID ID of the frame buffer to capture to.
- * @param tMode The trigger mode of this capture.
  * @return SUCCESS or an appropriate error code
  *//*********************************************************************/
-OSC_ERR OscCamSetupCapture(uint8 fbID, 
-        const enum EnOscCamTriggerMode tMode);
+OSC_ERR OscCamSetupCapture(uint8 fbID);
 
 /*********************************************************************//*!
  * @brief Cancel the capture of a picture

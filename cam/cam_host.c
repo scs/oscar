@@ -533,8 +533,7 @@ OSC_ERR OscCamSetFrameBuffer(const uint8 fbID,
     return SUCCESS;
 }
 
-OSC_ERR OscCamSetupCapture(uint8 fbID,
-        const enum EnOscCamTriggerMode tMode)
+OSC_ERR OscCamSetupCapture(uint8 fbID)
 {
     uint8           fb;
     int             i;
@@ -550,8 +549,8 @@ OSC_ERR OscCamSetupCapture(uint8 fbID,
     
     if(fb > MAX_NR_FRAME_BUFFERS)
     {
-        OscLog(ERROR, "%s(%u, %d): Invalid parameter!\n",
-                __func__, fbID, tMode);
+        OscLog(ERROR, "%s(%u): Invalid parameter!\n",
+                __func__, fbID);
         return -EINVALID_PARAMETER;
     }
 
@@ -564,31 +563,19 @@ OSC_ERR OscCamSetupCapture(uint8 fbID,
     
     for(i = 0; i < MAX_NR_FRAME_BUFFERS; i++)
     {
-        if((cam.fbStat[i] == STATUS_CAPTURING_EXT_TRIGGER) ||
-                (cam.fbStat[i] == STATUS_CAPTURING_MAN_TRIGGER))
+        if(cam.fbStat[i] == STATUS_CAPTURING_SINGLE)
         {
             /* Can only capture one picture at a time but we don't
              * know how 'long ago' the last capture was. */
             OscLog(WARN, 
-                    "%s(%d, %d):" \
+                    "%s(%d):" \
                     "Already capturing to different frame buffer (%d). "\
                     "This may not be possible on the target\n",
-                    __func__, fb, tMode, i);
+                    __func__, fb, i);
         }
     }
     
-    /* Distinguish the trigger modes */
-    switch(tMode)
-    {
-    case OSC_CAM_TRIGGER_MODE_EXTERNAL:
-        cam.fbStat[fb] = STATUS_CAPTURING_EXT_TRIGGER;
-        break;
-    case OSC_CAM_TRIGGER_MODE_MANUAL:
-        cam.fbStat[fb] = STATUS_CAPTURING_MAN_TRIGGER;
-        break;
-    default:
-        return -EINVALID_PARAMETER;
-    }
+    cam.fbStat[fb] = STATUS_CAPTURING_SINGLE;
      
     OscLog(DEBUG, 
             "%s: Setting up capture of %ux%d picture " \
@@ -618,8 +605,7 @@ OSC_ERR OscCamCancelCapture()
     int i;
     for(i = 0; i < MAX_NR_FRAME_BUFFERS; i++)
     {
-        if((cam.fbStat[i] == STATUS_CAPTURING_EXT_TRIGGER) ||
-                (cam.fbStat[i] == STATUS_CAPTURING_MAN_TRIGGER))
+        if((cam.fbStat[i] == STATUS_CAPTURING_SINGLE))
         {
             /* Assume worst case => corrupted */
             cam.fbStat[i] = STATUS_CORRUPTED;
@@ -675,8 +661,7 @@ OSC_ERR OscCamReadPicture(const uint8 fbID,
     
     *ppPic = NULL; /* Precaution */
 
-    if((cam.fbStat[fb] != STATUS_CAPTURING_EXT_TRIGGER) &&
-            (cam.fbStat[fb] != STATUS_CAPTURING_MAN_TRIGGER))
+    if(cam.fbStat[fb] != STATUS_CAPTURING_SINGLE)
     {
         /* There is no scheduled capture */
         OscLog(ERROR, "%s: No capture started on frame buffer %d!\n",
