@@ -18,8 +18,8 @@ TARGET_CC = bfin-uclinux-gcc
 TARGET_CFLAGS = $(TARGET_FEATURES) -Wall -pedantic -ggdb3 -I.. $(EXTRA_CFLAGS)
 
 # Source files of the logging module
-SOURCES_TARGET = gpio_target.c
-SOURCES_HOST = gpio_host.c 
+SOURCES_TARGET = gpio_target.c gpio_shared.c
+SOURCES_HOST = gpio_host.c gpio_shared.c
 
 
 all: target host

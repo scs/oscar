@@ -83,6 +83,8 @@ struct GPIO_PIN
 	struct GPIO_PIN_CONFIG 	*pDefConfig;	
 	/*! @brief The currently configured flags. */
 	int						flags;
+	/*! @brief Current state of the pin (on or off). */
+	bool					bState;
 };
 
 #ifdef TARGET_TYPE_LEANXCAM
@@ -98,15 +100,52 @@ struct GPIO_PIN
 		
 #endif /* TARGET_TYPE_INDXCAM */
 
+#ifdef OSC_HOST
+	/*! @brief True if pins reserved for internal use are to be logged
+	 * as well. */
+	#define OSC_GPIO_LOG_RESERVED_PINS FALSE
+	/*! @brief File where the output signals will be written to. */
+	#define OSC_GPIO_WRITER_FILE "gpio_out.txt"
+	/*! @brief File from where the input stimuli are read. */
+	#define OSC_GPIO_READER_FILE "gpio_in.txt"
+#endif /* OSC_HOST */
+
 /*! @brief The object struct of the GPIO module */
 struct OSC_GPIO
 {
 	/*! @brief File descriptors of all the pins used */
 	struct GPIO_PIN		pins[NR_OF_DSP_GPIOS];
-	
+#if defined(OSC_HOST) || OSC_SIM
+	/*! @brief Handle to stimuli writer. */
+	void 				*hWriter;
+	/*! @brief Handle to the stimuli reader. */
+	void				*hReader;
+	/*! @brief Writer handles to output signals. */
+	void				*phSignalOut[NR_OF_DSP_GPIOS];
+	/*! @brief Reader handles to input signals. */
+	void				*phSignalIn[NR_OF_DSP_GPIOS];
+#endif /* OSC_HOST or OSC_SIM */
 };
 
 /*======================= Private methods ==============================*/
+/*********************************************************************//*!
+ * @brief Open the file descriptors to the pins and set the correct modes.
+ * 
+ * All the pins listed in aryPinConfig are opened and configured in 
+ * accordance with the specified default flags.
+ * 
+ * @return SUCCESS or an appropriate error code otherwise
+ *//*********************************************************************/
+OSC_ERR OscGpioInitPins();
 
+#if defined(OSC_HOST) || defined(OSC_SIM)
+
+/*********************************************************************//*!
+ * @brief Callback from the stimuli reader to allow to query the updated
+ * signal values.
+ *//*********************************************************************/
+void OscGpioReaderCallback();
+
+#endif /* OSC_HOST or OSC_SIM */
 
 #endif /*GPIO_PRIV_H_*/

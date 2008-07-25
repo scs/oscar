@@ -18,6 +18,25 @@ MAKEFLAGS += -r
 # MAKEFILES += .config
 -include .config
 
+  # The names of the subfolders with the modules
+  MODULES = cam
+  MODULES += log
+  MODULES += cpld
+  MODULES += sim
+  MODULES += bmp
+  MODULES += swr
+  MODULES += srd
+  MODULES += ipc
+  MODULES += sup
+  MODULES += frd
+  MODULES += dspl
+  MODULES += dma
+  MODULES += hsm
+  MODULES += cfg
+  MODULES += clb
+  MODULES += vis
+  MODULES += gpio
+  
 # decide whether we are building or dooing something other like cleaning or configuring
 ifeq ($(filter $(MAKECMDGOALS), clean distclean config), )
   # check whether a .config file has been found
@@ -41,25 +60,6 @@ ifeq ($(filter $(MAKECMDGOALS), clean distclean config), )
   else
     $(error Neither INDXCAM nor LEANXCAM has been configured as target)
   endif
-  
-  # The names of the subfolders with the modules
-  MODULES = cam
-  MODULES += log
-  MODULES += cpld
-  MODULES += sim
-  MODULES += bmp
-  MODULES += swr
-  MODULES += srd
-  MODULES += ipc
-  MODULES += sup
-  MODULES += frd
-  MODULES += dspl
-  MODULES += dma
-  MODULES += hsm
-  MODULES += cfg
-  MODULES += clb
-  MODULES += vis
-  MODULES += gpio
   
   # This may need to be generalized by a board-to-feature-mapping table
   ifeq ($(CONFIG_BOARD), INDXCAM)

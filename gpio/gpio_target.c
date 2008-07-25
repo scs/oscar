@@ -19,107 +19,10 @@
 #include <errno.h>
 
 /*! @brief The module singelton instance. */
-struct OSC_GPIO gpio;       
-
-/*! @brief The dependencies of this module. */
-struct OSC_DEPENDENCY gpio_deps[] = {
-        {"log", OscLogCreate, OscLogDestroy}
-};
-		
-/*! @brief The length of the dependency array of this module. */
-#define DEP_LEN (sizeof(gpio_deps)/sizeof(struct OSC_DEPENDENCY))
-
-#ifdef TARGET_TYPE_LEANXCAM
-/*! @brief Array with the default config of all the pins used on the indXcam. 
- * All I/Os are configured to be high active at the actual plug. */
-struct GPIO_PIN_CONFIG aryPinConfig[] = {
-	/* {pinNr, defaultFlags, name, defaultState} */
-	{PIN_IN1_N, (DIR_INPUT | POL_LOWACTIVE | SEN_LEVEL | FUN_GPIO), "IN1", FALSE},
-	{PIN_IN2_N, (DIR_INPUT | POL_LOWACTIVE | SEN_LEVEL | FUN_GPIO), "IN2", FALSE},
-	{PIN_OUT1_N, (DIR_OUTPUT | POL_LOWACTIVE | SEN_LEVEL | FUN_GPIO), "OUT1", FALSE},
-	{PIN_OUT2_N, (DIR_OUTPUT | POL_LOWACTIVE | SEN_LEVEL | FUN_GPIO), "OUT2/DSP_LED_OUT", FALSE},
-	{PIN_EXPOSURE, (DIR_OUTPUT | POL_HIGHACTIVE | SEN_LEVEL | FUN_RESERVED), "EXPOSURE", FALSE},
-	{PIN_FN_EX_TRIGGER_N, (DIR_OUTPUT | POL_LOWACTIVE | SEN_LEVEL  | FUN_RESERVED), "FN_EX_TRIGGER", FALSE},
-	{PIN_TESTLED_R_N, (DIR_OUTPUT | POL_LOWACTIVE | SEN_LEVEL  | FUN_RESERVED), "TESTLED_RED", FALSE},
-	{PIN_TESTLED_G_N, (DIR_OUTPUT | POL_LOWACTIVE | SEN_LEVEL  | FUN_RESERVED), "TESTLED_GREEN", FALSE}
-};
-#endif /* TARGET_TYPE_INDXCAM */
-
-/*********************************************************************//*!
- * @brief Open the file descriptors to the pins and set the correct modes.
- * 
- * All the pins listed in aryPinConfig are opened and configured in accordance
- * with the specified default flags.
- * 
- * @return SUCCESS or an appropriate error code otherwise
- *//*********************************************************************/
-static OSC_ERR OscGpioInitPins();
-
-OSC_ERR OscGpioCreate(void *hFw)
-{
-    struct OSC_FRAMEWORK *pFw;
-    OSC_ERR err;
-
-    pFw = (struct OSC_FRAMEWORK *)hFw;
-    if(pFw->gpio.useCnt != 0)
-    {
-        pFw->gpio.useCnt++;
-        /* The module is already allocated */
-        return SUCCESS;
-    }
-    
-    /* Load the module dependencies of this module. */
-    err = OscLoadDependencies(pFw, 
-            gpio_deps, 
-            DEP_LEN);
-    
-    if(err != SUCCESS)
-    {
-        printf("%s: ERROR: Unable to load dependencies! (%d)\n",
-                __func__, 
-                err);
-        return err;
-    }
-    
-    memset(&gpio, 0, sizeof(struct OSC_GPIO));
-    
-    /* Setup our pins. */
-    err = OscGpioInitPins();
-    if(err != SUCCESS)
-    {
-    	OscLog(ERROR, "%s: Unable to intialize GPIO pins (%d)!\n",
-    				__func__, err);
-    	return -EDEVICE;
-    }
-    
-    /* Increment the use count */
-    pFw->gpio.hHandle = (void*)&gpio;
-    pFw->gpio.useCnt++; 
-    
-    return SUCCESS;
-}
-
-void OscGpioDestroy(void *hFw)
-{
-    struct OSC_FRAMEWORK *pFw;
-            
-    pFw = (struct OSC_FRAMEWORK *)hFw; 
-    /* Check if we really need to release or whether we still 
-     * have users. */
-    pFw->gpio.useCnt--;
-    if(pFw->gpio.useCnt > 0)
-    {
-        return;
-    }
-    
-    
-    OscUnloadDependencies(pFw, 
-            gpio_deps, 
-            DEP_LEN);
-    
-    memset(&gpio, 0, sizeof(struct OSC_GPIO));
-}
-
+extern struct OSC_GPIO gpio;       
+extern struct GPIO_PIN_CONFIG aryPinConfig[];
+extern const uint16 nrOfPins;
+                                           
 OSC_ERR OscGpioSetupPolarity(enum EnGpios enGpio, bool bLowActive)
 {
 	struct GPIO_PIN 	*pPin = &gpio.pins[enGpio];
@@ -222,55 +125,6 @@ OSC_ERR OscGpioRead(enum EnGpios enGpio, bool *pbState)
 	return SUCCESS;	
 }
 
-OSC_ERR OscGpioConfigImageTrigger(enum EnTriggerConfig enConfig)
-{
-	struct GPIO_PIN		*pPin = &gpio.pins[PIN_FN_EX_TRIGGER_N];
-	int 				ret;
-	
-	if(enConfig == TRIGGER_INTERNAL)
-	{
-		ret = write(pPin->fd, "0", sizeof("0"));
-	} else if(enConfig == TRIGGER_EXTERNAL_IN2){
-		ret = write(pPin->fd, "1", sizeof("1"));
-	} else {
-		OscLog(ERROR, "%s: Invalid trigger config for this hardware (%d)!\n",
-				__func__, enConfig);
-		return -EINVALID_PARAMETER;	
-	}
-	
-	if(unlikely(ret < 0))
-	{
-		OscLog(ERROR, "%s: Error writing to pin %s (%s)\n",
-				__func__, pPin->pDefConfig->name, strerror(errno));
-		return -EDEVICE;
-	}
-	
-	return SUCCESS;
-}
-
-OSC_ERR OscGpioConfigSensorLedOut(bool bSensorLedOut)
-{
-	struct GPIO_PIN		*pPin = &gpio.pins[GPIO_OUT2];
-	OSC_ERR				err = SUCCESS;
-	
-	if(bSensorLedOut)
-	{
-		/* Make sure to enable and invert the LED_OUT signal in the CMOS 
-		 * sensor for correct operation (OscGpioConfigSensorLedOut). */
-		/* OUT2 = ^(PIN_OUT2_N | SENSOR_LED_OUT)
-		 * => OUT2 = ^SENSOR_LED_OUT with PIN_OUT2_N = 0 */
-		err = OscGpioWrite(GPIO_OUT2, (pPin->flags & POL_LOWACTIVE));
-		/* Lock the pin from user access. */
-		pPin->flags |= FUN_RESERVED;
-	} else {
-		/* Make sure to disable the LED_OUT signal in the CMOS sensor
-		 *  for correct operation. (OscGpioConfigSensorLedOut) */
-		/* Clear the user lock access. */
-		pPin->flags &= ~FUN_RESERVED;
-	}
-	return err;
-}
-
 OSC_ERR OscGpioSetTestLed(bool bOn)
 {
 	int ret;
@@ -307,26 +161,33 @@ OSC_ERR OscGpioToggleTestLed()
 	return SUCCESS;
 }
 
-OSC_ERR OscGpioSetTestLedColor(uint8 red, uint8 green)
+OSC_ERR OscGpioTriggerImage()
 {
 	int ret;
-	struct GPIO_PIN		*pRed = &gpio.pins[PIN_TESTLED_R_N];
-	struct GPIO_PIN		*pGreen = &gpio.pins[PIN_TESTLED_G_N];
+	struct GPIO_PIN		*pPin = &gpio.pins[PIN_EXPOSURE];
 	
-	/* Color transitions currently not supported. */
-	ret = write(pRed->fd, (red ? "1" : "0"), 2);
-	ret |= write(pGreen->fd, (green ? "1" : "0"), 2);
-	
-	if(ret < 0)
+	/* Create a pulse on the Exposure pin of the image sensor. Sensor
+	 * is triggered by rising flank, so high flank should not have to
+	 * be too broad.*/
+	ret = write(pPin->fd, "1", 2); /* Rising flank */
+	if(unlikely(ret < 0))
 	{
-		OscLog(ERROR, "%s: Unable to set LED color (%s)\n",
-				__func__, strerror(errno));
-		return -EDEVICE;
+		goto exit_fail;
 	}
-	return SUCCESS;	
+	ret = write(pPin->fd, "0", 2); /* Falling flank */
+	if(unlikely(ret < 0))
+	{
+		goto exit_fail;
+	}
+	
+	return SUCCESS;
+exit_fail:
+	OscLog(ERROR, "%s: Unable to create trigger pulse (%s)\n",
+			__func__, strerror(errno));
+	return -EDEVICE;
 }
 
-static OSC_ERR OscGpioInitPins()
+OSC_ERR OscGpioInitPins()
 {
 	uint16 		pin;
 	int			pinNr;
@@ -334,7 +195,7 @@ static OSC_ERR OscGpioInitPins()
 	char		deviceNodePath[256];
 	struct GPIO_PIN_CONFIG* pPinConfig;
 	
-	for(pin = 0; pin < sizeof(aryPinConfig)/sizeof(aryPinConfig[0]); pin++)
+	for(pin = 0; pin < nrOfPins; pin++)
 	{
 		pPinConfig = &aryPinConfig[pin];
 		
@@ -419,3 +280,52 @@ static OSC_ERR OscGpioInitPins()
 	
 	return SUCCESS;
 }
+
+#ifdef TARGET_TYPE_LEANXCAM
+
+OSC_ERR OscGpioSetTestLedColor(uint8 red, uint8 green)
+{
+	int ret;
+	struct GPIO_PIN		*pRed = &gpio.pins[PIN_TESTLED_R_N];
+	struct GPIO_PIN		*pGreen = &gpio.pins[PIN_TESTLED_G_N];
+	
+	/* Color transitions currently not supported. */
+	ret = write(pRed->fd, (red ? "1" : "0"), 2);
+	ret |= write(pGreen->fd, (green ? "1" : "0"), 2);
+	
+	if(ret < 0)
+	{
+		OscLog(ERROR, "%s: Unable to set LED color (%s)\n",
+				__func__, strerror(errno));
+		return -EDEVICE;
+	}
+	return SUCCESS;	
+}
+
+OSC_ERR OscGpioConfigImageTrigger(enum EnTriggerConfig enConfig)
+{
+	struct GPIO_PIN		*pPin = &gpio.pins[PIN_FN_EX_TRIGGER_N];
+	int 				ret;
+	
+	if(enConfig == TRIGGER_INTERNAL)
+	{
+		ret = write(pPin->fd, "0", sizeof("0"));
+	} else if(enConfig == TRIGGER_EXTERNAL_IN2){
+		ret = write(pPin->fd, "1", sizeof("1"));
+	} else {
+		OscLog(ERROR, "%s: Invalid trigger config for this hardware (%d)!\n",
+				__func__, enConfig);
+		return -EINVALID_PARAMETER;	
+	}
+	
+	if(unlikely(ret < 0))
+	{
+		OscLog(ERROR, "%s: Error writing to pin %s (%s)\n",
+				__func__, pPin->pDefConfig->name, strerror(errno));
+		return -EDEVICE;
+	}
+	
+	return SUCCESS;
+}
+
+#endif /* TARGET_TYPE_LEANXCAM */

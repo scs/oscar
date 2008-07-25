@@ -103,6 +103,18 @@ OSC_ERR OscGpioSetTestLed(bool bOn);
  *//*********************************************************************/
 OSC_ERR OscGpioToggleTestLed();
 
+/*********************************************************************//*!
+ * @brief Trigger a new image with the internal trigger.
+ * 
+ * Both Gpio module and camera module must be configured to use
+ * the internal image trigger.
+ * @see OscGpioConfigImageTrigger
+ * @see OscCamConfigImageTrigger
+ * 
+ * @return SUCCESS or an appropriate error code.
+ *//*********************************************************************/
+OSC_ERR OscGpioTriggerImage();
+
 #ifdef TARGET_TYPE_LEANXCAM
 /*********************************************************************//*!
  * @brief Set the input for the image trigger of the camera sensor.

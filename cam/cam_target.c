@@ -231,17 +231,6 @@ OSC_ERR OscCamSetRegisterValue(const uint32 reg, const uint16 value)
 	
 	reg_info.addr = reg;
 	reg_info.value = value;
-	
-#ifdef TARGET_TYPE_LEANXCAM
-	/* On the leanXcam, the LED_OUT_CONTROL register must not be changed
-	 * manually, because it has an effect on the GPIO outputs. */
-	 if(unlikely(reg == CAM_REG_LED_OUT_CONTROL))
-	 {
-	 	OscLog(WARN, "%s: Not allowed to set register LED_OUT_CONTROL manually. "
-	 	"Use OscCamConfigSensorLedOut instead!\n", __func__);
-	 	return -EINVALID_PARAMETER;
-	 }
-#endif /* TARGET_TYPE_LEANXCAM */
 
 	/* Communicate the desired register value to the driver.
 	 * No input validation is done to retain flexibility */
