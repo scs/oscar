@@ -123,25 +123,4 @@ inline void* OscSupSramScratch()
     return sup.pScratch;
 }
 
-/*============================== LED =================================*/
-#ifdef TARGET_TYPE_INDXCAM
-OSC_ERR OscSupLedInit()
-{
-    return -SUCCESS;
-}
-#else /* TARGET_TYPE_INDXCAM */
-OSC_ERR OscSupLedInit()
-{
-    return -ENO_SUCH_DEVICE;
-}
-#endif /* TARGET_TYPE_INDXCAM */
-
-inline void OscSupLedWrite(char val)
-{
-}
-
-void OscSupLedClose()
-{
-}
-
 

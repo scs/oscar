@@ -362,33 +362,6 @@ inline void* OscSupSramScratch();
 }
 #endif /* OSC_HOST */
 
-/*------------------------------ LED ---------------------------------*/
-/*********************************************************************//*!
- * @brief Initialize the on-board LED of the Industrial OSC platform.
- * 
- * Target only. Industrial OSC only. 
- * 
- * @return SUCCESS or an appropriate error code.
- *//*********************************************************************/
-OSC_ERR OscSupLedInit();
-
-/*********************************************************************//*!
- * @brief Set the state of the LED.
- * 
- * Target only. Industrial OSC only. 
- * 
- * @param val   '1': on
- *              '0': off
- *              'T': toggle
- *//*********************************************************************/
-inline void OscSupLedWrite(char val);
-
-/*********************************************************************//*!
- * @brief Close the driver of the LED.
- * 
- * Target only. Industrial OSC only. 
- *//*********************************************************************/
-void OscSupLedClose();
 
 #endif /* SUP_PUB_H_ */
 

@@ -83,13 +83,6 @@ void OscSupDestroy(void *hFw)
     {
         OscSupWdtClose();
     }
-
-#ifdef TARGET_TYPE_INDXCAM    
-    if(sup.fdLed)
-    {
-        OscSupLedClose();
-    }
-#endif
     
     OscUnloadDependencies(pFw, 
             sup_deps, 
@@ -205,77 +198,3 @@ inline void* OscSupSramScratch()
 {
     return (void *)SRAM_SCRATCH;
 }
-
-/*============================== LED =================================*/
-#ifdef TARGET_TYPE_INDXCAM
-OSC_ERR OscSupLedInit()
-{
-    int     ret;
-    
-    if(sup.fdLed != 0)
-    {
-        OscLog(WARN, "%s: LED already open!\n", __func__);
-        return -EALREADY_INITIALIZED;
-    }
-    
-    sup.fdLed = open("/dev/pf27", O_RDWR, 0);
-    if(sup.fdLed < 0)
-    {
-        OscLog(ERROR, "%s: Unable to open device! (%s)\n",
-                __func__,
-                strerror(errno));
-        return -EDEVICE;
-    }
-    
-    /* Set to output and disable as input. */
-    ret = ioctl(sup.fdLed, SET_FIO_DIR, OUTPUT);
-    ret |= ioctl(sup.fdLed, SET_FIO_INEN, INPUT_DISABLE);
-    if(ret != 0)
-    {
-        OscLog(ERROR, "%s: Unable to set output direction!\n", __func__);
-        close(sup.fdLed);
-        return -EDEVICE;
-    }
-    
-    return SUCCESS;
-}
-
-inline void OscSupLedWrite(char val)
-{
-    /* LED is low-active, so we need to switch polarity. */
-    if(val == '0')
-    {
-        write(sup.fdLed, "1", sizeof("1"));
-    } 
-    else if(val == '1')
-    {
-        write(sup.fdLed, "0", sizeof("0"));
-    } else {
-        write(sup.fdLed, "T", sizeof("T"));
-    }
-}
-
-void OscSupLedClose()
-{
-    if(sup.fdLed != 0)
-    {
-        close(sup.fdLed);
-    }
-}
-
-#else /* TARGET_TYPE_INDXCAM */
-
-OSC_ERR OscSupLedInit()
-{
-    return -ENO_SUCH_DEVICE;
-}
-
-inline void OscSupLedWrite(char val)
-{
-}
-
-void OscSupLedClose()
-{
-}
-
-#endif /* TARGET_TYPE_INDXCAM */

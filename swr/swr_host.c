@@ -75,6 +75,7 @@ void OscSwrDestroy(void *hFw)
     /* close all files */
     for( wrId = 0; wrId<swr.nrOfWriters; wrId++)
     {
+    	fflush(swr.wr[ wrId].pFile);
         fclose( swr.wr[ wrId].pFile);
         OscLog(INFO, "Close %s\n", &swr.wr[ wrId].strFile);
     }
