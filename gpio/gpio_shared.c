@@ -1,5 +1,5 @@
-/*! @file gpio_target.c
- * @brief GPIO module implementation for host 
+/*! @file gpio_shared.c
+ * @brief GPIO module code shared between host and target.
  * 
  */
 #ifdef OSC_HOST

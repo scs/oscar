@@ -1,4 +1,4 @@
-/*! @file gpio_target.c
+/*! @file gpio_host.c
  * @brief GPIO module implementation for host 
  * 
  */
