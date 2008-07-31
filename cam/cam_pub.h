@@ -398,7 +398,8 @@ OSC_ERR OscCamPresetRegs();
  * 
  * Only on hardware with color sensor.
  * 
- * @param Returned identifier desribing the pixel color order.
+ * @param pBayerOrderFirstRow Returned identifier desribing the pixel color 
+ * order.
  * @param xPos X-Position of the row.
  * @param yPos Y-Position of the row.
  * @return SUCCESS or an appropriate error code.
