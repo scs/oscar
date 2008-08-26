@@ -351,8 +351,8 @@ OSC_ERR OscCamGetBayerOrder(enum EnBayerOrder *pBayerOrderFirstRow,
 	
 	/* The Adaptina mt9v032 sensor will automatically adjust for column and
 	 * row mirroring by means of a dummy column and read, i.e. the color order
-	 * will always be RGRG by default.*/
-	bFirstRowIsRed = TRUE;
+	 * will always be BGBG by default.*/
+	bFirstRowIsRed = FALSE;
 	bFirstPixIsGreen = FALSE;
 
 	

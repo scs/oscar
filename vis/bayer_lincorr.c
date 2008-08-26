@@ -28,13 +28,13 @@
 #define BYTES_PER_PIX 3
 /*! @brief Offset of red color pixels in output array (sequence of R G
  * and B pixels in memory. */
-#define RED_OFF 0
+#define RED_OFF 2
 /*! @brief Offset of green color pixels in output array (sequence of R G
  * and B pixels in memory. */
 #define GREEN_OFF 1
 /*! @brief Offset of blue color pixels in output array (sequence of R G
  * and B pixels in memory. */
-#define BLUE_OFF 2
+#define BLUE_OFF 0
 
 /*#define BENCHMARK*/
 #ifdef BENCHMARK

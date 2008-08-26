@@ -35,7 +35,7 @@ void OscVisDestroy(void *hFw);
 
 /*********************************************************************//*!
  * @brief Convert a raw image captured by a camera sensor with bayer
- * filter to an RGB output image.
+ * filter to an BGR output image.
  * 
  * Debayering calculates the missing color values by interpolating 
  * between neighboring pixels. In this case, linear interpolation with

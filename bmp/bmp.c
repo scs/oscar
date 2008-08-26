@@ -171,7 +171,7 @@ OSC_ERR OscBmpRead(struct OSC_PICTURE *pPic, const char *strFileName)
     pPic->height = (uint32)height;
     if(colorDepth == 24)
     {
-        pPic->type = OSC_PICTURE_RGB_24;
+        pPic->type = OSC_PICTURE_BGR_24;
     } else { /* colorDepth == 8 */
         pPic->type = OSC_PICTURE_GREYSCALE;
     }
@@ -218,7 +218,7 @@ OSC_ERR OscBmpWrite(const struct OSC_PICTURE *pPic,
                 __func__, pPic, strFileName);
         return -EINVALID_PARAMETER;
     }
-    if(pPic->type == OSC_PICTURE_RGB_24)
+    if(pPic->type == OSC_PICTURE_BGR_24)
     {   
         aryBmpHead = aryBmpHeadRGB;
         bmpHeadSize = sizeof(aryBmpHeadRGB);
@@ -345,7 +345,7 @@ static OSC_ERR OscBmpReverseRowOrder(struct OSC_PICTURE *pPic)
     uint32      curFIndex, curBIndex;
     uint8       *pData = (uint8*)pPic->data;
     
-    if(pPic->type == OSC_PICTURE_RGB_24)
+    if(pPic->type == OSC_PICTURE_BGR_24)
     {
         bytesPerPixel = 3;
     } else if(pPic->type == OSC_PICTURE_GREYSCALE) {

@@ -17,7 +17,7 @@
 /*! @brief Represents the color depth of a picture */
 enum EnOscPictureType {
     OSC_PICTURE_GREYSCALE,
-    OSC_PICTURE_RGB_24
+    OSC_PICTURE_BGR_24
 };
 
 /*! @brief Macro extracting the color depth from the EnOscPictureType 
@@ -25,7 +25,7 @@ enum EnOscPictureType {
  * @return The color depth of the specified type.*/
 #define OSC_PICTURE_TYPE_COLOR_DEPTH(enType)          \
     (                                               \
-            (enType == OSC_PICTURE_RGB_24) ? 24 : 8   \
+            (enType == OSC_PICTURE_BGR_24) ? 24 : 8   \
     )                                         
         
 /*! @brief Structure representing an 8-bit picture */
@@ -78,10 +78,14 @@ void OscBmpDestroy(void *hFw);
  * image format must also be specified to avoid overflow.
  * If the picture in the file has the row order reversed, this is 
  * corrected. The returned row order is top to bottom.
+ * 
+ * The data in a RGB color BMP is stored with the pixel order BGR, so
+ * that is the format in which the data is returned.
+ * 
  * @see OscBmpReverseRowOrder
  * 
  * @param pPic Pointer to an uninitialized or fully initialized OSC 
- * picture.
+ * picture (Pixel order BGR).
  * @param strFileName The file name of the picture to read.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
@@ -93,8 +97,9 @@ OSC_ERR OscBmpRead(struct OSC_PICTURE *pPic, const char *strFileName);
  * Open the specified .bmp file and initialize the header. Only 
  * 24 bit color depth and 8 bit greyscale with no compression or 
  * color tables are supported.
- * Pictures are expected in the top to bottom row order. The supplied
- * OSC_PICTURE remains unchanged and no memory is freed.
+ * Pictures are expected in the top to bottom row order and with the
+ * color order BGR. The supplied OSC_PICTURE remains unchanged and no
+ * memory is freed.
  * 
  * @param pPic Pointer to a fully initialized OSC picture.
  * @param strFileName The file name of the picture to write.
