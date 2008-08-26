@@ -523,8 +523,12 @@ OSC_ERR OscCamReadPicture(const uint8 fbID,
 		            __func__, fb, ppPic, maxAge, timeout);
 			return -EINVALID_PARAMETER;
 			break;
-		case EAGAIN: /* Timeout */
 		case EINTR: /* Interrupt */
+		  OscLog(WARN, "%s: Sync on frame buffer %d got interrupted!\n",
+			 __func__, fb);
+		  return -EINTERRUPTED;
+		  break;
+		case EAGAIN: /* Timeout */
 			OscLog(DEBUG, "%s: Sync on frame buffer %d timed out.\n", 
 			        __func__, fb);
 			return -ETIMEOUT;

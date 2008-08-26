@@ -219,6 +219,11 @@ OSC_ERR OscGpioTriggerImage()
 	int ret;
 	struct GPIO_PIN		*pPin = &gpio.pins[PIN_EXPOSURE];
 	
+	if(gpio.enTriggerConfig != TRIGGER_INTERNAL)
+	  {
+	    /* Don't allow internal triggering if external triggering is configured. */
+	    return -EDEVICE_BUSY;
+	  }
 	/* Create a pulse on the Exposure pin of the image sensor. Sensor
 	 * is triggered by rising flank, so high flank should not have to
 	 * be too broad.*/
@@ -379,6 +384,7 @@ OSC_ERR OscGpioConfigImageTrigger(enum EnTriggerConfig enConfig)
 		return -EDEVICE;
 	}
 	
+	gpio.enTriggerConfig = enConfig;
 	return SUCCESS;
 }
 

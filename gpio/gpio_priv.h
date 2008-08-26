@@ -121,6 +121,10 @@ struct OSC_GPIO
 {
 	/*! @brief File descriptors of all the pins used */
 	struct GPIO_PIN		pins[NR_OF_DSP_GPIOS];
+#ifdef TARGET_TYPE_LEANXCAM
+  /*! @brief Whether external or internal triggering is currently configured. */
+  enum EnTriggerConfig  enTriggerConfig;
+#endif /* TARGET_TYPE_LEANXCAM */
 #if defined(OSC_HOST) || OSC_SIM
 	/*! @brief Handle to stimuli writer. */
 	void 				*hWriter;

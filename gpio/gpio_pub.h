@@ -119,7 +119,6 @@ OSC_ERR OscGpioToggleTestLed();
  *//*********************************************************************/
 OSC_ERR OscGpioTriggerImage();
 
-#ifdef TARGET_TYPE_LEANXCAM
 /*********************************************************************//*!
  * @brief Set the input for the image trigger of the camera sensor.
  * 
@@ -172,7 +171,6 @@ OSC_ERR OscGpioConfigSensorLedOut(bool bSensorLedOut);
  *//*********************************************************************/
 OSC_ERR OscGpioSetTestLedColor(uint8 red, uint8 green);
 
-#endif /* TARGET_TYPE_LEANXCAM */
 
 #endif /* GPIO_PUB_H_ */
 
