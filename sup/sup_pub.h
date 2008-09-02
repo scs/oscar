@@ -45,7 +45,7 @@ void OscSupDestroy(void *hFw);
  * the application using the framework, or it can not be disabled.
  * 
  * Host: Since there is usually no watchdog support on regular PCs,
- * the functions are implemented for compability but they do not exert
+ * the functions are implemented for compatibility but they do not exert
  * any function.
  * 
  * Target: For the watchdog commands to work, the watchdog char driver 
