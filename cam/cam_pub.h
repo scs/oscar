@@ -408,7 +408,6 @@ OSC_ERR OscCamGetBayerOrder(enum EnBayerOrder *pBayerOrderFirstRow,
 							const uint16 xPos,
 							const uint16 yPos);
 							
-#ifdef TARGET_TYPE_LEANXCAM
 
 /*********************************************************************//*!
  * @brief Configure whether the LED_OUT pin from the image sensor is routed
@@ -434,6 +433,5 @@ OSC_ERR OscCamGetBayerOrder(enum EnBayerOrder *pBayerOrderFirstRow,
  *//*********************************************************************/
 OSC_ERR OscCamConfigSensorLedOut(bool bSensorLedOut, bool bInvert);
 
-#endif /* TARGET_TYPE_LEANXCAM */
 
 #endif /*CAM_PUB_H_*/

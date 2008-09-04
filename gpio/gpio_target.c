@@ -57,6 +57,7 @@ OSC_ERR OscGpioSetupPolarity(enum EnGpios enGpio, bool bLowActive)
 OSC_ERR OscGpioWrite(enum EnGpios enGpio, bool bState)
 {
 	struct GPIO_PIN 	*pPin = &gpio.pins[enGpio];
+	bool				bPolarity;
 	int 				ret;
 	
 	if(unlikely(!pPin->fd))
@@ -83,8 +84,9 @@ OSC_ERR OscGpioWrite(enum EnGpios enGpio, bool bState)
 		return -EDEVICE_BUSY;
 	}
 	
-	/* Write to the driver. */
-	if(bState)
+	/* Write to the driver. XOR with the pin polarity to get the correct value to write.*/
+	bPolarity = ((pPin->flags & POL_LOWACTIVE) == TRUE);
+	if(bState ^ bPolarity)
 	{
 		ret = write(pPin->fd, "1", sizeof("1"));
 	} else {
@@ -103,6 +105,7 @@ OSC_ERR OscGpioWrite(enum EnGpios enGpio, bool bState)
 OSC_ERR OscGpioRead(enum EnGpios enGpio, bool *pbState)
 {
 	struct GPIO_PIN 	*pPin = &gpio.pins[enGpio];
+	bool				bPolarity;
 	char				buf[2];
 	int 				ret;
 	
@@ -132,11 +135,13 @@ OSC_ERR OscGpioRead(enum EnGpios enGpio, bool *pbState)
 		return -EDEVICE;
 	}
 	
+	/* Get the current pin polarity and calculate the resulting value*/
+	bPolarity = ((pPin->flags & POL_LOWACTIVE) == TRUE);
 	if(buf[0])
 	{
-		*pbState = TRUE;
+		*pbState = !bPolarity;
 	} else {
-		*pbState = FALSE;
+		*pbState = bPolarity;
 	}		
 
 	return SUCCESS;	
@@ -182,9 +187,13 @@ OSC_ERR OscGpioSetTestLed(bool bOn)
 	int ret;
 	struct GPIO_PIN		*pRed = &gpio.pins[PIN_TESTLED_R_N];
 	struct GPIO_PIN		*pGreen = &gpio.pins[PIN_TESTLED_G_N];
+	bool bRedPolarity, bGreenPolarity;
 	
-	ret = write(pRed->fd, (bOn ? "1" : "0"), 2);
-	ret |= write(pGreen->fd, (bOn ? "1" : "0"), 2);
+	bRedPolarity = ((pRed->flags & POL_LOWACTIVE) == TRUE);
+	bGreenPolarity = ((pGreen->flags & POL_LOWACTIVE) == TRUE);
+	
+	ret = write(pRed->fd, ((bOn ^ bRedPolarity) ? "1" : "0"), 2);
+	ret |= write(pGreen->fd, ((bOn ^ bGreenPolarity) ? "1" : "0"), 2);
 	
 	if(ret < 0)
 	{
@@ -217,6 +226,7 @@ OSC_ERR OscGpioToggleTestLed()
 OSC_ERR OscGpioTriggerImage()
 {
 	int ret;
+	uint32 cyc;
 	struct GPIO_PIN		*pPin = &gpio.pins[PIN_EXPOSURE];
 	
 	if(gpio.enTriggerConfig != TRIGGER_INTERNAL)
@@ -225,13 +235,22 @@ OSC_ERR OscGpioTriggerImage()
 	    return -EDEVICE_BUSY;
 	  }
 	/* Create a pulse on the Exposure pin of the image sensor. Sensor
-	 * is triggered by rising flank, so high flank should not have to
+	 * is triggered by rising flank, so high time should not have to
 	 * be too broad.*/
 	ret = write(pPin->fd, "1", 2); /* Rising flank */
 	if(unlikely(ret < 0))
 	{
 		goto exit_fail;
 	}
+
+	/* There needs to be a certain minimum high time. Pass it by busy looping
+	 because we want this call to only take a deterministically long time.*/
+	cyc = OscSupCycGet();
+
+	while(OscSupCycGet() - cyc < TRIGGER_IMAGE_HIGH_TIME_CYCLES)
+	  {
+	    asm("nop;");
+	  }
 
 	ret = write(pPin->fd, "0", 2); /* Falling flank */
 	if(unlikely(ret < 0))
@@ -290,10 +309,11 @@ OSC_ERR OscGpioInitPins()
 	    			SET_FIO_INEN,
 	    			!((pPinConfig->defaultFlags & DIR_MASK) && INPUT_ENABLE));
 	    			
-	    /* Polarity */
-	    ret |= ioctl(gpio.pins[pinNr].fd, 
+	    /* Polarity does not work in the pflags driver, thus we do it manually. */
+	    /*ret |= ioctl(gpio.pins[pinNr].fd, 
 	    			SET_FIO_POLAR,
 	    			((pPinConfig->defaultFlags & POL_MASK) && ACTIVELOW_FALLINGEDGE));
+	    			*/
 	    			
 	    /* Edge sensitivity */
 	    ret |= ioctl(gpio.pins[pinNr].fd, 
@@ -347,10 +367,14 @@ OSC_ERR OscGpioSetTestLedColor(uint8 red, uint8 green)
 	int ret;
 	struct GPIO_PIN		*pRed = &gpio.pins[PIN_TESTLED_R_N];
 	struct GPIO_PIN		*pGreen = &gpio.pins[PIN_TESTLED_G_N];
+	bool bRedPolarity, bGreenPolarity;
+	
+	bRedPolarity = ((pRed->flags & POL_LOWACTIVE) == TRUE);
+	bGreenPolarity = ((pGreen->flags & POL_LOWACTIVE) == TRUE);
 	
 	/* Color transitions currently not supported. */
-	ret = write(pRed->fd, (red ? "1" : "0"), 2);
-	ret |= write(pGreen->fd, (green ? "1" : "0"), 2);
+	ret = write(pRed->fd, ((red ^ bRedPolarity) ? "1" : "0"), 2);
+	ret |= write(pGreen->fd, ((green ^ bGreenPolarity) ? "1" : "0"), 2);
 	
 	if(ret < 0)
 	{
