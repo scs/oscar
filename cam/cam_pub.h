@@ -347,7 +347,7 @@ OSC_ERR OscCamReadLatestPicture(uint8 ** ppPic);
  * @param pCallback Pointer to the function to be called.
  * @return SUCCESS or an appropriate error code.
  *//*********************************************************************/
-OSC_ERR OscCamRegisterCorretionCallback( 
+OSC_ERR OscCamRegisterCorrectionCallback( 
         int (*pCallback)(
                 uint8 *pImg, 
                 const uint16 lowX, 
