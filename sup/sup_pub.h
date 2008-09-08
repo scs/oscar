@@ -1,5 +1,5 @@
 /*! @file sup_pub.h
- * @brief Private support module definition
+ * @brief API definition for support module.
  * 
  * Contains stuff that is too small to be put in a separate module.
  * 
