@@ -765,7 +765,7 @@ OSC_ERR OscCamReadLatestPicture(uint8 ** ppPic)
     return SUCCESS;
 }
 
-OSC_ERR OscCamRegisterCorretionCallback( 
+OSC_ERR OscCamRegisterCorrectionCallback( 
         int (*pCallback)(
                 uint8 *pImg, 
                 const uint16 lowX, 
