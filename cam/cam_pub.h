@@ -428,7 +428,8 @@ OSC_ERR OscCamGetBayerOrder(enum EnBayerOrder *pBayerOrderFirstRow,
  * 
  * @param bSensorLedOut If TRUE, the sensor LED out is routed to OUT2 and
  * it cannot be used as GPIO anymore.
- * @param bInvert Invert the output of LED_OUT.
+ * @param bInvert Invert the output of LED_OUT. Non-inverting means that 
+ * there is a rising-flank pulse at the plug.
  * @return SUCCESS or an appropriate error code.
  *//*********************************************************************/
 OSC_ERR OscCamConfigSensorLedOut(bool bSensorLedOut, bool bInvert);

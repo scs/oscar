@@ -9,6 +9,7 @@
 #include "oscar_intern.h"
 #include "cam_pub.h"
 #include "cam_priv.h"
+#include <unistd.h>
 
 extern struct OSC_CAM cam; 
 
@@ -263,12 +264,17 @@ OSC_ERR PerspectiveCfgStr2Enum(const char *str, enum EnOscCamPerspective *per )
 OSC_ERR OscCamPresetRegs()
 {    
     OSC_ERR err;
+    
     /* Reset frame capture and AGC/Exposure logic.
      * Registers are _not_ set to default as done on power cycle.  */
     err = OscCamSetRegisterValue( CAM_REG_RESET, 3);
     
+    /* we need a short sleep here, otherwise the sensor might behave funny afterwards. */
+    usleep(100);
+    
     /* Snapshot mode; simultaneous readout */
     err |= OscCamSetRegisterValue( CAM_REG_CHIP_CONTROL, 0x398);
+    
     
     /* Define color type and operation mode */
     #ifdef TARGET_TYPE_INDXCAM  
@@ -322,6 +328,7 @@ OSC_ERR OscCamPresetRegs()
                 __func__, err);
     }
         
+                    
     /* Set default camera - scene perspective relation */
     err = OscCamSetupPerspective(OSC_CAM_PERSPECTIVE_DEFAULT);
     if(err != SUCCESS)

@@ -57,7 +57,7 @@ OSC_ERR OscGpioSetupPolarity(enum EnGpios enGpio, bool bLowActive)
 OSC_ERR OscGpioWrite(enum EnGpios enGpio, bool bState)
 {
 	struct GPIO_PIN 	*pPin = &gpio.pins[enGpio];
-	bool				bPolarity;
+	bool				bLowPolarity;
 	int 				ret;
 	
 	if(unlikely(!pPin->fd))
@@ -85,8 +85,8 @@ OSC_ERR OscGpioWrite(enum EnGpios enGpio, bool bState)
 	}
 	
 	/* Write to the driver. XOR with the pin polarity to get the correct value to write.*/
-	bPolarity = ((pPin->flags & POL_LOWACTIVE) == TRUE);
-	if(bState ^ bPolarity)
+	bLowPolarity = ((pPin->flags & POL_LOWACTIVE) != 0);
+	if(bState ^ bLowPolarity)
 	{
 		ret = write(pPin->fd, "1", sizeof("1"));
 	} else {
@@ -105,7 +105,7 @@ OSC_ERR OscGpioWrite(enum EnGpios enGpio, bool bState)
 OSC_ERR OscGpioRead(enum EnGpios enGpio, bool *pbState)
 {
 	struct GPIO_PIN 	*pPin = &gpio.pins[enGpio];
-	bool				bPolarity;
+	bool				bLowPolarity;
 	char				buf[2];
 	int 				ret;
 	
@@ -136,12 +136,12 @@ OSC_ERR OscGpioRead(enum EnGpios enGpio, bool *pbState)
 	}
 	
 	/* Get the current pin polarity and calculate the resulting value*/
-	bPolarity = ((pPin->flags & POL_LOWACTIVE) == TRUE);
-	if(buf[0])
+	bLowPolarity = ((pPin->flags & POL_LOWACTIVE) != 0);
+	if(buf[0] != '0')
 	{
-		*pbState = !bPolarity;
+		*pbState = !bLowPolarity;
 	} else {
-		*pbState = bPolarity;
+		*pbState = bLowPolarity;
 	}		
 
 	return SUCCESS;	
@@ -189,8 +189,8 @@ OSC_ERR OscGpioSetTestLed(bool bOn)
 	struct GPIO_PIN		*pGreen = &gpio.pins[PIN_TESTLED_G_N];
 	bool bRedPolarity, bGreenPolarity;
 	
-	bRedPolarity = ((pRed->flags & POL_LOWACTIVE) == TRUE);
-	bGreenPolarity = ((pGreen->flags & POL_LOWACTIVE) == TRUE);
+	bRedPolarity = ((pRed->flags & POL_LOWACTIVE) != 0);
+	bGreenPolarity = ((pGreen->flags & POL_LOWACTIVE) != 0);
 	
 	ret = write(pRed->fd, ((bOn ^ bRedPolarity) ? "1" : "0"), 2);
 	ret |= write(pGreen->fd, ((bOn ^ bGreenPolarity) ? "1" : "0"), 2);
@@ -226,7 +226,6 @@ OSC_ERR OscGpioToggleTestLed()
 OSC_ERR OscGpioTriggerImage()
 {
 	int ret;
-	uint32 cyc;
 	struct GPIO_PIN		*pPin = &gpio.pins[PIN_EXPOSURE];
 	
 	if(gpio.enTriggerConfig != TRIGGER_INTERNAL)
@@ -237,26 +236,36 @@ OSC_ERR OscGpioTriggerImage()
 	/* Create a pulse on the Exposure pin of the image sensor. Sensor
 	 * is triggered by rising flank, so high time should not have to
 	 * be too broad.*/
-	ret = write(pPin->fd, "1", 2); /* Rising flank */
+	if((pPin->flags & POL_LOWACTIVE) != 0)
+	{
+		/* Lowactive */
+		ret = write(pPin->fd, "0", 2); /* Rising flank */
+	} else {
+		ret = write(pPin->fd, "1", 2); /* Rising flank */
+	}
 	if(unlikely(ret < 0))
 	{
 		goto exit_fail;
 	}
 
-	/* There needs to be a certain minimum high time. Pass it by busy looping
-	 because we want this call to only take a deterministically long time.*/
-	cyc = OscSupCycGet();
+	/* Wait until the pin has been set. */
+	asm("ssync;\n");
 
-	while(OscSupCycGet() - cyc < TRIGGER_IMAGE_HIGH_TIME_CYCLES)
-	  {
-	    asm("nop;");
-	  }
-
-	ret = write(pPin->fd, "0", 2); /* Falling flank */
+	if((pPin->flags & POL_LOWACTIVE) != 0)
+	{
+		/* Lowactive */
+		ret = write(pPin->fd, "1", 2); /* Falling flank */
+	} else {
+		ret = write(pPin->fd, "0", 2); /* Falling flank */
+	}
+	
 	if(unlikely(ret < 0))
 	{
 		goto exit_fail;
 	}
+	
+	/* Wait until the pin has been set. */
+	asm("ssync;\n");
 	
 	return SUCCESS;
 exit_fail:
@@ -339,9 +348,19 @@ OSC_ERR OscGpioInitPins()
     		/* Output pin */
     		if(pPinConfig->defaultState)
     		{
-    			ret = write(gpio.pins[pinNr].fd, "1", sizeof("1"));
+    			if(pPinConfig->defaultFlags & POL_LOWACTIVE)
+    			{
+    				ret = write(gpio.pins[pinNr].fd, "0", sizeof("0"));
+    			} else {
+    				ret = write(gpio.pins[pinNr].fd, "1", sizeof("1"));
+    			}
     		} else {
-    			ret = write(gpio.pins[pinNr].fd, "0", sizeof("0"));
+    			if(pPinConfig->defaultFlags & POL_LOWACTIVE)
+    			{
+    				ret = write(gpio.pins[pinNr].fd, "1", sizeof("1"));
+    			} else {
+    				ret = write(gpio.pins[pinNr].fd, "0", sizeof("0"));
+    			}
     		}
     		if(unlikely(ret < 0))
 			{
@@ -369,8 +388,8 @@ OSC_ERR OscGpioSetTestLedColor(uint8 red, uint8 green)
 	struct GPIO_PIN		*pGreen = &gpio.pins[PIN_TESTLED_G_N];
 	bool bRedPolarity, bGreenPolarity;
 	
-	bRedPolarity = ((pRed->flags & POL_LOWACTIVE) == TRUE);
-	bGreenPolarity = ((pGreen->flags & POL_LOWACTIVE) == TRUE);
+	bRedPolarity = ((pRed->flags & POL_LOWACTIVE) != 0);
+	bGreenPolarity = ((pGreen->flags & POL_LOWACTIVE) != 0);
 	
 	/* Color transitions currently not supported. */
 	ret = write(pRed->fd, ((red ^ bRedPolarity) ? "1" : "0"), 2);
@@ -392,9 +411,12 @@ OSC_ERR OscGpioConfigImageTrigger(enum EnTriggerConfig enConfig)
 	
 	if(enConfig == TRIGGER_INTERNAL)
 	{
-		ret = write(pPin->fd, "0", sizeof("0"));
-	} else if(enConfig == TRIGGER_EXTERNAL_IN2){
+		/* Pin is lowactive. */
 		ret = write(pPin->fd, "1", sizeof("1"));
+	} else if(enConfig == TRIGGER_EXTERNAL_IN2)
+	{
+		/* Pin is lowactive. */
+		ret = write(pPin->fd, "0", sizeof("0"));
 	} else {
 		OscLog(ERROR, "%s: Invalid trigger config for this hardware (%d)!\n",
 				__func__, enConfig);

@@ -44,10 +44,10 @@ struct GPIO_PIN_CONFIG aryPinConfig[] = {
 	{PIN_IN2_N, (DIR_INPUT | POL_LOWACTIVE | SEN_LEVEL | FUN_GPIO), "IN2", FALSE},
 	{PIN_OUT1_N, (DIR_OUTPUT | POL_LOWACTIVE | SEN_LEVEL | FUN_GPIO), "OUT1", FALSE},
 	{PIN_OUT2_N, (DIR_OUTPUT | POL_LOWACTIVE | SEN_LEVEL | FUN_GPIO), "OUT2/DSP_LED_OUT", FALSE},
-	{PIN_EXPOSURE, (DIR_OUTPUT | POL_HIGHACTIVE | SEN_LEVEL | FUN_RESERVED), "EXPOSURE", FALSE},
 	{PIN_FN_EX_TRIGGER_N, (DIR_OUTPUT | POL_LOWACTIVE | SEN_LEVEL  | FUN_RESERVED), "FN_EX_TRIGGER", FALSE},
 	{PIN_TESTLED_R_N, (DIR_OUTPUT | POL_LOWACTIVE | SEN_LEVEL  | FUN_RESERVED), "TESTLED_RED", FALSE},
-	{PIN_TESTLED_G_N, (DIR_OUTPUT | POL_LOWACTIVE | SEN_LEVEL  | FUN_RESERVED), "TESTLED_GREEN", FALSE}
+	{PIN_TESTLED_G_N, (DIR_OUTPUT | POL_LOWACTIVE | SEN_LEVEL  | FUN_RESERVED), "TESTLED_GREEN", FALSE},
+	{PIN_EXPOSURE, (DIR_OUTPUT | POL_HIGHACTIVE | SEN_LEVEL | FUN_RESERVED), "EXPOSURE", FALSE}
 };
 #endif /* TARGET_TYPE_LEANXCAM */
 
@@ -138,16 +138,16 @@ OSC_ERR OscGpioConfigSensorLedOut(bool bSensorLedOut)
 	
 	if(bSensorLedOut)
 	{
-		/* Make sure to enable and invert the LED_OUT signal in the CMOS 
-		 * sensor for correct operation (OscGpioConfigSensorLedOut). */
-		/* OUT2 = ^(PIN_OUT2_N | SENSOR_LED_OUT)
-		 * => OUT2 = ^SENSOR_LED_OUT with PIN_OUT2_N = 0 */
-		err = OscGpioWrite(GPIO_OUT2, (pPin->flags & POL_LOWACTIVE));
+		/* Make sure to enable the LED_OUT signal in the CMOS 
+		 * sensor for correct operation (OscCamConfigSensorLedOut(TRUE, <Polarity>)). */
+		/* OUT2 = !(PIN_OUT2_N | SENSOR_LED_OUT)
+		 * => OUT2 = !SENSOR_LED_OUT with PIN_OUT2_N = 0 (before polarity inversion)*/
+		err = OscGpioWrite(GPIO_OUT2, ((pPin->flags & POL_LOWACTIVE) != 0));
 		/* Lock the pin from user access. */
 		pPin->flags |= FUN_RESERVED;
 	} else {
 		/* Make sure to disable the LED_OUT signal in the CMOS sensor
-		 *  for correct operation. (OscGpioConfigSensorLedOut) */
+		 *  for correct operation. (OscCamConfigSensorLedOut) */
 		/* Clear the user lock access. */
 		pPin->flags &= ~FUN_RESERVED;
 	}

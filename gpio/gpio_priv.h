@@ -23,9 +23,7 @@
 /*! @brief The path to the device nodes of the driver (pflags) for the GPIO
  * pins. The whole patch is built by suffixing with the pin number. */
 #define PIN_DEVICE_NODE_PREFIX "/dev/pf"
-/*! @brief The length of the high time of the image trigger pulse in dummy
- *  CPU cycles. 50 ~= 100 ns */
-#define TRIGGER_IMAGE_HIGH_TIME_CYCLES 500000
+
 
 /*************************** GPIO flags *********************/
 

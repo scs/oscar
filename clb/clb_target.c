@@ -57,7 +57,7 @@ OSC_ERR OscClbCreate(void *hFw)
     }  
 	
     /* Load the module clb_deps of this module. */
-    err = OSCLoadDependencies(pFw, 
+    err = OscLoadDependencies(pFw, 
             clb_deps, 
             sizeof(clb_deps)/sizeof(struct OSC_DEPENDENCY));
     if(err != SUCCESS)
@@ -125,7 +125,7 @@ void OscClbDestroy(void *hFw)
         return;
     }
   
-    OSCUnloadDependencies(pFw, 
+    OscUnloadDependencies(pFw, 
             clb_deps, 
             sizeof(clb_deps)/sizeof(struct OSC_DEPENDENCY));
     
