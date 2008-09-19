@@ -119,65 +119,84 @@ inline uint32 OscSupCycToMicroSecs(uint32 cycles);
 /*------------------------------ SRAM ----------------------------------*/
 
 /*********************************************************************//*!
- * @brief Query the length of the available L1 SRAM in Block A
+ * @brief Allocate a chunk of L1 Data SRAM from block A
  * 
- * @see OscSupSramL1A
+ * Memory is allocated continuously and the call fails if no continuous 
+ * chunk of the specified length can be found. Redirects to sram_alloc
+ * for target and malloc for host. 
  * 
- * @return Length
+ * @see OscSupSramFree
+ * 
+ * @param Number of bytes to allocate.
+ * @return Pointer to allocated memory area or NULL on failure.
  *//*********************************************************************/
-inline uint32 OscSupSramL1ALen();
+void* OscSupSramAllocL1DataA(unsigned int size);
 
 /*********************************************************************//*!
- * @brief Get the pointer to the available L1 SRAM in block A
+ * @brief Allocate a chunk of L1 Data SRAM from block B
  * 
- * Host: This is implemented by a temporary memory area which is not
- * really faster than any other.
- * @see OscSupSramL1ALen
+ * Memory is allocated continuously and the call fails if no continuous 
+ * chunk of the specified length can be found. Redirects to sram_alloc
+ * for target and malloc for host. 
  * 
- * @return Pointer to L1A.
+ * @see OscSupSramFree
+ * 
+ * @param Number of bytes to allocate.
+ * @return Pointer to allocated memory area or NULL on failure.
  *//*********************************************************************/
-inline void* OscSupSramL1A();
+void* OscSupSramAllocL1DataB(unsigned int size);
 
 /*********************************************************************//*!
- * @brief Query the length of the available L1 SRAM in Block B
+ * @brief Allocate a chunk of L1 Data SRAM from block A or B
  * 
- * @see OscSupSramL1B
+ * Memory is allocated continuously and the call fails if no continuous 
+ * chunk of the specified length can be found. Redirects to sram_alloc
+ * for target and malloc for host. 
  * 
- * @return Length
+ * @see OscSupSramFree
+ * 
+ * @param Number of bytes to allocate.
+ * @return Pointer to allocated memory area or NULL on failure.
  *//*********************************************************************/
-inline uint32 OscSupSramL1BLen();
+void* OscSupSramAllocL1Data(unsigned int size);
 
 /*********************************************************************//*!
- * @brief Get the pointer to the available L1 SRAM in block B
+ * @brief Allocate a chunk of L1 Instruction SRAM
  * 
- * Host: This is implemented by a temporary memory area which is not
- * really faster than any other.
- * @see OscSupSramL1BLen
+ * Memory is allocated continuously and the call fails if no continuous 
+ * chunk of the specified length can be found. Redirects to sram_alloc
+ * for target and malloc for host. 
  * 
- * @return Pointer to L1B.
+ * @see OscSupSramFree
+ * 
+ * @param Number of bytes to allocate.
+ * @return Pointer to allocated memory area or NULL on failure.
  *//*********************************************************************/
-inline void* OscSupSramL1B();
+void* OscSupSramAllocL1Instr(unsigned int size);
 
 /*********************************************************************//*!
- * @brief Query the length of the available L1 SRAM in the Scratchpad
+ * @brief Allocate a chunk of Scratchpad SRAM
  * 
- * @see OscSupSramScratch
+ * Memory is allocated continuously and the call fails if no continuous 
+ * chunk of the specified length can be found. Redirects to sram_alloc
+ * for target and malloc for host. 
  * 
- * @return Length
+ * @see OscSupSramFree
+ * 
+ * @param Number of bytes to allocate.
+ * @return Pointer to allocated memory area or NULL on failure.
  *//*********************************************************************/
-inline uint32 OscSupSramScratchLen();
+void* OscSupSramAllocScratch(unsigned int size);
 
 /*********************************************************************//*!
- * @brief Get the pointer to the available L1 SRAM in the Scratchpad
+ * @brief Free a previously allocated chunk of any SRAM memory
  * 
- * Host: This is implemented by a temporary memory area which is not
- * really faster than any other.
- * @see OscSupSramScratchLen
+ * Redirects to sram_free for target and free for host. 
  * 
- * @return Pointer to the Scratchpad.
+ * @param Pointer to memory area to be freed.
+ * @return SUCCESS or an appropriate error code
  *//*********************************************************************/
-inline void* OscSupSramScratch();
-
+int OscSupSramFree(void *pAddr);
 
 /*------------------------------ Cache ---------------------------------*/
 

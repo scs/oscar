@@ -93,34 +93,55 @@ inline uint32 OscSupCycToMicroSecs(uint32 cycles)
 }
 
 /*============================== SRAM =================================*/
-inline uint32 OscSupSramL1ALen()
+void* OscSupSramAllocL1DataA(unsigned int size)
 {
-    return SRAM_L1A_LENGTH;
+	if(size > SRAM_L1A_LENGTH)
+		return NULL;
+		
+	/* Just allocate normal memory on host. */
+	return malloc(size);	
 }
 
-inline void* OscSupSramL1A()
+void* OscSupSramAllocL1DataB(unsigned int size)
 {
-    return sup.pL1A;
+	if(size > SRAM_L1B_LENGTH)
+		return NULL;
+		
+	/* Just allocate normal memory on host. */
+	return malloc(size);	
 }
 
-inline uint32 OscSupSramL1BLen()
+void* OscSupSramAllocL1Data(unsigned int size)
 {
-    return SRAM_L1B_LENGTH;
+	if((size > SRAM_L1A_LENGTH) && (size > SRAM_L1B_LENGTH))
+		return NULL;
+		
+	/* Just allocate normal memory on host. */
+	return malloc(size);	
 }
 
-inline void* OscSupSramL1B()
+void* OscSupSramAllocL1Instr(unsigned int size)
 {
-    return sup.pL1B;
+	if(size > SRAM_INSTR_LENGTH)
+		return NULL;
+		
+	/* Just allocate normal memory on host. */
+	return malloc(size);	
 }
 
-inline uint32 OscSupSramScratchLen()
+void* OscSupSramAllocScratch(unsigned int size)
 {
-    return SRAM_SCRATCH_LENGTH;
+	if(size > SRAM_SCRATCH_LENGTH)
+		return NULL;
+		
+	/* Just allocate normal memory on host. */
+	return malloc(size);	
 }
 
-inline void* OscSupSramScratch()
+OSC_ERR OscSupSramFree(void *pAddr)
 {
-    return sup.pScratch;
+	free(pAddr);
+	return SUCCESS;
 }
 
 

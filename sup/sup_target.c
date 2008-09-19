@@ -16,6 +16,7 @@
 #include <sys/ioctl.h>
 #include <linux/ioctl.h>
 #include <errno.h>
+#include <bfin_sram.h>
 
 /*! @brief The module singelton instance. */
 struct OSC_SUP sup;       
@@ -168,32 +169,37 @@ inline uint32 OscSupCycToMicroSecs(uint32 cycles)
 }
 
 /*============================== SRAM =================================*/
-inline uint32 OscSupSramL1ALen()
+void* OscSupSramAllocL1DataA(unsigned int size)
 {
-    return SRAM_L1A_LENGTH;
+	return sram_alloc(size, L1_DATA_A_SRAM);	
 }
 
-inline void* OscSupSramL1A()
+void* OscSupSramAllocL1DataB(unsigned int size)
 {
-    return (void *)SRAM_L1A;
+	return sram_alloc(size, L1_DATA_B_SRAM);	
 }
 
-inline uint32 OscSupSramL1BLen()
+void* OscSupSramAllocL1Data(unsigned int size)
 {
-    return SRAM_L1B_LENGTH;
+	return sram_alloc(size, L1_DATA_SRAM);	
 }
 
-inline void* OscSupSramL1B()
+void* OscSupSramAllocL1Instr(unsigned int size)
 {
-    return (void *)SRAM_L1B;
+	return sram_alloc(size, L1_INST_SRAM);	
 }
 
-inline uint32 OscSupSramScratchLen()
+void* OscSupSramAllocScratch(unsigned int size)
 {
-    return SRAM_SCRATCH_LENGTH;
+	return sram_alloc(size, L1_SCRATCH_SRAM);	
 }
 
-inline void* OscSupSramScratch()
+int OscSupSramFree(void *pAddr)
 {
-    return (void *)SRAM_SCRATCH;
+	if(!sram_free(pAddr))
+	{
+		return SUCCESS;
+	} else {
+		return -EINVALID_PARAMETER;
+	}
 }

@@ -26,18 +26,9 @@
 /*! @brief The length of the L1 SRAM Block B */
 #define SRAM_L1B_LENGTH     0x4000 /* 16 kB */
 /*! @brief The length of the L1 Scratchpad memory */
-#define SRAM_SCRATCH_LENGTH 0x0800 /*  2 kB */
-
-#ifdef OSC_TARGET
-/*! @brief The address of the L1 SRAM Block A */
-#define SRAM_L1A            0xFF800000
-
-/*! @brief The address of the L1 SRAM Block B */
-#define SRAM_L1B            0xFF900000
-
-/*! @brief The address of the L1 Scratchpad memory */
-#define SRAM_SCRATCH        0xFFB00000
-#endif /* OSC_TARGET */
+#define SRAM_SCRATCH_LENGTH 0x1000 /*  4 kB */
+/*! @brief The length of the instruction memory. */
+#define SRAM_INSTR_LENGTH	0xC000 /* 48 kB */
 
 /*! @brief The object struct of the sup module */
 struct OSC_SUP
@@ -47,15 +38,6 @@ struct OSC_SUP
     /*! @brief The file descriptor of the onboard LED. */
     int fdLed;
 #endif
-#ifdef OSC_HOST
-    /*! @brief Host only: Memory area for the L1 SRAM Block A */
-    uint8 pL1A[SRAM_L1A_LENGTH];
-    /*! @brief Host only: Memory area for the L1 SRAM Block B */
-    uint8 pL1B[SRAM_L1B_LENGTH];
-    /*! @brief Host only: Memory area for the L1 SRAM Scratchpad */
-    uint8 pScratch[SRAM_SCRATCH_LENGTH];
-#endif /* OSC_HOST */
-
 };
 
 /*======================= Private methods ==============================*/
