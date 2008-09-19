@@ -307,7 +307,7 @@ OSC_ERR OscGpioInitPins()
 	    dir = pPinConfig->defaultFlags ? 'O' : 'I';
 	    ret = write(gpio.pins[pinNr].fd, &dir, 1);
 	    			
-	    if(unlikely(ret != 0))
+	    if(unlikely(ret < 0))
 	    {
 	        OscLog(ERROR, "%s: Unable to set direction for pin %s (%d)!\n", 
 	        __func__, pPinConfig->name, pinNr);
