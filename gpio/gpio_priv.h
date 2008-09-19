@@ -20,9 +20,9 @@
 
 /*! @brief How many GPIOs exist in hardware. */
 #define NR_OF_DSP_GPIOS 48
-/*! @brief The path to the device nodes of the driver (pflags) for the GPIO
+/*! @brief The path to the device nodes of the driver (simple-gpio) for the GPIO
  * pins. The whole patch is built by suffixing with the pin number. */
-#define PIN_DEVICE_NODE_PREFIX "/dev/pf"
+#define PIN_DEVICE_NODE_PREFIX "/dev/gpio"
 
 
 /*************************** GPIO flags *********************/
@@ -41,20 +41,6 @@
 /*! @brief Pin is low active or sensitive to falling flank is edge sensitive. */
 #define POL_LOWACTIVE 	0x2
 
-/*! @brief The bit mask for the sensitivity field in the flags register. */
-#define SEN_MASK		0x4
-/*! @brief Pin is level-sensitive. */
-#define SEN_LEVEL		0x0
-/*! @brief Pin is edge-sensitive. */
-#define SEN_EDGE		0x4
-
-/*! @brief The bit mask for the edge selection field in the flags register. */
-#define EDGE_MASK		0x8
-/*! @brief Pin is sensitive to rising/falling edge only. */
-#define EDGE_SINGLE		0x0
-/*! @brief Pin is sensitive to both edges. */
-#define EDGE_BOTH		0x8
-
 /*! @brief The bit mask for the function field in the flags register. */
 #define FUN_MASK		0x10
 /*! @brief Pin is no accessible directly from application, but rather
@@ -65,7 +51,7 @@
 
 struct GPIO_PIN_CONFIG
 {
-	/*! @brief The pflags pin number of this pin. */
+	/*! @brief The simple-gpio pin number of this pin. */
 	int pinNr;
 	/*! @brief The default flags used for this pin (Input/Output etc.). */
 	int defaultFlags;

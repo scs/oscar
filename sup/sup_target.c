@@ -8,7 +8,6 @@
 #include "sup_pub.h"
 #include "sup_priv.h"
 #include "oscar_intern.h"
-#include "pflags.h"
 
 #include <sys/stat.h>
 #include <sys/types.h>
