@@ -131,11 +131,10 @@ void* OscSupSramAllocL1Instr(unsigned int size)
 
 void* OscSupSramAllocScratch(unsigned int size)
 {
-	if(size > SRAM_SCRATCH_LENGTH)
-		return NULL;
-		
-	/* Just allocate normal memory on host. */
-	return malloc(size);	
+	OscLog(ERROR, "%s: Allocating scratchpad not supported since "
+					"not supported by uClinux yet!\n",
+					__func__);
+	return NULL;	
 }
 
 OSC_ERR OscSupSramFree(void *pAddr)

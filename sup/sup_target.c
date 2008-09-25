@@ -191,7 +191,10 @@ void* OscSupSramAllocL1Instr(unsigned int size)
 
 void* OscSupSramAllocScratch(unsigned int size)
 {
-	return sram_alloc(size, L1_SCRATCH_SRAM);	
+	OscLog(ERROR, "%s: Allocating scratchpad not supported since "
+					"not supported by uClinux yet!\n",
+					__func__);
+	return NULL;
 }
 
 int OscSupSramFree(void *pAddr)
