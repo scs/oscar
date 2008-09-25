@@ -1,0 +1,3 @@
+FileNamePrefix = testdata/Bogen001_
+FileNameSeqNrDigits = 5
+FileNameSuffix = .bmp
