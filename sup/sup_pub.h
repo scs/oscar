@@ -181,6 +181,10 @@ void* OscSupSramAllocL1Instr(unsigned int size);
  * chunk of the specified length can be found. Redirects to sram_alloc
  * for target and malloc for host. 
  * 
+ * @warning Currently not supported by the HEAD build of uclinux; a feature
+ * request has been submitted though and hopefully it is being incorporated
+ * soon.
+ * 
  * @see OscSupSramFree
  * 
  * @param Number of bytes to allocate.
