@@ -304,7 +304,7 @@ OSC_ERR OscGpioInitPins()
 	    
 	    /*************** Set the pin flags. ***************************/
 	    /* Direction */
-	    dir = pPinConfig->defaultFlags ? 'O' : 'I';
+	    dir = (pPinConfig->defaultFlags & DIR_MASK) ? 'O' : 'I';
 	    ret = write(gpio.pins[pinNr].fd, &dir, 1);
 	    			
 	    if(unlikely(ret < 0))
