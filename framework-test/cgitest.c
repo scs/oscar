@@ -8,7 +8,7 @@
 #include <errno.h>
 
 /* This implements the client side of the IPC. The server side is implemented
-   in the 'test' executable, which needs to be started before this. */
+	in the 'test' executable, which needs to be started before this. */
 LCV_ERR testIpc()
 {
 	LCV_IPC_CHAN_ID chan;
@@ -53,12 +53,12 @@ int main()
 	LCV_ERR err;
 
 	err = LCVCreate(&hFramework);
-	if(err < 0) 
+	if(err < 0)
 	{
 		printf("Unable to create framework.\n");
 		return -1;
 	}
-      
+		
 	err = LCVLogCreate(hFramework);
 
 	err = LCVIpcCreate(hFramework);

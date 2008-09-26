@@ -9,15 +9,15 @@
 
 #include "oscar_error.h"
 #ifdef OSC_HOST
-    #include "oscar_types_host.h"
-    #include "oscar_host.h"
+	#include "oscar_types_host.h"
+	#include "oscar_host.h"
 #else
-    #include "oscar_types_target.h"
-    #include "oscar_target.h"
+	#include "oscar_types_target.h"
+	#include "oscar_target.h"
 #endif /* OSC_HOST */
 
 
-/*! @brief The GPIO pins that can be accessed from the application. 
+/*! @brief The GPIO pins that can be accessed from the application.
  * 
  * This is a list of all the GPIO names on all the supported hardware
  * platforms. Not all listed here may be available on your platform.
@@ -32,15 +32,15 @@ enum EnGpios
 };
 
 /*! @brief Defines whether the image trigger of the camera sensor is activated
- * internally from the camera module or from externally over an input 
+ * internally from the camera module or from externally over an input
  * 
  * leanXcam only */
 enum EnTriggerConfig
 {
 	/*! @brief Default: Internal triggering. */
-	TRIGGER_INTERNAL,		
+	TRIGGER_INTERNAL,
 	/*! @brief Trigger from external input2 (leanXcam) */
-	TRIGGER_EXTERNAL_IN2	
+	TRIGGER_EXTERNAL_IN2
 };
 
 
@@ -83,7 +83,7 @@ OSC_ERR OscGpioRead(enum EnGpios enGpio, bool *pbState);
  * @brief Set the output/input polarity of a GPIO
  * 
  * The polarity in this sense is defined not as the polarity of the DSP
- * pin driving a GPIO, but rather as the polarity of the input/output of 
+ * pin driving a GPIO, but rather as the polarity of the input/output of
  * the board after opto-couplers etc.
  * 
  * @param enGpio Identifier of the GPIO to be configured.
@@ -137,10 +137,10 @@ OSC_ERR OscGpioConfigImageTrigger(enum EnTriggerConfig enConfig);
  * to OUT2 or whether it can be used as a GPIO.
  * 
  * On the leanXcam hardware, the output OUT2 is a logical OR between the
- * corresponding DSP pin and the LED_OUT pin from the image sensor. This 
+ * corresponding DSP pin and the LED_OUT pin from the image sensor. This
  * means that if one wants to use it as a GPIO, the LED_OUT from the
- * sensor has to be disabled (done by OscCamConfigSensorLedOut) and in the 
- * opposite case, where OUT2 should be assigned to LED_OUT, the DSP pin 
+ * sensor has to be disabled (done by OscCamConfigSensorLedOut) and in the
+ * opposite case, where OUT2 should be assigned to LED_OUT, the DSP pin
  * has to be wired to zero (done by this function).
  * 
  * ! Must also call OscCamConfigSensorLedOut !
@@ -158,8 +158,8 @@ OSC_ERR OscGpioConfigSensorLedOut(bool bSensorLedOut);
 /*********************************************************************//*!
  * @brief Set the color of the onboard test led.
  * 
- * The leanXcam features a 2-color test led with a green and a red 
- * channel that can be controlled separately. 
+ * The leanXcam features a 2-color test led with a green and a red
+ * channel that can be controlled separately.
  * 
  * Smooth color transitions are not supported yet.
  * 

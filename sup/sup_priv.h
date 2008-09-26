@@ -11,9 +11,9 @@
 #include <string.h>
 
 #ifdef OSC_HOST
-    #include <oscar_types_host.h>
+	#include <oscar_types_host.h>
 #else
-    #include <oscar_types_target.h>
+	#include <oscar_types_target.h>
 #endif /* OSC_HOST */
 
 #include <log/log_pub.h>
@@ -28,15 +28,15 @@
 /*! @brief The length of the L1 Scratchpad memory */
 #define SRAM_SCRATCH_LENGTH 0x1000 /*  4 kB */
 /*! @brief The length of the instruction memory. */
-#define SRAM_INSTR_LENGTH	0xC000 /* 48 kB */
+#define SRAM_INSTR_LENGTH   0xC000 /* 48 kB */
 
 /*! @brief The object struct of the sup module */
 struct OSC_SUP
 {
-    int fdWatchdog; /*!< @brief The file descriptor of the watchdog. */
+	int fdWatchdog; /*!< @brief The file descriptor of the watchdog. */
 #ifdef TARGET_TYPE_INDXCAM
-    /*! @brief The file descriptor of the onboard LED. */
-    int fdLed;
+	/*! @brief The file descriptor of the onboard LED. */
+	int fdLed;
 #endif
 };
 

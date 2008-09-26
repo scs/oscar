@@ -7,11 +7,11 @@
 
 #include "oscar_error.h"
 #ifdef OSC_HOST
-    #include "oscar_types_host.h"
-    #include "oscar_host.h"
+	#include "oscar_types_host.h"
+	#include "oscar_host.h"
 #else
-    #include "oscar_types_target.h"
-    #include "oscar_target.h"
+	#include "oscar_types_target.h"
+	#include "oscar_target.h"
 #endif /* OSC_HOST */
 
 #include "bayer_pub.h"
@@ -37,16 +37,16 @@ void OscVisDestroy(void *hFw);
  * @brief Convert a raw image captured by a camera sensor with bayer
  * filter to an BGR output image.
  * 
- * Debayering calculates the missing color values by interpolating 
+ * Debayering calculates the missing color values by interpolating
  * between neighboring pixels. In this case, linear interpolation with
  * LaPlace correction is used in accordance with the algorithm
- * described in 
+ * described in
  * http://scien.stanford.edu/class/psych221/projects/99/tingchen/main.htm
  * (Interpolation with color correction I).
  * This is one of the best algorithms for quality but does require more
  * processing than a simple one.
  * 
- * The bayer pattern color order of the first row is specified with an 
+ * The bayer pattern color order of the first row is specified with an
  * identifier.
  * 
  * ! Only even widths are supported !

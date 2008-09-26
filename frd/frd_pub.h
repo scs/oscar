@@ -2,7 +2,7 @@
  * @brief API definition for filename reader module
  * 
  * Frd allows reads a configuration file containing the syntax rules
- * for the files to be generated. These have to be of the form 
+ * for the files to be generated. These have to be of the form
  * 'prefix + seq_nr + suffix', e.g. 'test/img001.bmp'.
  * 
  * The config file must be specified during creation of a reader. It
@@ -14,7 +14,7 @@
  * 
  * FileNameSuffix = .bmp
  * 
- ************************************************************************/
+	************************************************************************/
 #ifndef FRD_PUB_H_
 #define FRD_PUB_H_
 
@@ -26,9 +26,9 @@
  * all modules can be made */
 enum EnOscFrdErrors
 {
-    EFRD_PARSING_FAILURE = OSC_FRD_ERROR_OFFSET,
-    EFRD_MAX_NR_READERS_REACHED,
-    EFRD_INVALID_VALUES_CONFIGURED
+	EFRD_PARSING_FAILURE = OSC_FRD_ERROR_OFFSET,
+	EFRD_MAX_NR_READERS_REACHED,
+	EFRD_INVALID_VALUES_CONFIGURED
 };
 
 /*====================== API functions =================================*/
@@ -51,8 +51,8 @@ void OscFrdDestroy(void *hFw);
 
 /*********************************************************************//*!
  * @brief Create a filename reader.
- *
- * This will parse the supplied config file for the parameters to 
+ * 
+ * This will parse the supplied config file for the parameters to
  * assemble the desired file names depending on the time step. It is also
  * possible to create a reader without going through a config file.
  * 
@@ -79,12 +79,12 @@ void OscFrdDestroy(void *hFw);
  * the reader parameters are stored.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-OSC_ERR OscFrdCreateReader(void ** phReaderHandle, 
-        const char strReaderConfigFile[]);
+OSC_ERR OscFrdCreateReader(void ** phReaderHandle,
+		const char strReaderConfigFile[]);
 
 /*********************************************************************//*!
  * @brief Create a file-list filename reader directly.
- *
+ * 
  * Create a filename reader for file-lists directly without parsing a
  * config file.
  * @see OscFrdCreateReader
@@ -98,12 +98,12 @@ OSC_ERR OscFrdCreateReader(void ** phReaderHandle,
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
 OSC_ERR OscFrdCreateFileListReader(void **phReaderHandle,
-        const char strFileList[]);
+		const char strFileList[]);
 
 /*********************************************************************//*!
  * @brief Create a sequence filename reader directly.
- *
- * Create a filename reader for sequential file names directly without 
+ * 
+ * Create a filename reader for sequential file names directly without
  * parsing a config file.
  * @see OscFrdCreateReader
  * @see OscFrdCreateFileListReader
@@ -119,13 +119,13 @@ OSC_ERR OscFrdCreateFileListReader(void **phReaderHandle,
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
 OSC_ERR OscFrdCreateSequenceReader(void **phReaderHandle,
-        char strPrefix[], 
-        int seqNrDigits,
-        char strSuffix[]);
+		char strPrefix[],
+		int seqNrDigits,
+		char strSuffix[]);
 
 /*********************************************************************//*!
  * @brief Create a constant filename reader directly.
- *
+ * 
  * Create a filename reader which always reads the same file name.
  * Good for simple testing.
  * @see OscFrdCreateReader
@@ -141,13 +141,13 @@ OSC_ERR OscFrdCreateConstantReader(void **phReaderHandle, char strFN[]);
 
 /*********************************************************************//*!
  * @brief Returns the file name corresponding to the current time step.
- *
+ * 
  * @param hReaderHandle Handle to the reader.
  * @param strCurName The current file name is written into this string.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-OSC_ERR OscFrdGetCurrentFileName(const void *hReaderHandle, 
-        char strCurName[]);
+OSC_ERR OscFrdGetCurrentFileName(const void *hReaderHandle,
+		char strCurName[]);
 
 
 #endif /*FRD_PUB_H_*/

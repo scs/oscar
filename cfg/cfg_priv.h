@@ -11,9 +11,9 @@
 #include <string.h>
 
 #ifdef OSC_HOST
-    #include <oscar_types_host.h>
+	#include <oscar_types_host.h>
 #else
-    #include <oscar_types_target.h>
+	#include <oscar_types_target.h>
 #endif /* OSC_HOST */
 
 #include <log/log_pub.h>
@@ -40,8 +40,8 @@ struct CFG_FILE_CONTENT {
 };
 
 /*! @brief Config File Content handels. */
-struct OSC_CFG { 
-    uint16 nrOfContents;		/*!< @brief Number of managed contents */
+struct OSC_CFG {
+	uint16 nrOfContents;        /*!< @brief Number of managed contents */
 	struct CFG_FILE_CONTENT contents[CONFIG_FILE_MAX_NUM];
 };
 
@@ -67,7 +67,7 @@ OSC_ERR OscCfgFlushContentHelper(const CFG_FILE_CONTENT_HANDLE hFileContent, boo
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
 OSC_ERR OscCfgGetValPtr(
-		const unsigned int 	contentIndex, 
+		const unsigned int  contentIndex,
 		const struct CFG_KEY *pKey,
 		char **pPStrVal);
 
@@ -80,21 +80,21 @@ OSC_ERR OscCfgGetValPtr(
  * @return Pointer to char in string after subString, NULL if no subString is found
  *//*********************************************************************/
 char* OscCfgIsSubStr(
-		const char *subString, 
-		const size_t subStringLen, 
+		const char *subString,
+		const size_t subStringLen,
 		const char *string);
 
 /*********************************************************************//*!
- * @brief Finds label at the beginning of the line of a text. 
+ * @brief Finds label at the beginning of the line of a text.
  * 
- * @param label Pointer to label. If NULL, beginning of text is returned 
+ * @param label Pointer to label. If NULL, beginning of text is returned
  * @param labelSuffix Pointer to label suffix (e.g. ": " for tags).
  * @param text Pointer to text.
  * @return Pointer to char in test after label suffix, NULL if label not found
  *//*********************************************************************/
 char* OscCfgFindNewlineLabel(
-		const char* label, 
-		const char* labelSuffix, 
+		const char* label,
+		const char* labelSuffix,
 		char* text);
 
 /*********************************************************************//*!
@@ -107,9 +107,9 @@ char* OscCfgFindNewlineLabel(
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
 OSC_ERR OscCfgReplaceStr(
-		const unsigned int 	contentIndex, 
-		const char *oldStr, 
-		const char *newStr, 
+		const unsigned int  contentIndex,
+		const char *oldStr,
+		const char *newStr,
 		char* text);
 
 
@@ -124,9 +124,9 @@ OSC_ERR OscCfgReplaceStr(
  * @return pointer to char after labelSuffix
  *//*********************************************************************/
 char* OscCfgAppendLabel(
-		char* text, 
-		const unsigned int maxTextLen, 
-		const char* label, 
+		char* text,
+		const unsigned int maxTextLen,
+		const char* label,
 		const char* labelPrefix,
 		const char* labelSuffix);
 

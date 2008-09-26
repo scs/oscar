@@ -20,14 +20,14 @@
 #endif
 
 /*! @brief The module singelton instance. */
-struct OSC_GPIO gpio;       
+struct OSC_GPIO gpio;
 
 /*! @brief The dependencies of this module. */
 struct OSC_DEPENDENCY gpio_deps[] = {
-        {"log", OscLogCreate, OscLogDestroy}
+		{"log", OscLogCreate, OscLogDestroy}
 #if defined(OSC_HOST) || defined(OSC_SIM)
-        ,{"srd", OscSrdCreate, OscSrdDestroy}
-        ,{"swr", OscSwrCreate, OscSwrDestroy}
+		,{"srd", OscSrdCreate, OscSrdDestroy}
+		,{"swr", OscSwrCreate, OscSwrDestroy}
 #endif /* OSC_HOST or OSC_SIM */
 };
 		
@@ -35,8 +35,8 @@ struct OSC_DEPENDENCY gpio_deps[] = {
 #define DEP_LEN (sizeof(gpio_deps)/sizeof(struct OSC_DEPENDENCY))
 
 #ifdef TARGET_TYPE_LEANXCAM
-/*! @brief Array with the default config of all the pins used on the 
- * leanXcam. 
+/*! @brief Array with the default config of all the pins used on the
+ * leanXcam.
  * All I/Os are configured to be high active at the actual plug. */
 struct GPIO_PIN_CONFIG aryPinConfig[] = {
 	/* {pinNr, defaultFlags, name, defaultState} */
@@ -52,8 +52,8 @@ struct GPIO_PIN_CONFIG aryPinConfig[] = {
 #endif /* TARGET_TYPE_LEANXCAM */
 
 #ifdef TARGET_TYPE_INDXCAM
-/*! @brief Array with the default config of all the pins used on the 
- * indXcam. 
+/*! @brief Array with the default config of all the pins used on the
+ * indXcam.
  * All I/Os are configured to be high active at the actual plug. */
 struct GPIO_PIN_CONFIG aryPinConfig[] = {
 	/* {pinNr, defaultFlags, name, defaultState} */
@@ -66,79 +66,79 @@ const uint16 nrOfPins = sizeof(aryPinConfig)/sizeof(aryPinConfig[0]);
 
 OSC_ERR OscGpioCreate(void *hFw)
 {
-    struct OSC_FRAMEWORK *pFw;
-    OSC_ERR err;
+	struct OSC_FRAMEWORK *pFw;
+	OSC_ERR err;
 
-    pFw = (struct OSC_FRAMEWORK *)hFw;
-    if(pFw->gpio.useCnt != 0)
-    {
-        pFw->gpio.useCnt++;
-        /* The module is already allocated */
-        return SUCCESS;
-    }
-    
-    /* Load the module dependencies of this module. */
-    err = OscLoadDependencies(pFw, 
-            gpio_deps, 
-            DEP_LEN);
-    
-    if(err != SUCCESS)
-    {
-        printf("%s: ERROR: Unable to load dependencies! (%d)\n",
-                __func__, 
-                err);
-        return err;
-    }
-    
-    memset(&gpio, 0, sizeof(struct OSC_GPIO));
-    
-    /* Setup our pins. */
-    err = OscGpioInitPins();
-    if(err != SUCCESS)
-    {
-    	OscLog(ERROR, "%s: Unable to intialize GPIO pins (%d)!\n",
-    				__func__, err);
-    	return -EDEVICE;
-    }
-    
-    /* Increment the use count */
-    pFw->gpio.hHandle = (void*)&gpio;
-    pFw->gpio.useCnt++; 
-    
-    return SUCCESS;
+	pFw = (struct OSC_FRAMEWORK *)hFw;
+	if(pFw->gpio.useCnt != 0)
+	{
+		pFw->gpio.useCnt++;
+		/* The module is already allocated */
+		return SUCCESS;
+	}
+	
+	/* Load the module dependencies of this module. */
+	err = OscLoadDependencies(pFw,
+			gpio_deps,
+			DEP_LEN);
+	
+	if(err != SUCCESS)
+	{
+		printf("%s: ERROR: Unable to load dependencies! (%d)\n",
+				__func__,
+				err);
+		return err;
+	}
+	
+	memset(&gpio, 0, sizeof(struct OSC_GPIO));
+	
+	/* Setup our pins. */
+	err = OscGpioInitPins();
+	if(err != SUCCESS)
+	{
+		OscLog(ERROR, "%s: Unable to intialize GPIO pins (%d)!\n",
+					__func__, err);
+		return -EDEVICE;
+	}
+	
+	/* Increment the use count */
+	pFw->gpio.hHandle = (void*)&gpio;
+	pFw->gpio.useCnt++;
+	
+	return SUCCESS;
 }
 
 void OscGpioDestroy(void *hFw)
 {
-    struct OSC_FRAMEWORK *pFw;
-            
-    pFw = (struct OSC_FRAMEWORK *)hFw; 
-    /* Check if we really need to release or whether we still 
-     * have users. */
-    pFw->gpio.useCnt--;
-    if(pFw->gpio.useCnt > 0)
-    {
-        return;
-    }
-    
-    
-    OscUnloadDependencies(pFw, 
-            gpio_deps, 
-            DEP_LEN);
-    
-    memset(&gpio, 0, sizeof(struct OSC_GPIO));
+	struct OSC_FRAMEWORK *pFw;
+			
+	pFw = (struct OSC_FRAMEWORK *)hFw;
+	/* Check if we really need to release or whether we still
+	 * have users. */
+	pFw->gpio.useCnt--;
+	if(pFw->gpio.useCnt > 0)
+	{
+		return;
+	}
+	
+	
+	OscUnloadDependencies(pFw,
+			gpio_deps,
+			DEP_LEN);
+	
+	memset(&gpio, 0, sizeof(struct OSC_GPIO));
 }
 
 #ifdef TARGET_TYPE_LEANXCAM
 
 OSC_ERR OscGpioConfigSensorLedOut(bool bSensorLedOut)
 {
-	struct GPIO_PIN		*pPin = &gpio.pins[GPIO_OUT2];
-	OSC_ERR				err = SUCCESS;
+	struct GPIO_PIN     *pPin = &gpio.pins[GPIO_OUT2];
+	OSC_ERR             err = SUCCESS;
 	
 	if(bSensorLedOut)
 	{
-		/* Make sure to enable the LED_OUT signal in the CMOS 
+		/* Make sure to enable the LED_OUT signal in the CMOS
 		 * sensor for correct operation (OscCamConfigSensorLedOut(TRUE, <Polarity>)). */
 		/* OUT2 = !(PIN_OUT2_N | SENSOR_LED_OUT)
 		 * => OUT2 = !SENSOR_LED_OUT with PIN_OUT2_N = 0 (before polarity inversion)*/

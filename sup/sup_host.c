@@ -11,47 +11,47 @@
 #include <time.h>
 
 /*! @brief The module singelton instance. */
-struct OSC_SUP sup;		
+struct OSC_SUP sup;
 
 
 OSC_ERR OscSupCreate(void *hFw)
 {
-    struct OSC_FRAMEWORK *pFw;
+	struct OSC_FRAMEWORK *pFw;
 
-    pFw = (struct OSC_FRAMEWORK *)hFw;
-    if(pFw->sup.useCnt != 0)
-    {
-        pFw->sup.useCnt++;
-        /* The module is already allocated */
-        return SUCCESS;
-    }
-    
+	pFw = (struct OSC_FRAMEWORK *)hFw;
+	if(pFw->sup.useCnt != 0)
+	{
+		pFw->sup.useCnt++;
+		/* The module is already allocated */
+		return SUCCESS;
+	}
+	
 	memset(&sup, 0, sizeof(struct OSC_SUP));
 	
-    /* Increment the use count */
-    pFw->sup.hHandle = (void*)&sup;
-    pFw->sup.useCnt++; 
-    
-    return SUCCESS;
+	/* Increment the use count */
+	pFw->sup.hHandle = (void*)&sup;
+	pFw->sup.useCnt++;
+	
+	return SUCCESS;
 }
 
 void OscSupDestroy(void *hFw)
 {
-    struct OSC_FRAMEWORK *pFw;
-            
-    pFw = (struct OSC_FRAMEWORK *)hFw; 
-    /* Check if we really need to release or whether we still 
-     * have users. */
-    pFw->sup.useCnt--;
-    if(pFw->sup.useCnt > 0)
-    {
-        return;
-    }
-    
-    /* Make sure the watchdog is closed, otherwise the board may
-     * be reset by it after the application has closed. */
-    OscSupWdtClose();
-    
+	struct OSC_FRAMEWORK *pFw;
+			
+	pFw = (struct OSC_FRAMEWORK *)hFw;
+	/* Check if we really need to release or whether we still
+	 * have users. */
+	pFw->sup.useCnt--;
+	if(pFw->sup.useCnt > 0)
+	{
+		return;
+	}
+	
+	/* Make sure the watchdog is closed, otherwise the board may
+	 * be reset by it after the application has closed. */
+	OscSupWdtClose();
+	
 	memset(&sup, 0, sizeof(struct OSC_SUP));
 }
 
@@ -59,37 +59,37 @@ void OscSupDestroy(void *hFw)
 
 OSC_ERR OscSupWdtInit()
 {
-    /* There is no watchdog on the host => do nothing. */
+	/* There is no watchdog on the host => do nothing. */
 
-    return SUCCESS;
+	return SUCCESS;
 }
 
 OSC_ERR OscSupWdtClose()
 {
-    /* There is no watchdog on the host => do nothing. */
+	/* There is no watchdog on the host => do nothing. */
 
-    return SUCCESS;
+	return SUCCESS;
 }
 
 inline void OscSupWdtKeepAlive()
 {
-    /* There is no watchdog on the host => do nothing. */
+	/* There is no watchdog on the host => do nothing. */
 }
 
 /*============================= Cycles =================================*/
 inline uint32 OscSupCycGet()
 {
-  /* The host implementation uses the ANSI C function clock() 
-   * with much lower precision than on the blackfin. 
-   * The actual precision is dependent on the platform. */
+	/* The host implementation uses the ANSI C function clock()
+	 * with much lower precision than on the blackfin.
+	 * The actual precision is dependent on the platform. */
 
-  /* ANSI C function, low resolution */
-  return ((uint32)clock()); 
+	/* ANSI C function, low resolution */
+	return ((uint32)clock());
 }
 
 inline uint32 OscSupCycToMicroSecs(uint32 cycles)
 {
-  return (cycles/(CLOCKS_PER_SEC/1000000));
+	return (cycles/(CLOCKS_PER_SEC/1000000));
 }
 
 /*============================== SRAM =================================*/
@@ -99,7 +99,7 @@ void* OscSupSramAllocL1DataA(unsigned int size)
 		return NULL;
 		
 	/* Just allocate normal memory on host. */
-	return malloc(size);	
+	return malloc(size);
 }
 
 void* OscSupSramAllocL1DataB(unsigned int size)
@@ -108,7 +108,7 @@ void* OscSupSramAllocL1DataB(unsigned int size)
 		return NULL;
 		
 	/* Just allocate normal memory on host. */
-	return malloc(size);	
+	return malloc(size);
 }
 
 void* OscSupSramAllocL1Data(unsigned int size)
@@ -117,7 +117,7 @@ void* OscSupSramAllocL1Data(unsigned int size)
 		return NULL;
 		
 	/* Just allocate normal memory on host. */
-	return malloc(size);	
+	return malloc(size);
 }
 
 void* OscSupSramAllocL1Instr(unsigned int size)
@@ -126,7 +126,7 @@ void* OscSupSramAllocL1Instr(unsigned int size)
 		return NULL;
 		
 	/* Just allocate normal memory on host. */
-	return malloc(size);	
+	return malloc(size);
 }
 
 void* OscSupSramAllocScratch(unsigned int size)
@@ -134,7 +134,7 @@ void* OscSupSramAllocScratch(unsigned int size)
 	OscLog(ERROR, "%s: Allocating scratchpad not supported since "
 					"not supported by uClinux yet!\n",
 					__func__);
-	return NULL;	
+	return NULL;
 }
 
 OSC_ERR OscSupSramFree(void *pAddr)

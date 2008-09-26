@@ -1,5 +1,5 @@
 /*! @file gpio_host.c
- * @brief GPIO module implementation for host 
+ * @brief GPIO module implementation for host
  * 
  */
 
@@ -14,14 +14,14 @@
 #include "../swr/swr_pub.h"
 
 /*! @brief The module singelton instance. */
-extern struct OSC_GPIO gpio;       
+extern struct OSC_GPIO gpio;
 extern struct GPIO_PIN_CONFIG aryPinConfig[];
 extern const uint16 nrOfPins;
 
 OSC_ERR OscGpioSetupPolarity(enum EnGpios enGpio, bool bLowActive)
 {
-	struct GPIO_PIN 	*pPin = &gpio.pins[enGpio];
-	bool 				bPinLowActive;
+	struct GPIO_PIN     *pPin = &gpio.pins[enGpio];
+	bool                bPinLowActive;
 	
 	/* Since the default polarity setup of pin at the plug is always high
 	 * active, we can consult the default config to deduce the correct setup
@@ -40,7 +40,7 @@ OSC_ERR OscGpioSetupPolarity(enum EnGpios enGpio, bool bLowActive)
 
 OSC_ERR OscGpioWrite(enum EnGpios enGpio, bool bState)
 {
-	struct GPIO_PIN 	*pPin = &gpio.pins[enGpio];
+	struct GPIO_PIN     *pPin = &gpio.pins[enGpio];
 	
 	if(unlikely(!pPin->fd))
 	{
@@ -80,7 +80,7 @@ OSC_ERR OscGpioWrite(enum EnGpios enGpio, bool bState)
 
 OSC_ERR OscGpioRead(enum EnGpios enGpio, bool *pbState)
 {
-	struct GPIO_PIN 	*pPin = &gpio.pins[enGpio];
+	struct GPIO_PIN     *pPin = &gpio.pins[enGpio];
 	
 	if(unlikely(!pPin->fd))
 	{
@@ -99,40 +99,40 @@ OSC_ERR OscGpioRead(enum EnGpios enGpio, bool *pbState)
 		return -EDEVICE_BUSY;
 	}
 	
-	*pbState = pPin->bState;	
+	*pbState = pPin->bState;
 
-	return SUCCESS;	
+	return SUCCESS;
 }
 
 #ifdef TARGET_TYPE_INDXCAM
 OSC_ERR OscGpioSetTestLed(bool bOn)
 {
-	OSC_ERR 			err = SUCCESS;
-	struct GPIO_PIN		*pPin = &gpio.pins[PIN_TESTLED_N];
+	OSC_ERR             err = SUCCESS;
+	struct GPIO_PIN     *pPin = &gpio.pins[PIN_TESTLED_N];
 	
 	pPin->bState = bOn;
 
 #ifdef OSC_GPIO_LOG_RESERVED_PINS
 		bOn = (pPin->flags & POL_LOWACTIVE) ? !pPin->bState : pPin->bState;
 		err = OscSwrUpdateSignal(gpio.phSignalOut[PIN_TESTLED_N], &bOn);
-#endif /* OSC_GPIO_LOG_RESERVED_PINS */	
+#endif /* OSC_GPIO_LOG_RESERVED_PINS */
 	return err;
 }
 
 OSC_ERR OscGpioToggleTestLed()
 {
-	OSC_ERR				err = SUCCESS;
-	struct GPIO_PIN		*pPin = &gpio.pins[PIN_TESTLED_N];
+	OSC_ERR             err = SUCCESS;
+	struct GPIO_PIN     *pPin = &gpio.pins[PIN_TESTLED_N];
 #ifdef OSC_GPIO_LOG_RESERVED_PINS
-	bool				bOn;
-#endif /* OSC_GPIO_LOG_RESERVED_PINS */	
+	bool                bOn;
+#endif /* OSC_GPIO_LOG_RESERVED_PINS */
 	
 	pPin->bState = !pPin->bState;
 
 #ifdef OSC_GPIO_LOG_RESERVED_PINS
 	bOn = (pPin->flags & POL_LOWACTIVE) ? !pPin->bState : pPin->bState;
 	err = OscSwrUpdateSignal(gpio.phSignalOut[PIN_TESTLED_N], &bOn);
-#endif /* OSC_GPIO_LOG_RESERVED_PINS */	
+#endif /* OSC_GPIO_LOG_RESERVED_PINS */
 	return err;
 }
 #endif /* TARGET_TYPE_INDXCAM */
@@ -140,9 +140,9 @@ OSC_ERR OscGpioToggleTestLed()
 #ifdef TARGET_TYPE_LEANXCAM
 OSC_ERR OscGpioSetTestLed(bool bOn)
 {
-	OSC_ERR 			err = SUCCESS;
-	struct GPIO_PIN		*pRed = &gpio.pins[PIN_TESTLED_R_N];
-	struct GPIO_PIN		*pGreen = &gpio.pins[PIN_TESTLED_G_N];
+	OSC_ERR             err = SUCCESS;
+	struct GPIO_PIN     *pRed = &gpio.pins[PIN_TESTLED_R_N];
+	struct GPIO_PIN     *pGreen = &gpio.pins[PIN_TESTLED_G_N];
 	
 	pRed->bState = pGreen->bState = bOn;
 
@@ -151,18 +151,18 @@ OSC_ERR OscGpioSetTestLed(bool bOn)
 		err = OscSwrUpdateSignal(gpio.phSignalOut[PIN_TESTLED_R_N], &bOn);
 		bOn = (pGreen->flags & POL_LOWACTIVE) ? !pGreen->bState : pGreen->bState;
 		err |= OscSwrUpdateSignal(gpio.phSignalOut[PIN_TESTLED_G_N], &bOn);
-#endif /* OSC_GPIO_LOG_RESERVED_PINS */	
+#endif /* OSC_GPIO_LOG_RESERVED_PINS */
 	return err;
 }
 
 OSC_ERR OscGpioToggleTestLed()
 {
-	OSC_ERR				err = SUCCESS;
-	struct GPIO_PIN		*pRed = &gpio.pins[PIN_TESTLED_R_N];
-	struct GPIO_PIN		*pGreen = &gpio.pins[PIN_TESTLED_G_N];
+	OSC_ERR             err = SUCCESS;
+	struct GPIO_PIN     *pRed = &gpio.pins[PIN_TESTLED_R_N];
+	struct GPIO_PIN     *pGreen = &gpio.pins[PIN_TESTLED_G_N];
 #ifdef OSC_GPIO_LOG_RESERVED_PINS
-	bool				bOn;
-#endif /* OSC_GPIO_LOG_RESERVED_PINS */	
+	bool                bOn;
+#endif /* OSC_GPIO_LOG_RESERVED_PINS */
 	
 	pRed->bState = !pRed->bState;
 	pGreen->bState = !pGreen->bState;
@@ -172,7 +172,7 @@ OSC_ERR OscGpioToggleTestLed()
 	err = OscSwrUpdateSignal(gpio.phSignalOut[PIN_TESTLED_R_N], &bOn);
 	bOn = (pGreen->flags & POL_LOWACTIVE) ? !pGreen->bState : pGreen->bState;
 	err |= OscSwrUpdateSignal(gpio.phSignalOut[PIN_TESTLED_G_N], &bOn);
-#endif /* OSC_GPIO_LOG_RESERVED_PINS */	
+#endif /* OSC_GPIO_LOG_RESERVED_PINS */
 	return err;
 }
 #endif /* TARGET_TYPE_LEANXCAM */
@@ -186,11 +186,11 @@ OSC_ERR OscGpioTriggerImage()
 #ifdef TARGET_TYPE_LEANXCAM
 OSC_ERR OscGpioSetTestLedColor(uint8 red, uint8 green)
 {
-	OSC_ERR				err = SUCCESS;
-	struct GPIO_PIN		*pRed = &gpio.pins[PIN_TESTLED_R_N];
-	struct GPIO_PIN		*pGreen = &gpio.pins[PIN_TESTLED_G_N];
+	OSC_ERR             err = SUCCESS;
+	struct GPIO_PIN     *pRed = &gpio.pins[PIN_TESTLED_R_N];
+	struct GPIO_PIN     *pGreen = &gpio.pins[PIN_TESTLED_G_N];
 #ifdef OSC_GPIO_LOG_RESERVED_PINS
-	bool				bOn;
+	bool                bOn;
 #endif /* OSC_GPIO_LOG_RESERVED_PINS */
 	
 	/* Color transitions currently not supported. */
@@ -209,7 +209,7 @@ OSC_ERR OscGpioSetTestLedColor(uint8 red, uint8 green)
 
 OSC_ERR OscGpioConfigImageTrigger(enum EnTriggerConfig enConfig)
 {
-	struct GPIO_PIN		*pPin = &gpio.pins[PIN_FN_EX_TRIGGER_N];
+	struct GPIO_PIN     *pPin = &gpio.pins[PIN_FN_EX_TRIGGER_N];
 	
 	/* This function does not really have an effect on host. */
 	if(enConfig == TRIGGER_INTERNAL)
@@ -220,7 +220,7 @@ OSC_ERR OscGpioConfigImageTrigger(enum EnTriggerConfig enConfig)
 	} else {
 		OscLog(ERROR, "%s: Invalid trigger config for this hardware (%d)!\n",
 				__func__, enConfig);
-		return -EINVALID_PARAMETER;	
+		return -EINVALID_PARAMETER;
 	}
 	
 	return SUCCESS;
@@ -229,13 +229,13 @@ OSC_ERR OscGpioConfigImageTrigger(enum EnTriggerConfig enConfig)
 
 OSC_ERR OscGpioInitPins()
 {
-	uint16 		pin;
-	int			pinNr;
+	uint16      pin;
+	int         pinNr;
 	struct GPIO_PIN_CONFIG* pPinConfig;
-	uint32		defaultValue;
-	OSC_ERR		err;
-	bool		bReaderCreated = FALSE;
-	bool		bWriterCreated = FALSE;
+	uint32      defaultValue;
+	OSC_ERR     err;
+	bool        bReaderCreated = FALSE;
+	bool        bWriterCreated = FALSE;
 
 	for(pin = 0; pin < nrOfPins; pin++)
 	{
@@ -245,7 +245,7 @@ OSC_ERR OscGpioInitPins()
 		pinNr = pPinConfig->pinNr;
 		if(pinNr < 0 || pinNr >= NR_OF_DSP_GPIOS)
 		{
-			OscLog(ERROR, 
+			OscLog(ERROR,
 					"%s: Fatal! Invalid pin number for %s configured! (%d)\n",
 					__func__, pPinConfig->name, pinNr);
 			return -EDEVICE;
@@ -259,12 +259,12 @@ OSC_ERR OscGpioInitPins()
 			{
 				err = SUCCESS;
 				goto skip_logging;
-			} 
+			}
 #endif
 			if(!bWriterCreated)
 			{
 				/* Create a writer for the outputs */
-				err = OscSwrCreateWriter( 
+				err = OscSwrCreateWriter(
 						&gpio.hWriter, OSC_GPIO_WRITER_FILE,
 						TRUE, TRUE); /*report property: time, cyclic */
 				if(err != SUCCESS)
@@ -275,19 +275,19 @@ OSC_ERR OscGpioInitPins()
 				}
 				bWriterCreated = TRUE;
 			}
-			defaultValue = pPinConfig->defaultState ? 1 : 0; 
-			err = OscSwrRegisterSignal(&gpio.phSignalOut[pinNr], 
-					gpio.hWriter, 
-					pPinConfig->name, 
-					SWR_INTEGER, 
-					&defaultValue, 
+			defaultValue = pPinConfig->defaultState ? 1 : 0;
+			err = OscSwrRegisterSignal(&gpio.phSignalOut[pinNr],
+					gpio.hWriter,
+					pPinConfig->name,
+					SWR_INTEGER,
+					&defaultValue,
 					"%d");
 		} else {
 			if(!bReaderCreated)
 			{
 				/* Create a stimuli reader for the inputs */
-				err = OscSrdCreateReader( OSC_GPIO_READER_FILE, 
-						&OscGpioReaderCallback, 
+				err = OscSrdCreateReader( OSC_GPIO_READER_FILE,
+						&OscGpioReaderCallback,
 						&gpio.hReader);
 				if(err != SUCCESS)
 				{
@@ -297,8 +297,8 @@ OSC_ERR OscGpioInitPins()
 				}
 				bReaderCreated = TRUE;
 			}
-			err = OscSrdRegisterSignal( gpio.hReader, 
-					pPinConfig->name, 
+			err = OscSrdRegisterSignal( gpio.hReader,
+					pPinConfig->name,
 					&gpio.phSignalIn[pinNr]);
 		}
 skip_logging:
@@ -310,7 +310,7 @@ skip_logging:
 		}
 
 		/* Save a pointer to the pin configuration. */
-		gpio.pins[pinNr].pDefConfig = pPinConfig; 
+		gpio.pins[pinNr].pDefConfig = pPinConfig;
 		/* Save the default flags as the currently active flags. */
 		gpio.pins[pinNr].flags = pPinConfig->defaultFlags;
 		gpio.pins[pinNr].bState = pPinConfig->defaultState;
@@ -321,9 +321,9 @@ skip_logging:
 
 void OscGpioReaderCallback()
 {
-	void 	*phSignalIn;
-	bool 	bPolState;
-	uint16 	pinNr;
+	void    *phSignalIn;
+	bool    bPolState;
+	uint16  pinNr;
 	
 	for(pinNr = 0; pinNr < NR_OF_DSP_GPIOS; pinNr++)
 	{
@@ -332,7 +332,7 @@ void OscGpioReaderCallback()
 			phSignalIn = gpio.phSignalIn[pinNr];
 			
 			/* Get the new signal value. */
-			OscSrdGetUpdateSignal(phSignalIn, 
+			OscSrdGetUpdateSignal(phSignalIn,
 					&bPolState);
 			/* Apply polarity. */
 			if(gpio.pins[pinNr].flags & POL_LOWACTIVE)

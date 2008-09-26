@@ -14,26 +14,26 @@
  * all modules can be made */
 enum EnOscCamErrors
 {
-    ENO_VIDEO_DEVICE_FOUND = OSC_CAM_ERROR_OFFSET,
-    EPICTURE_TOO_OLD,
-    ENO_MATCHING_PICTURE,
-    ENO_CAPTURE_STARTED,
-    EFRAME_BUFFER_BUSY,
-    EPICTURE_TOO_SMALL,
-    ENO_AREA_OF_INTEREST_SET,
-    ENO_COLOR_SENSOR
+	ENO_VIDEO_DEVICE_FOUND = OSC_CAM_ERROR_OFFSET,
+	EPICTURE_TOO_OLD,
+	ENO_MATCHING_PICTURE,
+	ENO_CAPTURE_STARTED,
+	EFRAME_BUFFER_BUSY,
+	EPICTURE_TOO_SMALL,
+	ENO_AREA_OF_INTEREST_SET,
+	ENO_COLOR_SENSOR
 };
 
 /*! @brief Camera perspective adaptation */
 enum EnOscCamPerspective
 {
-    OSC_CAM_PERSPECTIVE_DEFAULT,
-    OSC_CAM_PERSPECTIVE_HORIZONTAL_MIRROR,
-    OSC_CAM_PERSPECTIVE_VERTICAL_MIRROR,
-    OSC_CAM_PERSPECTIVE_180DEG_ROTATE
+	OSC_CAM_PERSPECTIVE_DEFAULT,
+	OSC_CAM_PERSPECTIVE_HORIZONTAL_MIRROR,
+	OSC_CAM_PERSPECTIVE_VERTICAL_MIRROR,
+	OSC_CAM_PERSPECTIVE_180DEG_ROTATE
 };
 
-/*! @brief Configuration value string for default perspective */ 
+/*! @brief Configuration value string for default perspective */
 #define OSC_CAM_PERSPECTIVE_CFG_STR_DEFAULT              "DEFAULT"
 /*! @brief Configuration value string for horizontal mirrored perspective*/
 #define OSC_CAM_PERSPECTIVE_CFG_STR_HORIZONTAL_MIRROR    "HMIRROR"
@@ -46,7 +46,7 @@ enum EnOscCamPerspective
  * the multi buffer. */
 #define OSC_CAM_MULTI_BUFFER 254
 /*! @brief Buffer ID of an invalid buffer. */
-#define OSC_CAM_INVALID_BUFFER_ID 255 
+#define OSC_CAM_INVALID_BUFFER_ID 255
 
 /*! @brief The width of the biggest image that can be captured with this
  * sensor. */
@@ -75,14 +75,14 @@ OSC_ERR OscCamCreate(void *hFw);
 void OscCamDestroy(void *hFw);
 
 /*********************************************************************//*!
- * @brief Host only: Set the file name reader the host implementation 
+ * @brief Host only: Set the file name reader the host implementation
  * reads the pictures from.
  * 
  * Host only:
  * If the camera configuration file is present, the filename reader
- * is opened according to the information contained therein. 
+ * is opened according to the information contained therein.
  * If not, the file name reader has to be set over this function for
- * the host. 
+ * the host.
  * It can be changed afterwards, but the old file name handle cannot
  * be closed and thus it will produce a warning.
  * 
@@ -96,45 +96,45 @@ OSC_ERR OscCamSetFileNameReader(void* hReaderHandle);
  * 
  * @see OscCamGetAreaOfInterest
  * Writes the configuration to limit the image format captured by the CMOS
- * sensor to the specified values. Becomes valid with the next image 
+ * sensor to the specified values. Becomes valid with the next image
  * captured.
  * ! Only even widths are supported !
  * To restore the default (full) image size, specify 0 for all parameters.
  * 
- * @param lowX X coordinate limiting the capture rectangle on the left 
+ * @param lowX X coordinate limiting the capture rectangle on the left
  * side
- * @param lowY Y coordinate limiting the capture rectangle on the bottom 
+ * @param lowY Y coordinate limiting the capture rectangle on the bottom
  * side
  * @param width Width of the rectangle. !Must be an even value!
  * @param height Height of the rectangle.
  * @return SUCCESS or  an appropriate error code otherwise
  *//*********************************************************************/
 OSC_ERR OscCamSetAreaOfInterest(const uint16 lowX, const uint16 lowY,
-        const uint16 width, const uint16 height);
+		const uint16 width, const uint16 height);
 
 /*********************************************************************//*!
  * @brief Read back the rectangle currently being read out by the sensor.
  * 
  * @see OscCamSetAreaOfInterest
- * @param pLowX X coordinate limiting the capture rectangle on the left 
+ * @param pLowX X coordinate limiting the capture rectangle on the left
  * side
- * @param pLowY Y coordinate limiting the capture rectangle on the bottom 
+ * @param pLowY Y coordinate limiting the capture rectangle on the bottom
  * side
  * @param pWidth Width of the rectangle. !Must be an even value!
  * @param pHeight Height of the rectangle.
  * @return SUCCESS or  an appropriate error code otherwise
  *//*********************************************************************/
 OSC_ERR OscCamGetAreaOfInterest(uint16 *pLowX,
-        uint16 *pLowY,
-        uint16 *pWidth,
-        uint16 *pHeight);
+		uint16 *pLowY,
+		uint16 *pWidth,
+		uint16 *pHeight);
 
 /*********************************************************************//*!
  * @brief Set the exposure time
  * 
  * Write the configuration for the shutter width (exposure) in useconds
- * to the camera sensor. Does become valid with the next image captured. 
- * Value is wrapped onto the valid range and rounded. An argument of 0 
+ * to the camera sensor. Does become valid with the next image captured.
+ * Value is wrapped onto the valid range and rounded. An argument of 0
  * activates the automatic exposure control (AEC) of the sensor.
  * 
  * @param usecs Desired exposure time in microseconds
@@ -145,8 +145,8 @@ OSC_ERR OscCamSetShutterWidth(const uint32 usecs);
 /*********************************************************************//*!
  * @brief Get the current exposure time
  * 
- * Reads out the current exposure time in microseconds. A return value of 
- * 0 indicates that the automatic exposure control (AEC) of the camera 
+ * Reads out the current exposure time in microseconds. A return value of
+ * 0 indicates that the automatic exposure control (AEC) of the camera
  * is active.
  * 
  * @param pResult Configured exposure time in microseconds
@@ -157,17 +157,17 @@ OSC_ERR OscCamGetShutterWidth(uint32 *pResult);
 /*********************************************************************//*!
  * @brief Set the black level offset
  * 
- * Write the Row Noise Constant to the camera sensor. The parameter is 
- * used to control the black-level response. In conjunction with the 
- * sensor calibration this may have to be adapted in order to get a 
+ * Write the Row Noise Constant to the camera sensor. The parameter is
+ * used to control the black-level response. In conjunction with the
+ * sensor calibration this may have to be adapted in order to get a
  * undistorted gaussian response for a black image (lens covered).
  * By default sensor applies a certain offset.
- * A offset increment generated a boosted sensor response by one grey 
+ * A offset increment generated a boosted sensor response by one grey
  * level (8bit output mode). Maximum offset is 63.
  * This offset parameter is used only in function with the enabled
  * row noise cancellation algorithm.
  * 
- * @param offset Boost the sensor response by N grey levels 
+ * @param offset Boost the sensor response by N grey levels
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
 OSC_ERR OscCamSetBlackLevelOffset(const uint16 offset);
@@ -183,9 +183,9 @@ OSC_ERR OscCamGetBlackLevelOffset(uint16 *pOffset);
 /*********************************************************************//*!
  * @brief Set a register value.
  * 
- * Sets the register described by reg to the specified value. 
- * This should only be used for testing an debugging and the 
- * framework should be extended by designated functions 
+ * Sets the register described by reg to the specified value.
+ * This should only be used for testing an debugging and the
+ * framework should be extended by designated functions
  * controlling the used registers.
  * 
  * @param reg Identifier specifying the register to write to
@@ -197,9 +197,9 @@ OSC_ERR OscCamSetRegisterValue(const uint32 reg, const uint16 value);
 /*********************************************************************//*!
  * @brief Read a register value
  * 
- * Reads the register described by reg and returns its value. 
- * This should only be used for testing an debugging and the 
- * framework should be extended by designated functions controlling 
+ * Reads the register described by reg and returns its value.
+ * This should only be used for testing an debugging and the
+ * framework should be extended by designated functions controlling
  * the used registers.
  * 
  * @param reg Identifier specifying the register to read
@@ -211,14 +211,14 @@ OSC_ERR OscCamGetRegisterValue(const uint32 reg, uint16 *pResult);
 /*********************************************************************//*!
  * @brief Configure multiple frame buffer to form a multi buffer.
  * 
- * This can be used e.g. to allow automatic management of double or 
+ * This can be used e.g. to allow automatic management of double or
  * triple buffering. Just specify the depth of the multi buffer and the
  * frame buffer IDs forming the multi buffer. Afterwards the commands
- * requiring a frame buffer number can be supplied with 
+ * requiring a frame buffer number can be supplied with
  * OSC_CAM_MULTI_BUFFER to access the data in the automatically managed
  * multi buffer.
  * Only one multi buffer can exist per camera module.
- * The specified frame buffers must first be configured by calls 
+ * The specified frame buffers must first be configured by calls
  * to OscCamCreateFrameBuffer.
  * @see OscCamCreateFrameBuffer
  * @see OscCamDeleteMultiBuffer
@@ -228,7 +228,7 @@ OSC_ERR OscCamGetRegisterValue(const uint32 reg, uint16 *pResult);
  * @return SUCCESS or an appropriate error code
  *//*********************************************************************/
 OSC_ERR OscCamCreateMultiBuffer(const uint8 multiBufferDepth,
-        const uint8 bufferIDs[]);
+		const uint8 bufferIDs[]);
 
 /*********************************************************************//*!
  * @brief Delete a previously configured multi buffer
@@ -248,7 +248,7 @@ inline OSC_ERR OscCamDeleteMultiBuffer();
  * OscCamCreateMultiBuffer.
  * A frame buffer is unregistered by specifying NULL for pData and
  * a size of zero.
- * Double-Buffering is therefore easily implemented by just 
+ * Double-Buffering is therefore easily implemented by just
  * specifying 2 framebuffers.
  * @see OscCamCreateMultiBuffer
  * 
@@ -259,13 +259,13 @@ inline OSC_ERR OscCamDeleteMultiBuffer();
  * @return SUCCESS or an appropriate error code
  *//*********************************************************************/
 OSC_ERR OscCamSetFrameBuffer(const uint8 fbID, const uint32 uSize,
-        const void * pData, const int bCached);
+		const void * pData, const int bCached);
 
 /*********************************************************************//*!
  * @brief Prepare the capture of a new picture
  * 
  * This method needs to be called before OscCamReadPicture(). It does not
- * block. 
+ * block.
  * The camera sensor must be triggered either through an external trigger
  * signal or over the GPIOs, respectively CPLD, depending on the hardware
  * platform.
@@ -281,11 +281,11 @@ OSC_ERR OscCamSetupCapture(uint8 fbID);
  * @brief Cancel the capture of a picture
  * 
  * Cancels a previous call to OscCamSetupCapture if the picture
- * is not yet in the frame-buffer. In case the 
- * picture is currently being captured, this action will be 
- * cancelled, resulting in a corrupted picture in the frame 
+ * is not yet in the frame-buffer. In case the
+ * picture is currently being captured, this action will be
+ * cancelled, resulting in a corrupted picture in the frame
  * buffer.
- * Does not block. 
+ * Does not block.
  * @see OscCamSetupCapture
  * 
  * @return SUCCESS or an appropriate error code
@@ -296,13 +296,13 @@ OSC_ERR OscCamCancelCapture();
  * @brief Reads a new picture from the camera.
  * 
  * Blocks until the picture from a previous call to OscCamSetupCapture
- * is stored fully in RAM (the frame-buffer). It then supplies the 
+ * is stored fully in RAM (the frame-buffer). It then supplies the
  * pointer of the frame-buffer that contains the image. To prevent
  * an infinite blocking on this function a timeout can be supplied.
  * After the timeout, the function should just be called again.
  * Additionally a maximum age of the picture can be specified
  * after which the error -EPICTURE_TOO_OLD is returned. The picture
- * can still be used if desired. 
+ * can still be used if desired.
  * No image processing is performed, which means that when reading a
  * picture from a color CMOS sensor, Bayer pattern filtering has to be
  * done before being able to use the color content of the picture.
@@ -316,19 +316,19 @@ OSC_ERR OscCamCancelCapture();
  * 
  * @param fbID ID of the framebuffer to read the image from.
  * @param ppPic Location where to save the pointer to the frame-buffer.
- * @param maxAge Maximum age of the returned image in milliseconds. 0 
+ * @param maxAge Maximum age of the returned image in milliseconds. 0
  * means no maximum age.
  * @param timeout Timeout in milliseconds. 0 means no timeout.
  * @return SUCCESS or an appropriate error code.
  *//*********************************************************************/
-OSC_ERR OscCamReadPicture(const uint8 fbID, void ** ppPic, 
-        const uint16 maxAge, const uint16 timeout);
+OSC_ERR OscCamReadPicture(const uint8 fbID, void ** ppPic,
+		const uint16 maxAge, const uint16 timeout);
 
 /*********************************************************************//*!
  * @brief Returns the latest picture from the camera
  * 
  * Returns a pointer to the frame-buffer where the last successfully
- * captured picture resides. 
+ * captured picture resides.
  * 
  * @param ppPic Location where to save the pointer to the frame-buffer
  * @return SUCCESS or an appropriate error code
@@ -338,8 +338,8 @@ OSC_ERR OscCamReadLatestPicture(uint8 ** ppPic);
 /*********************************************************************//*!
  * @brief Register a callback function for image correction
  * 
- * ReadPicture calls this registered function at the very end. Depending 
- * on the configured noise removal methods (OscClbSetupCalibrate) the 
+ * ReadPicture calls this registered function at the very end. Depending
+ * on the configured noise removal methods (OscClbSetupCalibrate) the
  * image is corrected in place.
  * 
  * Host: No effect
@@ -347,20 +347,20 @@ OSC_ERR OscCamReadLatestPicture(uint8 ** ppPic);
  * @param pCallback Pointer to the function to be called.
  * @return SUCCESS or an appropriate error code.
  *//*********************************************************************/
-OSC_ERR OscCamRegisterCorrectionCallback( 
-        int (*pCallback)(
-                uint8 *pImg, 
-                const uint16 lowX, 
-                const uint16 lowY,
-                const uint16 width, 
-                const uint16 height));
+OSC_ERR OscCamRegisterCorrectionCallback(
+		int (*pCallback)(
+				uint8 *pImg,
+				const uint16 lowX,
+				const uint16 lowY,
+				const uint16 width,
+				const uint16 height));
 
 /*********************************************************************//*!
  * @brief Setup the camera to scene perspective relation
  * 
- * This function allows to compensate for a non-upright camera and scene 
+ * This function allows to compensate for a non-upright camera and scene
  * relation. The received image is modified as follow:
- * no modification; horizontal mirror; vertical mirror; 180 degree rotation. 
+ * no modification; horizontal mirror; vertical mirror; 180 degree rotation.
  * 
  * Host: No effect
  * 
@@ -377,15 +377,15 @@ OSC_ERR OscCamSetupPerspective(const enum EnOscCamPerspective perspective);
  * @param per Returned perspective identifier
  * @return SUCCESS or an appropriate error code
  *//*********************************************************************/
-OSC_ERR PerspectiveCfgStr2Enum(const char *str, 
-        enum EnOscCamPerspective *per );
+OSC_ERR PerspectiveCfgStr2Enum(const char *str,
+		enum EnOscCamPerspective *per );
 
 /*********************************************************************//*!
  * @brief Host only: Set image sensor registers to standard configuration.
  * 
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-OSC_ERR OscCamPresetRegs();  
+OSC_ERR OscCamPresetRegs();
 
 /*********************************************************************//*!
  * @brief Returns an identifier describing the order of the bayer colors
@@ -398,7 +398,7 @@ OSC_ERR OscCamPresetRegs();
  * 
  * Only on hardware with color sensor.
  * 
- * @param pBayerOrderFirstRow Returned identifier desribing the pixel color 
+ * @param pBayerOrderFirstRow Returned identifier desribing the pixel color
  * order.
  * @param xPos X-Position of the row.
  * @param yPos Y-Position of the row.
@@ -414,10 +414,10 @@ OSC_ERR OscCamGetBayerOrder(enum EnBayerOrder *pBayerOrderFirstRow,
  * to OUT2 or whether it can be used as a GPIO.
  * 
  * On the leanXcam hardware, the output OUT2 is a logical OR between the
- * corresponding DSP pin and the LED_OUT pin from the image sensor. This 
+ * corresponding DSP pin and the LED_OUT pin from the image sensor. This
  * means that if one wants to use it as a GPIO, the LED_OUT from the
- * sensor has to be disabled (done by this function) and in the 
- * opposite case, where OUT2 should be assigned to LED_OUT, the DSP pin 
+ * sensor has to be disabled (done by this function) and in the
+ * opposite case, where OUT2 should be assigned to LED_OUT, the DSP pin
  * has to be wired to zero (done by OscGpioConfigSensorLedOut).
  * 
  * ! Must also call OscGpioConfigSensorLedOut !
@@ -428,7 +428,7 @@ OSC_ERR OscCamGetBayerOrder(enum EnBayerOrder *pBayerOrderFirstRow,
  * 
  * @param bSensorLedOut If TRUE, the sensor LED out is routed to OUT2 and
  * it cannot be used as GPIO anymore.
- * @param bInvert Invert the output of LED_OUT. Non-inverting means that 
+ * @param bInvert Invert the output of LED_OUT. Non-inverting means that
  * there is a rising-flank pulse at the plug.
  * @return SUCCESS or an appropriate error code.
  *//*********************************************************************/

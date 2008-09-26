@@ -12,8 +12,8 @@
 
 /*! @brief The object struct of the camera module */
 struct OSC_DSPL {
-    /*! @brief Dummy to have at least one member in this struct. */
-    int dummy; 
+	/*! @brief Dummy to have at least one member in this struct. */
+	int dummy;
 };
 
 /*********************************************************************//*!
@@ -25,7 +25,7 @@ struct OSC_DSPL {
  * @param size of the input array to be rearranged
  * @param out Real output array containing the values of the input array
  *  in bit reversed order
-*//*********************************************************************/
+ *//*********************************************************************/
 void OscDsplRBitrev(const fract16 in[], fract16 out[], int size);
 
 /*********************************************************************//*!
@@ -37,7 +37,7 @@ void OscDsplRBitrev(const fract16 in[], fract16 out[], int size);
  * @param size of the input array to be rearranged
  * @param out Complex output array containing the values of the input array
  *  in bit reversed order
-*//*********************************************************************/
+ *//*********************************************************************/
 void OscDsplCBitrev(const complex_fract16 in[], complex_fract16 out[], int size);
 
 /*********************************************************************//*!
@@ -48,8 +48,8 @@ void OscDsplCBitrev(const complex_fract16 in[], complex_fract16 out[], int size)
  * 
  * @param butterflyfr16 fract16 array to be checked
  * @param fft_size size of the input array
- * @return  Returns 1 if the array needs scaling, else 0 
-*//*********************************************************************/
+ * @return  Returns 1 if the array needs scaling, else 0
+ *//*********************************************************************/
 int OscDsplRDscale( fract16 butterflyfr16[], int fft_size);
 
 /*********************************************************************//*!
@@ -60,8 +60,8 @@ int OscDsplRDscale( fract16 butterflyfr16[], int fft_size);
  * 
  * @param butterflycfr16 complex_fract16 array to be checked
  * @param fft_size size of the input array
- * @return  Returns 1 if the array needs scaling, else 0 
-*//*********************************************************************/
+ * @return  Returns 1 if the array needs scaling, else 0
+ *//*********************************************************************/
 int OscDsplCDscale( complex_fract16 butterflycfr16[], int fft_size);
 
 /*********************************************************************//*!
@@ -69,9 +69,9 @@ int OscDsplCDscale( complex_fract16 butterflycfr16[], int fft_size);
  * 
  * This function is needed for the var_fr16 function
  * 
- * @param in fract64 input value 
+ * @param in fract64 input value
  * @return  Returns saturated value
-*//*********************************************************************/
+ *//*********************************************************************/
 long long int OscDsplSatFr64(long long int in);
 
 #endif /*DSPL_PRIV_H_*/

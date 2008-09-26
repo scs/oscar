@@ -14,7 +14,7 @@
 #define MAX_MOVES_PER_CHAIN 4
 /*! @brief The maximum number of DMA chains that can be allocated. */
 #define MAX_NR_DMA_CHAINS 2
-/*! @brief The number of loop cycles before OscDmaSync gives up and 
+/*! @brief The number of loop cycles before OscDmaSync gives up and
  * returns. */
 #define DMA_SYNC_TIMEOUT_LOOPS 0xFFFFFFFF
 
@@ -38,62 +38,62 @@
 /*! @brief Bitmask for the wordsize DMA channel option.*/
 #define WDSIZE_MASK     0x0000000C
 /*! @brief DMA channel option: 2D mode. */
-#define DMA2D           0x00000010  
+#define DMA2D           0x00000010
 /*! @brief DMA channel option: Synchronized execution. This
  * is needed to switch word sizes. */
 #define SYNC            0x00000020
 /*! @brief DMA channel option: Data interrupt select. */
-#define DI_SEL          0x00000040 
+#define DI_SEL          0x00000040
 /*! @brief DMA channel option: Data interrupt enable. */
 #define DI_EN           0x00000080
 /*! @brief DMA channel option: Size of next descriptor (always 7B). */
 #define NDSIZE          0x00000700
 /*! @brief DMA channel option: Set flow mode to descriptor array. */
-#define FLOW_ARRAY      0x00004000 
+#define FLOW_ARRAY      0x00004000
 
 
 struct DMA_DESC
 {
-    /*! @brief The low part of the start address for the transfer */
-    uint16 startAddrLow;
-    /*! @brief The high part of the start address for the transfer */
-    uint16 startAddrHigh;
-    /*! @brief DMA channel config */
-    uint16 config;
-    /*! @brief Number of words along X axis. */
-    uint16 xCount;
-    /*! @brief Address offset along X axis. */
-    int16 xModify;
-    /*! @brief Number of words along Y axis. */
-    uint16 yCount;
-    /*! @brief Address offset along Y axis. */
-    int16 yModify;
+	/*! @brief The low part of the start address for the transfer */
+	uint16 startAddrLow;
+	/*! @brief The high part of the start address for the transfer */
+	uint16 startAddrHigh;
+	/*! @brief DMA channel config */
+	uint16 config;
+	/*! @brief Number of words along X axis. */
+	uint16 xCount;
+	/*! @brief Address offset along X axis. */
+	int16 xModify;
+	/*! @brief Number of words along Y axis. */
+	uint16 yCount;
+	/*! @brief Address offset along Y axis. */
+	int16 yModify;
 };
 
 struct DMA_CHAIN
 {
-    /*! @brief Data field used for waiting until the DMA transfers have
-     *  been completed. 
-     * 
-     * This is set to zero at the beginning of a transfer and is 
-     * overwritten with ones with the last operation in the DMA chain. */
-    uint32 syncFlag;
-    /*! @brief The number of data moves currently scheduled in this 
-     * chain. */
-    uint32 nMoves;
-    /*! The source channel descriptors of this chain. */
-    struct DMA_DESC arySrcDesc[MAX_MOVES_PER_CHAIN + 1];
-    /*! The destination channel descriptors of this chain. */
-    struct DMA_DESC aryDstDesc[MAX_MOVES_PER_CHAIN + 1];
+	/*! @brief Data field used for waiting until the DMA transfers have
+	 *  been completed.
+	 * 
+	 * This is set to zero at the beginning of a transfer and is
+	 * overwritten with ones with the last operation in the DMA chain. */
+	uint32 syncFlag;
+	/*! @brief The number of data moves currently scheduled in this
+	 * chain. */
+	uint32 nMoves;
+	/*! The source channel descriptors of this chain. */
+	struct DMA_DESC arySrcDesc[MAX_MOVES_PER_CHAIN + 1];
+	/*! The destination channel descriptors of this chain. */
+	struct DMA_DESC aryDstDesc[MAX_MOVES_PER_CHAIN + 1];
 
 };
 
 /*! @brief The object struct of the camera module */
 struct OSC_DMA {
-    /*! @brief The DMA chains that can be allocated. */
-    struct DMA_CHAIN        dmaChains[MAX_NR_DMA_CHAINS];
-    /*! @brief The current number of allocated DMA chains. */
-    uint16                  nChainsAllocated;
+	/*! @brief The DMA chains that can be allocated. */
+	struct DMA_CHAIN        dmaChains[MAX_NR_DMA_CHAINS];
+	/*! @brief The current number of allocated DMA chains. */
+	uint16                  nChainsAllocated;
 };
 
 /*************************** Private methods ***************************/
@@ -122,9 +122,9 @@ uint8 OscDmaExtractWdSize(const uint16 dmaConfigMask);
  * @param wdSize Word size used for transfers.
  * @return SUCCESS or an appropriate error code.
  *//*********************************************************************/
-OSC_ERR OscDmaChanCopy(const struct DMA_DESC *pDesc, 
-        void *pTemp, 
-        const uint8 wdSize);
+OSC_ERR OscDmaChanCopy(const struct DMA_DESC *pDesc,
+		void *pTemp,
+		const uint8 wdSize);
 
 #endif /* OSC_HOST */
 

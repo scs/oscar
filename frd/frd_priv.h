@@ -1,7 +1,7 @@
 /*! @file frd_priv.h
  * @brief Private filename reader module definition
  * 
- ************************************************************************/
+	************************************************************************/
 #ifndef FRD_PRIV_H_
 #define FRD_PRIV_H_
 
@@ -23,22 +23,22 @@
 #define MAX_PREFIX_LEN 1024
 /*! @brief The maximum length of a file name postfix. */
 #define MAX_SUFFIX_LEN 16
-/*! @brief The maximum length of a path name of the file name list 
+/*! @brief The maximum length of a path name of the file name list
  * reader. */
 #define MAX_PATH_LEN 1024
 
 /*! @brief Reader object struct for a sequential reader*/
 struct OSC_FRD_SEQUENCE_READER
 {
-    /*! @brief The prefix of the filenames. */
-    char strPrefix[MAX_PREFIX_LEN];    
-    /*! @brief To how many digits the sequence number is expanded. */
-    int seqNrDigits;     
-    /*! @brief The suffix of the filenames. */
-    char strSuffix[MAX_SUFFIX_LEN];
+	/*! @brief The prefix of the filenames. */
+	char strPrefix[MAX_PREFIX_LEN];
+	/*! @brief To how many digits the sequence number is expanded. */
+	int seqNrDigits;
+	/*! @brief The suffix of the filenames. */
+	char strSuffix[MAX_SUFFIX_LEN];
 };
 
-/*! @brief Reader object struct for a filelist reader*/ 
+/*! @brief Reader object struct for a filelist reader*/
 struct OSC_FRD_FILELIST_READER
 {
 	/* @brief The file name of the file list. */
@@ -49,7 +49,7 @@ struct OSC_FRD_FILELIST_READER
 	char curFileName[1024];
 };
 
-/*! @brief Reader object struct for a constant reader*/ 
+/*! @brief Reader object struct for a constant reader*/
 struct OSC_FRD_CONSTANT_READER
 {
 	/* @brief The constant file name to return. */
@@ -57,7 +57,7 @@ struct OSC_FRD_CONSTANT_READER
 };
 
 /* @brief Enumeration of the different supported reader types. */
-enum EnFilenameReaderType 
+enum EnFilenameReaderType
 {
 	FRD_READER_TYPE_SEQUENCE,
 	FRD_READER_TYPE_LIST,
@@ -73,21 +73,21 @@ struct OSC_FRD_READER
 	/*! @brief The actual data of the reader, depending on its type. */
 	union OSC_FRD_READER_DATA
 	{
-    	/*! @brief Sequence file name reader. */
-    	struct OSC_FRD_SEQUENCE_READER seq;
-    	/*! @brief List file name reader. */
-    	struct OSC_FRD_FILELIST_READER list;
-    	/*! @brief Constant file name reader. */
-    	struct OSC_FRD_CONSTANT_READER constant;
+		/*! @brief Sequence file name reader. */
+		struct OSC_FRD_SEQUENCE_READER seq;
+		/*! @brief List file name reader. */
+		struct OSC_FRD_FILELIST_READER list;
+		/*! @brief Constant file name reader. */
+		struct OSC_FRD_CONSTANT_READER constant;
 	} reader;
 };
 
 /*!@brief Filename reader module object struct */
 struct OSC_FRD
 {
-    uint16 nrOfReaders;		/*!< @brief Number of managed readers */
+	uint16 nrOfReaders;     /*!< @brief Number of managed readers */
 	/*! @brief Reader object array */
-    struct OSC_FRD_READER rd[MAX_NR_READERS];
+	struct OSC_FRD_READER rd[MAX_NR_READERS];
 };
 
 /*********************************************************************//*!
@@ -99,7 +99,7 @@ struct OSC_FRD
  * in the file.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-static OSC_ERR OscFrdParseSequentialReader(FILE *pConfigFile, 
+static OSC_ERR OscFrdParseSequentialReader(FILE *pConfigFile,
 		struct OSC_FRD_SEQUENCE_READER * pReader);
 
 /*********************************************************************//*!
@@ -111,7 +111,7 @@ static OSC_ERR OscFrdParseSequentialReader(FILE *pConfigFile,
  * in the file.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-static OSC_ERR OscFrdParseListReader(FILE *pConfigF, 
+static OSC_ERR OscFrdParseListReader(FILE *pConfigF,
 		struct OSC_FRD_FILELIST_READER * pReader);
 
 /*********************************************************************//*!
@@ -123,7 +123,7 @@ static OSC_ERR OscFrdParseListReader(FILE *pConfigF,
  * in the file.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-static OSC_ERR OscFrdParseConstantReader(FILE *pConfigF, 
+static OSC_ERR OscFrdParseConstantReader(FILE *pConfigF,
 		struct OSC_FRD_CONSTANT_READER * pReader);
 		
 /*********************************************************************//*!
@@ -133,8 +133,8 @@ static OSC_ERR OscFrdParseConstantReader(FILE *pConfigF,
  * @param strCurName Current file name is written to this string.
  *//*********************************************************************/
 static inline void OscFrdListGetCurrentFileName(
-		const struct OSC_FRD_FILELIST_READER *pReader, 
-        char strCurName[]);
+		const struct OSC_FRD_FILELIST_READER *pReader,
+		char strCurName[]);
 
 /*********************************************************************//*!
  * @brief Get the current file name of a sequence reader.
@@ -143,18 +143,18 @@ static inline void OscFrdListGetCurrentFileName(
  * @param strCurName Current file name is written to this string.
  *//*********************************************************************/
 static void OscFrdSeqGetCurrentFileName(
-		const struct OSC_FRD_SEQUENCE_READER *pReader, 
-        char strCurName[]);
+		const struct OSC_FRD_SEQUENCE_READER *pReader,
+		char strCurName[]);
 
 /*********************************************************************//*!
  * @brief Get the current file name of a constant reader.
  * 
  * @param pReader Handle to the file sequence reader.
  * @param strCurName Current file name is written to this string.
- *//*********************************************************************/        
+ *//*********************************************************************/
 static void OscFrdConstGetCurrentFileName(
-		const struct OSC_FRD_CONSTANT_READER *pReader, 
-        char strCurName[]);
+		const struct OSC_FRD_CONSTANT_READER *pReader,
+		char strCurName[]);
 
 /*********************************************************************//*!
  * @brief The callback being invoked every simulation cycle.

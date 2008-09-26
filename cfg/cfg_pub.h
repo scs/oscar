@@ -11,32 +11,32 @@
  * Sample usage of API:
  * 
  *     // variable declaration@n
- * 	   struct CFG_VAL_STR val;@n
- * 	   struct CFG_KEY key;@n
- * 	   CFG_FILE_CONTENT_HANDLE hCfgHandle;@n
- * 	   const char fileName[] = "eeprom.txt";@n
- * 	   int16 tmpInt = 0;@n
- * 	   
- * 	   // register file and read it to memory@n
- * 	   OscCfgRegisterFile(&hCfgHandle, fileName, 256);@n 
- * 	   
- * 	   // read out string@n
- * 	   key.strSection = NULL;@n
- * 	   key.strTag = "IP";@n
- * 	   OscCfgGetStr(hCfgHandle, &key, &val);@n
- * 	   
- * 	   // read int@n
- * 	   key.strSection = NULL;@n
- * 	   key.strTag = "DEL";@n
- * 	   OscCfgGetInt(hCfgHandle, &key, &tmpInt);@n
- * 	   
- * 	   // set new string value@n
- * 	   key.strSection = NULL;@n
- * 	   key.strTag = "MAC";@n
- * 	   OscCfgSetStr(hCfgHandle, &key, "00:20:e3:22:00:01");@n
- * 	   
- * 	   // flush the file to disk@n
- * 	   OscCfgFlushContent(hCfgHandle);@n
+ *     struct CFG_VAL_STR val;@n
+ *     struct CFG_KEY key;@n
+ *     CFG_FILE_CONTENT_HANDLE hCfgHandle;@n
+ *     const char fileName[] = "eeprom.txt";@n
+ *     int16 tmpInt = 0;@n
+ * 
+ *     // register file and read it to memory@n
+ *     OscCfgRegisterFile(&hCfgHandle, fileName, 256);@n
+ * 
+ *     // read out string@n
+ *     key.strSection = NULL;@n
+ *     key.strTag = "IP";@n
+ *     OscCfgGetStr(hCfgHandle, &key, &val);@n
+ * 
+ *     // read int@n
+ *     key.strSection = NULL;@n
+ *     key.strTag = "DEL";@n
+ *     OscCfgGetInt(hCfgHandle, &key, &tmpInt);@n
+ * 
+ *     // set new string value@n
+ *     key.strSection = NULL;@n
+ *     key.strTag = "MAC";@n
+ *     OscCfgSetStr(hCfgHandle, &key, "00:20:e3:22:00:01");@n
+ * 
+ *     // flush the file to disk@n
+ *     OscCfgFlushContent(hCfgHandle);@n
  * 
  */
 #ifndef CFG_PUB_H_
@@ -44,11 +44,11 @@
 
 #include "oscar_error.h"
 #ifdef OSC_HOST
-    #include "oscar_types_host.h"
-    #include "oscar_host.h"
+	#include "oscar_types_host.h"
+	#include "oscar_host.h"
 #else
-    #include "oscar_types_target.h"
-    #include "oscar_target.h"
+	#include "oscar_types_target.h"
+	#include "oscar_target.h"
 #endif /* OSC_HOST */
 
 /*! @brief Module-specific error codes.
@@ -57,17 +57,17 @@
  * assigned to each module, so a distinction over
  * all modules can be made */
 enum EnOscCfgErrors {
-    ECFG_UNSUPPORTED_FORMAT = OSC_CFG_ERROR_OFFSET,
-    ECFG_INVALID_RANGE,
-    ECFG_INVALID_VAL,
-    ECFG_INVALID_KEY,
-    ECFG_NO_HANDLES,
-    ECFG_INVALID_FUNC_PARAMETER,
-    ECFG_UNABLE_TO_OPEN_FILE,
-    ECFG_UNABLE_TO_CLOSE_FILE,
-    ECFG_UNABLE_TO_WRITE_FILE,
-    ECFG_UNABLE_TO_READ_FILE,
-    ECFG_ERROR
+	ECFG_UNSUPPORTED_FORMAT = OSC_CFG_ERROR_OFFSET,
+	ECFG_INVALID_RANGE,
+	ECFG_INVALID_VAL,
+	ECFG_INVALID_KEY,
+	ECFG_NO_HANDLES,
+	ECFG_INVALID_FUNC_PARAMETER,
+	ECFG_UNABLE_TO_OPEN_FILE,
+	ECFG_UNABLE_TO_CLOSE_FILE,
+	ECFG_UNABLE_TO_WRITE_FILE,
+	ECFG_UNABLE_TO_READ_FILE,
+	ECFG_ERROR
 };
 /*! @brief Macro defining the maximal value string size*/
 #define CONFIG_VAL_MAX_SIZE 1024
@@ -112,7 +112,7 @@ void OscCfgDestroy(void *hFw);
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
 OSC_ERR OscCfgRegisterFile(
-		CFG_FILE_CONTENT_HANDLE* pFileContentHandle, 
+		CFG_FILE_CONTENT_HANDLE* pFileContentHandle,
 		const char *strFileName,
 		const unsigned int maxFileSize);
 
@@ -163,7 +163,7 @@ OSC_ERR OscCfgGetStr(
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
 OSC_ERR OscCfgSetStr(
-		const CFG_FILE_CONTENT_HANDLE hFileContent, 
+		const CFG_FILE_CONTENT_HANDLE hFileContent,
 		const struct CFG_KEY *pKey,
 		const char *strNewVal);
 
@@ -176,9 +176,9 @@ OSC_ERR OscCfgSetStr(
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
 OSC_ERR OscCfgGetUInt8(
-        const CFG_FILE_CONTENT_HANDLE hFileContent, 
-        const struct CFG_KEY *pKey,
-        uint8 *iVal);
+		const CFG_FILE_CONTENT_HANDLE hFileContent,
+		const struct CFG_KEY *pKey,
+		uint8 *iVal);
 
 /*********************************************************************//*!
  * @brief Read Int from content structure
@@ -189,7 +189,7 @@ OSC_ERR OscCfgGetUInt8(
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
 OSC_ERR OscCfgGetInt(
-		const CFG_FILE_CONTENT_HANDLE hFileContent, 
+		const CFG_FILE_CONTENT_HANDLE hFileContent,
 		const struct CFG_KEY *pKey,
 		int16 *iVal);
 
@@ -202,9 +202,9 @@ OSC_ERR OscCfgGetInt(
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
 OSC_ERR OscCfgGetInt32(
-        const CFG_FILE_CONTENT_HANDLE hFileContent, 
-        const struct CFG_KEY *pKey,
-        int32 *iVal);
+		const CFG_FILE_CONTENT_HANDLE hFileContent,
+		const struct CFG_KEY *pKey,
+		int32 *iVal);
 
 /*********************************************************************//*!
  * @brief Read Int from content structure
@@ -215,9 +215,9 @@ OSC_ERR OscCfgGetInt32(
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
 OSC_ERR OscCfgGetUInt32(
-        const CFG_FILE_CONTENT_HANDLE hFileContent, 
-        const struct CFG_KEY *pKey,
-        uint32 *iVal);
+		const CFG_FILE_CONTENT_HANDLE hFileContent,
+		const struct CFG_KEY *pKey,
+		uint32 *iVal);
 
 /*********************************************************************//*!
  * @brief Read Int from content structure and check range
@@ -230,10 +230,10 @@ OSC_ERR OscCfgGetUInt32(
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
 OSC_ERR OscCfgGetIntRange(
-		const CFG_FILE_CONTENT_HANDLE hFileContent, 
+		const CFG_FILE_CONTENT_HANDLE hFileContent,
 		const struct CFG_KEY *pKey,
-		int16 *iVal, 
-		const int16 min, 
+		int16 *iVal,
+		const int16 min,
 		const int16 max);
 
 /*********************************************************************//*!
@@ -247,11 +247,11 @@ OSC_ERR OscCfgGetIntRange(
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
 OSC_ERR OscCfgGetUInt16Range(
-        const CFG_FILE_CONTENT_HANDLE hFileContent, 
-        const struct CFG_KEY *pKey,
-        uint16 *iVal, 
-        const uint16 min, 
-        const uint16 max);
+		const CFG_FILE_CONTENT_HANDLE hFileContent,
+		const struct CFG_KEY *pKey,
+		uint16 *iVal,
+		const uint16 min,
+		const uint16 max);
 
 /*********************************************************************//*!
  * @brief Read Int from content structure and check range
@@ -264,11 +264,11 @@ OSC_ERR OscCfgGetUInt16Range(
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
 OSC_ERR OscCfgGetInt32Range(
-        const CFG_FILE_CONTENT_HANDLE hFileContent, 
-        const struct CFG_KEY *pKey,
-        int32 *iVal, 
-        const int32 min, 
-        const int32 max);
+		const CFG_FILE_CONTENT_HANDLE hFileContent,
+		const struct CFG_KEY *pKey,
+		int32 *iVal,
+		const int32 min,
+		const int32 max);
 
 /*********************************************************************//*!
  * @brief Read Int from content structure and check range
@@ -281,10 +281,10 @@ OSC_ERR OscCfgGetInt32Range(
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
 OSC_ERR OscCfgGetUInt32Range(
-        const CFG_FILE_CONTENT_HANDLE hFileContent, 
-        const struct CFG_KEY *pKey,
-        uint32 *iVal, 
-        const uint32 min, 
-        const uint32 max);
+		const CFG_FILE_CONTENT_HANDLE hFileContent,
+		const struct CFG_KEY *pKey,
+		uint32 *iVal,
+		const uint32 min,
+		const uint32 max);
 
 #endif /*CFG_PUB_H_*/

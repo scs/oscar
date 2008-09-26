@@ -2,22 +2,22 @@
 #define OSCAR_DEPENDENCIES_H_
 
 #ifdef OSC_HOST
-    #include "oscar_types_host.h"
+	#include "oscar_types_host.h"
 #endif
 #ifdef OSC_TARGET
-    #include "oscar_types_target.h"
+	#include "oscar_types_target.h"
 #endif
 
 /*! @brief Describes a module dependency of a module and all necessary
  * information to load and unload that module. */
 struct OSC_DEPENDENCY
 {
-    /*! @brief The name of the dependency. */
-    char                strName[24];
-    /*! @brief The constructor of the dependency. */
-    OSC_ERR             (*create)(void *);
-    /*! @brief The destructor of the dependency. */
-    void                (*destroy)(void *);
+	/*! @brief The name of the dependency. */
+	char                strName[24];
+	/*! @brief The constructor of the dependency. */
+	OSC_ERR             (*create)(void *);
+	/*! @brief The destructor of the dependency. */
+	void                (*destroy)(void *);
 };
 
 /*********************************************************************//*!
@@ -33,8 +33,8 @@ struct OSC_DEPENDENCY
  * @return SUCCESS or an appropriate error code.
  *//*********************************************************************/
 OSC_ERR OscLoadDependencies(void *pFw,
-        const struct OSC_DEPENDENCY aryDeps[], 
-        const uint32 nDeps);
+		const struct OSC_DEPENDENCY aryDeps[],
+		const uint32 nDeps);
 
 /*********************************************************************//*!
  * @brief Unloads the module depencies give in a list of modules.
@@ -47,6 +47,6 @@ OSC_ERR OscLoadDependencies(void *pFw,
  * @param nDeps Length of the dependency array.
  *//*********************************************************************/
 void OscUnloadDependencies(void *pFw,
-        const struct OSC_DEPENDENCY aryDeps[], 
-        const uint32 nDeps);
+		const struct OSC_DEPENDENCY aryDeps[],
+		const uint32 nDeps);
 #endif /*OSCAR_DEPENDENCIES_H_*/

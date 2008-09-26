@@ -33,9 +33,9 @@ enum EnOscErrors {
  * define module-specific errors that do not overlap.
  */
 /*! @brief Error identifier offset of the cam module. */
-#define OSC_CAM_ERROR_OFFSET 	100
+#define OSC_CAM_ERROR_OFFSET    100
 /*! @brief Error identifier offset of the cpld module. */
-#define OSC_CPLD_ERROR_OFFSET 	200
+#define OSC_CPLD_ERROR_OFFSET   200
 /*! @brief Error identifier offset of the lgx module. */
 #define OSC_LGX_ERROR_OFFSET    300
 /*! @brief Error identifier offset of the log module. */

@@ -9,11 +9,11 @@
 
 #include "oscar_error.h"
 #ifdef OSC_HOST
-    #include "oscar_types_host.h"
-    #include "oscar_host.h"
+	#include "oscar_types_host.h"
+	#include "oscar_host.h"
 #else
-    #include "oscar_types_target.h"
-    #include "oscar_target.h"
+	#include "oscar_types_target.h"
+	#include "oscar_target.h"
 #endif /* OSC_HOST */
 
 
@@ -39,8 +39,8 @@ void OscSupDestroy(void *hFw);
 /*********************************************************************//*!
  * @brief Initialize and start the watchdog timer.
  * 
- * The default watchdog timeout is 1 minute. Depending on the 
- * setting in the linux driver configuration (CONFIG_WATCHDOG_NOWAYOUT), 
+ * The default watchdog timeout is 1 minute. Depending on the
+ * setting in the linux driver configuration (CONFIG_WATCHDOG_NOWAYOUT),
  * the watchdog is closed when closing the file (e.g. due to a crash of
  * the application using the framework, or it can not be disabled.
  * 
@@ -48,9 +48,9 @@ void OscSupDestroy(void *hFw);
  * the functions are implemented for compatibility but they do not exert
  * any function.
  * 
- * Target: For the watchdog commands to work, the watchdog char driver 
+ * Target: For the watchdog commands to work, the watchdog char driver
  * has to be enabled in the uCLinux Kernel configuration. For hardware
- * watchdog support, KGDB has to be disabled; only then will the option 
+ * watchdog support, KGDB has to be disabled; only then will the option
  * for the built-in hardware watchdog appear. Otherwise, the less
  * reliable software watchdog can be used.
  * 
@@ -121,9 +121,9 @@ inline uint32 OscSupCycToMicroSecs(uint32 cycles);
 /*********************************************************************//*!
  * @brief Allocate a chunk of L1 Data SRAM from block A
  * 
- * Memory is allocated continuously and the call fails if no continuous 
+ * Memory is allocated continuously and the call fails if no continuous
  * chunk of the specified length can be found. Redirects to sram_alloc
- * for target and malloc for host. 
+ * for target and malloc for host.
  * 
  * @see OscSupSramFree
  * 
@@ -135,9 +135,9 @@ void* OscSupSramAllocL1DataA(unsigned int size);
 /*********************************************************************//*!
  * @brief Allocate a chunk of L1 Data SRAM from block B
  * 
- * Memory is allocated continuously and the call fails if no continuous 
+ * Memory is allocated continuously and the call fails if no continuous
  * chunk of the specified length can be found. Redirects to sram_alloc
- * for target and malloc for host. 
+ * for target and malloc for host.
  * 
  * @see OscSupSramFree
  * 
@@ -149,9 +149,9 @@ void* OscSupSramAllocL1DataB(unsigned int size);
 /*********************************************************************//*!
  * @brief Allocate a chunk of L1 Data SRAM from block A or B
  * 
- * Memory is allocated continuously and the call fails if no continuous 
+ * Memory is allocated continuously and the call fails if no continuous
  * chunk of the specified length can be found. Redirects to sram_alloc
- * for target and malloc for host. 
+ * for target and malloc for host.
  * 
  * @see OscSupSramFree
  * 
@@ -163,9 +163,9 @@ void* OscSupSramAllocL1Data(unsigned int size);
 /*********************************************************************//*!
  * @brief Allocate a chunk of L1 Instruction SRAM
  * 
- * Memory is allocated continuously and the call fails if no continuous 
+ * Memory is allocated continuously and the call fails if no continuous
  * chunk of the specified length can be found. Redirects to sram_alloc
- * for target and malloc for host. 
+ * for target and malloc for host.
  * 
  * @see OscSupSramFree
  * 
@@ -177,9 +177,9 @@ void* OscSupSramAllocL1Instr(unsigned int size);
 /*********************************************************************//*!
  * @brief Allocate a chunk of Scratchpad SRAM
  * 
- * Memory is allocated continuously and the call fails if no continuous 
+ * Memory is allocated continuously and the call fails if no continuous
  * chunk of the specified length can be found. Redirects to sram_alloc
- * for target and malloc for host. 
+ * for target and malloc for host.
  * 
  * @warning Currently not supported by the HEAD build of uclinux; a feature
  * request has been submitted though and hopefully it is being incorporated
@@ -195,7 +195,7 @@ void* OscSupSramAllocScratch(unsigned int size);
 /*********************************************************************//*!
  * @brief Free a previously allocated chunk of any SRAM memory
  * 
- * Redirects to sram_free for target and free for host. 
+ * Redirects to sram_free for target and free for host.
  * 
  * @param Pointer to memory area to be freed.
  * @return SUCCESS or an appropriate error code
@@ -216,7 +216,7 @@ int OscSupSramFree(void *pAddr);
  * @param address Address to be prefetched.
  *//*********************************************************************/
 #define PREFETCH(address) \
-    asm volatile ("prefetch [%0];\n\t" : : "a" (address))
+	asm volatile ("prefetch [%0];\n\t" : : "a" (address))
 
 /*********************************************************************//*!
  * @brief Prefetch the cacheline following the specified address.
@@ -226,7 +226,7 @@ int OscSupSramFree(void *pAddr);
  * @param address Address before the cache line to be prefetched.
  *//*********************************************************************/
 #define PREFETCH_NEXT(address) \
-     PREFETCH(((uint32)address) + CACHE_LINE_LEN)
+		PREFETCH(((uint32)address) + CACHE_LINE_LEN)
 
 /*********************************************************************//*!
  * @brief Flush the cacheline containing an address.
@@ -236,7 +236,7 @@ int OscSupSramFree(void *pAddr);
  * @param address Address to be flushed.
  *//*********************************************************************/
 #define FLUSH(address) \
-    asm volatile ("flush [%0];\n\t" : : "a" (address))
+	asm volatile ("flush [%0];\n\t" : : "a" (address))
 
 /*********************************************************************//*!
  * @brief Flush and invalidate the cacheline containing an address.
@@ -246,7 +246,7 @@ int OscSupSramFree(void *pAddr);
  * @param address Address to be flushed and invalidated.
  *//*********************************************************************/
 #define FLUSHINV(address) \
-    asm volatile ("flushinv [%0];\n\t" : : "a" (address))
+	asm volatile ("flushinv [%0];\n\t" : : "a" (address))
 
 /*********************************************************************//*!
  * @brief Flush the cacheline containing an address in instruction cache.
@@ -256,7 +256,7 @@ int OscSupSramFree(void *pAddr);
  * @param address Address to be flushed.
  *//*********************************************************************/
 #define IFLUSH(address) \
-    asm volatile ("iflush [%0];\n\t" : : "a" (address))
+	asm volatile ("iflush [%0];\n\t" : : "a" (address))
 
 /*********************************************************************//*!
  * @brief Flush and invalidate a whole memory region.
@@ -266,25 +266,25 @@ int OscSupSramFree(void *pAddr);
  * 
  * Host: This does nothing.
  * 
- * @param address Start address of memory region to be flushed and 
+ * @param address Start address of memory region to be flushed and
  * invalidated.
  * @param size Length of the memory region.
  *//*********************************************************************/
 #define FLUSHINV_REGION(address,size) \
-        __asm__ __volatile__(   \
-        "[--SP]=%0;"            \
-        "%0+=31;"               \
-        "%0>>=5;"               \
-        "p0=%0;"                \
-        "p1=%1;"                \
-        "lsetup (1f,1f) LC1=P0\n" \
-        "1:\n"                  \
-        "flushinv [P1++]\n"     \
-        "2:\n"                  \
-        "%0=[SP++]\n"           \
-        :                       \
-        : "d" (size), "a" (address) \
-        : "LC1", "LT1", "LB1", "P0", "P1" )
+		__asm__ __volatile__(   \
+		"[--SP]=%0;"            \
+		"%0+=31;"               \
+		"%0>>=5;"               \
+		"p0=%0;"                \
+		"p1=%1;"                \
+		"lsetup (1f,1f) LC1=P0\n" \
+		"1:\n"                  \
+		"flushinv [P1++]\n"     \
+		"2:\n"                  \
+		"%0=[SP++]\n"           \
+		:                       \
+		: "d" (size), "a" (address) \
+		: "LC1", "LT1", "LB1", "P0", "P1" )
 
 /*********************************************************************//*!
  * @brief Flush a whole memory region.
@@ -298,20 +298,20 @@ int OscSupSramFree(void *pAddr);
  * @param size Length of the memory region.
  *//*********************************************************************/
 #define FLUSH_REGION(address,size) \
-        __asm__ __volatile__(   \
-        "[--SP]=%0;"            \
-        "%0+=31;"               \
-        "%0>>=5;"               \
-        "p0=%0;"                \
-        "p1=%1;"                \
-        "lsetup (1f,1f) LC1=P0\n" \
-        "1:\n"                  \
-        "flush [P1++]\n"        \
-        "2:\n"                  \
-        "%0=[SP++]\n"           \
-        :                       \
-        : "d" (size), "a" (address) \
-        : "LC1", "LT1", "LB1", "P0", "P1" )
+		__asm__ __volatile__(   \
+		"[--SP]=%0;"            \
+		"%0+=31;"               \
+		"%0>>=5;"               \
+		"p0=%0;"                \
+		"p1=%1;"                \
+		"lsetup (1f,1f) LC1=P0\n" \
+		"1:\n"                  \
+		"flush [P1++]\n"        \
+		"2:\n"                  \
+		"%0=[SP++]\n"           \
+		:                       \
+		: "d" (size), "a" (address) \
+		: "LC1", "LT1", "LB1", "P0", "P1" )
 
 #endif /* OSC_TARGET */
 
@@ -328,13 +328,13 @@ int OscSupSramFree(void *pAddr);
 /*------------------------ Instruction Flow ----------------------------*/
 #ifdef OSC_TARGET
 /*! @brief Wait until all previous actions have been completed
- * (system-wide) 
+ * (system-wide)
  * 
  * Host: This does nothing
  */
 #define SSYNC asm("ssync;\n")
 /*! @brief Wait until all previous actions have been completed
- * (core-wide) 
+ * (core-wide)
  * 
  * Host: This does nothing
  */
@@ -359,29 +359,29 @@ int OscSupSramFree(void *pAddr);
  * @param count Number of 4-byte words to copy.
  *//*********************************************************************/
 #define memcpy_inline(pDst,pSrc,count)      \
-        asm(                                \
-        "I0=%1;"                            \
-        "P0=%0;"                            \
-        "R0=[I0++];"                        \
-        "LSETUP (1f,1f) LC1=%2;\n"          \
-        "1:\n"                              \
-        "mnop || [P0++]=R0 || R0=[I0++];"   \
-        "[P0++]=R0;"                        \
-        :                                   \
-        :"a" (pDst), "a" (pSrc), "a" (count-1) \
-        : "LC1","LT1","LB1", "I0","P0", "R0")
+		asm(                                \
+		"I0=%1;"                            \
+		"P0=%0;"                            \
+		"R0=[I0++];"                        \
+		"LSETUP (1f,1f) LC1=%2;\n"          \
+		"1:\n"                              \
+		"mnop || [P0++]=R0 || R0=[I0++];"   \
+		"[P0++]=R0;"                        \
+		:                                   \
+		:"a" (pDst), "a" (pSrc), "a" (count-1) \
+		: "LC1","LT1","LB1", "I0","P0", "R0")
 #endif /* OSC_TARGET */
 
 #ifdef OSC_HOST
 #define memcpy_inline(pDst,pSrc,count)      \
 {                                           \
-    int i;                                  \
-    uint32 *pS = (uint32*)pSrc;             \
-    uint32 *pD = (uint32*)pDst;             \
-    for(i=0; i < count; i++)                \
-    {                                       \
-        *pD++ = *pS++;                      \
-    }                                       \
+	int i;                                  \
+	uint32 *pS = (uint32*)pSrc;             \
+	uint32 *pD = (uint32*)pDst;             \
+	for(i=0; i < count; i++)                \
+	{                                       \
+		*pD++ = *pS++;                      \
+	}                                       \
 }
 #endif /* OSC_HOST */
 

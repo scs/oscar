@@ -4,8 +4,8 @@
  * 
  * The CPLD interface (AMC bus, bank0) is provided by the amc static
  * module: drivers/char/bfin_amc.c out placed in the uclinux tree.
- *  
- ************************************************************************/
+ * 
+	************************************************************************/
 #ifndef CPLD_PRIV_H_
 #define CPLD_PRIV_H_
 
@@ -31,15 +31,15 @@
 /*! @brief Object struct of the cpld module */
 struct OSC_CPLD
 {
-    /*! Handle to device file */
-    FILE* file;
-    /*! Base address of mapped CPLD register space, 16bit AMC bus */
-    uint16* addr;
-    
-    /*! @brief Register set
-     * Host: Used for emulation on host.
-     * Target: Used as local copy (field set on write only registers) */
-    uint8 reg[ OSC_CPLD_MAX_REGISTER_NR];        
+	/*! Handle to device file */
+	FILE* file;
+	/*! Base address of mapped CPLD register space, 16bit AMC bus */
+	uint16* addr;
+	
+	/*! @brief Register set
+	 * Host: Used for emulation on host.
+	 * Target: Used as local copy (field set on write only registers) */
+	uint8 reg[ OSC_CPLD_MAX_REGISTER_NR];
 };
 
 /******************** Private methods ******************/

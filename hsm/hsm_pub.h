@@ -1,17 +1,17 @@
 /*! @file hsm_pub.h
  * @brief API definition for Hierarchical State Machine module
  * 
- ************************************************************************/
+	************************************************************************/
 #ifndef HSM_PUB_H_
 #define HSM_PUB_H_
 
 #include "oscar_error.h"
 #ifdef OSC_HOST
-    #include "oscar_types_host.h"
-    #include "oscar_host.h"
+	#include "oscar_types_host.h"
+	#include "oscar_host.h"
 #else
-    #include "oscar_types_target.h"
-    #include "oscar_target.h"
+	#include "oscar_types_target.h"
+	#include "oscar_target.h"
 #endif /* OSC_HOST */
 
 /*! Module-specific error codes.
@@ -20,7 +20,7 @@
  * all modules can be made */
 enum EnOscHsmErrors
 {
-    EHSM_PARSING_FAILURE = OSC_HSM_ERROR_OFFSET
+	EHSM_PARSING_FAILURE = OSC_HSM_ERROR_OFFSET
 };
 
 #define START_EVT ((Event)(-1))     /*!< @brief Predefined Start event */
@@ -31,7 +31,7 @@ enum EnOscHsmErrors
 typedef int Event;
 /*!@brief Message class */
 typedef struct {
-    Event evt;        /*!< @brief Event */
+	Event evt;        /*!< @brief Event */
 } Msg;
 
 /*!@brief Hsm type */
@@ -43,9 +43,9 @@ typedef Msg const *(*EvtHndlr)(Hsm*, Msg const*);
 typedef struct State State;
 /*!@brief State class */
 struct State {
-    State *super;           /*!< @brief Pointer to superstate */
-    EvtHndlr hndlr;         /*!< @brief State's handler function */
-    char const *name;       /*!< @brief State name */
+	State *super;           /*!< @brief Pointer to superstate */
+	EvtHndlr hndlr;         /*!< @brief State's handler function */
+	char const *name;       /*!< @brief State name */
 };
 
 /*********************************************************************//*!
@@ -55,18 +55,18 @@ struct State {
  * @param name      State name
  * @param super     Pointer to super state
  * @param hndlr     Pointer to state handler
-*//*********************************************************************/ 
+ *//*********************************************************************/
 void StateCtor(State *me, char const *name, State *super, EvtHndlr hndlr);
 #define StateOnEvent(me_, ctx_, msg_) \
-    (*(me_)->hndlr)((ctx_), (msg_))
+	(*(me_)->hndlr)((ctx_), (msg_))
 
 /*!@brief Hierarchical State Machine base class */
-struct Hsm {    
-    char const *name; /*!< @brief Pointer to static name */
-    State *curr;      /*!< @brief Current state */
-    State *next;      /*!< @brief Next state (non 0 if transition taken) */
-    State *source;    /*!< @brief Source state during last transition */
-    State top;        /*!< @brief Top-most state object */
+struct Hsm {
+	char const *name; /*!< @brief Pointer to static name */
+	State *curr;      /*!< @brief Current state */
+	State *next;      /*!< @brief Next state (non 0 if transition taken) */
+	State *source;    /*!< @brief Source state during last transition */
+	State top;        /*!< @brief Top-most state object */
 };
 
 /*********************************************************************//*!
@@ -96,11 +96,11 @@ void HsmExit_(Hsm *me, unsigned char toLca);
 
 /*assert(((Hsm *)me_)->next == 0); \ do assertion test in marco*/
 #define STATE_TRAN(me_, target_) if (1) { \
-    static unsigned char toLca_ = 0xFF; \
-    if (toLca_ == 0xFF) \
-        toLca_ = HsmToLCA_((Hsm *)(me_), (target_)); \
-    HsmExit_((Hsm *)(me_), toLca_); \
-    ((Hsm *)(me_))->next = (target_); \
+	static unsigned char toLca_ = 0xFF; \
+	if (toLca_ == 0xFF) \
+		toLca_ = HsmToLCA_((Hsm *)(me_), (target_)); \
+	HsmExit_((Hsm *)(me_), toLca_); \
+	((Hsm *)(me_))->next = (target_); \
 } else ((void)0)
 
 /*********************************************************************//*!
@@ -109,7 +109,7 @@ void HsmExit_(Hsm *me, unsigned char toLca);
  * @param me        Pointer to hsm
  * @param name      Hsm name
  * @param topHndlr  Pointer to Hsm top handler
-*//*********************************************************************/ 
+ *//*********************************************************************/
 void HsmCtor(Hsm *me, char const *name, EvtHndlr topHndlr);
 
 /*********************************************************************//*!
@@ -117,7 +117,7 @@ void HsmCtor(Hsm *me, char const *name, EvtHndlr topHndlr);
  * 
  * @param me        Pointer to hsm
  *//*********************************************************************/
-void HsmOnStart(Hsm *me);                  
+void HsmOnStart(Hsm *me);
 
 /*********************************************************************//*!
  * @brief State machine "engine"

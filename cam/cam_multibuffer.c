@@ -1,6 +1,6 @@
 /*! @file cam_multibuffer.c
  * @brief Multibuffer implementation
- 
+	
  * Used to automatically manage multi
  * buffers (e.g. double buffers).
  * 
@@ -17,7 +17,7 @@
  * @brief Returns the next buffer in line.
  * 
  * Returns the correct buffer id to sync next and adjusts the idNextSync
- * and idNextCapture variables accordingly. Can return 
+ * and idNextCapture variables accordingly. Can return
  * OSC_CAM_INVALID_BUFFER_ID if sync currently not possible.
  * 
  * @see OscCamMultiBufferCapture
@@ -29,113 +29,113 @@
  * @return Buffer ID for the next capture.
  *//*********************************************************************/
 static uint8 OscCamMultiBufferGetNext(struct OSC_CAM_MULTIBUFFER * pMB,
-        uint8 fbID);
+		uint8 fbID);
 
 
 /*=========================== Code =====================================*/
 
 OSC_ERR OscCamMultiBufferCreate(struct OSC_CAM_MULTIBUFFER * pMB,
-        const uint8 multiBufferDepth,
-        const uint8 bufferIDs[])
+		const uint8 multiBufferDepth,
+		const uint8 bufferIDs[])
 {
-    if(pMB->multiBufferDepth != 0)
-    {
-        OscLog(NOTICE, "%s: \
-                Replacing existing multibuffer.\n",
-                __func__);
-    }
+	if(pMB->multiBufferDepth != 0)
+	{
+		OscLog(NOTICE, "%s: \
+				Replacing existing multibuffer.\n",
+				__func__);
+	}
 
-    pMB->multiBufferDepth = multiBufferDepth;
-    memcpy(&pMB->fbIDs,
-            bufferIDs,
-            multiBufferDepth*sizeof(uint8));
+	pMB->multiBufferDepth = multiBufferDepth;
+	memcpy(&pMB->fbIDs,
+			bufferIDs,
+			multiBufferDepth*sizeof(uint8));
 
-    pMB->idNextCapture = pMB->fbIDs[0];
-    /* Since there was no capture yet, we have nothing to sync to */
-    pMB->idNextSync = OSC_CAM_INVALID_BUFFER_ID;
+	pMB->idNextCapture = pMB->fbIDs[0];
+	/* Since there was no capture yet, we have nothing to sync to */
+	pMB->idNextSync = OSC_CAM_INVALID_BUFFER_ID;
 
-    return SUCCESS;
+	return SUCCESS;
 }
 
 inline OSC_ERR OscCamMultiBufferDestroy(struct OSC_CAM_MULTIBUFFER * pMB)
 {
-    if (pMB->multiBufferDepth == 0)
-    {
-        OscLog(WARN, "%s: Nothing to delete.\n", __func__);
-    }
-    pMB->multiBufferDepth = 0;
-    return SUCCESS;
+	if (pMB->multiBufferDepth == 0)
+	{
+		OscLog(WARN, "%s: Nothing to delete.\n", __func__);
+	}
+	pMB->multiBufferDepth = 0;
+	return SUCCESS;
 }
 
 static uint8 OscCamMultiBufferGetNext(struct OSC_CAM_MULTIBUFFER * pMB,
-        uint8 fbID)
+		uint8 fbID)
 {
-    int i;
-    uint8 ret;
+	int i;
+	uint8 ret;
 
-    ret = OSC_CAM_INVALID_BUFFER_ID;
-    for (i = 0; i < pMB->multiBufferDepth; i++)
-    {
-        if (pMB->fbIDs[i] == fbID)
-        {
-            i++; /* Select the next buffer */
-            if (i == pMB->multiBufferDepth)
-            {
-                i = 0; /* wrap-around */
-            }
-            ret = pMB->fbIDs[i];
-            return ret;
-        }
-    }
-    return ret;
+	ret = OSC_CAM_INVALID_BUFFER_ID;
+	for (i = 0; i < pMB->multiBufferDepth; i++)
+	{
+		if (pMB->fbIDs[i] == fbID)
+		{
+			i++; /* Select the next buffer */
+			if (i == pMB->multiBufferDepth)
+			{
+				i = 0; /* wrap-around */
+			}
+			ret = pMB->fbIDs[i];
+			return ret;
+		}
+	}
+	return ret;
 }
 
 inline uint8 OscCamMultiBufferGetCapBuf(
-        const struct OSC_CAM_MULTIBUFFER *pMB)
+		const struct OSC_CAM_MULTIBUFFER *pMB)
 {
-    return pMB->idNextCapture;
+	return pMB->idNextCapture;
 }
 
 void OscCamMultiBufferCapture(struct OSC_CAM_MULTIBUFFER *pMB)
 {
-    uint8 cur;
+	uint8 cur;
 
-    cur = pMB->idNextCapture;
+	cur = pMB->idNextCapture;
 
-    /* Find the next buffer to capture to */
-    pMB->idNextCapture =
-    OscCamMultiBufferGetNext(pMB, pMB->idNextCapture);
+	/* Find the next buffer to capture to */
+	pMB->idNextCapture =
+	OscCamMultiBufferGetNext(pMB, pMB->idNextCapture);
 
-    /* Find the next buffer to sync */
-    if(pMB->idNextSync == OSC_CAM_INVALID_BUFFER_ID)
-    {
-        pMB->idNextSync = cur;
-    }
-    else if(pMB->idNextSync == cur)
-    {
-        pMB->idNextSync =
-        OscCamMultiBufferGetNext(pMB, pMB->idNextSync);
-    }
+	/* Find the next buffer to sync */
+	if(pMB->idNextSync == OSC_CAM_INVALID_BUFFER_ID)
+	{
+		pMB->idNextSync = cur;
+	}
+	else if(pMB->idNextSync == cur)
+	{
+		pMB->idNextSync =
+		OscCamMultiBufferGetNext(pMB, pMB->idNextSync);
+	}
 }
 
 inline uint8 OscCamMultiBufferGetSyncBuf(
-        const struct OSC_CAM_MULTIBUFFER *pMB)
+		const struct OSC_CAM_MULTIBUFFER *pMB)
 {
-    return pMB->idNextSync;
+	return pMB->idNextSync;
 }
 
 void OscCamMultiBufferSync(struct OSC_CAM_MULTIBUFFER * pMB)
 {
-    uint8 cur;
+	uint8 cur;
 
-    cur = pMB->idNextSync;
+	cur = pMB->idNextSync;
 
-    pMB->idNextSync =
-        OscCamMultiBufferGetNext(pMB, pMB->idNextSync);
-    
-    if(pMB->idNextSync == pMB->idNextCapture)
-    {
-        /* We need to prevent a sync before the capture has happened */
-        pMB->idNextSync = OSC_CAM_INVALID_BUFFER_ID;
-    }
+	pMB->idNextSync =
+		OscCamMultiBufferGetNext(pMB, pMB->idNextSync);
+	
+	if(pMB->idNextSync == pMB->idNextCapture)
+	{
+		/* We need to prevent a sync before the capture has happened */
+		pMB->idNextSync = OSC_CAM_INVALID_BUFFER_ID;
+	}
 }

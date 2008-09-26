@@ -12,12 +12,12 @@
  */
 #ifdef OSC_HOST
 	#include "oscar_types_host.h"
-    #include "oscar_host.h"
+	#include "oscar_host.h"
 #endif
 #ifdef OSC_TARGET
 	#include "oscar_types_target.h"
-    #include "oscar_target.h"
-#endif 
+	#include "oscar_target.h"
+#endif
 
 #include "oscar_error.h"
 #include "oscar_dependencies.h"
@@ -43,7 +43,7 @@ OSC_ERR OscDestroy(void *hFw);
 
 /* Include the public header files of the different modules, which
  * contain the declarations of the API functions of the respective
- * module. 
+ * module.
  */
 #include "log_pub.h"
 #include "cam_pub.h"

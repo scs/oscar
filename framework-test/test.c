@@ -47,48 +47,48 @@ int testLgx()
 	uint16 clock = FALSE;
 
 	if((err = LCVLgxCreate(hFramework)))
-                return -1;
-       
-        LCVLogSetConsoleLogLevel(DEBUG);
-        LCVLogSetFileLogLevel(DEBUG);
+				return -1;
+		
+		LCVLogSetConsoleLogLevel(DEBUG);
+		LCVLogSetFileLogLevel(DEBUG);
 
-        LCVLgxIoPinWrite( LCV_LGX_OUT1, TRUE);
+		LCVLgxIoPinWrite( LCV_LGX_OUT1, TRUE);
 	LCVLgxIoPinRead( LCV_LGX_IN1, &clock);
-        printf("t=%d, CLOCK=%d\n", (int)LCVSimGetCurTimeStep(), clock);
-        LCVSimStep();
-        LCVLgxIoPinWrite( LCV_LGX_OUT1, FALSE);
-        LCVLgxIoPinWrite( LCV_LGX_OUT3, TRUE);
-        LCVLgxIoPinRead( LCV_LGX_IN1, &clock);
-        printf("t=%d, CLOCK=%d\n", (int)LCVSimGetCurTimeStep(), clock);
-        LCVSimStep();
+		printf("t=%d, CLOCK=%d\n", (int)LCVSimGetCurTimeStep(), clock);
+		LCVSimStep();
+		LCVLgxIoPinWrite( LCV_LGX_OUT1, FALSE);
+		LCVLgxIoPinWrite( LCV_LGX_OUT3, TRUE);
+		LCVLgxIoPinRead( LCV_LGX_IN1, &clock);
+		printf("t=%d, CLOCK=%d\n", (int)LCVSimGetCurTimeStep(), clock);
+		LCVSimStep();
 
-        LCVLgxIoPinRead( LCV_LGX_IN1, &clock);
-        printf("t=%d, CLOCK=%d\n", (int)LCVSimGetCurTimeStep(), clock);
+		LCVLgxIoPinRead( LCV_LGX_IN1, &clock);
+		printf("t=%d, CLOCK=%d\n", (int)LCVSimGetCurTimeStep(), clock);
 
-        LCVSimStep();
+		LCVSimStep();
 
-        LCVLgxIoPinRead( LCV_LGX_IN1, &clock);
-        printf("t=%d, CLOCK=%d\n", (int)LCVSimGetCurTimeStep(), clock);
+		LCVLgxIoPinRead( LCV_LGX_IN1, &clock);
+		printf("t=%d, CLOCK=%d\n", (int)LCVSimGetCurTimeStep(), clock);
 
-        LCVSimStep();
+		LCVSimStep();
 
-        LCVLgxIoPinRead( LCV_LGX_IN1, &clock);
-        printf("t=%d, CLOCK=%d\n", (int)LCVSimGetCurTimeStep(), clock);
+		LCVLgxIoPinRead( LCV_LGX_IN1, &clock);
+		printf("t=%d, CLOCK=%d\n", (int)LCVSimGetCurTimeStep(), clock);
 
-        LCVSimStep();
+		LCVSimStep();
 
-        LCVLgxIoPinRead( LCV_LGX_IN1, &clock);
-        printf("t=%d, CLOCK=%d\n", (int)LCVSimGetCurTimeStep(), clock);
+		LCVLgxIoPinRead( LCV_LGX_IN1, &clock);
+		printf("t=%d, CLOCK=%d\n", (int)LCVSimGetCurTimeStep(), clock);
 
 
-        LCVSimStep();
+		LCVSimStep();
 
-        LCVLgxIoPinRead( LCV_LGX_IN1, &clock);
-        printf("t=%d, CLOCK=%d\n", (int)LCVSimGetCurTimeStep(), clock);
+		LCVLgxIoPinRead( LCV_LGX_IN1, &clock);
+		printf("t=%d, CLOCK=%d\n", (int)LCVSimGetCurTimeStep(), clock);
 
-        LCVLog(INFO, "-------------------------------------------------------\n");
+		LCVLog(INFO, "-------------------------------------------------------\n");
 	LCVLgxDestroy(hFramework);
-        return 0;
+		return 0;
 }
 
 int testSwr()
@@ -101,44 +101,44 @@ int testSwr()
 	float sig1;
 	char sig2[20];
 
-        if((err = LCVSwrCreate(hFramework)))
-                return -1;
+		if((err = LCVSwrCreate(hFramework)))
+				return -1;
 
-	LCVSwrCreateWriter( 
-        	&pWr,        
-	        "swr.txt", 
-        	FALSE, /* bReportTime */
-	        FALSE ); /* bReportCyclic */
+	LCVSwrCreateWriter(
+			&pWr,
+			"swr.txt",
+			FALSE, /* bReportTime */
+			FALSE ); /* bReportCyclic */
 
-	LCVSwrRegisterSignal( 
-	        &pSig1,        
-	        pWr, 
-	        "Sig1",
-	        SWR_FLOAT,        
-	        NULL, /* default value */
-	        "%1.3f" );
+	LCVSwrRegisterSignal(
+			&pSig1,
+			pWr,
+			"Sig1",
+			SWR_FLOAT,
+			NULL, /* default value */
+			"%1.3f" );
 
-        LCVSwrRegisterSignal(        
-                &pSig2,
-                pWr,
-                "Sig2",
-                SWR_STRING,
-                NULL, /* default value */
-                "%s" );
+		LCVSwrRegisterSignal(
+				&pSig2,
+				pWr,
+				"Sig2",
+				SWR_STRING,
+				NULL, /* default value */
+				"%s" );
 
 
-        sig1 = 1.23456;
-        strcpy( sig2, "Some Text");
+		sig1 = 1.23456;
+		strcpy( sig2, "Some Text");
 	LCVSwrUpdateSignal( pSig1, &sig1);
 	LCVSwrUpdateSignal( pSig2, sig2);
 	LCVSwrManualReport( pWr);
 
-        sig1 = 9.8765;
-        strcpy( sig2, "Other Text");
-        LCVSwrUpdateSignal( pSig1, &sig1);
-        LCVSwrUpdateSignal( pSig2, sig2);
-        LCVSwrManualReport( pWr);
-        
+		sig1 = 9.8765;
+		strcpy( sig2, "Other Text");
+		LCVSwrUpdateSignal( pSig1, &sig1);
+		LCVSwrUpdateSignal( pSig2, sig2);
+		LCVSwrManualReport( pWr);
+		
 	LCVSwrManualReport( pWr);
 
 #endif /*LCV_HOST*/
@@ -230,8 +230,8 @@ int testBMP()
 	/************ Loading Greyscale *******************/
 	/* No pre-allocated memory, no assumptions */
 	LCVBmpRead(&pic1, "test_grey_in.bmp");
-	LCVLog(INFO, "%s: ## Pic1 loaded.(%dx%d|type %d)\n", __FUNCTION__, 
-	       pic1.width, pic1.height, pic1.type);
+	LCVLog(INFO, "%s: ## Pic1 loaded.(%dx%d|type %d)\n", __FUNCTION__,
+			pic1.width, pic1.height, pic1.type);
 
 	/* No pre-allocated memory, assumptions */
 	pic2.width = pic1.width;
@@ -250,7 +250,7 @@ int testBMP()
 
 	imageSize = pic1.width*pic1.height;
 	if(memcmp(pic1.data, pic2.data, imageSize) ||
-	   memcmp(pic1.data, pic3.data, imageSize))
+		memcmp(pic1.data, pic3.data, imageSize))
 	{
 		LCVLog(ERROR, "%s: Greyscale pics differ.\n",
 			__FUNCTION__);
@@ -268,8 +268,8 @@ int testBMP()
 
 	/***************** Loading RGB ********************/
 	LCVBmpRead(&pic1, "test_rgb_in.bmp");
-	LCVLog(INFO, "%s: ## Pic1 RGB loaded.(%dx%d|type %d)\n", __FUNCTION__, 
-	       pic1.width, pic1.height, pic1.type);
+	LCVLog(INFO, "%s: ## Pic1 RGB loaded.(%dx%d|type %d)\n", __FUNCTION__,
+			pic1.width, pic1.height, pic1.type);
 
 	/***************** Writing RGB ********************/
 	LCVBmpWrite(&pic1, "test_rgb_out1.bmp");
@@ -297,15 +297,15 @@ int testCam()
 		return -1;
 
 	/* The camera trigger is floating when specifying BF537-LCV-IND as the
-	   target platform. Therefore this will only work with BF537-LCV and
-	   the manual trigger or by adjusting mt9v032.c */
+		target platform. Therefore this will only work with BF537-LCV and
+		the manual trigger or by adjusting mt9v032.c */
 	LCVLog(DEBUG, "Setting up frame buffers.\n");
 	for(i=0; i < 8; i++)
 	{
-		LCVCamSetFrameBuffer((uint8)i, 
-				     (uint32)FB_SIZE, 
-				     (void*)fbs[i], 
-				     TRUE);
+		LCVCamSetFrameBuffer((uint8)i,
+						(uint32)FB_SIZE,
+						(void*)fbs[i],
+						TRUE);
 	}
 
 	LCVLog(DEBUG, "Setting area of interest.\n");
@@ -326,7 +326,7 @@ int testCam()
 	pic.type = LCV_PICTURE_GREYSCALE;
 	LCVBmpWrite(&pic, "Cap752x130.bmp");
 
-//	usleep(10000);
+//  usleep(10000);
 
 	LCVLog(DEBUG, "Capturing picture.\n");
 	LCVCamSetupCapture(1, LCV_CAM_TRIGGER_MODE_MANUAL);
@@ -372,8 +372,8 @@ int testCam()
 	LCVCamSetupCapture(LCV_CAM_MULTI_BUFFER, LCV_CAM_TRIGGER_MODE_MANUAL);
 	LCVCamReadPicture(LCV_CAM_MULTI_BUFFER, &pPic, 0, 0);
 	LCVCamReadPicture(LCV_CAM_MULTI_BUFFER, &pPic, 0, 0);
-	LCVCamReadPicture(LCV_CAM_MULTI_BUFFER, &pPic, 0, 0);	
-	LCVCamReadPicture(LCV_CAM_MULTI_BUFFER, &pPic, 0, 0);	
+	LCVCamReadPicture(LCV_CAM_MULTI_BUFFER, &pPic, 0, 0);
+	LCVCamReadPicture(LCV_CAM_MULTI_BUFFER, &pPic, 0, 0);
 	
 
 	LCVLog(DEBUG, "Getting latest picture.\n");
@@ -406,8 +406,8 @@ int testPriority()
 	if(policy == SCHED_FIFO)
 		LCVLog(DEBUG, "Successfully set real-time priority.\n");
 	else {
-		LCVLog(ERROR, "Setting real-time priority unsuccessful (%d).\n", 
-		       policy);
+		LCVLog(ERROR, "Setting real-time priority unsuccessful (%d).\n",
+				policy);
 		return -1;
 	}
 
@@ -457,7 +457,7 @@ int testCycles()
 	musecs = LCVSupCycToMicroSecs(end - start);
 
 	LCVLog(INFO, "%s:\tstart: %u\tend: %u\tdiff: %u\tmuSecs: %u\n",
-	       __func__, start, end, end - start, musecs);
+			__func__, start, end, end - start, musecs);
 
 	LCVLog(INFO, "-------------------------------------------------------\n");
 	LCVSupDestroy(hFramework);
@@ -466,13 +466,13 @@ int testCycles()
 
 
 /* This process acts only as one part of the IPC connection.
-It implements only the server part, the client part is in a 
+It implements only the server part, the client part is in a
 separate executable called cgitest,
 which must be started after this.
 Also, for the host, the permissions of the two created FIFOs must
 currently be changed manually, since they are automatically created
 as root only.
-*/
+ */
 LCV_ERR testIpc()
 {
 	LCV_IPC_CHAN_ID chan;
@@ -494,7 +494,7 @@ LCV_ERR testIpc()
 	}
 
 	for(i = 0; i < 2; i++)
-//	while(1)
+//  while(1)
 	{
 		while(1)
 		{
@@ -564,17 +564,17 @@ int testRtl()
 
 void pblkl (void *a, int w, int h, int s)
 {
-  unsigned *p = a;
-  int x,y;
-  printf ("%08x\n", (unsigned int)p);
-  for (y=0;y<h;y++) {
-    for (x=0;x<w;x++)
-      printf ("%4d ", *p++);
-    printf ("\n");
-    if (s)
-      p += (s-w);
-  }
-  printf ("\n");
+	unsigned *p = a;
+	int x,y;
+	printf ("%08x\n", (unsigned int)p);
+	for (y=0;y<h;y++) {
+	for (x=0;x<w;x++)
+		printf ("%4d ", *p++);
+	printf ("\n");
+	if (s)
+		p += (s-w);
+	}
+	printf ("\n");
 }
 
 
@@ -599,8 +599,8 @@ int testDma()
 	/* Flush the source memory. */
 	FLUSH_REGION((void*)buf1, 1024 + CACHE_LINE_LEN);
 	/* Invalidate the destination memory. Do this before the actual
-	 transfer since if you do it afterwards, the newly written memory
-	will get overwritten again by the contents of the cache. 
+		transfer since if you do it afterwards, the newly written memory
+	will get overwritten again by the contents of the cache.
 	(!FLUSH!)INVALIDATE */
 	FLUSHINV_REGION((void*)buf2, 1024 + CACHE_LINE_LEN);
 	
@@ -618,26 +618,26 @@ int testDma()
 	LCVLog(INFO, "1D/2D move:\n\n");
 	LCVDmaResetChain(hDmaChain);
 	err = LCVDmaAdd1DMove(hDmaChain,
-			      buf1,
-			      DMA_WDSIZE_16,
-			      1024/4, 4,
-			      buf2,
-			      DMA_WDSIZE_16,
-			      1024/4, 4);
+					buf1,
+					DMA_WDSIZE_16,
+					1024/4, 4,
+					buf2,
+					DMA_WDSIZE_16,
+					1024/4, 4);
 	if(err != SUCCESS)
 	{
 		LCVLog(ERROR, "Unable to add 1D move!(%d)\n", err);
 		return err;
 	}
 	err = LCVDmaAdd2DMove(hDmaChain,
-			      buf2,
-			      DMA_WDSIZE_32,
-			      16, 4,
-			      16, 4,
-			      buf1,
-			      DMA_WDSIZE_32,
-			      16, 16*4,
-			      16, -15*16*4 + 4);
+					buf2,
+					DMA_WDSIZE_32,
+					16, 4,
+					16, 4,
+					buf1,
+					DMA_WDSIZE_32,
+					16, 16*4,
+					16, -15*16*4 + 4);
 	if(err != SUCCESS) {
 		LCVLog(ERROR, "Unable to add 2D move!(%d)\n", err);
 		return err;
@@ -668,7 +668,7 @@ int testDma()
 
 /*..........................................................................*/
 /* For the HSM module test we use a small state diagram example called Fsm.
- * It consists of two main states (alpha, beta) and a substate (subbeta) of 
+ * It consists of two main states (alpha, beta) and a substate (subbeta) of
  * beta. Two events are defined which force transitions:
  * TOSUBBETA defined for state alpha, forces transition to subbeta.
  * TOALPHA defined for beta, forces transitions to alpha (from beta or subbeta)
@@ -677,9 +677,9 @@ int testDma()
 
 typedef struct Fsm Fsm;
 struct Fsm {
-    Hsm super;
-    State alpha, beta;
-    State subbeta; /* substate of beta */
+	Hsm super;
+	State alpha, beta;
+	State subbeta; /* substate of beta */
 };
 
 enum FsmEvents {
@@ -689,12 +689,12 @@ enum FsmEvents {
 
 
 Msg const *Fsm_top(Fsm *me, Msg *msg) {
-    switch (msg->evt) {
-    case START_EVT:
-        STATE_START(me, &me->alpha);
-        return 0;
-    }
-    return msg;
+	switch (msg->evt) {
+	case START_EVT:
+		STATE_START(me, &me->alpha);
+		return 0;
+	}
+	return msg;
 }
 
 Msg const *Fsm_alpha(Fsm *me, Msg *msg) {
@@ -702,36 +702,36 @@ Msg const *Fsm_alpha(Fsm *me, Msg *msg) {
 	case ENTRY_EVT:
 		LCVLog(INFO, "Enter state Alpha\n");
 		return 0;
-    
+	
 	case TOSUBBETA_EVT:
 		LCVLog(INFO, "msg arrived TOSUBBETA_EVT\n");
-		STATE_TRAN(me, &me->subbeta);	
+		STATE_TRAN(me, &me->subbeta);
 		return 0;
-    	}
-    	return msg;
+		}
+		return msg;
 }
 
 Msg const *Fsm_beta(Fsm *me, Msg *msg) {
-        switch (msg->evt) {
-        case ENTRY_EVT:
-                LCVLog(INFO, "Enter state Beta\n");
-                return 0;
-    
-        case TOALPHA_EVT:
-                LCVLog(INFO, "msg arrived ALPHA_EVT\n");
-                STATE_TRAN(me, &me->alpha);   
-                return 0;
-        }
-        return msg;
+		switch (msg->evt) {
+		case ENTRY_EVT:
+				LCVLog(INFO, "Enter state Beta\n");
+				return 0;
+	
+		case TOALPHA_EVT:
+				LCVLog(INFO, "msg arrived ALPHA_EVT\n");
+				STATE_TRAN(me, &me->alpha);
+				return 0;
+		}
+		return msg;
 }
 
 Msg const *Fsm_subbeta(Fsm *me, Msg *msg) {
-        switch (msg->evt) {
-        case ENTRY_EVT:
-                LCVLog(INFO, "Enter state Sub-Beta\n");
-                return 0;
-        }
-        return msg;
+		switch (msg->evt) {
+		case ENTRY_EVT:
+				LCVLog(INFO, "Enter state Sub-Beta\n");
+				return 0;
+		}
+		return msg;
 }
 
 
@@ -739,16 +739,16 @@ Msg const *Fsm_subbeta(Fsm *me, Msg *msg) {
 void FsmCtor(Fsm *me){
 	HsmCtor((Hsm *)me, "Fsm", (EvtHndlr)Fsm_top);
 	StateCtor(&me->alpha, "alpha",
-              &((Hsm *)me)->top, (EvtHndlr)Fsm_alpha);
-        StateCtor(&me->beta, "beta",
-              &((Hsm *)me)->top, (EvtHndlr)Fsm_beta);
-        StateCtor(&me->subbeta, "subbeta",
-              &me->beta, (EvtHndlr)Fsm_subbeta);
+				&((Hsm *)me)->top, (EvtHndlr)Fsm_alpha);
+		StateCtor(&me->beta, "beta",
+				&((Hsm *)me)->top, (EvtHndlr)Fsm_beta);
+		StateCtor(&me->subbeta, "subbeta",
+				&me->beta, (EvtHndlr)Fsm_subbeta);
 }
 
-const Msg fsmMsg[] = { 
-        {TOALPHA_EVT},
-        {TOSUBBETA_EVT} 
+const Msg fsmMsg[] = {
+		{TOALPHA_EVT},
+		{TOSUBBETA_EVT}
 };
 
 
@@ -757,7 +757,7 @@ int testHsm()
 {
 	LCV_ERR err = SUCCESS;
 
-        LCVHsmCreate(hFramework);
+		LCVHsmCreate(hFramework);
 
 	Msg const *msg;
 	Fsm fsm;
@@ -767,11 +767,11 @@ int testHsm()
 	msg = &fsmMsg[ TOSUBBETA_EVT];
 	HsmOnEvent((Hsm *)&fsm, msg);
 
-        msg = &fsmMsg[ TOALPHA_EVT];
-        HsmOnEvent((Hsm *)&fsm, msg);
+		msg = &fsmMsg[ TOALPHA_EVT];
+		HsmOnEvent((Hsm *)&fsm, msg);
 
-        msg = &fsmMsg[ TOSUBBETA_EVT];
-        HsmOnEvent((Hsm *)&fsm, msg);
+		msg = &fsmMsg[ TOSUBBETA_EVT];
+		HsmOnEvent((Hsm *)&fsm, msg);
 
 	LCVRtlDestroy(hFramework);
 	return err;
@@ -791,7 +791,7 @@ int main()
 
 
 	err = LCVCreate(&hFramework);
-	if(err < 0) 
+	if(err < 0)
 	{
 		printf("Unable to create framework.\n");
 		return -1;
@@ -800,7 +800,7 @@ int main()
 	if((err = LCVLogCreate(hFramework)))
 		return -1;
 
-/*	if(testHsm())
+/*  if(testHsm())
 		return -1;
 
 	if(testRtl())
@@ -814,13 +814,13 @@ int main()
 
 	if(testBMP())
 		return -1;
-*/
+ */
 	if(testSwr())
 		return -1;
 
 /*
 	if(testCam())
-	        return -1;
+			return -1;
 	
 	if(testCycles())
 		return -1;
@@ -835,7 +835,7 @@ int main()
 
 	if(testDma())
 		return -1;
-*/
+ */
 	LCVLogDestroy(hFramework);
 	LCVDestroy(hFramework);
 	return 0;

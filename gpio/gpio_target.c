@@ -1,5 +1,5 @@
 /*! @file gpio_target.c
- * @brief GPIO module implementation for host 
+ * @brief GPIO module implementation for host
  * 
  */
 
@@ -18,18 +18,18 @@
 #include <errno.h>
 
 /*! @brief The module singelton instance. */
-extern struct OSC_GPIO gpio;       
+extern struct OSC_GPIO gpio;
 extern struct GPIO_PIN_CONFIG aryPinConfig[];
 extern const uint16 nrOfPins;
-                                
+								
 static const char on = '1';
 static const char off = '0';
 static const char toggle = 'T';
-                                           
+											
 OSC_ERR OscGpioSetupPolarity(enum EnGpios enGpio, bool bLowActive)
 {
-	struct GPIO_PIN 	*pPin = &gpio.pins[enGpio];
-	bool 				bPinLowActive;
+	struct GPIO_PIN     *pPin = &gpio.pins[enGpio];
+	bool                bPinLowActive;
 	
 	/* Since the default polarity setup of pin at the plug is always high
 	 * active, we can consult the default config to deduce the correct setup
@@ -48,9 +48,9 @@ OSC_ERR OscGpioSetupPolarity(enum EnGpios enGpio, bool bLowActive)
 
 OSC_ERR OscGpioWrite(enum EnGpios enGpio, bool bState)
 {
-	struct GPIO_PIN 	*pPin = &gpio.pins[enGpio];
-	bool				bLowPolarity;
-	int 				ret;
+	struct GPIO_PIN     *pPin = &gpio.pins[enGpio];
+	bool                bLowPolarity;
+	int                 ret;
 	
 	if(unlikely(!pPin->fd))
 	{
@@ -96,10 +96,10 @@ OSC_ERR OscGpioWrite(enum EnGpios enGpio, bool bState)
 
 OSC_ERR OscGpioRead(enum EnGpios enGpio, bool *pbState)
 {
-	struct GPIO_PIN 	*pPin = &gpio.pins[enGpio];
-	bool				bLowPolarity;
-	char				buf;
-	int 				ret;
+	struct GPIO_PIN     *pPin = &gpio.pins[enGpio];
+	bool                bLowPolarity;
+	char                buf;
+	int                 ret;
 	
 	if(unlikely(!pPin->fd))
 	{
@@ -134,16 +134,16 @@ OSC_ERR OscGpioRead(enum EnGpios enGpio, bool *pbState)
 		*pbState = !bLowPolarity;
 	} else {
 		*pbState = bLowPolarity;
-	}		
+	}
 
-	return SUCCESS;	
+	return SUCCESS;
 }
 
 #ifdef TARGET_TYPE_INDXCAM
 OSC_ERR OscGpioSetTestLed(bool bOn)
 {
 	int ret;
-	struct GPIO_PIN		*pPin = &gpio.pins[PIN_TESTLED_N];
+	struct GPIO_PIN     *pPin = &gpio.pins[PIN_TESTLED_N];
 	
 	ret = write(pPin->fd, (bOn ? &on : &off), 1);
 	
@@ -159,7 +159,7 @@ OSC_ERR OscGpioSetTestLed(bool bOn)
 OSC_ERR OscGpioToggleTestLed()
 {
 	int ret;
-	struct GPIO_PIN		*pPin = &gpio.pins[PIN_TESTLED_N];
+	struct GPIO_PIN     *pPin = &gpio.pins[PIN_TESTLED_N];
 	
 	ret = write(pPin->fd, &toggle, 1);
 	
@@ -177,8 +177,8 @@ OSC_ERR OscGpioToggleTestLed()
 OSC_ERR OscGpioSetTestLed(bool bOn)
 {
 	int ret;
-	struct GPIO_PIN		*pRed = &gpio.pins[PIN_TESTLED_R_N];
-	struct GPIO_PIN		*pGreen = &gpio.pins[PIN_TESTLED_G_N];
+	struct GPIO_PIN     *pRed = &gpio.pins[PIN_TESTLED_R_N];
+	struct GPIO_PIN     *pGreen = &gpio.pins[PIN_TESTLED_G_N];
 	bool bRedPolarity, bGreenPolarity;
 	
 	bRedPolarity = ((pRed->flags & POL_LOWACTIVE) != 0);
@@ -199,8 +199,8 @@ OSC_ERR OscGpioSetTestLed(bool bOn)
 OSC_ERR OscGpioToggleTestLed()
 {
 	int ret;
-	struct GPIO_PIN		*pRed = &gpio.pins[PIN_TESTLED_R_N];
-	struct GPIO_PIN		*pGreen = &gpio.pins[PIN_TESTLED_G_N];
+	struct GPIO_PIN     *pRed = &gpio.pins[PIN_TESTLED_R_N];
+	struct GPIO_PIN     *pGreen = &gpio.pins[PIN_TESTLED_G_N];
 	
 	ret = write(pRed->fd, &toggle, 1);
 	ret |= write(pGreen->fd, &toggle, 1);
@@ -218,13 +218,13 @@ OSC_ERR OscGpioToggleTestLed()
 OSC_ERR OscGpioTriggerImage()
 {
 	int ret;
-	struct GPIO_PIN		*pPin = &gpio.pins[PIN_EXPOSURE];
+	struct GPIO_PIN     *pPin = &gpio.pins[PIN_EXPOSURE];
 	
 	if(gpio.enTriggerConfig != TRIGGER_INTERNAL)
-	  {
-	    /* Don't allow internal triggering if external triggering is configured. */
-	    return -EDEVICE_BUSY;
-	  }
+		{
+		/* Don't allow internal triggering if external triggering is configured. */
+		return -EDEVICE_BUSY;
+		}
 	/* Create a pulse on the Exposure pin of the image sensor. Sensor
 	 * is triggered by rising flank, so high time should not have to
 	 * be too broad.*/
@@ -268,11 +268,11 @@ exit_fail:
 
 OSC_ERR OscGpioInitPins()
 {
-	uint16 		pin;
-	int			pinNr;
-	char		dir;
-	int 		ret;
-	char		deviceNodePath[256];
+	uint16      pin;
+	int         pinNr;
+	char        dir;
+	int         ret;
+	char        deviceNodePath[256];
 	struct GPIO_PIN_CONFIG* pPinConfig;
 	
 	for(pin = 0; pin < nrOfPins; pin++)
@@ -283,7 +283,7 @@ OSC_ERR OscGpioInitPins()
 		pinNr = pPinConfig->pinNr;
 		if(pinNr < 0 || pinNr >= NR_OF_DSP_GPIOS)
 		{
-			OscLog(ERROR, 
+			OscLog(ERROR,
 					"%s: Fatal! Invalid pin number for %s configured! (%d)\n",
 				__func__, pPinConfig->name, pinNr);
 			return -EDEVICE;
@@ -293,60 +293,60 @@ OSC_ERR OscGpioInitPins()
 		sprintf(deviceNodePath, PIN_DEVICE_NODE_PREFIX "%d", pinNr);
 		gpio.pins[pinNr].fd = open(deviceNodePath, O_RDWR, 0);
 		if(gpio.pins[pinNr].fd < 0)
-	    {
-	        OscLog(ERROR, "%s: Unable to open device node for pin %d (%s)! (%s)\n",
-	                __func__,
-	                pinNr,
-	                pPinConfig->name,
-	                strerror(errno));
-	        return -EDEVICE;
-	    }
-	    
-	    /*************** Set the pin flags. ***************************/
-	    /* Direction */
-	    dir = pPinConfig->defaultFlags ? 'O' : 'I';
-	    ret = write(gpio.pins[pinNr].fd, &dir, 1);
-	    			
-	    if(unlikely(ret < 0))
-	    {
-	        OscLog(ERROR, "%s: Unable to set direction for pin %s (%d)!\n", 
-	        __func__, pPinConfig->name, pinNr);
-	        close(gpio.pins[pinNr].fd);
-	        return -EDEVICE;
-	    }
-    
-    	/******** Set the default initialization state of the pin ********/
-    	if(pPinConfig->defaultFlags & DIR_MASK)
-    	{
-    		/* Output pin */
-    		if(pPinConfig->defaultState)
-    		{
-    			if(pPinConfig->defaultFlags & POL_LOWACTIVE)
-    			{
-    				ret = write(gpio.pins[pinNr].fd, &off, 1);
-    			} else {
-    				ret = write(gpio.pins[pinNr].fd, &on, 1);
-    			}
-    		} else {
-    			if(pPinConfig->defaultFlags & POL_LOWACTIVE)
-    			{
-    				ret = write(gpio.pins[pinNr].fd, &on, 1);
-    			} else {
-    				ret = write(gpio.pins[pinNr].fd, &off, 1);
-    			}
-    		}
-    		if(unlikely(ret < 0))
+		{
+			OscLog(ERROR, "%s: Unable to open device node for pin %d (%s)! (%s)\n",
+					__func__,
+					pinNr,
+					pPinConfig->name,
+					strerror(errno));
+			return -EDEVICE;
+		}
+		
+		/*************** Set the pin flags. ***************************/
+		/* Direction */
+		dir = pPinConfig->defaultFlags ? 'O' : 'I';
+		ret = write(gpio.pins[pinNr].fd, &dir, 1);
+					
+		if(unlikely(ret < 0))
+		{
+			OscLog(ERROR, "%s: Unable to set direction for pin %s (%d)!\n",
+			__func__, pPinConfig->name, pinNr);
+			close(gpio.pins[pinNr].fd);
+			return -EDEVICE;
+		}
+	
+		/******** Set the default initialization state of the pin ********/
+		if(pPinConfig->defaultFlags & DIR_MASK)
+		{
+			/* Output pin */
+			if(pPinConfig->defaultState)
+			{
+				if(pPinConfig->defaultFlags & POL_LOWACTIVE)
+				{
+					ret = write(gpio.pins[pinNr].fd, &off, 1);
+				} else {
+					ret = write(gpio.pins[pinNr].fd, &on, 1);
+				}
+			} else {
+				if(pPinConfig->defaultFlags & POL_LOWACTIVE)
+				{
+					ret = write(gpio.pins[pinNr].fd, &on, 1);
+				} else {
+					ret = write(gpio.pins[pinNr].fd, &off, 1);
+				}
+			}
+			if(unlikely(ret < 0))
 			{
 				OscLog(ERROR, "%s: Error writing to pin %s (%s)\n",
 						__func__, pPinConfig->name, strerror(errno));
 				return -EDEVICE;
 			}
-    	}
-   	
-    	/* Save a pointer to the pin configuration. */
-    	gpio.pins[pinNr].pDefConfig = pPinConfig; 
-    	/* Save the default flags as the currently active flags. */
-    	gpio.pins[pinNr].flags = pPinConfig->defaultFlags;
+		}
+	
+		/* Save a pointer to the pin configuration. */
+		gpio.pins[pinNr].pDefConfig = pPinConfig;
+		/* Save the default flags as the currently active flags. */
+		gpio.pins[pinNr].flags = pPinConfig->defaultFlags;
 	}
 	
 	return SUCCESS;
@@ -357,8 +357,8 @@ OSC_ERR OscGpioInitPins()
 OSC_ERR OscGpioSetTestLedColor(uint8 red, uint8 green)
 {
 	int ret;
-	struct GPIO_PIN		*pRed = &gpio.pins[PIN_TESTLED_R_N];
-	struct GPIO_PIN		*pGreen = &gpio.pins[PIN_TESTLED_G_N];
+	struct GPIO_PIN     *pRed = &gpio.pins[PIN_TESTLED_R_N];
+	struct GPIO_PIN     *pGreen = &gpio.pins[PIN_TESTLED_G_N];
 	bool bRedPolarity, bGreenPolarity;
 	
 	bRedPolarity = ((pRed->flags & POL_LOWACTIVE) != 0);
@@ -374,13 +374,13 @@ OSC_ERR OscGpioSetTestLedColor(uint8 red, uint8 green)
 				__func__, strerror(errno));
 		return -EDEVICE;
 	}
-	return SUCCESS;	
+	return SUCCESS;
 }
 
 OSC_ERR OscGpioConfigImageTrigger(enum EnTriggerConfig enConfig)
 {
-	struct GPIO_PIN		*pPin = &gpio.pins[PIN_FN_EX_TRIGGER_N];
-	int 				ret;
+	struct GPIO_PIN     *pPin = &gpio.pins[PIN_FN_EX_TRIGGER_N];
+	int                 ret;
 	
 	if(enConfig == TRIGGER_INTERNAL)
 	{
@@ -393,7 +393,7 @@ OSC_ERR OscGpioConfigImageTrigger(enum EnTriggerConfig enConfig)
 	} else {
 		OscLog(ERROR, "%s: Invalid trigger config for this hardware (%d)!\n",
 				__func__, enConfig);
-		return -EINVALID_PARAMETER;	
+		return -EINVALID_PARAMETER;
 	}
 	
 	if(unlikely(ret < 0))

@@ -6,16 +6,16 @@
 #define VIS_PRIV_H_
 
 #ifdef OSC_HOST
-    #include <oscar_types_host.h>
+	#include <oscar_types_host.h>
 #else
-    #include <oscar_types_target.h>
+	#include <oscar_types_target.h>
 #endif /* OSC_HOST */
 
 #include <log/log_pub.h>
 
 /*! @brief Object struct of the bitmap module */
 struct OSC_VIS {
-    uint32      vis_dummy;  /*!< @brief dummy member */
+	uint32      vis_dummy;  /*!< @brief dummy member */
 };
 
 /*======================= Private methods ==============================*/

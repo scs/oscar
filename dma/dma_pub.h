@@ -7,11 +7,11 @@
 
 #include "oscar_error.h"
 #ifdef OSC_HOST
-    #include "oscar_types_host.h"
-    #include "oscar_host.h"
+	#include "oscar_types_host.h"
+	#include "oscar_host.h"
 #else
-    #include "oscar_types_target.h"
-    #include "oscar_target.h"
+	#include "oscar_types_target.h"
+	#include "oscar_target.h"
 #endif /* OSC_HOST */
 
 /*! Module-specific error codes.
@@ -25,12 +25,12 @@ enum EnOscDmaErrors {
 /*! @brief The number of bits the DMA transfers with one operation. */
 enum EnDmaWdSize
 {
-    /*! @brief DMA channel option: Word size  8 bits */
-    DMA_WDSIZE_8 = 0x00000000,
-    /*! @brief DMA channel option: Word size 16  bits */
-    DMA_WDSIZE_16 = 0x00000004,
-    /*! @brief DMA channel option: Word size 32 bits */
-    DMA_WDSIZE_32 = 0x00000008 
+	/*! @brief DMA channel option: Word size  8 bits */
+	DMA_WDSIZE_8 = 0x00000000,
+	/*! @brief DMA channel option: Word size 16  bits */
+	DMA_WDSIZE_16 = 0x00000004,
+	/*! @brief DMA channel option: Word size 32 bits */
+	DMA_WDSIZE_32 = 0x00000008
 };
 
 /*=========================== API functions ============================*/
@@ -53,7 +53,7 @@ void OscDmaDestroy(void *hFw);
 /*********************************************************************//*!
  * @brief Allocate a new, re-usable DMA chain handle.
  * 
- * @param phChainHandle Pointer to where the DMA chain handle should be 
+ * @param phChainHandle Pointer to where the DMA chain handle should be
  * returned.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
@@ -80,36 +80,36 @@ inline void OscDmaResetChain(void *hChainHandle);
  * @param pDstAddr The starting address at which writing will begin.
  * @param enDstWdSize The word size transferred per DMA cycle on the
  * writing end.
- * @param dstXCount The number of words in the X direction of the 
+ * @param dstXCount The number of words in the X direction of the
  * destination memory block.
  * @param dstXModify The offset the write address is modified with
  * after each line.
- * @param dstYCount The number of words in the Y direction of the 
+ * @param dstYCount The number of words in the Y direction of the
  * destination memory block.
  * @param dstYModify The offset the write address is modified with
  * after each word.
  * @param pSrcAddr The starting address at which reading will begin.
  * @param enSrcWdSize The word size transferred per DMA cycle on the
  * writing end.
- * @param srcXCount The number of words in the X direction of the 
+ * @param srcXCount The number of words in the X direction of the
  * source memory block.
  * @param srcXModify The offset the read address is modified with
  * after each word.
- * @param srcYCount The number of words in the Y direction of the 
+ * @param srcYCount The number of words in the Y direction of the
  * source memory block.
  * @param srcYModify The offset the read address is modified with
  * after each line.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
 OSC_ERR OscDmaAdd2DMove(void *hChainHandle,
-        const void *pDstAddr, 
-        const enum EnDmaWdSize enDstWdSize,
-        const uint16 dstXCount, const int32 dstXModify, 
-        const uint16 dstYCount, const int32 dstYModify,
-        const void *pSrcAddr,
-        const enum EnDmaWdSize enSrcWdSize,
-        const uint16 srcXCount, const int32 srcXModify,
-        const uint16 srcYCount, const int32 srcYModify);
+		const void *pDstAddr,
+		const enum EnDmaWdSize enDstWdSize,
+		const uint16 dstXCount, const int32 dstXModify,
+		const uint16 dstYCount, const int32 dstYModify,
+		const void *pSrcAddr,
+		const enum EnDmaWdSize enSrcWdSize,
+		const uint16 srcXCount, const int32 srcXModify,
+		const uint16 srcYCount, const int32 srcYModify);
 
 /*********************************************************************//*!
  * @brief Add a 1D memory move to a DMA chain.
@@ -125,26 +125,26 @@ OSC_ERR OscDmaAdd2DMove(void *hChainHandle,
  * @param pDstAddr The starting address at which writing will begin.
  * @param enDstWdSize The word size transferred per DMA cycle on the
  * writing end.
- * @param dstCount The number of words in the 
+ * @param dstCount The number of words in the
  * destination memory block.
  * @param dstModify The offset the write address is modified with
  * after each word.
  * @param pSrcAddr The starting address at which reading will begin.
  * @param enSrcWdSize The word size transferred per DMA cycle on the
  * writing end.
- * @param srcCount The number of words in the the 
+ * @param srcCount The number of words in the the
  * source memory block.
  * @param srcModify The offset the read address is modified with
  * after each word.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
 inline OSC_ERR OscDmaAdd1DMove(void *hChainHandle,
-        const void *pDstAddr, 
-        const enum EnDmaWdSize enDstWdSize,
-        const uint16 dstCount, const int32 dstModify, 
-        const void *pSrcAddr,
-        const enum EnDmaWdSize enSrcWdSize,
-        const uint16 srcCount, const int32 srcModify);
+		const void *pDstAddr,
+		const enum EnDmaWdSize enDstWdSize,
+		const uint16 dstCount, const int32 dstModify,
+		const void *pSrcAddr,
+		const enum EnDmaWdSize enSrcWdSize,
+		const uint16 srcCount, const int32 srcModify);
 
 /*********************************************************************//*!
  * @brief Add a a synchronization point to the DMA chain.
@@ -183,12 +183,12 @@ void OscDmaStart(void *hChainHandle);
  * @brief Synchronize to the end of a DMA move chain.
  * 
  * Waits until the DMA has finished a previously started move chain. This
- * only works if a synchronization point has been added to the end of 
+ * only works if a synchronization point has been added to the end of
  * the chain with OscDmaAddSyncPoint. To prevent total lockups due to
  * a DMA malfunction, an improvised timeout was added. The polling loop
  * is only cycled a predefined number of times after which the function
  * returns with -ETIMEOUT (> 8 seconds).
- * All moves in a chain must have the same word size or the DMA will 
+ * All moves in a chain must have the same word size or the DMA will
  * lock up on the target!
  * 
  * Host: Nothing to wait on, just check whether it has been successful.
@@ -212,14 +212,14 @@ OSC_ERR OscDmaSync(void *hChainHandle);
  * @return SUCCESS or an appropriate error code.
  *//*********************************************************************/
 OSC_ERR OscDmaMemCpy(void *hChainHandle,
-        void *pDstAddr,
-        void *pSrcAddr,
-        uint32 len);
+		void *pDstAddr,
+		void *pSrcAddr,
+		uint32 len);
 
 /*********************************************************************//*!
  * @brief Copy a memory area and wait for completion.
  * 
- * Only lengths that are multiples of 4 bytes are supported. Do not 
+ * Only lengths that are multiples of 4 bytes are supported. Do not
  * forget invalidating the target memory area.
  * 
  * @param hChainHandle Handle to the DMA chain.
@@ -229,8 +229,8 @@ OSC_ERR OscDmaMemCpy(void *hChainHandle,
  * @return SUCCESS or an appropriate error code.
  *//*********************************************************************/
 OSC_ERR OscDmaMemCpySync(void *hChainHandle,
-        void *pDstAddr,
-        void *pSrcAddr,
-        uint32 len);
+		void *pDstAddr,
+		void *pSrcAddr,
+		uint32 len);
 
 #endif /*DMA_PUB_H_*/

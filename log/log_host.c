@@ -1,5 +1,5 @@
 /*! @file log_host.c
- * @brief Logging module implementation for host 
+ * @brief Logging module implementation for host
  * 
  */
 
@@ -10,31 +10,31 @@
 #include "oscar_intern.h"
 #include <unistd.h>
 
-/*! @brief The module singelton instance. 
+/*! @brief The module singelton instance.
  * 
  * This is called osc_log
  * instead of log because log is a internal function of the C
  * library */
-struct OSC_LOG osc_log;		
+struct OSC_LOG osc_log;
 
 
 OSC_ERR OscLogCreate(void *hFw)
 {
-    struct OSC_FRAMEWORK *pFw;
+	struct OSC_FRAMEWORK *pFw;
 
-    pFw = (struct OSC_FRAMEWORK *)hFw;
-    if(pFw->log.useCnt != 0)
-    {
-        pFw->log.useCnt++;
-        /* The module is already allocated */
-        return SUCCESS;
-    }    
-        
+	pFw = (struct OSC_FRAMEWORK *)hFw;
+	if(pFw->log.useCnt != 0)
+	{
+		pFw->log.useCnt++;
+		/* The module is already allocated */
+		return SUCCESS;
+	}
+		
 	memset(&osc_log, 0, sizeof(struct OSC_LOG));
-    /* Set log levels to defaults. */
-    osc_log.consoleLogLevel = DEFAULT_CONSOLE_LOGLEVEL;
-    osc_log.fileLogLevel = DEFAULT_FILE_LOGLEVEL;
-    
+	/* Set log levels to defaults. */
+	osc_log.consoleLogLevel = DEFAULT_CONSOLE_LOGLEVEL;
+	osc_log.fileLogLevel = DEFAULT_FILE_LOGLEVEL;
+	
 	osc_log.pLogF = fopen(LOG_FILE_NAME, "a");
 	if(osc_log.pLogF == NULL)
 	{
@@ -50,26 +50,26 @@ OSC_ERR OscLogCreate(void *hFw)
 		return -EUNABLE_TO_OPEN_FILE;
 	}
 		
-    /* Increment the use count */
-    pFw->log.hHandle = (void*)&osc_log;
-    pFw->log.useCnt++;    
+	/* Increment the use count */
+	pFw->log.hHandle = (void*)&osc_log;
+	pFw->log.useCnt++;
 
 	return SUCCESS;
 }
 
 void OscLogDestroy(void *hFw)
 {
-    struct OSC_FRAMEWORK *pFw;
-        
-    pFw = (struct OSC_FRAMEWORK *)hFw; 
-    /* Check if we really need to release or whether we still 
-     * have users. */
-    pFw->log.useCnt--;
-    if(pFw->log.useCnt > 0)
-    {
-        return;
-    }
-    
+	struct OSC_FRAMEWORK *pFw;
+		
+	pFw = (struct OSC_FRAMEWORK *)hFw;
+	/* Check if we really need to release or whether we still
+	 * have users. */
+	pFw->log.useCnt--;
+	if(pFw->log.useCnt > 0)
+	{
+		return;
+	}
+	
 	fclose(osc_log.pLogF);
 	fclose(osc_log.pSimLogF);
 	
@@ -89,15 +89,15 @@ inline void OscLogSetFileLogLevel(const enum EnOscLogLevel level)
 void OscLog(const enum EnOscLogLevel level, const char * strFormat, ...)
 {
 	char strTemp[256];
-	va_list ap;			/*< The dynamic argument list */
+	va_list ap;         /*< The dynamic argument list */
 	
-	strTemp[0] = 0;	/* Mark the string as empty */
+	strTemp[0] = 0; /* Mark the string as empty */
 	
 	if(level <= osc_log.consoleLogLevel)
 	{
 		/* Log to console if the current log level is high enough */
 		
-		/* We can't use sprintf because we only have the additional 
+		/* We can't use sprintf because we only have the additional
 		 * arguments as a list => use vsprintf */
 		va_start(ap, strFormat);
 		vprintf(strFormat, ap);
@@ -124,7 +124,7 @@ void OscLog(const enum EnOscLogLevel level, const char * strFormat, ...)
 		/* Log to the simulation log. */
 		va_start(ap, strFormat);
 		vfprintf(osc_log.pSimLogF, strFormat, ap);
-		va_end(ap);		
+		va_end(ap);
 	}
 }
 

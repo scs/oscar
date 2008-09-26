@@ -38,20 +38,20 @@
 
 /*#define BENCHMARK*/
 #ifdef BENCHMARK
- #define BENCH_START(startCyc) \
-        startCyc = OscSupCycGet(); 
+	#define BENCH_START(startCyc) \
+		startCyc = OscSupCycGet();
 #else /* BENCHMARK */
- #define BENCH_START(startCyc) \
-        {}; 
+	#define BENCH_START(startCyc) \
+		{};
 #endif /* BENCHMARK */
 
 #ifdef BENCHMARK
-    #define BENCH_STOP(label, startCyc) \
-    OscLog(CRITICAL, label ": %dus\n", \
-    OscSupCycToMicroSecs(OscSupCycGet() - startCyc));
+	#define BENCH_STOP(label, startCyc) \
+	OscLog(CRITICAL, label ": %dus\n", \
+	OscSupCycToMicroSecs(OscSupCycGet() - startCyc));
 #else /* BENCHMARK */
- #define BENCH_STOP(label, startCyc) \
-       {}; 
+	#define BENCH_STOP(label, startCyc) \
+		{};
 #endif /* BESWNCHMARK */
 
 static inline void InterpRedAndBlue_CurGreenPixRedRow(const uint8* pRaw,
@@ -62,15 +62,15 @@ static inline void InterpRedAndBlue_CurGreenPixRedRow(const uint8* pRaw,
 
 	/* Interpolate the red color horizontally. */
 	red = 2*(pRaw[-1] + pRaw[1]);
-	red += 2*pRaw[0] - pOut[BYTES_PER_PIX*(-1) + GREEN_OFF] 
-	                        - pOut[BYTES_PER_PIX*(1) + GREEN_OFF];
+	red += 2*pRaw[0] - pOut[BYTES_PER_PIX*(-1) + GREEN_OFF]
+							- pOut[BYTES_PER_PIX*(1) + GREEN_OFF];
 	red = INT_DIVIDE_BY_4_ROUND(red);
 	pOut[RED_OFF] = SATURATE_TO_UINT8(red);
 	
 	/* Interpolate the blue color vertically. */
 	blue = 2*(pRaw[-width] + pRaw[width]);
-	blue += 2*pRaw[0] - pOut[BYTES_PER_PIX*(-width) + GREEN_OFF] 
-	                        - pOut[BYTES_PER_PIX*(width) + GREEN_OFF];
+	blue += 2*pRaw[0] - pOut[BYTES_PER_PIX*(-width) + GREEN_OFF]
+							- pOut[BYTES_PER_PIX*(width) + GREEN_OFF];
 	blue = INT_DIVIDE_BY_4_ROUND(blue);
 	pOut[BLUE_OFF] = SATURATE_TO_UINT8(blue);
 }
@@ -83,15 +83,15 @@ static inline void InterpRedAndBlue_CurGreenPixBlueRow(const uint8* pRaw,
 
 	/* Interpolate the blue color horizontally. */
 	blue = 2*(pRaw[-1] + pRaw[1]);
-	blue += 2*pRaw[0] - pOut[BYTES_PER_PIX*(-1) + GREEN_OFF] 
-	                        - pOut[BYTES_PER_PIX*(1) + GREEN_OFF];
+	blue += 2*pRaw[0] - pOut[BYTES_PER_PIX*(-1) + GREEN_OFF]
+							- pOut[BYTES_PER_PIX*(1) + GREEN_OFF];
 	blue = INT_DIVIDE_BY_4_ROUND(blue);
 	pOut[BLUE_OFF] = SATURATE_TO_UINT8(blue);
 	
 	/* Interpolate the red color vertically. */
 	red = 2*(pRaw[-width] + pRaw[width]);
-	red += 2*pRaw[0] - pOut[BYTES_PER_PIX*(-width) + GREEN_OFF] 
-	                        - pOut[BYTES_PER_PIX*(width) + GREEN_OFF];
+	red += 2*pRaw[0] - pOut[BYTES_PER_PIX*(-width) + GREEN_OFF]
+							- pOut[BYTES_PER_PIX*(width) + GREEN_OFF];
 	red = INT_DIVIDE_BY_4_ROUND(red);
 	pOut[RED_OFF] = SATURATE_TO_UINT8(red);
 }
@@ -111,12 +111,12 @@ static inline uint8 InterpRedOrBlue_CurBlueOrRedPix(const uint8* pRaw,
 	southeast = pRaw[width + 1];
 	
 	/* Calculate the value of the color not being the raw input. */
-	lapN = 2*pOut[GREEN_OFF] 
-	              - pOut[BYTES_PER_PIX*(-width - 1) + GREEN_OFF] 
-	              - pOut[BYTES_PER_PIX*(width + 1) + GREEN_OFF];
+	lapN = 2*pOut[GREEN_OFF]
+					- pOut[BYTES_PER_PIX*(-width - 1) + GREEN_OFF]
+					- pOut[BYTES_PER_PIX*(width + 1) + GREEN_OFF];
 	lapP = 2*pOut[GREEN_OFF]
-	              - pOut[BYTES_PER_PIX*(-width + 1) + GREEN_OFF]
-	              - pOut[BYTES_PER_PIX*(width - 1) + GREEN_OFF];
+					- pOut[BYTES_PER_PIX*(-width + 1) + GREEN_OFF]
+					- pOut[BYTES_PER_PIX*(width - 1) + GREEN_OFF];
 	
 	/* The diagonal LaPlace of the green color pixels surrounding
 	 * the current pixels. */
@@ -137,7 +137,7 @@ static inline uint8 InterpRedOrBlue_CurBlueOrRedPix(const uint8* pRaw,
 	return SATURATE_TO_UINT8(out);
 }
 
-static void InterpGreen_FirstTwoRows(const uint8* pRaw, 
+static void InterpGreen_FirstTwoRows(const uint8* pRaw,
 		const uint16 width,
 		const bool bTopLeftIsGreen,
 		uint8 *const pOut)
@@ -165,7 +165,7 @@ static void InterpGreen_FirstTwoRows(const uint8* pRaw,
 	PREFETCH(&pRawPix[width]);
 	for(col = startCol; col < width - 2; col+=2)
 	{
-		/* Always process two pixels. Copy the first, native green 
+		/* Always process two pixels. Copy the first, native green
 		 * pixel and interpolate the other. */
 		*pOutPix = *pRawPix;
 		pRawPix++;
@@ -217,7 +217,7 @@ static void InterpGreen_FirstTwoRows(const uint8* pRaw,
 	/* Second line. */
 	for(col = startCol; col < width - 2; col+=2)
 	{
-		/* Always process two pixels. Copy the first, native green 
+		/* Always process two pixels. Copy the first, native green
 		 * pixel and interpolate the other. */
 		*pOutPix = *pRawPix;
 		pRawPix++;
@@ -239,7 +239,7 @@ static void InterpGreen_FirstTwoRows(const uint8* pRaw,
 		pOutPix += BYTES_PER_PIX;
 
 		/* Last pixel is not green. */
-		*pOutPix = INT_DIVIDE_BY_3_ROUND(pRawPix[-1] + pRawPix[width] + 
+		*pOutPix = INT_DIVIDE_BY_3_ROUND(pRawPix[-1] + pRawPix[width] +
 					pRawPix[-width]);
 	} else {
 		/* Last pixel is green. */
@@ -248,7 +248,7 @@ static void InterpGreen_FirstTwoRows(const uint8* pRaw,
 	}
 }
 
-static void InterpGreen_LastTwoRows(const uint8* pRaw, 
+static void InterpGreen_LastTwoRows(const uint8* pRaw,
 		const uint16 width,
 		const bool bFirstIsGreen,
 		uint8 *const pOut)
@@ -277,7 +277,7 @@ static void InterpGreen_LastTwoRows(const uint8* pRaw,
 	PREFETCH(&pRawPix[width]);
 	for(col = startCol; col < width - 2; col+=2)
 	{
-		/* Always process two pixels. Copy the first, native green 
+		/* Always process two pixels. Copy the first, native green
 		 * pixel and interpolate the other. */
 		*pOutPix = *pRawPix;
 		pRawPix++;
@@ -300,7 +300,7 @@ static void InterpGreen_LastTwoRows(const uint8* pRaw,
 		pOutPix += BYTES_PER_PIX;
 
 		/* Last pixel is not green. */
-		*pOutPix = 
+		*pOutPix =
 			INT_DIVIDE_BY_3_ROUND(pRaw[-1] + pRaw[-width] + pRaw[width]);
 	} else {
 		/* Last pixel is green. */
@@ -327,7 +327,7 @@ static void InterpGreen_LastTwoRows(const uint8* pRaw,
 	/* Last line. */
 	for(col = startCol; col < width - 2; col+=2)
 	{
-		/* Always process two pixels. Copy the first, native green 
+		/* Always process two pixels. Copy the first, native green
 		 * pixel and interpolate the other. */
 		*pOutPix = *pRawPix;
 		pRawPix++;
@@ -348,7 +348,7 @@ static void InterpGreen_LastTwoRows(const uint8* pRaw,
 		pOutPix += BYTES_PER_PIX;
 
 		/* Last pixel is not green. */
-		*pOutPix = 
+		*pOutPix =
 			INT_DIVIDE_BY_2_ROUND(pRawPix[-1] + pRawPix[-width]);
 	} else {
 		/* Last pixel is green. */
@@ -375,7 +375,7 @@ static inline void InterpGreen_FirstTwoCols(const uint8 *pRaw,
 		out = pRaw[1] + pRaw[width] + pRaw[-width];
 		pOut[GREEN_OFF] = INT_DIVIDE_BY_3_ROUND(out);
 		
-		pOut[BYTES_PER_PIX + GREEN_OFF] = pRaw[1]; 
+		pOut[BYTES_PER_PIX + GREEN_OFF] = pRaw[1];
 	}
 }
 
@@ -397,11 +397,11 @@ static inline void InterpGreen_LastTwoCols(const uint8 *pRaw,
 		out = pRaw[-1] + pRaw[1] + pRaw[width] + pRaw[-width];
 		pOut[GREEN_OFF] = INT_DIVIDE_BY_4_ROUND(out);
 
-		pOut[BYTES_PER_PIX + GREEN_OFF] = pRaw[1]; 
+		pOut[BYTES_PER_PIX + GREEN_OFF] = pRaw[1];
 	}
 }
 
-static inline uint8 InterpGreen_CurRedOrBluePix(const uint8* pRaw, 
+static inline uint8 InterpGreen_CurRedOrBluePix(const uint8* pRaw,
 		uint16 width)
 {
 	int16 west, east, north, south;
@@ -415,7 +415,7 @@ static inline uint8 InterpGreen_CurRedOrBluePix(const uint8* pRaw,
 	north = pRaw[-width];
 	south = pRaw[width];
 	
-	/* The horizontal and vertical LaPlace of the current pixel. 
+	/* The horizontal and vertical LaPlace of the current pixel.
 	 * Depending on the actual position, these are blue or red pixels. */
 	lapH = 2*pRaw[0] - pRaw[-2] - pRaw[2];
 	lapV = 2*pRaw[0] - pRaw[-2*width] - pRaw[2*width];
@@ -431,7 +431,7 @@ static inline uint8 InterpGreen_CurRedOrBluePix(const uint8* pRaw,
 	} else if(deltaH > deltaV) {
 		out = INT_DIVIDE_BY_4_ROUND(2 * (north + south) + deltaV);
 	} else {
-		out = INT_DIVIDE_BY_8_ROUND(2 * (west + east + north + south) + 
+		out = INT_DIVIDE_BY_8_ROUND(2 * (west + east + north + south) +
 				deltaH + deltaV);
 	}
 	return SATURATE_TO_UINT8(out);
@@ -532,12 +532,12 @@ OSC_ERR OscVisDebayer(const uint8* pRaw,
 		enum EnBayerOrder enBayerOrderFirstRow,
 		uint8 *const pOut)
 {
-	bool 		bTopLeftIsGreen, bTopRowIsRed, bFirstPixIsGreen, bRowIsRed;
-	uint8 		*pOutPix, *pOutRow, *pOutPrefetch;
+	bool        bTopLeftIsGreen, bTopRowIsRed, bFirstPixIsGreen, bRowIsRed;
+	uint8       *pOutPix, *pOutRow, *pOutPrefetch;
 	const uint8 *pRawPix, *pRawRow, *pRawPrefetch;
-	uint16 		row, col;
+	uint16      row, col;
 #ifdef BENCHMARK
-	uint32 		startCyc;
+	uint32      startCyc;
 #endif
 	
 	/*---------------------- Input validation. -------------------- */
@@ -556,7 +556,7 @@ OSC_ERR OscVisDebayer(const uint8* pRaw,
 		return -EINVALID_PARAMETER;
 	}
 	
-	bTopLeftIsGreen = (enBayerOrderFirstRow == ROW_GBGB) || 
+	bTopLeftIsGreen = (enBayerOrderFirstRow == ROW_GBGB) ||
 						(enBayerOrderFirstRow == ROW_GRGR);
 	bTopRowIsRed = (enBayerOrderFirstRow == ROW_RGRG) ||
 						(enBayerOrderFirstRow == ROW_GRGR);
@@ -565,7 +565,7 @@ OSC_ERR OscVisDebayer(const uint8* pRaw,
 	
 	BENCH_START(startCyc);
 	/* The first and last two rows must be treated specially. */
-	InterpGreen_FirstTwoRows(pRaw, 
+	InterpGreen_FirstTwoRows(pRaw,
 		width,
 		bTopLeftIsGreen,
 		pOut);
@@ -583,7 +583,7 @@ OSC_ERR OscVisDebayer(const uint8* pRaw,
 	for(row = 2; row < height - 2; row++)
 	{
 		/* Interpolate a single row. Copy the pixels that natively
-		 * represent green from the raw data and interpolate the 
+		 * represent green from the raw data and interpolate the
 		 * others. We must treat the first and the last two columns
 		 * specially. */
 		InterpGreen_FirstTwoCols(pRawPix,
@@ -600,7 +600,7 @@ OSC_ERR OscVisDebayer(const uint8* pRaw,
 				pOutPix[GREEN_OFF] = *pRawPix;
 				pRawPix++;
 				
-				pOutPix[BYTES_PER_PIX + GREEN_OFF] = 
+				pOutPix[BYTES_PER_PIX + GREEN_OFF] =
 					InterpGreen_CurRedOrBluePix(pRawPix, width);
 				
 				pOutPix += 2*BYTES_PER_PIX;
@@ -610,7 +610,7 @@ OSC_ERR OscVisDebayer(const uint8* pRaw,
 			/* First pixel is red or blue. */
 			for(col = 2; col < width - 2; col += 2)
 			{
-				pOutPix[GREEN_OFF] = 
+				pOutPix[GREEN_OFF] =
 					InterpGreen_CurRedOrBluePix(pRawPix, width);
 				pRawPix++;
 				
@@ -636,7 +636,7 @@ OSC_ERR OscVisDebayer(const uint8* pRaw,
 	
 	BENCH_START(startCyc);
 	bFirstPixIsGreen = IS_EVEN(height) ? bTopLeftIsGreen : !bTopLeftIsGreen;
-	InterpGreen_LastTwoRows(pRawPix, 
+	InterpGreen_LastTwoRows(pRawPix,
 			width,
 			bFirstPixIsGreen,
 			pOutPix);
@@ -654,7 +654,7 @@ OSC_ERR OscVisDebayer(const uint8* pRaw,
 	for(row = 1; row < height - 1; row++)
 	{
 		/* Interpolate a single row. Copy the pixels that natively
-		 * represent green from the raw data and interpolate the 
+		 * represent green from the raw data and interpolate the
 		 * others. We must treat the first and the last columns
 		 * specially. */
 		
@@ -666,7 +666,7 @@ OSC_ERR OscVisDebayer(const uint8* pRaw,
 		{
 			/* First pixel is not green. */
 			if(bRowIsRed)
-			{				
+			{
 				for(col = 1; col < width - 1; col += 2)
 				{
 					InterpRedAndBlue_CurGreenPixRedRow(
@@ -686,14 +686,14 @@ OSC_ERR OscVisDebayer(const uint8* pRaw,
 					pOutPix += BYTES_PER_PIX;
 					pRawPix++;
 				}
-				/* First and last column. Just copy from the neighboring 
+				/* First and last column. Just copy from the neighboring
 				 * pixels. */
 				pOutRow[RED_OFF] = *pRawRow;
 				pOutRow[BLUE_OFF] = pOutRow[BYTES_PER_PIX + BLUE_OFF];
 				
-				pOutRow[(width - 1)*BYTES_PER_PIX + RED_OFF] = 
+				pOutRow[(width - 1)*BYTES_PER_PIX + RED_OFF] =
 					pOutRow[(width - 2)*BYTES_PER_PIX + RED_OFF];
-				pOutRow[(width - 1)*BYTES_PER_PIX + BLUE_OFF] = 
+				pOutRow[(width - 1)*BYTES_PER_PIX + BLUE_OFF] =
 					pOutRow[(width - 2)*BYTES_PER_PIX + BLUE_OFF];
 			} else {
 								
@@ -716,18 +716,18 @@ OSC_ERR OscVisDebayer(const uint8* pRaw,
 					pOutPix += BYTES_PER_PIX;
 					pRawPix++;
 				}
-				/* First and last column. Just copy from the neighboring 
+				/* First and last column. Just copy from the neighboring
 				 * pixels. */
 				pOutRow[RED_OFF] = pOutRow[BYTES_PER_PIX + RED_OFF];
 				pOutRow[BLUE_OFF] = *pRawRow;
 
-				pOutRow[(width - 1)*BYTES_PER_PIX + RED_OFF] = 
+				pOutRow[(width - 1)*BYTES_PER_PIX + RED_OFF] =
 					pOutRow[(width - 2)*BYTES_PER_PIX + RED_OFF];
-				pOutRow[(width - 1)*BYTES_PER_PIX + BLUE_OFF] = 
+				pOutRow[(width - 1)*BYTES_PER_PIX + BLUE_OFF] =
 					pOutRow[(width - 2)*BYTES_PER_PIX + BLUE_OFF];
 			}
-		} 
-		else 
+		}
+		else
 		{
 			/* First pixel is green. */
 			if(bRowIsRed)
@@ -751,17 +751,17 @@ OSC_ERR OscVisDebayer(const uint8* pRaw,
 					pOutPix += BYTES_PER_PIX;
 					pRawPix++;
 				}
-				/* First and last column. Just copy from the neighboring 
+				/* First and last column. Just copy from the neighboring
 				 * pixels. */
 				pOutRow[RED_OFF] = pOutRow[BYTES_PER_PIX + RED_OFF];
 				pOutRow[BLUE_OFF] = pOutRow[BYTES_PER_PIX + BLUE_OFF];
 
-				pOutRow[(width - 1)*BYTES_PER_PIX + RED_OFF] = 
+				pOutRow[(width - 1)*BYTES_PER_PIX + RED_OFF] =
 					*pRawPix;
-				pOutRow[(width - 1)*BYTES_PER_PIX + BLUE_OFF] = 
+				pOutRow[(width - 1)*BYTES_PER_PIX + BLUE_OFF] =
 					pOutRow[(width - 2)*BYTES_PER_PIX + BLUE_OFF];
 			}
-			else 
+			else
 			{
 				for(col = 1; col < width - 1; col += 2)
 				{
@@ -782,14 +782,14 @@ OSC_ERR OscVisDebayer(const uint8* pRaw,
 					pOutPix += BYTES_PER_PIX;
 					pRawPix++;
 				}
-				/* First and last column. Just copy from the neighboring 
+				/* First and last column. Just copy from the neighboring
 				 * pixels. */
 				pOutRow[RED_OFF] = pOutRow[BYTES_PER_PIX + RED_OFF];
 				pOutRow[BLUE_OFF] = pOutRow[BYTES_PER_PIX + BLUE_OFF];
 
-				pOutRow[(width - 1)*BYTES_PER_PIX + RED_OFF] = 
+				pOutRow[(width - 1)*BYTES_PER_PIX + RED_OFF] =
 					pOutRow[(width - 2)*BYTES_PER_PIX + RED_OFF];
-				pOutRow[(width - 1)*BYTES_PER_PIX + BLUE_OFF] = 
+				pOutRow[(width - 1)*BYTES_PER_PIX + BLUE_OFF] =
 					*pRawPix;
 			}
 

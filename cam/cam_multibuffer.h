@@ -1,5 +1,5 @@
 /*! @file cam_multibuffer.h
-* @brief Private multibuffer definitions
+ * @brief Private multibuffer definitions
  * 
  */
 #ifndef CAM_MULTIBUFFER_H_
@@ -15,19 +15,19 @@
 
 /*! @brief The structure representing a multibuffer.
  * 
- * Used to organize frame buffers into automatically managed 
+ * Used to organize frame buffers into automatically managed
  * multi buffers (e.g. double buffers) */
 struct OSC_CAM_MULTIBUFFER
 {
-    /*! The depth of this multibuffer, e.g. 2 for double-buffering */
-    uint8 multiBufferDepth;
-    /*! The frame buffer IDs of the frame buffers forming this
-     * multibuffer. */
-    uint8 fbIDs[MAX_NR_FRAME_BUFFERS];
-    /*! ID of the frame buffer where to start the next capture to. */
-    uint8 idNextCapture;
-    /*! ID of the frame buffer where to sync and read from next. */
-    uint8 idNextSync;
+	/*! The depth of this multibuffer, e.g. 2 for double-buffering */
+	uint8 multiBufferDepth;
+	/*! The frame buffer IDs of the frame buffers forming this
+	 * multibuffer. */
+	uint8 fbIDs[MAX_NR_FRAME_BUFFERS];
+	/*! ID of the frame buffer where to start the next capture to. */
+	uint8 idNextCapture;
+	/*! ID of the frame buffer where to sync and read from next. */
+	uint8 idNextSync;
 };
 
 /*=================== Public Method prototypes =========================*/
@@ -35,10 +35,10 @@ struct OSC_CAM_MULTIBUFFER
 /*********************************************************************//*!
  * @brief Configure multiple frame buffer to form a multi buffer.
  * 
- * This can be used e.g. to allow automatic management of double or 
+ * This can be used e.g. to allow automatic management of double or
  * triple buffering. Just specify the depth of the multi buffer and the
  * frame buffer IDs forming the multi buffer. Afterwards the commands
- * requiring a frame buffer number can be supplied with 
+ * requiring a frame buffer number can be supplied with
  * OSC_CAM_MULTI_BUFFER to acces the data in the automatically managed
  * multi buffer.
  * No input validation is done (must be done beforehand).
@@ -53,8 +53,8 @@ struct OSC_CAM_MULTIBUFFER
  * @return SUCCESS or an appropriate error code
  *//*********************************************************************/
 OSC_ERR OscCamMultiBufferCreate(struct OSC_CAM_MULTIBUFFER * pMB,
-        const uint8 multiBufferDepth,
-        const uint8 bufferIDs[]);
+		const uint8 multiBufferDepth,
+		const uint8 bufferIDs[]);
 
 /*********************************************************************//*!
  * @brief Delete a previously configured multi buffer
@@ -78,13 +78,13 @@ inline OSC_ERR OscCamMultiBufferDestroy(struct OSC_CAM_MULTIBUFFER * pMB);
  * @return Buffer ID for the next capture.
  *//*********************************************************************/
 inline uint8 OscCamMultiBufferGetCapBuf(
-        const struct OSC_CAM_MULTIBUFFER *pMB);
+		const struct OSC_CAM_MULTIBUFFER *pMB);
 
 /*********************************************************************//*!
  * @brief Execute all multi buffer management associated with a capture.
  * 
  * Adjusts the idNextSync and idNextCapture variables. Captures are
- * always possible, the oldest picture simply gets overwritten. 
+ * always possible, the oldest picture simply gets overwritten.
  * 
  * @see OscCamMultiBufferGetCaptBuf
  * @see OscCamMultiBufferSync
@@ -108,7 +108,7 @@ void OscCamMultiBufferCapture(struct OSC_CAM_MULTIBUFFER * pMB);
  * @return Buffer ID for the next capture.
  *//*********************************************************************/
 inline uint8 OscCamMultiBufferGetSyncBuf(
-        const struct OSC_CAM_MULTIBUFFER *pMB);
+		const struct OSC_CAM_MULTIBUFFER *pMB);
 
 /*********************************************************************//*!
  * @brief Execute all multi buffer management associated with a sync.

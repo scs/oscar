@@ -7,19 +7,19 @@
 
 #include "oscar_error.h"
 #ifdef OSC_HOST
-    #include "oscar_types_host.h"
-    #include "oscar_host.h"
+	#include "oscar_types_host.h"
+	#include "oscar_host.h"
 #else
-    #include "oscar_types_target.h"
-    #include "oscar_target.h"
+	#include "oscar_types_target.h"
+	#include "oscar_target.h"
 #endif /* OSC_HOST */
 
 
 #ifdef OSC_TARGET
-/* Include the header files of the DSP runtime library 
+/* Include the header files of the DSP runtime library
  * (part of the toolchain)*/
 #include <filter.h>
-#include <fract.h> 
+#include <fract.h>
 #include <fract_complex.h>
 #endif /* OSC_TARGET */
 
@@ -30,8 +30,8 @@ typedef int32 fract32;
 typedef int32 fract2x16;
 
 typedef struct complex_fract16 {
-    fract16 re;
-    fract16 im;
+	fract16 re;
+	fract16 im;
 } complex_fract16;
 
 #endif /* OSC_HOST */
@@ -134,7 +134,7 @@ fract2x16 OscDsplCompose_fr2x16(fract16 h, fract16 l);
 /*********************************************************************//*!
  * @brief Transform a fract32 number into a fract16 number
  * 
- * Saturates and rounds the same way as the dsp 
+ * Saturates and rounds the same way as the dsp
  * (when saving an accumulator result into a fract16 data register)
  * 
  * Only for host
@@ -157,7 +157,7 @@ fract16 mult_fr1x16(fract16 a,fract16 b);
  * Multiplies two fract16 numbers and truncates the result. No rounding
  * takes place!
  * @see OscDsplMultRfr16
- *
+ * 
  *  Only for host
  * 
  * @param a Fract16 number.
@@ -178,7 +178,7 @@ fract16 multr_fr1x16(fract16 a,fract16 b);
  * Multiplies two fract16 numbers, then rounds and saturates
  * the result the same way as the DSP.
  * @see OscDsplMultfr16
- *
+ * 
  *  Only for host
  * 
  * @param a Fract16 number.
@@ -238,7 +238,7 @@ fract16 _mean_fr16(const fract16 x[], int lenght);
  * 
  * @param x Fract16 array with input values
  * @param length of input array
- * @return The mean of the input values 
+ * @return The mean of the input values
  *//*********************************************************************/
 fract16 OscDspl_mean_fr16(const fract16 x[],int  length);
 #endif /* OSC_HOST */
@@ -253,7 +253,7 @@ complex_fract16 _cadd_fr16 ( complex_fract16 a, complex_fract16 b );
 /*********************************************************************//*!
  * @brief Complex_fract16 adder
  * 
- * Adds two complexfract16 numbers and round the result 
+ * Adds two complexfract16 numbers and round the result
  * the same way as the dsp
  * 
  * @param a Complex_fract16 number.
@@ -274,7 +274,7 @@ complex_fract16 _csub_fr16 ( complex_fract16 a, complex_fract16 b );
 /*********************************************************************//*!
  * @brief Complex_fract16 subtracter
  * 
- * Subtracts two complexfract16 numbers and round the result 
+ * Subtracts two complexfract16 numbers and round the result
  * the same way as the dsp
  * 
  * @param a Complex_fract16 number.
@@ -295,7 +295,7 @@ complex_fract16 _cdiv_fr16 ( complex_fract16 a, complex_fract16 b );
 /*********************************************************************//*!
  * @brief Complex_fract16 division
  * 
- * Divides two complex_fract16 numbers and round the result 
+ * Divides two complex_fract16 numbers and round the result
  * the same way as the dsp
  * 
  * @param a Fract16 number.
@@ -315,7 +315,7 @@ complex_fract16 _cmlt_fr16 ( complex_fract16 a, complex_fract16 b );
 /*********************************************************************//*!
  * @brief Complex_fract16 multiplicator
  * 
- * Multiplies two complex_fract16 numbers and round the result 
+ * Multiplies two complex_fract16 numbers and round the result
  * the same way as the dsp
  * 
  * @param a Fract16 number.
@@ -327,7 +327,7 @@ complex_fract16 OscDspl_cmlt_fr16(complex_fract16 a, complex_fract16 b );
 #endif /* OSC_HOST */
 
 #ifdef OSC_TARGET
-/*! @brief Target only: Redirect the call to the DSP runtime library 
+/*! @brief Target only: Redirect the call to the DSP runtime library
  * 
  *  ATTENTION: The function Negate(x) does not exist in the library and
  *  therefore this function is not working in the dsp*/
@@ -354,7 +354,7 @@ complex_fract16 OscDspl_conj_fr16(complex_fract16 a);
 
 #ifdef OSC_TARGET
 /*! @brief Target only: Redirect the call to the DSP runtime library */
-void _twidfftrad2_fr16(complex_fract16 w[],int n);       
+void _twidfftrad2_fr16(complex_fract16 w[],int n);
 #define OscDspl_twidfftrad2_fr16 _twidfftrad2_fr16
 #endif /* OSC_TARGET */
 
@@ -375,12 +375,12 @@ void OscDspl_twidfftrad2_fr16(complex_fract16 w[], int n );
 #ifdef OSC_TARGET
 /*! @brief Target only: Redirect the call to the DSP runtime library */
 void  rfft_fr16( const fract16          in[],
-                                          complex_fract16  out[],
-                                    const complex_fract16  twiddle[],
-                                    int  stride,
-                                    int  fft_size,
-                                    int  *block_exponent,
-                                    int  scaling );
+											complex_fract16  out[],
+									const complex_fract16  twiddle[],
+									int  stride,
+									int  fft_size,
+									int  *block_exponent,
+									int  scaling );
 #define OscDspl_rfft_fr16 rfft_fr16
 #endif /* OSC_TARGET */
 #ifdef OSC_HOST
@@ -389,63 +389,63 @@ void  rfft_fr16( const fract16          in[],
  * 
  * Equivalent to rfft_fr16 from the ADI DSP library.
  * 
- * This FFT uses the decimation-in-time FFT algorithm, for more details 
+ * This FFT uses the decimation-in-time FFT algorithm, for more details
  * please read the following webpage: oscar/dspl/FFT/fft.html
  * 
  * The FFT consists of differt stages:
  * 
  * - The input array is rearranged in bit reverse order
  * 
- * - Not the official first stage starts: calculate the butterfly. As there is 
+ * - Not the official first stage starts: calculate the butterfly. As there is
  * no twiddle factor but 0 and -1, this stage is calculated on its own
- * 		- Number of groups : fft_size/2
- *		- Number of butterflies: 1 	
+ *      - Number of groups : fft_size/2
+ *      - Number of butterflies: 1
  * 
  * - The remaining stages are iterativ and have the following algorithm:
- * 	  	- Number of groups : fft_size/4
- * 	  	- Number of butterflies: 2 		
- * 	  	- While (group > 0)
- * 		- {
- * 		  	- For each group calculate all butterflies
- * 		  	- Number of groups : groups / 2
- * 	  	 	- Number of butterflies:  butterflies * 2  
- * 		- }	 	
+ *      - Number of groups : fft_size/4
+ *      - Number of butterflies: 2
+ *      - While (group > 0)
+ *      - {
+ *          - For each group calculate all butterflies
+ *          - Number of groups : groups / 2
+ *          - Number of butterflies:  butterflies * 2
+ *      - }
  * 
- * 				
+ * 
  * 
  * stride = (FFT-size for which the twiddle array has been created) / FFT-size
  * 
- * For static scaling set scaling = 1, for dynamic: scaling = 2 
+ * For static scaling set scaling = 1, for dynamic: scaling = 2
  * for no scaling (only saturating): scaling = 3
  * 
- *  
+ * 
  * @param in  Array of input data with real values
  * @param twiddle Twiddle table array
  * @param stride Defines how the twiddle table should be read
  * @param fft_size Size of the fft array
- * @param scaling Scaling method to be used 
+ * @param scaling Scaling method to be used
  * @param out Output data array with complex values
  * @param block_exponent Outputs the number it times the data has been scaled
  *//*********************************************************************/
 void  OscDspl_rfft_fr16( const fract16          in[],
-                                          complex_fract16  out[],
-                                    const complex_fract16  twiddle[],
-                                    int  stride,
-                                    int  fft_size,
-                                    int  *block_exponent,
-                                    int  scaling );
+											complex_fract16  out[],
+									const complex_fract16  twiddle[],
+									int  stride,
+									int  fft_size,
+									int  *block_exponent,
+									int  scaling );
 
 #endif /* OSC_HOST */
 
 #ifdef OSC_TARGET
 /*! @brief Target only: Redirect the call to the DSP runtime library */
 void  cfft_fr16( const complex_fract16          in[],
-                                          complex_fract16  out[],
-                                    const complex_fract16  twiddle[],
-                                    int  stride,
-                                    int  fft_size,
-                                    int  *block_exponent,
-                                    int  scaling );
+											complex_fract16  out[],
+									const complex_fract16  twiddle[],
+									int  stride,
+									int  fft_size,
+									int  *block_exponent,
+									int  scaling );
 #define OscDspl_cfft_fr16 cfft_fr16
 #endif /* OSC_TARGET */
 
@@ -455,54 +455,11 @@ void  cfft_fr16( const complex_fract16          in[],
  * 
  * Equivalent to cfft_fr16 from the ADI DSP library.
  * 
- * @see OscDsplRfftFr16 for more details about the algorithm 
- *  
- * stride = (FFT-size for which the twiddle array has been created)/FFT-size
- * 
- * For static scaling set scaling = 1, for dynamic: scaling = 2 
- * for no scaling (only saturating): scaling = 3
- * 
- * @param in  Array of input data with complex values
- * @param twiddle Twiddle table array
- * @param stride Defines how the twiddle table should be read
- * @param fft_size Size of the fft array
- * @param scaling Scaling method to be used 
- * @param out Output data array with complex values
- * @param block_exponent Outputs the number it times the data has been scaled
- *//*********************************************************************/
-void  OscDspl_cfft_fr16( const complex_fract16          in[],
-                                          complex_fract16  out[],
-                                    const complex_fract16  twiddle[],
-                                    int  stride,
-                                    int  fft_size,
-                                    int  *block_exponent,
-                                    int  scaling );
-
-#endif /* OSC_HOST */
-
-#ifdef OSC_TARGET
-/*! @brief Target only: Redirect the call to the DSP runtime library */
-void  ifft_fr16( const complex_fract16          in[],
-                                          complex_fract16  out[],
-                                    const complex_fract16  twiddle[],
-                                    int  stride,
-                                    int  fft_size,
-                                    int  *block_exponent,
-                                    int  scaling );
-#define OscDspl_ifft_fr16 ifft_fr16
-#endif /* OSC_TARGET */
-
-#ifdef OSC_HOST
-/*********************************************************************//*!
- * @brief Inverse fast fourier transformation
- * 
- * Equivalent to ifft_fr16 from the ADI DSP library.
- 
- * @see OscDsplRfftFr16 for more details about the algorithm 
+ * @see OscDsplRfftFr16 for more details about the algorithm
  * 
  * stride = (FFT-size for which the twiddle array has been created)/FFT-size
  * 
- * For static scaling set scaling = 1, for dynamic: scaling = 2 
+ * For static scaling set scaling = 1, for dynamic: scaling = 2
  * for no scaling (only saturating): scaling = 3
  * 
  * @param in  Array of input data with complex values
@@ -512,14 +469,57 @@ void  ifft_fr16( const complex_fract16          in[],
  * @param scaling Scaling method to be used
  * @param out Output data array with complex values
  * @param block_exponent Outputs the number it times the data has been scaled
-*//*********************************************************************/
+ *//*********************************************************************/
+void  OscDspl_cfft_fr16( const complex_fract16          in[],
+											complex_fract16  out[],
+									const complex_fract16  twiddle[],
+									int  stride,
+									int  fft_size,
+									int  *block_exponent,
+									int  scaling );
+
+#endif /* OSC_HOST */
+
+#ifdef OSC_TARGET
+/*! @brief Target only: Redirect the call to the DSP runtime library */
+void  ifft_fr16( const complex_fract16          in[],
+											complex_fract16  out[],
+									const complex_fract16  twiddle[],
+									int  stride,
+									int  fft_size,
+									int  *block_exponent,
+									int  scaling );
+#define OscDspl_ifft_fr16 ifft_fr16
+#endif /* OSC_TARGET */
+
+#ifdef OSC_HOST
+/*********************************************************************//*!
+ * @brief Inverse fast fourier transformation
+ * 
+ * Equivalent to ifft_fr16 from the ADI DSP library.
+	
+ * @see OscDsplRfftFr16 for more details about the algorithm
+ * 
+ * stride = (FFT-size for which the twiddle array has been created)/FFT-size
+ * 
+ * For static scaling set scaling = 1, for dynamic: scaling = 2
+ * for no scaling (only saturating): scaling = 3
+ * 
+ * @param in  Array of input data with complex values
+ * @param twiddle Twiddle table array
+ * @param stride Defines how the twiddle table should be read
+ * @param fft_size Size of the fft array
+ * @param scaling Scaling method to be used
+ * @param out Output data array with complex values
+ * @param block_exponent Outputs the number it times the data has been scaled
+ *//*********************************************************************/
 void  OscDspl_ifft_fr16( const complex_fract16          in[],
-                                          complex_fract16  out[],
-                                    const complex_fract16  twiddle[],
-                                    int  stride,
-                                    int  fft_size,
-                                    int  *block_exponent,
-                                    int  scaling );
+											complex_fract16  out[],
+									const complex_fract16  twiddle[],
+									int  stride,
+									int  fft_size,
+									int  *block_exponent,
+									int  scaling );
 
 #endif /* OSC_HOST */
 
@@ -610,7 +610,7 @@ fract16 OscDspl_var_fr16(const fract16 sample[], int length);
 
 #ifdef OSC_TARGET
 /*! @brief Target only: Redirect the call to the DSP runtime library */
-void _histogram_fr16(	const fract16 samples[],
+void _histogram_fr16(   const fract16 samples[],
 							int histogram[],
 							fract16 max_sample,
 							fract16 min_sample,
@@ -630,7 +630,7 @@ void _histogram_fr16(	const fract16 samples[],
  * @param bin_count Length of histogram vector = number of bins
  * @param histogram Output array containing the histogram data
  *//*********************************************************************/
-void OscDspl_histogram_fr16(	const fract16 samples[],
+void OscDspl_histogram_fr16(    const fract16 samples[],
 							int histogram[],
 							fract16 max_sample,
 							fract16 min_sample,
@@ -645,7 +645,7 @@ fract16 _sqrt_fr16(fract16 x);
 
 #ifdef OSC_HOST
 /*********************************************************************//*!
- * @brief Calculate the square root 
+ * @brief Calculate the square root
  * 
  * @param x  Input value
  * @return Square root of the input value

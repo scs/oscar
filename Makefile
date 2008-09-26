@@ -198,20 +198,20 @@ lib_host:
 	@echo "Library for Host created"
 
 # Target to explicitly start the configuration process
-.PHONY : config
-config :
+.PHONY: config
+config:
 	@ ./configure
 	@ $(MAKE) --no-print-directory get_lgx
 
 # Target to implicitly start the configuration process
-#.config :
+#.config:
 #	@ echo "No config file has been found. Starting the configuration process now:"
 #	@ ./configure
 #	@ $(MAKE) --no-print-directory get_lgx
 
 # Target to get the lgx framework explicitly
-.PHONY : get_lgx
-get_lgx : .config
+.PHONY: get_lgx
+get_lgx: .config
 ifeq ($(CONFIG_FIRMWARE), )
 	@ echo "No firmware has been configured."
 else
@@ -221,12 +221,12 @@ else
 endif
 
 ## Target to get the lgx framework implicitly
-#lgx : 
+#lgx: 
 #	$(MAKE) get_lgx
 
 # Cleanup
-.PHONY : clean
-clean:	
+.PHONY: clean
+clean:
 	for i in $(MODULES) ; do  make clean -C $$i || exit $? ; done
 	rm -f $(OUT)$(HOST_SUFFIX) $(OUT)$(TARGET_SUFFIX)
 	rm -rf $(STAGING_DIR)
@@ -234,7 +234,7 @@ clean:
 	@echo "Directory cleaned"
 
 # Cleans everything not intended for source distribution
-.PHONY : distclean
-distclean : clean
+.PHONY: distclean
+distclean: clean
 	rm -f .config
 	rm -rf lgx

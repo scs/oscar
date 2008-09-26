@@ -1,7 +1,7 @@
 /*! @file sim_pub.h
  * @brief API definition for simulation module
  * 
- * Simulation is only used for host. Target implementation provides 
+ * Simulation is only used for host. Target implementation provides
  * stump function definition.
  * 
  */
@@ -10,11 +10,11 @@
 
 #include "oscar_error.h"
 #ifdef OSC_HOST
-    #include "oscar_types_host.h"
-    #include "oscar_host.h"
+	#include "oscar_types_host.h"
+	#include "oscar_host.h"
 #else
-    #include "oscar_types_target.h"
-    #include "oscar_target.h"
+	#include "oscar_types_target.h"
+	#include "oscar_target.h"
 #endif /* OSC_HOST */
 
 /*! @brief Module-specific error codes.
@@ -23,7 +23,7 @@
  * assigned to each module, so a distinction over
  * all modules can be made */
 enum EnOscSimErrors {
-    ENUM_CALLBACK_EXHAUSTED = OSC_SIM_ERROR_OFFSET
+	ENUM_CALLBACK_EXHAUSTED = OSC_SIM_ERROR_OFFSET
 };
 
 /*======================== API functions ===============================*/
@@ -48,19 +48,19 @@ void OscSimDestroy(void *hFw);
  * 
  * After creation of all required modules the application has to init
  * the simulation module. Time variable is set to 0. Callbacks to
- * stimuli reader and writer are issued to applie default signal values. 
+ * stimuli reader and writer are issued to applie default signal values.
  *//*********************************************************************/
 void OscSimInitialize(void);
 
 /*********************************************************************//*!
- * @brief Increment the simulation time step. 
+ * @brief Increment the simulation time step.
  * 
- * The application should call this function after every 'frame' of 
+ * The application should call this function after every 'frame' of
  * the simulation. This automatically adjusts the current test image
  * file name fo the next cycle. Callback for stimuli reader and
  * writer is issued after timer increment. This prepares the the input
- * signals for the next cycle and writes current output signals (to 
- * next cycle!) 
+ * signals for the next cycle and writes current output signals (to
+ * next cycle!)
  * Target: Stump since simulation is only done on host.
  *//*********************************************************************/
 void OscSimStep();

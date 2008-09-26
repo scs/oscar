@@ -8,10 +8,10 @@
 #include <string.h>
 
 #ifdef OSC_HOST
-    #include "oscar_types_host.h"
+	#include "oscar_types_host.h"
 #endif
 #ifdef OSC_TARGET
-    #include "oscar_types_target.h"
+	#include "oscar_types_target.h"
 #endif
 
 #include "oscar_intern.h"

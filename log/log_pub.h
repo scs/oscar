@@ -7,11 +7,11 @@
 
 #include "oscar_error.h"
 #ifdef OSC_HOST
-    #include "oscar_types_host.h"
-    #include "oscar_host.h"
+	#include "oscar_types_host.h"
+	#include "oscar_host.h"
 #else
-    #include "oscar_types_target.h"
-    #include "oscar_target.h"
+	#include "oscar_types_target.h"
+	#include "oscar_target.h"
 #endif /* OSC_HOST */
 
 /*! Module-specific error codes.
@@ -34,8 +34,8 @@ enum EnOscLogLevel {
 	DEBUG,
 	NONE,
 	/*! @brief A special loglevel used to report simulation results
-	 *  in the host implementation */	
-	SIMULATION = 255  
+	 *  in the host implementation */
+	SIMULATION = 255
 };
 
 /*=========================== API functions ============================*/

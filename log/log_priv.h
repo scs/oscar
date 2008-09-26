@@ -25,14 +25,14 @@
 
 /*! @brief The object struct of the camera module */
 struct OSC_LOG {
-    /*! @brief The log identity prepended to syslog messages. */
-    char logName[64];
+	/*! @brief The log identity prepended to syslog messages. */
+	char logName[64];
 	/*! @brief The highest log level that is output to the console */
 	enum EnOscLogLevel consoleLogLevel;
 	/*! @brief The highest log level that is output to the log file */
 	enum EnOscLogLevel fileLogLevel;
 	/*! @brief Temporary string for log messages generation */
-    char strTemp[65536];
+	char strTemp[65536];
 #ifdef OSC_HOST
 	/*! @brief Host only: The log file handle */
 	FILE * pLogF;
