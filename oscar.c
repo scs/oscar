@@ -23,6 +23,16 @@
  * 
  */
 
+ /*!
+ * \mainpage
+ * \image html camera-title.png
+ * \image html scs-logo.png
+ * 
+ * \section Introduction
+ * This is the documentation of the LeanXsugus source code. LeanXsugus is a Project to port the Sugus sorting algorithm of the SCS Demo-Sorter to the LeanXcam.
+ *
+ */
+
 #include "oscar_priv.h"
 #include "oscar_error.h"
 
