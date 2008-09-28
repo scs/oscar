@@ -59,6 +59,36 @@ OSC_ERR OscCreate(void ** phFw);
  *//*********************************************************************/
 OSC_ERR OscDestroy(void *hFw);
 
+/*********************************************************************//*!
+ * @brief Get framework version numbers
+ * 
+ * Used scheme: major.minor[.revsion]
+ * 
+ * The major number is used for significant changes in functionality or 
+ * supported plattform. Instable pre releases use a major number of 0.
+ * The minor number decodes small feature changes.
+ * The patch number is intended for bug fixes without changes of API.
+ * 
+ * @param hMajor Pointer to major version number.
+ * @param hMinor Pointer to minor version number.
+ * @param hPatch Pointer to patch number.
+ * @return SUCCESS or an appropriate error code.
+ *//*********************************************************************/
+OSC_ERR OscGetVersionNumber(char *hMajor, char *hMinor, char *hPatch);
+
+/*********************************************************************//*!
+ * @brief Get framework version string
+ * 
+ * Version string format: v<major>.<minor>[-p<patch>]  eg: v1.3  or v1.3-p1
+ * The patch number is not printed if no bug-fixes are available (patch=0).
+ *  
+ * See @see OscGetVersionNumber for number interpretation.
+ * 
+ * @param hMajor Pointer to formated version string.
+ * @return SUCCESS or an appropriate error code.
+ *//*********************************************************************/
+OSC_ERR OscGetVersionString(char *hVersion);
+
 /* Include the public header files of the different modules, which
  * contain the declarations of the API functions of the respective
  * module.

@@ -35,6 +35,7 @@
 
 #include "oscar_priv.h"
 #include "oscar_error.h"
+#include "oscar_version.h"
 
 #include <stdio.h>
 
@@ -203,3 +204,25 @@ void OscUnloadDependencies(void *hFw,
 		aryDeps[nDeps - i - 1].destroy(pFw);
 	}
 }
+
+OSC_ERR OscGetVersionNumber(
+	char *hMajor, 
+	char *hMinor, 
+	char *hPatch)
+{
+	*hMajor 	= OSC_VERSION_MAJOR;
+	*hMinor 	= OSC_VERSION_MINOR;
+	*hPatch 	= OSC_VERSION_PATCH;
+	return SUCCESS;
+}
+
+OSC_ERR OscGetVersionString( char *hVersion)
+{  
+  	sprintf(hVersion, "v%d.%d", OSC_VERSION_MAJOR, OSC_VERSION_MINOR);
+   	if(OSC_VERSION_PATCH)
+   	{    	
+   		sprintf(hVersion, "%s-p%d", hVersion, OSC_VERSION_PATCH);
+   	}
+	return SUCCESS;
+}
+
