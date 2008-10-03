@@ -28,9 +28,10 @@
 #include "oscar_types_target.h"
 #endif
 
+#include "oscar_intern.h"
+
 #include "gpio_pub.h"
 #include "gpio_priv.h"
-#include "oscar_intern.h"
 
 #if defined(OSC_HOST) || defined(OSC_SIM)
 #include "../srd/srd_pub.h"

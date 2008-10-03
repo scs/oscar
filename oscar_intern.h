@@ -24,6 +24,8 @@
 #define OSCAR_INTERN_H_
 
 #include "oscar_dependencies.h"
+#include "oscar_version.h"
+
 #ifdef OSC_HOST
 	#include "oscar_types_host.h"
 #endif

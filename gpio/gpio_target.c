@@ -22,10 +22,10 @@
  */
 
 #include "oscar_types_target.h"
+#include "oscar_intern.h"
 
 #include "gpio_pub.h"
 #include "gpio_priv.h"
-#include "oscar_intern.h"
 
 #include <sys/stat.h>
 #include <sys/types.h>
