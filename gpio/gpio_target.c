@@ -22,10 +22,10 @@
  */
 
 #include "oscar_types_target.h"
+#include "oscar_intern.h"
 
 #include "gpio_pub.h"
 #include "gpio_priv.h"
-#include "oscar_intern.h"
 
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -238,11 +238,14 @@ OSC_ERR OscGpioTriggerImage()
 	int ret;
 	struct GPIO_PIN     *pPin = &gpio.pins[PIN_EXPOSURE];
 	
+#ifdef TARGET_TYPE_LEANXCAM
 	if(gpio.enTriggerConfig != TRIGGER_INTERNAL)
 		{
 		/* Don't allow internal triggering if external triggering is configured. */
 		return -EDEVICE_BUSY;
 		}
+#endif
+
 	/* Create a pulse on the Exposure pin of the image sensor. Sensor
 	 * is triggered by rising flank, so high time should not have to
 	 * be too broad.*/

@@ -41,6 +41,9 @@
 #define DMA_TIMEOUT_WORKAROUND
 /*! @brief Milliseconds to wait for the DMA to finish. */
 #define DMA_TIMEOUT 20000
+/*! @brief The frequency (in CPU cycles) with which the DMA is polled
+ * when waiting for it to finish. */ 
+#define DMA_WAIT_POLL_FREQ_CYCLES 200
 
 /* Configuration word masks */
 /*! @brief DMA channel option: Enable. */

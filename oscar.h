@@ -37,6 +37,7 @@
 	#include "oscar_target.h"
 #endif
 
+#include "oscar_version.h"
 #include "oscar_error.h"
 #include "oscar_dependencies.h"
 

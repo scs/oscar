@@ -9,6 +9,7 @@ lgx
 .metadata
 .settings
 .config
+oscar_target_type.h
 
 # Mac OS X meta data on filesystems that do not support it
 ._*

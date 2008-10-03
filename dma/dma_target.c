@@ -70,6 +70,7 @@ void OscDmaStart(void *hChainHandle)
 OSC_ERR OscDmaSync(void *hChainHandle)
 {
 	struct DMA_CHAIN *pChain = (struct DMA_CHAIN*)hChainHandle;
+	uint32 waitCyc;
 	
 #ifdef DMA_TIMEOUT_WORKAROUND
 	uint32 startCyc = OscSupCycGet();
@@ -79,6 +80,16 @@ OSC_ERR OscDmaSync(void *hChainHandle)
 		FLUSHINV(&pChain->syncFlag);
 		if(pChain->syncFlag != 0)
 			return SUCCESS;
+		waitCyc = OscSupCycGet();
+		while(OscSupCycToMicroSecs(OscSupCycGet() - waitCyc) < DMA_WAIT_POLL_FREQ_CYCLES)
+		{
+			asm("nop;");
+			asm("nop;");
+			asm("nop;");
+			asm("nop;");
+			asm("nop;");
+			asm("nop;");
+		}
 	}
 	printf("DMA timeout!\n");
 	return -ETIMEOUT;
@@ -89,6 +100,16 @@ OSC_ERR OscDmaSync(void *hChainHandle)
 		FLUSHINV(&pChain->syncFlag);
 		if(pChain->syncFlag != 0)
 			return SUCCESS;
+		waitCyc = OscSupCycGet();
+		while(OscSupCycToMicroSecs(OscSupCycGet() - waitCyc) < DMA_WAIT_POLL_FREQ_CYCLES)
+		{
+			asm("nop;");
+			asm("nop;");
+			asm("nop;");
+			asm("nop;");
+			asm("nop;");
+			asm("nop;");
+		}
 	}
 	return -ETIMEOUT;
 #endif /* DMA_TIMEOUT_WORKAROUND */

@@ -23,9 +23,9 @@
 
 #include "oscar_types_host.h"
 
+#include "oscar_intern.h"
 #include "gpio_pub.h"
 #include "gpio_priv.h"
-#include "oscar_intern.h"
 #include <time.h>
 
 #include "../srd/srd_pub.h"

@@ -89,7 +89,8 @@ endif
 STAGING_DIR = staging
 
 # Header files needed by an application using this framework
-FW_HEADERS = oscar.h oscar_error.h oscar_dependencies.h
+FW_HEADERS_TARGET = oscar_types_target.h oscar_target.h oscar.h oscar_error.h oscar_dependencies.h oscar_version.h oscar_target_type.h
+FW_HEADERS_HOST = oscar_types_host.h oscar_host.h oscar.h oscar_error.h oscar_dependencies.h oscar_version.h oscar_target_type.h
 
 # Header file suffix for headers marked as public by modules
 MOD_HEADER_SUFFIX = _pub.h
@@ -100,11 +101,11 @@ TARGET_CREATE_LIB = bfin-uclinux-ar rcs
 
 # Host-Compiler executables and flags
 HOST_CC = gcc 
-HOST_CFLAGS = $(HOST_FEATURES) -Wall -pedantic -O2 -I./ -DOSC_HOST -D$(TARGET_TYPE) -g 
+HOST_CFLAGS = $(HOST_FEATURES) -Wall -pedantic -O2 -I./ -DOSC_HOST -g 
 
 # Cross-Compiler executables and flags
 TARGET_CC = bfin-uclinux-gcc 
-TARGET_CFLAGS = -Wall -pedantic -ggdb3 -I./ -DOSC_TARGET -D$(TARGET_TYPE)
+TARGET_CFLAGS = -Wall -pedantic -ggdb3 -I./ -DOSC_TARGET
 
 # Source files of the camera module
 SOURCES = oscar.c
@@ -121,11 +122,9 @@ target_sim: oscar_target modules_target_sim lib_target_sim
 	@mkdir -p $(STAGING_DIR)/lib
 	@# Creating a staging dir with all necessary data for the application
 	@mv $(OUT)$(TARGET_SIM_SUFFIX) $(STAGING_DIR)/lib
-	@for i in $(FW_HEADERS) ; do  \
+	@for i in $(FW_HEADERS_TARGET) ; do  \
 		cp $$i $(STAGING_DIR)/inc/ || exit $? ; \
 	done
-	@cp oscar_types_target.h $(STAGING_DIR)/inc/
-	@cp oscar_target.h $(STAGING_DIR)/inc/
 	@for i in $(MODULES) ; do \
 		cp $$i/*$(MOD_HEADER_SUFFIX)  $(STAGING_DIR)/inc/ || exit $? ; \
 	done
@@ -138,11 +137,9 @@ target: oscar_target modules_target lib_target
 	@mkdir -p $(STAGING_DIR)/lib
 	@# Creating a staging dir with all necessary data for the application
 	@mv $(OUT)$(TARGET_SUFFIX) $(STAGING_DIR)/lib
-	@for i in $(FW_HEADERS) ; do  \
+	@for i in $(FW_HEADERS_TARGET) ; do  \
 		cp $$i $(STAGING_DIR)/inc/ || exit $? ; \
 	done
-	@cp oscar_types_target.h $(STAGING_DIR)/inc/
-	@cp oscar_target.h $(STAGING_DIR)/inc/
 	@for i in $(MODULES) ; do \
 		cp $$i/*$(MOD_HEADER_SUFFIX)  $(STAGING_DIR)/inc/ || exit $? ; \
 	done
@@ -155,11 +152,9 @@ host: oscar_host modules_host lib_host
 	@mkdir -p $(STAGING_DIR)/lib
 	@# Creating a staging dir with all necessary data for the application
 	@mv $(OUT)$(HOST_SUFFIX) $(STAGING_DIR)/lib/
-	@for i in $(FW_HEADERS) ; do  \
+	@for i in $(FW_HEADERS_HOST) ; do  \
 		cp $$i $(STAGING_DIR)/inc/ || exit $? ; \
 	done
-	@cp oscar_types_host.h $(STAGING_DIR)/inc/
-	@cp oscar_host.h $(STAGING_DIR)/inc/
 	@for i in $(MODULES) ; do\
 		cp $$i/*$(MOD_HEADER_SUFFIX)  $(STAGING_DIR)/inc/ || exit $? ; \
 	done
@@ -174,13 +169,13 @@ oscar_target: $(SOURCES) oscar.h oscar_priv.h
 	
 # Compile the modules
 modules_target:
-	for i in $(MODULES) ; do  make target EXTRA_CFLAGS="-D$(TARGET_TYPE)" -C $$i  || exit $? ; done
+	for i in $(MODULES) ; do  make target EXTRA_CFLAGS="" -C $$i  || exit $? ; done
 	
 modules_target_sim:
-	for i in $(MODULES) ; do  make target EXTRA_CFLAGS="-D$(TARGET_TYPE)" -C $$i || exit $? ; done
+	for i in $(MODULES) ; do  make target EXTRA_CFLAGS="" -C $$i || exit $? ; done
 
 modules_host:
-	for i in $(MODULES) ; do  make host EXTRA_CFLAGS="-D$(TARGET_TYPE)" -C $$i || exit $? ; done
+	for i in $(MODULES) ; do  make host EXTRA_CFLAGS="" -C $$i || exit $? ; done
 	
 # Create the library
 lib_target:
@@ -212,6 +207,7 @@ lib_host:
 config:
 	@ ./configure
 	@ $(MAKE) --no-print-directory get_lgx
+	@ $(MAKE) --no-print-directory set_target
 
 # Target to implicitly start the configuration process
 #.config:
@@ -229,6 +225,11 @@ else
 	@ [ -e "lgx" ] && rm -rf "lgx"; exit 0
 	@ cp -r $(CONFIG_FIRMWARE)/lgx .
 endif
+
+.PHONY: set_target
+set_target: .config
+	@ echo "/* Automatically generated file. Do not edit. */\n\n" \
+	"#define $(TARGET_TYPE)" > oscar_target_type.h
 
 ## Target to get the lgx framework implicitly
 #lgx: 
