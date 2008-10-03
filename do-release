@@ -5,4 +5,4 @@ find . -name ".gitignore" -or -name ".cdtproject" -or -name ".project" | while I
 	rm -f "$i"
 done
 
-rm -f do-release
+rm -f "do-{release,tag}"
