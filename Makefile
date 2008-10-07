@@ -48,38 +48,38 @@ MAKEFLAGS += -r
   MODULES += gpio
   
 # decide whether we are building or dooing something other like cleaning or configuring
-ifeq ($(filter $(MAKECMDGOALS), clean distclean config), )
+ifeq '' '$(filter $(MAKECMDGOALS), clean distclean config doc)'
   # check whether a .config file has been found
   $(info $(MAKEFILE_LIST))
-  ifeq ($(filter .config,$(MAKEFILE_LIST)), )
+  ifeq '' '$(filter .config,$(MAKEFILE_LIST))'
     $(error "Cannot make the target '$(MAKECMDGOALS)' without configuring the framework. Please run make config to do this.")
   endif
   
 # Prevent using a cpld firmware when compiling for the LEANXCAM target
-  ifeq ($(CONFIG_BOARD), LEANXCAM)
+  ifeq '$(CONFIG_BOARD)' 'LEANXCAM'
     CONFIG_FIRMWARE =
   endif
   
   # The type of the hardware platform. Must be either of the following:
   # TARGET_TYPE_INDXCAM		Industrial OpenSourceCamera Platform
   # TARGET_TYPE_LEANXCAM		Original OpenSourceCamera Platform
-  ifeq ($(CONFIG_BOARD), INDXCAM)
+  ifeq '$(CONFIG_BOARD)' 'INDXCAM'
     TARGET_TYPE = TARGET_TYPE_INDXCAM
-  else ifeq ($(CONFIG_BOARD), LEANXCAM)
+  else ifeq '$(CONFIG_BOARD)' 'LEANXCAM'
     TARGET_TYPE = TARGET_TYPE_LEANXCAM
   else
     $(error Neither INDXCAM nor LEANXCAM has been configured as target)
   endif
   
   # This may need to be generalized by a board-to-feature-mapping table
-  ifeq ($(CONFIG_BOARD), INDXCAM)
-    ifeq ($(CONFIG_FIRMWARE), )
+  ifeq '$(CONFIG_BOARD)' 'INDXCAM'
+    ifeq '' '$(CONFIG_FIRMWARE)'
       $(error The INDXCAM target requires a firmware.)
     endif
   endif
   
   # The lgx module may be configured to not being used, so it needs special treatment
-  ifneq ($(CONFIG_FIRMWARE), )
+  ifneq '' '$(CONFIG_FIRMWARE)'
     MODULES += lgx
   endif
 endif
@@ -218,7 +218,7 @@ config:
 # Target to get the lgx framework explicitly
 .PHONY: get_lgx
 get_lgx: .config
-ifeq ($(CONFIG_FIRMWARE), )
+ifeq '' '$(CONFIG_FIRMWARE)'
 	@ echo "No firmware has been configured."
 else
 	@ echo "Copying the lgx firmware from $(CONFIG_FIRMWARE)"
