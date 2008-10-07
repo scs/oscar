@@ -44,7 +44,8 @@ enum EnOscErrors {
 		ENO_SUCH_DEVICE,
 		EUNABLE_TO_READ,
 		ETRY_AGAIN,
-		EINTERRUPTED
+		EINTERRUPTED,
+		EUNSUPPORTED
 };
 
 /* Define an offset for all modules, which allows it to
