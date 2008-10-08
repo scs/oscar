@@ -228,8 +228,9 @@ endif
 
 .PHONY: set_target
 set_target: .config
-	@ echo "/* Automatically generated file. Do not edit. */\n\n" \
-	"#define $(TARGET_TYPE)" > oscar_target_type.h
+	@ echo "/* Automatically generated file. Do not edit. */" > oscar_target_type.h
+	@ echo "#define $(TARGET_TYPE)" >> oscar_target_type.h
+	@ echo "'oscar_target_type.h' generated."
 
 ## Target to get the lgx framework implicitly
 #lgx: 
