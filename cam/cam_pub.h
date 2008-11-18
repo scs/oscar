@@ -395,8 +395,18 @@ OSC_ERR OscCamSetupPerspective(const enum EnOscCamPerspective perspective);
  * @param per Returned perspective identifier
  * @return SUCCESS or an appropriate error code
  *//*********************************************************************/
-OSC_ERR PerspectiveCfgStr2Enum(const char *str,
-		enum EnOscCamPerspective *per );
+OSC_ERR OscCamPerspectiveStr2Enum( const char *str,
+		enum EnOscCamPerspective *per);
+
+/*********************************************************************//*!
+ * @brief Convert perspective enum value to the corresponding string.
+ * 
+ * @param per Perspective identifier
+ * @param str Returned string identifier.
+ * @return SUCCESS or an appropriate error code
+ *//*********************************************************************/
+OSC_ERR OscCamPerspectiveEnum2Str( const enum EnOscCamPerspective per,
+		char *str);
 
 /*********************************************************************//*!
  * @brief Host only: Set image sensor registers to standard configuration.
