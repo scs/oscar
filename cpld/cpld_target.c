@@ -152,14 +152,13 @@ OSC_ERR OscCpldFset(
 {
 	uint8 current;
 	current = cpld.reg[ regId];
-	if( val)
-	{
-		current = current | field;
-	}
-	else
-	{
-		current = current & (0xff ^ field);
-	}
+	
+	/* Set bits. */
+	current = current | (field & val);
+	
+	/* Clear bits. */
+	current = current & ~(field & (~val));
+
 	cpld.addr[ regId] = current;
 	cpld.reg[ regId] = current;
 	return SUCCESS;

@@ -233,6 +233,16 @@ OSC_ERR OscGpioToggleTestLed()
 }
 #endif /* TARGET_TYPE_LEANXCAM */
 
+#ifdef TARGET_TYPE_INDXCAM
+
+OSC_ERR OscGpioTriggerImage()
+{
+	/* Triggering is done over the CPLD and not over the GPIOs for indXcam. */
+	return -EUNSUPPORTED;
+}
+
+#else /* TARGET_TYPE_INDXCAM */
+
 OSC_ERR OscGpioTriggerImage()
 {
 	int ret;
@@ -286,6 +296,8 @@ exit_fail:
 			__func__, strerror(errno));
 	return -EDEVICE;
 }
+
+#endif /* TARGET_TYPE_INDXCAM*/
 
 OSC_ERR OscGpioInitPins()
 {

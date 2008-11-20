@@ -76,8 +76,7 @@ struct GPIO_PIN_CONFIG aryPinConfig[] = {
  * All I/Os are configured to be high active at the actual plug. */
 struct GPIO_PIN_CONFIG aryPinConfig[] = {
 	/* {pinNr, defaultFlags, name, defaultState} */
-	{PIN_TESTLED_N, (DIR_OUTPUT | POL_LOWACTIVE | FUN_RESERVED), "TESTLED", FALSE},
-	{PIN_EXPOSURE, (DIR_OUTPUT | POL_HIGHACTIVE | FUN_RESERVED), "EXPOSURE", FALSE}
+	{PIN_TESTLED_N, (DIR_OUTPUT | POL_LOWACTIVE | FUN_RESERVED), "TESTLED", FALSE}
 };
 #endif /* TARGET_TYPE_INDXCAM */
 
