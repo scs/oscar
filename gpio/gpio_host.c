@@ -201,6 +201,13 @@ OSC_ERR OscGpioTriggerImage()
 	return SUCCESS;
 }
 
+#ifdef TARGET_TYPE_INDXCAM
+OSC_ERR OscGpioSetTestLedColor(uint8 red, uint8 green)
+{
+	return SUCCESS;
+}
+#endif /* TARGET_TYPE_INDXCAM */
+
 #ifdef TARGET_TYPE_LEANXCAM
 OSC_ERR OscGpioSetTestLedColor(uint8 red, uint8 green)
 {
