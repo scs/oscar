@@ -252,7 +252,7 @@ OSC_ERR OscCamSetupPerspective(const enum EnOscCamPerspective perspective)
 
 OSC_ERR OscCamPerspectiveStr2Enum(const char *str, enum EnOscCamPerspective *per )
 {
-  OSC_ERR err = SUCCESS;
+	OSC_ERR err = SUCCESS;
 	if(0 == strcmp(str, OSC_CAM_PERSPECTIVE_CFG_STR_DEFAULT) )
 	{
 		*per = OSC_CAM_PERSPECTIVE_DEFAULT;
@@ -280,25 +280,24 @@ OSC_ERR OscCamPerspectiveStr2Enum(const char *str, enum EnOscCamPerspective *per
 
 OSC_ERR OscCamPerspectiveEnum2Str(const enum EnOscCamPerspective per, char *str)
 {
-	switch( per)
-	  {
-	  case OSC_CAM_PERSPECTIVE_DEFAULT:
-	    sprintf( str, "%s", OSC_CAM_PERSPECTIVE_CFG_STR_DEFAULT);
-	    break;
-	  case OSC_CAM_PERSPECTIVE_HORIZONTAL_MIRROR:
-	    sprintf( str, "%s", OSC_CAM_PERSPECTIVE_CFG_STR_HORIZONTAL_MIRROR);
-	    break;
-	  case OSC_CAM_PERSPECTIVE_VERTICAL_MIRROR:
-	    sprintf( str, "%s", OSC_CAM_PERSPECTIVE_CFG_STR_VERTICAL_MIRROR);
-	    break;
-	  case OSC_CAM_PERSPECTIVE_180DEG_ROTATE:
-	    sprintf( str, "%s", OSC_CAM_PERSPECTIVE_CFG_STR_180DEG_ROTATE);
-	    break;
-	  default:
-	    OscLog(ERROR, "%s: Invalid perspective parameter (%d).\n", 
-		   __func__, per);
-	    return -EINVALID_PARAMETER;
-	  }
+	switch(per)
+	{
+	case OSC_CAM_PERSPECTIVE_DEFAULT:
+		sprintf( str, "%s", OSC_CAM_PERSPECTIVE_CFG_STR_DEFAULT);
+		break;
+	case OSC_CAM_PERSPECTIVE_HORIZONTAL_MIRROR:
+		sprintf( str, "%s", OSC_CAM_PERSPECTIVE_CFG_STR_HORIZONTAL_MIRROR);
+		break;
+	case OSC_CAM_PERSPECTIVE_VERTICAL_MIRROR:
+		sprintf( str, "%s", OSC_CAM_PERSPECTIVE_CFG_STR_VERTICAL_MIRROR);
+		break;
+	case OSC_CAM_PERSPECTIVE_180DEG_ROTATE:
+		sprintf( str, "%s", OSC_CAM_PERSPECTIVE_CFG_STR_180DEG_ROTATE);
+		break;
+	default:
+		OscLog(ERROR, "%s: Invalid perspective parameter (%d).\n", __func__, per);
+		return -EINVALID_PARAMETER;
+	}
 	return SUCCESS;
 }
 	

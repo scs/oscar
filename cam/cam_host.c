@@ -638,9 +638,9 @@ OSC_ERR OscCamCancelCapture()
 }
 
 OSC_ERR OscCamReadPicture(const uint8 fbID,
-        uint8 ** ppPic,
-        const uint16 maxAge,
-        const uint16 timeout)
+		uint8 ** ppPic,
+		const uint16 maxAge,
+		const uint16 timeout)
 {
 	OSC_ERR             err = SUCCESS;
 	uint8               fb;
@@ -662,8 +662,7 @@ OSC_ERR OscCamReadPicture(const uint8 fbID,
 		fb = OscCamMultiBufferGetSyncBuf(&cam.multiBuffer);
 		if(fb == OSC_CAM_INVALID_BUFFER_ID)
 		{
-			OscLog(ERROR, "%s: No capture started!\n",
-					__func__);
+			OscLog(ERROR, "%s: No capture started!\n", __func__);
 			return -ENO_CAPTURE_STARTED;
 		}
 	}

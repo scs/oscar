@@ -217,12 +217,11 @@ OSC_ERR OscGetVersionNumber(
 }
 
 OSC_ERR OscGetVersionString( char *hVersion)
-{  
-  	sprintf(hVersion, "v%d.%d", OSC_VERSION_MAJOR, OSC_VERSION_MINOR);
-   	if(OSC_VERSION_PATCH)
-   	{    	
-   		sprintf(hVersion, "%s-p%d", hVersion, OSC_VERSION_PATCH);
-   	}
+{
+	sprintf(hVersion, "v%d.%d", OSC_VERSION_MAJOR, OSC_VERSION_MINOR);
+	if(OSC_VERSION_PATCH)
+	{
+		sprintf(hVersion, "%s-p%d", hVersion, OSC_VERSION_PATCH);
+	}
 	return SUCCESS;
 }
-
