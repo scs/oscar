@@ -106,7 +106,7 @@ inline void OscSupWdtKeepAlive();
 /*---------------------------- Cycles ----------------------------------*/
 
 /*********************************************************************//*!
- * @brief Get the current cycle count to measure time.
+ * @brief Get the current 32 bit cycle count to measure time.
  * 
  * Target: Reads out the current cycle count from the blackfin hardware
  * register and returns the lower 32 bit.
@@ -114,25 +114,116 @@ inline void OscSupWdtKeepAlive();
  * Host: Get the cycle count from the ANSI C function clock(). The time
  * resolution is worse with this method, but it is compatible among a
  * wide selection of platforms.
- * /todo Low priority: Use whole 64 bit cycles counter.
+ * @see OscSupCycGet64
  * @see OscSupCycToMicroSecs
+ * @see OscSupCycToMilliSecs
+ * @see OscSupCycToSecs
  * 
  * @return The current cycle count (wraps).
  *//*********************************************************************/
 inline uint32 OscSupCycGet();
 
 /*********************************************************************//*!
- * @brief Convert a cycle count to microseconds.
+ * @brief Get the current 64 bit cycle count to measure time.
+ * 
+ * Target: Reads out the current cycle count from the blackfin hardware
+ * register.
+ * 
+ * Host: Get the cycle count from the ANSI C function clock(). The time
+ * resolution is worse with this method, but it is compatible among a
+ * wide selection of platforms.
+ * @see OscSupCycGet
+ * @see OscSupCycToMicroSecs64
+ * @see OscSupCycToMilliSecs64
+ * @see OscSupCycToSecs64
+ *
+ * @return The current cycle count (wraps).
+ *//*********************************************************************/
+inline long long OscSupCycGet64();
+
+/*********************************************************************//*!
+ * @brief Convert a 32-bit cycle count to microseconds.
  * 
  * Use to get a real time measure of time passed by supplying the
  * difference between to cycle counts.
- * /todo Low priority: Use whole 64 bit cycles counter.
  * @see OscSupCycGet
+ * @see OscSupCycToMilliSecs
+ * @see OscSupCycToSecs
  * 
  * @param cycles Cycle count to be converted.
  * @return Microseconds corresponding to supplied cycle count.
  *//*********************************************************************/
 inline uint32 OscSupCycToMicroSecs(uint32 cycles);
+
+/*********************************************************************//*!
+ * @brief Convert a 32-bit cycle count to milliseconds.
+ * 
+ * Use to get a real time measure of time passed by supplying the
+ * difference between to cycle counts.
+ * @see OscSupCycGet
+ * @see OscSupCycToMicroSecs
+ * @see OscSupCycToSecs
+ * 
+ * @param cycles Cycle count to be converted.
+ * @return Microseconds corresponding to supplied cycle count.
+ *//*********************************************************************/
+inline uint32 OscSupCycToMilliSecs(uint32 cycles);
+
+/*********************************************************************//*!
+ * @brief Convert a 32-bit cycle count to seconds.
+ * 
+ * Use to get a real time measure of time passed by supplying the
+ * difference between to cycle counts.
+ * @see OscSupCycGet
+ * @see OscSupCycToMicroSecs
+ * @see OscSupCycToMilliSecs
+ * 
+ * @param cycles Cycle count to be converted.
+ * @return Microseconds corresponding to supplied cycle count.
+ *//*********************************************************************/
+inline uint32 OscSupCycToSecs(uint32 cycles);
+
+/*********************************************************************//*!
+ * @brief Convert a 64-bit cycle count to microseconds.
+ * 
+ * Use to get a real time measure of time passed by supplying the
+ * difference between to cycle counts.
+ * @see OscSupCycGet64
+ * @see OscSupCycToMilliSecs64
+ * @see OscSupCycToSecs64
+ * 
+ * @param cycles Cycle count to be converted.
+ * @return Microseconds corresponding to supplied cycle count.
+ *//*********************************************************************/
+inline long long OscSupCycToMicroSecs64(long long cycles);
+
+/*********************************************************************//*!
+ * @brief Convert a 64-bit cycle count to milliseconds.
+ * 
+ * Use to get a real time measure of time passed by supplying the
+ * difference between to cycle counts.
+ * @see OscSupCycGet64
+ * @see OscSupCycToMicroSecs64
+ * @see OscSupCycToSecs64
+ * 
+ * @param cycles Cycle count to be converted.
+ * @return Microseconds corresponding to supplied cycle count.
+ *//*********************************************************************/
+inline long long OscSupCycToMilliSecs64(long long cycles);
+
+/*********************************************************************//*!
+ * @brief Convert a 64-bit cycle count to seconds.
+ * 
+ * Use to get a real time measure of time passed by supplying the
+ * difference between to cycle counts.
+ * @see OscSupCycGet64
+ * @see OscSupCycToMicroSecs64
+ * @see OscSupCycToMilliSecs64
+ * 
+ * @param cycles Cycle count to be converted.
+ * @return Microseconds corresponding to supplied cycle count.
+ *//*********************************************************************/
+inline long long OscSupCycToSecs64(long long cycles);
 
 /*------------------------------ SRAM ----------------------------------*/
 
