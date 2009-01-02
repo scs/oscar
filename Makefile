@@ -50,7 +50,6 @@ MAKEFLAGS += -r
 # decide whether we are building or dooing something other like cleaning or configuring
 ifeq '' '$(filter $(MAKECMDGOALS), clean distclean config doc)'
   # check whether a .config file has been found
-  $(info $(MAKEFILE_LIST))
   ifeq '' '$(filter .config,$(MAKEFILE_LIST))'
     $(error "Cannot make the target '$(MAKECMDGOALS)' without configuring the framework. Please run make config to do this.")
   endif

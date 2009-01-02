@@ -88,4 +88,63 @@ OSC_ERR OscVisDebayer(const uint8* pRaw,
 		const enum EnBayerOrder enBayerOrderFirstRow,
 		uint8 *const pOut);
 
+/*!
+ * @brief Convert a raw image captured by a camera sensor with bayer filter to a greyscale output image with halvened dimensions.
+ * 
+ * Debayering calculates the missing color values by averaging over four colored cells. 2 green and one red and blue cell are weightened averaged to form a single greyscale cell.
+ * 
+ * The bayer pattern color order of the first row is specified with an identifier.
+ * 
+ * ! Only even widths and heights are supported !
+ * 
+ * The output picture has 8 bit greyscale cells with halve the with and height of the original image.
+ * 
+ * @param pRaw Pointer to the raw input picture of size width x height.
+ * @param width Width of the input and output image.
+ * @param height Height of the input and output image.
+ * @param enBayerOrderFirstRow The order of the bayer pattern colors
+ * in the first row of the image to be debayered. Can be queried by
+ * OscCamGetBayerOrder().
+ * @param pOut Pointer to the greyscale output image.
+ * @return SUCCESS or an appropriate error code otherwise
+ */
+OSC_ERR OscVisDebayerGreyscaleHalfSize(uint8 const * const pRaw, uint16 const width, uint16 const height, enum EnBayerOrder const enBayerOrderFirstRow, uint8 * const color);
+
+/*!
+ * @brief Convert a raw image captured by a camera sensor with bayer filter to a color output image with halvened dimensions.
+ * 
+ * The bayer pattern color order of the first row is specified with an identifier.
+ * 
+ * ! Only even widths and heights are supported !
+ * 
+ * The output picture has 24 bit color cells with halve the with and height of the original image.
+ * 
+ * @param pRaw Pointer to the raw input picture of size width x height.
+ * @param width Width of the input and output image.
+ * @param height Height of the input and output image.
+ * @param enBayerOrderFirstRow The order of the bayer pattern colors
+ * in the first row of the image to be debayered. Can be queried by
+ * OscCamGetBayerOrder().
+ * @param pOut Pointer to the color output image.
+ * @return SUCCESS or an appropriate error code otherwise
+ */
+OSC_ERR OscVisDebayerHalfSize(uint8 const * const pRaw, uint16 const width, uint16 const height, enum EnBayerOrder const enBayerOrderFirstRow, uint8 * const pOut);
+
+/*!
+ * @brief Debayers an image at one spot and gives its mean color.
+ * 
+ * ! Only even size is supported !
+ * 
+ * @param pRaw Pointer to the raw input picture of size width x height.
+ * @param width Width of the input and output image.
+ * @param height Height of the input and output image.
+ * @param enBayerOrderFirstRow The order of the bayer pattern colors in the first row of the image to be debayered. Can be queried by OscCamGetBayerOrder().
+ * @param xPos Left border of the spot.
+ * @param yPos Upper boder of the spot.
+ * @param size Size of the sport in pixles, this must be an even value.
+ * @param color Pointer to a 3-element field where the color is written.
+ * @return SUCCESS or an appropriate error code otherwise
+ */
+OSC_ERR OscVisDebayerSpot(uint8 const * const pRaw, uint16 const width, uint16 const height, enum EnBayerOrder enBayerOrderFirstRow, uint16 const xPos, uint16 const yPos, uint16 const size, uint8 * color);
+
 #endif /*VIS_PUB_H_*/

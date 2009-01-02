@@ -852,3 +852,253 @@ OSC_ERR OscVisDebayer(const uint8* pRaw,
 	BENCH_STOP("RedBlue_Border", startCyc);
 	return SUCCESS;
 }
+
+OSC_ERR OscVisDebayerGreyscaleHalfSize(uint8 const * const pRaw, uint16 const width, uint16 const height, enum EnBayerOrder const enBayerOrderFirstRow, uint8 * const pOut)
+{
+	bool bTopLeftIsGreen;
+	uint16 ix, iy, outWidth = width / 2, outHeight = height / 2;
+	
+	/*---------------------- Input validation. -------------------- */
+	if((pRaw == NULL) || (pOut == NULL))
+	{
+		OscLog(ERROR, "%s(0x%x, %d, %d, %d 0x%x): Invalid arguments!",
+				__func__, pRaw, width, height, enBayerOrderFirstRow, pOut);
+		return -EINVALID_PARAMETER;
+	}
+	
+	if((!IS_EVEN(width)) || (!IS_EVEN(height)) || (width < 2) || (height < 2))
+	{
+		OscLog(ERROR, "%s: Invalid parameter! Width: %d Height: %d\n"
+				"Width must be even and >=2 and height must be >=2.\n",
+				__func__, width, height);
+		return -EINVALID_PARAMETER;
+	}
+	
+	bTopLeftIsGreen = (enBayerOrderFirstRow == ROW_GBGB) || (enBayerOrderFirstRow == ROW_GRGR);
+
+	if (bTopLeftIsGreen)
+		for(iy = 0; iy < outHeight; iy += 1)
+		{
+			uint16 iyRaw = iy * 2;
+			for(ix = 0; ix < outWidth; ix += 1)
+			{
+				uint8 cellRed, cellGreen1, cellGreen2, cellBlue;
+				uint16 ixRaw = ix * 2;
+				uint16 grey;
+				
+				cellGreen1 = pRaw[iyRaw * width + ixRaw];
+				cellRed = pRaw[iyRaw * width + ixRaw + 1];
+				cellBlue = pRaw[(iyRaw + 1) * width + ixRaw];
+				cellGreen2 = pRaw[(iyRaw + 1) * width + ixRaw + 1];
+				
+				grey = (uint16)cellRed * 2 + (uint16)cellGreen1 + (uint16)cellGreen2 + (uint16)cellBlue * 2;
+				pOut[iy * outWidth + ix] = grey / 6;
+			}
+		}
+	else
+		for(iy = 0; iy < outHeight; iy += 1)
+		{
+			uint16 iyRaw = iy * 2;
+			for(ix = 0; ix < outWidth; ix += 1)
+			{
+				uint8 cellRed, cellGreen1, cellGreen2, cellBlue;
+				uint16 ixRaw = ix * 2;
+				uint16 grey;;
+				
+				cellRed = pRaw[iyRaw * width + ixRaw];
+				cellGreen1 = pRaw[iyRaw * width + ixRaw + 1];
+				cellGreen2 = pRaw[(iyRaw + 1) * width + ixRaw];
+				cellBlue = pRaw[(iyRaw + 1) * width + ixRaw + 1];
+				
+				grey = (uint16)cellRed * 2 + (uint16)cellGreen1 + (uint16)cellGreen2 + (uint16)cellBlue * 2;
+				pOut[iy * outWidth + ix] = grey / 6;
+			}
+		}
+	
+	return SUCCESS;
+}
+
+OSC_ERR OscVisDebayerHalfSize(uint8 const * const pRaw, uint16 const width, uint16 const height, enum EnBayerOrder const enBayerOrderFirstRow, uint8 * const pOut)
+{
+	bool bTopLeftIsGreen, bTopRowIsRed;
+	uint16 ix, iy, outWidth = width / 2, outHeight = height / 2;
+	
+	/*---------------------- Input validation. -------------------- */
+	if((pRaw == NULL) || (pOut == NULL))
+	{
+		OscLog(ERROR, "%s(0x%x, %d, %d, %d 0x%x): Invalid arguments!",
+				__func__, pRaw, width, height, enBayerOrderFirstRow, pOut);
+		return -EINVALID_PARAMETER;
+	}
+	
+	if((!IS_EVEN(width)) || (!IS_EVEN(height)) || (width < 2) || (height < 2))
+	{
+		OscLog(ERROR, "%s: Invalid parameter! Width: %d Height: %d\n"
+				"Width must be even and >=2 and height must be >=2.\n",
+				__func__, width, height);
+		return -EINVALID_PARAMETER;
+	}
+	
+	bTopLeftIsGreen = enBayerOrderFirstRow == ROW_GBGB || enBayerOrderFirstRow == ROW_GRGR;
+	bTopRowIsRed = enBayerOrderFirstRow == ROW_RGRG || enBayerOrderFirstRow == ROW_GRGR;
+
+	if (bTopLeftIsGreen)
+		if (bTopRowIsRed)
+			for(iy = 0; iy < outHeight; iy += 1)
+			{
+				uint16 iyRaw = iy * 2;
+				for(ix = 0; ix < outWidth; ix += 1)
+				{
+					uint8 cellRed, cellBlue;
+					uint16 cellGreen;
+					uint16 ixRaw = ix * 2;
+					
+					cellGreen = pRaw[iyRaw * width + ixRaw];
+					cellRed = pRaw[iyRaw * width + ixRaw + 1];
+					cellBlue = pRaw[(iyRaw + 1) * width + ixRaw];
+					cellGreen += pRaw[(iyRaw + 1) * width + ixRaw + 1];
+					
+					pOut[(iy * outWidth + ix) * 3] = cellRed;
+					pOut[(iy * outWidth + ix) * 3 + 1] = cellGreen / 2;
+					pOut[(iy * outWidth + ix) * 3 + 2] = cellBlue;
+				}
+			}
+		else
+			for(iy = 0; iy < outHeight; iy += 1)
+			{
+				uint16 iyRaw = iy * 2;
+				for(ix = 0; ix < outWidth; ix += 1)
+				{
+					uint8 cellRed, cellBlue;
+					uint16 cellGreen;
+					uint16 ixRaw = ix * 2;
+					
+					cellGreen = pRaw[iyRaw * width + ixRaw];
+					cellBlue = pRaw[iyRaw * width + ixRaw + 1];
+					cellRed = pRaw[(iyRaw + 1) * width + ixRaw];
+					cellGreen += pRaw[(iyRaw + 1) * width + ixRaw + 1];
+					
+					pOut[(iy * outWidth + ix) * 3] = cellRed;
+					pOut[(iy * outWidth + ix) * 3 + 1] = cellGreen / 2;
+					pOut[(iy * outWidth + ix) * 3 + 2] = cellBlue;
+				}
+			}
+	else
+		if (bTopRowIsRed)
+			for(iy = 0; iy < outHeight; iy += 1)
+			{
+				uint16 iyRaw = iy * 2;
+				for(ix = 0; ix < outWidth; ix += 1)
+				{
+					uint8 cellRed, cellBlue;
+					uint16 cellGreen;
+					uint16 ixRaw = ix * 2;
+					
+					cellRed = pRaw[iyRaw * width + ixRaw];
+					cellGreen = pRaw[iyRaw * width + ixRaw + 1];
+					cellGreen += pRaw[(iyRaw + 1) * width + ixRaw];
+					cellBlue = pRaw[(iyRaw + 1) * width + ixRaw + 1];
+					
+					pOut[(iy * outWidth + ix) * 3] = cellRed;
+					pOut[(iy * outWidth + ix) * 3 + 1] = cellGreen / 2;
+					pOut[(iy * outWidth + ix) * 3 + 2] = cellBlue;
+				}
+			}
+		else
+			for(iy = 0; iy < outHeight; iy += 1)
+			{
+				uint16 iyRaw = iy * 2;
+				for(ix = 0; ix < outWidth; ix += 1)
+				{
+					uint8 cellRed, cellBlue;
+					uint16 cellGreen;
+					uint16 ixRaw = ix * 2;
+					
+					cellBlue = pRaw[iyRaw * width + ixRaw];
+					cellGreen = pRaw[iyRaw * width + ixRaw + 1];
+					cellGreen += pRaw[(iyRaw + 1) * width + ixRaw];
+					cellRed = pRaw[(iyRaw + 1) * width + ixRaw + 1];
+					
+					pOut[(iy * outWidth + ix) * 3] = cellRed;
+					pOut[(iy * outWidth + ix) * 3 + 1] = cellGreen / 2;
+					pOut[(iy * outWidth + ix) * 3 + 2] = cellBlue;
+				}
+			}
+	
+	return SUCCESS;
+}
+
+OSC_ERR OscVisDebayerSpot(uint8 const * const pRaw, uint16 const width, uint16 const height, enum EnBayerOrder const enBayerOrderFirstRow, uint16 const xPos, uint16 const yPos, uint16 const size, uint8 * color)
+{
+	bool bTopLeftIsGreen, bTopRowIsRed;
+	uint16 ix, iy;
+	uint32 sumRed = 0, sumGreen = 0, sumBlue = 0;
+	uint32 const sizeSq = size * size;
+	
+	/*---------------------- Input validation. -------------------- */
+	if(pRaw == NULL)
+	{
+		OscLog(ERROR, "%s(0x%x, %d, %d, %d): Invalid arguments!",
+				__func__, pRaw, width, height, enBayerOrderFirstRow);
+		return -EINVALID_PARAMETER;
+	}
+	
+	if((!IS_EVEN(width)) || (!IS_EVEN(height)) || (width < 2) || (height < 2))
+	{
+		OscLog(ERROR, "%s: Invalid parameter! Width: %d Height: %d\n"
+				"Width must be even and >=2 and height must be >=2.\n",
+				__func__, width, height);
+		return -EINVALID_PARAMETER;
+	}
+	
+	
+	/* Adjust pattern for an unaligned spot. */
+	
+	bTopLeftIsGreen = (enBayerOrderFirstRow == ROW_GBGB || enBayerOrderFirstRow == ROW_GRGR) == IS_EVEN(xPos) == IS_EVEN(yPos);
+	bTopRowIsRed = (enBayerOrderFirstRow == ROW_RGRG || enBayerOrderFirstRow == ROW_GRGR) == IS_EVEN(yPos);
+	
+	if (bTopLeftIsGreen)
+		if (bTopRowIsRed)
+			for(iy = yPos; iy < yPos + size; iy += 2)
+				for(ix = xPos; ix < xPos + size; ix += 2)
+				{
+					sumGreen += pRaw[iy * width + ix];
+					sumRed += pRaw[iy * width + ix + 1];
+					sumBlue += pRaw[(iy + 1) * width + ix];
+					sumGreen += pRaw[(iy + 1) * width + ix + 1];
+				}
+		else
+			for(iy = yPos; iy < yPos + size; iy += 2)
+				for(ix = xPos; ix < xPos + size; ix += 2)
+				{
+					sumGreen += pRaw[iy * width + ix];
+					sumBlue += pRaw[iy * width + ix + 1];
+					sumRed += pRaw[(iy + 1) * width + ix];
+					sumGreen += pRaw[(iy + 1) * width + ix + 1];
+				}
+	else
+		if (bTopRowIsRed)
+			for(iy = yPos; iy < yPos + size; iy += 2)
+				for(ix = xPos; ix < xPos + size; ix += 2)
+				{
+					sumRed += pRaw[iy * width + ix];
+					sumGreen += pRaw[iy * width + ix + 1];
+					sumGreen += pRaw[(iy + 1) * width + ix];
+					sumBlue += pRaw[(iy + 1) * width + ix + 1];
+				}
+		else
+			for(iy = yPos; iy < yPos + size; iy += 2)
+				for(ix = xPos; ix < xPos + size; ix += 2)
+				{
+					sumBlue += pRaw[iy * width + ix];
+					sumGreen += pRaw[iy * width + ix + 1];
+					sumGreen += pRaw[(iy + 1) * width + ix];
+					sumRed += pRaw[(iy + 1) * width + ix + 1];
+				}
+	
+	color[0] = sumRed * 4 / sizeSq;
+	color[1] = sumGreen * 2 / sizeSq;
+	color[2] = sumBlue * 4 / sizeSq;
+		
+	return SUCCESS;
+}
