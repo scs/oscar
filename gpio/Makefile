@@ -12,12 +12,12 @@ SIM_FEATURES += -DOSC_TARGET -DOSC_SIM
 
 # Host-Compiler executables and flags
 HOST_CC = gcc 
-HOST_CFLAGS = $(HOST_FEATURES) -Wall -O2 -I.. -g $(EXTRA_CFLAGS)
+HOST_CFLAGS = $(HOST_FEATURES) -Wall -Wno-long-long -O2 -I.. -g $(EXTRA_CFLAGS)
 
 # Cross-Compiler executables and flags
 TARGET_CC = bfin-uclinux-gcc 
-TARGET_CFLAGS = $(TARGET_FEATURES) -Wall -pedantic -ggdb3 -I.. $(EXTRA_CFLAGS)
-TARGET_SIM_CFLAGS = $(SIM_FEATURES) -Wall -pedantic -ggdb3 -I.. $(EXTRA_CFLAGS)
+TARGET_CFLAGS = $(TARGET_FEATURES) -Wall -Wno-long-long -pedantic -ggdb3 -I.. $(EXTRA_CFLAGS)
+TARGET_SIM_CFLAGS = $(SIM_FEATURES) -Wall -Wno-long-long -pedantic -ggdb3 -I.. $(EXTRA_CFLAGS)
 
 # Source files of the logging module
 SOURCES_TARGET = gpio_target.c gpio_shared.c

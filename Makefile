@@ -100,11 +100,11 @@ TARGET_CREATE_LIB = bfin-uclinux-ar rcs
 
 # Host-Compiler executables and flags
 HOST_CC = gcc 
-HOST_CFLAGS = $(HOST_FEATURES) -Wall -pedantic -O2 -I./ -DOSC_HOST -g 
+HOST_CFLAGS = $(HOST_FEATURES) -Wall -Wno-long-long -pedantic -O2 -I./ -DOSC_HOST -g 
 
 # Cross-Compiler executables and flags
 TARGET_CC = bfin-uclinux-gcc 
-TARGET_CFLAGS = -Wall -pedantic -ggdb3 -I./ -DOSC_TARGET
+TARGET_CFLAGS = -Wall -Wno-long-long -pedantic -ggdb3 -I./ -DOSC_TARGET
 
 # Source files of the camera module
 SOURCES = oscar.c
