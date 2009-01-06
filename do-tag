@@ -69,14 +69,14 @@ update_files() {
 	
 	VERSION_FILE="oscar_version.h"
 
-	sed -ri -e "s/(OSC_VERSION_MAJOR[\t ]+)[0-9]+/\1$OPT_VERSION_MAJOR/" "$VERSION_FILE"
-	sed -ri -e "s/(OSC_VERSION_MINOR[\t ]+)[0-9]+/\1$OPT_VERSION_MINOR/" "$VERSION_FILE"
-	sed -ri -e "s/(OSC_VERSION_PATCH[\t ]+)[0-9]+/\1$OPT_VERSION_PATCH/" "$VERSION_FILE"
+	sed -ri -e "s/(OSC_VERSION_MAJOR[\t ]+)[0-9]+/\1$VERSION_MAJOR/" "$VERSION_FILE"
+	sed -ri -e "s/(OSC_VERSION_MINOR[\t ]+)[0-9]+/\1$VERSION_MINOR/" "$VERSION_FILE"
+	sed -ri -e "s/(OSC_VERSION_PATCH[\t ]+)[0-9]+/\1$VERSION_PATCH/" "$VERSION_FILE"
 	
 	echo "$VERSION_FILE"
 }
 
-OPT_MAINTAIN_HISTORY_FILE=
+OPT_MAINTAIN_HISTORY_FILE=1
 
 [ "$1" == "--help" ] && { help; exit; }
 
