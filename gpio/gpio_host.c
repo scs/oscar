@@ -280,7 +280,7 @@ OSC_ERR OscGpioInitPins()
 		if(pPinConfig->defaultFlags & DIR_OUTPUT)
 		{
 #ifndef OSC_GPIO_LOG_RESERVED_PINS
-			if(!(pPinConfig->defaultFlags & FUN_RESERVED))
+			if((pPinConfig->defaultFlags & FUN_RESERVED))
 			{
 				err = SUCCESS;
 				goto skip_logging;

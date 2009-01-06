@@ -17,10 +17,10 @@
 */
 
 /*! @file gpio_pub.h
- * @brief Private GPIO module definition
- * 
- * Contains stuff that is too small to be put in a separate module.
- * 
+ * @brief Public GPIO module definition
+ *
+ * Contains the public definitions of the GPIO module.
+ *
  */
 #ifndef GPIO_PUB_H_
 #define GPIO_PUB_H_
