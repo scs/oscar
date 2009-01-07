@@ -1,10 +1,19 @@
 #! /usr/bin/env bash
+# do-release [ <action> ]
 # This script is used to bring the working directory into a shape where it can be released as a tar Archive.
 
-make doc
+[ "$1" ] && OPT_ACTION=$1 || OPT_ACTION="release"
 
-find . -name ".gitignore" -or -name ".cdtproject" -or -name ".project" | while IFS= read i; do
-	rm -f "$i"
-done
-
-rm -f "do-{release,tag}"
+if [ "$OPT_ACTION" == "release" ]; then
+	make doc || exit 1
+	
+	find . -name ".gitignore" -or -name ".cdtproject" -or -name ".project" | while IFS= read i; do
+		rm -f "$i"
+	done
+	
+	rm -f "do-release" "do-tag"
+elif [ "$OPT_ACTION" == "name" ]; then
+	echo "Oscar"
+else
+	echo "Unknown action: $OPT_ACTION" >&2; exit 1
+fi
