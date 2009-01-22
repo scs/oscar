@@ -24,6 +24,7 @@
 #define VIS_PUB_H_
 
 #include "oscar_error.h"
+
 #ifdef OSC_HOST
 	#include "oscar_types_host.h"
 	#include "oscar_host.h"
@@ -33,6 +34,7 @@
 #endif /* OSC_HOST */
 
 #include "bayer_pub.h"
+#include "bmp_pub.h"
 
 /*====================== API functions =================================*/
 
@@ -105,7 +107,7 @@ OSC_ERR OscVisDebayer(const uint8* pRaw,
  * @param enBayerOrderFirstRow The order of the bayer pattern colors
  * in the first row of the image to be debayered. Can be queried by
  * OscCamGetBayerOrder().
- * @param pOut Pointer to the greyscale output image.
+ * @param color Pointer to the greyscale output image.
  * @return SUCCESS or an appropriate error code otherwise
  */
 OSC_ERR OscVisDebayerGreyscaleHalfSize(uint8 const * const pRaw, uint16 const width, uint16 const height, enum EnBayerOrder const enBayerOrderFirstRow, uint8 * const color);
@@ -146,5 +148,145 @@ OSC_ERR OscVisDebayerHalfSize(uint8 const * const pRaw, uint16 const width, uint
  * @return SUCCESS or an appropriate error code otherwise
  */
 OSC_ERR OscVisDebayerSpot(uint8 const * const pRaw, uint16 const width, uint16 const height, enum EnBayerOrder enBayerOrderFirstRow, uint16 const xPos, uint16 const yPos, uint16 const size, uint8 * color);
+
+
+/*********************************************************************//*!
+ * @brief Convert a raw image captured by a camera sensor with bayer
+ * filter to an RGB output image.
+ * 
+ * Very simple debayering. Makes one colour pixel out of 4 bayered pixels
+ * This means that the resulting image is only width/2 by height/2 pixels
+ * Image size is reduced by a factor of 4!
+ * This needs about 6ms for a full 752x480 frame on leanXcam
+ * The image is returned in RGB24 Format
+ * 
+ * @param pRaw Pointer to an OSC_PICTURE structure which contains the raw input picture of size width x height.
+ * @param pOut Pointer to the result OSC_PICTURE structure of size (width/2) x (height/2).
+ * @return SUCCESS or an appropriate error code.
+ *//*********************************************************************/
+OSC_ERR OscVisFastDebayerRGB(const struct OSC_PICTURE *pRaw, struct OSC_PICTURE *pOut);
+
+
+/*********************************************************************//*!
+ * @brief Convert a raw image captured by a camera sensor with bayer
+ * filter to a luminance "Y" output image.
+ * 
+ * This function performs a very simple debayering and makes one 
+ * luminance "Y" pixel out of 4 bayered pixels. This means that the
+ * resulting image is only width/2 by height/2 pixels. Only even width
+ * and height are supported. Image size is reduced by a factor of 4!
+ * The image is returned in 8 Bit/Pixel greyscale format.
+ * 
+ * @param pRaw Pointer to an OSC_PICTURE structure which contains the raw input picture of size width x height.
+ * @param pOut Pointer to the result OSC_PICTURE structure of size (width/2) x (height/2).
+ * @return SUCCESS or an appropriate error code.
+ *//*********************************************************************/
+OSC_ERR OscVisFastDebayerLumY(const struct OSC_PICTURE *pRaw, struct OSC_PICTURE *pOut);
+
+
+/*********************************************************************//*!
+ * @brief Convert a raw image captured by a camera sensor with bayer
+ * filter to a chrominance "U" output image.
+ * 
+ * This function performs a very simple debayering and makes one 
+ * chrominance "U" pixel out of 4 bayered pixels. This means that the
+ * resulting image is only width/2 by height/2 pixels. Only even width
+ * and height are supported. Image size is reduced by a factor of 4!
+ * The image is returned in 8 Bit/Pixel Format.
+ * 
+ * @param pRaw Pointer to an OSC_PICTURE structure which contains the raw input picture of size width x height.
+ * @param pOut Pointer to the result OSC_PICTURE structure of size (width/2) x (height/2).
+ * @return SUCCESS or an appropriate error code.
+ *//*********************************************************************/
+OSC_ERR OscVisFastDebayerChromU(const struct OSC_PICTURE *pRaw, struct OSC_PICTURE *pOut);
+
+
+/*********************************************************************//*!
+ * @brief Convert a raw image captured by a camera sensor with bayer
+ * filter to a chrominance "V" output image.
+ * 
+ * This function performs a very simple debayering and makes one 
+ * chrominance "V" pixel out of 4 bayered pixels. This means that the
+ * resulting image is only width/2 by height/2 pixels. Only even width
+ * and height are supported. Image size is reduced by a factor of 4!
+ * The image is returned in 8 Bit/Pixel Format.
+ * 
+ * @param pRaw Pointer to an OSC_PICTURE structure which contains the raw input picture of size width x height.
+ * @param pOut Pointer to the result OSC_PICTURE structure of size (width/2) x (height/2).
+ * @return SUCCESS or an appropriate error code.
+ *//*********************************************************************/
+OSC_ERR OscVisFastDebayerChromV(const struct OSC_PICTURE *pRaw, struct OSC_PICTURE *pOut);
+
+
+/*********************************************************************//*!
+ * @brief Convert a raw image captured by a camera sensor with bayer
+ * filter to a YUV422 output image.
+ * 
+ * Very simple debayering. Makes one colour pixel out of 4 bayered pixels
+ * This means that the resulting image is only width/2 by height/2 pixels
+ * Image size is reduced by a factor of 4!
+ * And returns the image in YUV422 Format
+ * The macro pixel is stored in UYVY order (equal to Y422 and UYNV and HDYC 
+ * according to www.fourcc.org. The fourcc hexcode is 0x59565955
+ * 
+ * @param pRaw Pointer to an OSC_PICTURE structure which contains the raw input picture of size width x height.
+ * @param pOut Pointer to the result OSC_PICTURE structure of size (width/2) x (height/2).
+ * @return SUCCESS or an appropriate error code.
+ *//*********************************************************************/
+OSC_ERR OscVisFastDebayerYUV422(const struct OSC_PICTURE *pRaw, struct OSC_PICTURE *pOut);
+
+
+/*********************************************************************//*!
+ * @brief Convert a raw image captured by a camera sensor with bayer
+ * filter to a hue "H" output image.
+ * 
+ * This function performs a very simple debayering and makes one 
+ * hue pixel out of 4 bayered pixels according to the HSL color space.
+ * This means that the resulting image is only width/2 by height/2 pixels.
+ * Only even width and height are supported. Image size is reduced by a factor of 4!
+ * The image is returned in 8 Bit/Pixel Format.
+ * 
+ * The HSL space color value 0 is mapped to the output value 0.
+ * The HSL space color value 359 is mapped to the output value 255.
+ * 
+ * @param pRaw Pointer to an OSC_PICTURE structure which contains the raw input picture of size width x height.
+ * @param pOut Pointer to the result OSC_PICTURE structure of size (width/2) x (height/2).
+ * @return SUCCESS or an appropriate error code.
+ *//*********************************************************************/
+OSC_ERR OscVisFastDebayerHSL_H(const struct OSC_PICTURE *pRaw, struct OSC_PICTURE *pOut);
+
+
+/*********************************************************************//*!
+ * @brief Convert a raw image captured by a camera sensor with bayer
+ * filter to a saturation output image.
+ * 
+ * This function performs a very simple debayering and makes one 
+ * saturation pixel out of 4 bayered pixels according to the HSL color space.
+ * This means that the resulting image is only width/2 by height/2 pixels.
+ * Only even width and height are supported. Image size is reduced by a factor of 4!
+ * The image is returned in 8 Bit/Pixel Format.
+ * 
+ * @param pRaw Pointer to an OSC_PICTURE structure which contains the raw input picture of size width x height.
+ * @param pOut Pointer to the result OSC_PICTURE structure of size (width/2) x (height/2).
+ * @return SUCCESS or an appropriate error code.
+ *//*********************************************************************/
+OSC_ERR OscVisFastDebayerHSL_S(const struct OSC_PICTURE *pRaw, struct OSC_PICTURE *pOut);
+
+
+/*********************************************************************//*!
+ * @brief Convert a raw image captured by a camera sensor with bayer
+ * filter to a luminance output image.
+ * 
+ * This function performs a very simple debayering and makes one 
+ * luminance pixel out of 4 bayered pixels according to the HSL color space.
+ * This means that the resulting image is only width/2 by height/2 pixels.
+ * Only even width and height are supported. Image size is reduced by a factor of 4!
+ * The image is returned in 8 Bit/Pixel Format.
+ * 
+ * @param pRaw Pointer to an OSC_PICTURE structure which contains the raw input picture of size width x height.
+ * @param pOut Pointer to the result OSC_PICTURE structure of size (width/2) x (height/2).
+ * @return SUCCESS or an appropriate error code.
+ *//*********************************************************************/
+OSC_ERR OscVisFastDebayerHSL_L(const struct OSC_PICTURE *pRaw, struct OSC_PICTURE *pOut);
 
 #endif /*VIS_PUB_H_*/
