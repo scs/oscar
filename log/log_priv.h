@@ -50,7 +50,7 @@ struct OSC_LOG {
 	/*! @brief The highest log level that is output to the log file */
 	enum EnOscLogLevel fileLogLevel;
 	/*! @brief Temporary string for log messages generation */
-	char strTemp[65536];
+	char strTemp[2048];
 #ifdef OSC_HOST
 	/*! @brief Host only: The log file handle */
 	FILE * pLogF;

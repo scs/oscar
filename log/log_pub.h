@@ -51,8 +51,7 @@ enum EnOscLogLevel {
 	INFO,
 	DEBUG,
 	NONE,
-	/*! @brief A special loglevel used to report simulation results
-	 *  in the host implementation */
+	/*! @brief A special loglevel used to report simulation results in the host implementation */
 	SIMULATION = 255
 };
 
