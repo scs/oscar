@@ -158,6 +158,12 @@ OSC_ERR OscSupWdtClose()
 
 inline void OscSupWdtKeepAlive()
 {
+	if(sup.fdWatchdog <= 0)
+	{
+		/* No watchdog open. */
+		OscLog(WARN, "%s: Watchdog not initialized!\n", __func__);
+		return;
+	}
 	/* Write anything to the watchdog to disable it and
 	 * make sure it is flushed. */
 	write(sup.fdWatchdog, "\0", 1);
