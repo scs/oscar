@@ -106,11 +106,8 @@ inline void OscLogSetFileLogLevel(const enum EnOscLogLevel level)
 
 void OscLog(const enum EnOscLogLevel level, const char * strFormat, ...)
 {
-	char strTemp[256];
 	va_list ap;         /*< The dynamic argument list */
-	
-	strTemp[0] = 0; /* Mark the string as empty */
-	
+		
 	if(level <= osc_log.consoleLogLevel)
 	{
 		/* Log to console if the current log level is high enough */
