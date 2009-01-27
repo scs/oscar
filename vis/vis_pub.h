@@ -306,4 +306,25 @@ OSC_ERR OscVisFastDebayerHSL_S(const struct OSC_PICTURE *pRaw, struct OSC_PICTUR
  *//*********************************************************************/
 OSC_ERR OscVisFastDebayerHSL_L(const struct OSC_PICTURE *pRaw, struct OSC_PICTURE *pOut);
 
+
+/*********************************************************************//*!
+ * @brief Sobel edge filter.
+ * 
+ * This function calculates the sobel operator in x and y direction and combines
+ * the resulting gradients to a saturated 8-Bit gradient magnitude. Instead of 
+ * the usual magnitude formula G = sqrt(Gx² + Gy²) with the resource consuming
+ * square root function, a simple division by a power of two is used: G = (Gx² + Gy²) * 2^(-exp).
+ * 
+ * This function leaves a one pixel wide border of the output image untouched.
+ * Unless these pixels are treated outside this function, they might be in an undefined state.
+ * 
+ * @param pIn Pointer to the input picture data.
+ * @param pOut Pointer to the output picture data.
+ * @param width Image width.
+ * @param height Image height.
+ * @param exp Squared gradient magnitude division power.
+ * @return SUCCESS or an appropriate error code.
+ *//*********************************************************************/
+OSC_ERR OscVisSobel(const uint8 *pIn, uint8 *pOut, const uint16 width, const uint16 height, const uint8 exp);
+
 #endif /*VIS_PUB_H_*/

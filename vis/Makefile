@@ -18,8 +18,8 @@ TARGET_CC = bfin-uclinux-gcc
 TARGET_CFLAGS = $(TARGET_FEATURES) -Wall -Wno-long-long -pedantic -O2 -I.. $(EXTRA_CFLAGS)
 
 # Source files of the vision module
-SOURCES_TARGET = vis.c bayer_fast.c bayer_lincorr.c
-SOURCES_HOST = vis.c bayer_fast.c bayer_lincorr.c 
+SOURCES_TARGET = vis.c bayer_fast.c transform.c bayer_lincorr.c
+SOURCES_HOST = vis.c bayer_fast.c transform.c bayer_lincorr.c 
 
 
 all: target host
