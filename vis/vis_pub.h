@@ -186,6 +186,23 @@ OSC_ERR OscVisFastDebayerLumY(const struct OSC_PICTURE *pRaw, struct OSC_PICTURE
 
 /*********************************************************************//*!
  * @brief Convert a raw image captured by a camera sensor with bayer
+ * filter to a greyscale output image.
+ * 
+ * This function performs a very simple debayering and makes one 
+ * greyscale pixel out of 4 bayered pixels. This means that the
+ * resulting image is only width/2 by height/2 pixels. Only even width
+ * and height are supported. Image size is reduced by a factor of 4!
+ * The image is returned in 8 Bit/Pixel greyscale format.
+ * 
+ * @param pRaw Pointer to an OSC_PICTURE structure which contains the raw input picture of size width x height.
+ * @param pOut Pointer to the result OSC_PICTURE structure of size (width/2) x (height/2).
+ * @return SUCCESS or an appropriate error code.
+ *//*********************************************************************/
+OSC_ERR OscVisFastDebayerGrey(const struct OSC_PICTURE *pRaw, struct OSC_PICTURE *pOut);
+
+
+/*********************************************************************//*!
+ * @brief Convert a raw image captured by a camera sensor with bayer
  * filter to a chrominance "U" output image.
  * 
  * This function performs a very simple debayering and makes one 
