@@ -1,7 +1,6 @@
 ############################################################################
 #
-# Makefile for the bitmap Module of the Oscar framework
-#
+# Makefile for the config Module of the Oscar framework
 # 
 ############################################################################
 
@@ -17,10 +16,9 @@ HOST_CFLAGS = $(HOST_FEATURES) -Wall -Wno-long-long -O2 -I.. -g $(EXTRA_CFLAGS)
 TARGET_CC = bfin-uclinux-gcc 
 TARGET_CFLAGS = $(TARGET_FEATURES) -Wall -Wno-long-long -pedantic -ggdb3 -I.. $(EXTRA_CFLAGS)
 
-# Source files of the logging module
+# Source files of the config module
 SOURCES_TARGET = cfg.c
 SOURCES_HOST = cfg.c 
-
 
 all: target host
 
@@ -30,15 +28,15 @@ host: cfg_host.o
 
 clean:
 	rm -f *.o *.elf *.gdb
-	
+
 ############################# Host object file ####################################
 cfg_host.o: *.c *.h ../oscar*.h
-	@echo "Compiling bitmap Module for host."
+	@echo "Compiling config Module for host."
 	$(HOST_CC) $(HOST_CFLAGS) -c $(SOURCES_HOST) -o cfg_host.o
-	
+
 ########################### Target object file ####################################
 cfg_target.o: *.c *.h ../oscar*.h
-	@echo "Compiling bitmap Module for target."
+	@echo "Compiling config Module for target."
 	$(TARGET_CC) $(TARGET_CFLAGS) -c $(SOURCES_TARGET) -o cfg_target.o
 	@cp cfg_target.o cfg_target_sim.o
-	
+
