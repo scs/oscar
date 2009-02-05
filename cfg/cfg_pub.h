@@ -85,6 +85,7 @@ enum EnOscCfgErrors {
 	ECFG_UNABLE_TO_CLOSE_FILE,
 	ECFG_UNABLE_TO_WRITE_FILE,
 	ECFG_UNABLE_TO_READ_FILE,
+	ECFG_USED_DEFAULT,
 	ECFG_ERROR
 };
 /*! @brief Macro defining the maximal value string size*/
@@ -184,6 +185,36 @@ OSC_ERR OscCfgSetStr(
 		const CFG_FILE_CONTENT_HANDLE hFileContent,
 		const struct CFG_KEY *pKey,
 		const char *strNewVal);
+		
+/*********************************************************************//*!
+ * @brief Write boolean value to content structure
+ * 
+ * Use strings TRUE or FALSE.
+ * 
+ * @param hFileContent Handle to the File content.
+ * @param pKey The name of the section and tag.
+ * @param val Write value (boolean).
+ * @return SUCCESS or an appropriate error code otherwise
+ *//*********************************************************************/
+OSC_ERR OscCfgSetBool(
+		const CFG_FILE_CONTENT_HANDLE hFileContent,
+		const struct CFG_KEY *pKey,
+		const bool val);		
+		
+/*********************************************************************//*!
+ * @brief Write integer value to content structure
+ * 
+ * Use strings TRUE or FALSE.
+ * 
+ * @param hFileContent Handle to the File content.
+ * @param pKey The name of the section and tag.
+ * @param val Write value (integer).
+ * @return SUCCESS or an appropriate error code otherwise
+ *//*********************************************************************/
+OSC_ERR OscCfgSetInt(
+		const CFG_FILE_CONTENT_HANDLE hFileContent,
+		const struct CFG_KEY *pKey,
+		const int val);			
 
 /*********************************************************************//*!
  * @brief Read Int from content structure
@@ -245,6 +276,7 @@ OSC_ERR OscCfgGetUInt32(
  * @param iVal Return value.
  * @param min Min value for range check.
  * @param max Max value for range check. Ignored if -1.
+ * @param def Use default value in case of failure. 
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
 OSC_ERR OscCfgGetIntRange(
@@ -252,7 +284,8 @@ OSC_ERR OscCfgGetIntRange(
 		const struct CFG_KEY *pKey,
 		int16 *iVal,
 		const int16 min,
-		const int16 max);
+		const int16 max,
+		const int16 def);
 
 /*********************************************************************//*!
  * @brief Read Int from content structure and check range
@@ -262,6 +295,7 @@ OSC_ERR OscCfgGetIntRange(
  * @param iVal Return value.
  * @param min Min value for range check.
  * @param max Max value for range check. Ignored if -1.
+ * @param def Use default value in case of failure. 
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
 OSC_ERR OscCfgGetUInt16Range(
@@ -269,7 +303,8 @@ OSC_ERR OscCfgGetUInt16Range(
 		const struct CFG_KEY *pKey,
 		uint16 *iVal,
 		const uint16 min,
-		const uint16 max);
+		const uint16 max,
+		const uint16 def);
 
 /*********************************************************************//*!
  * @brief Read Int from content structure and check range
@@ -279,6 +314,7 @@ OSC_ERR OscCfgGetUInt16Range(
  * @param iVal Return value.
  * @param min Min value for range check.
  * @param max Max value for range check. Ignored if -1.
+ * @param def Use default value in case of failure. 
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
 OSC_ERR OscCfgGetInt32Range(
@@ -286,7 +322,8 @@ OSC_ERR OscCfgGetInt32Range(
 		const struct CFG_KEY *pKey,
 		int32 *iVal,
 		const int32 min,
-		const int32 max);
+		const int32 max,
+		const int32 def);
 
 /*********************************************************************//*!
  * @brief Read Int from content structure and check range
@@ -296,6 +333,7 @@ OSC_ERR OscCfgGetInt32Range(
  * @param iVal Return value.
  * @param min Min value for range check.
  * @param max Max value for range check. Ignored if -1.
+ * @param def Use default value in case of failure. 
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
 OSC_ERR OscCfgGetUInt32Range(
@@ -303,6 +341,42 @@ OSC_ERR OscCfgGetUInt32Range(
 		const struct CFG_KEY *pKey,
 		uint32 *iVal,
 		const uint32 min,
-		const uint32 max);
+		const uint32 max,
+		const uint32 def);
+		
+/*********************************************************************//*!
+ * @brief Read string from content structure and length check
+ * 
+ * @param hFileContent Handle to the File content.
+ * @param pKey The name of the section and tag.
+ * @param pVal Return value (string).
+ * @param len Max string length check. Ignored if -1.
+ * @param pDefault Use default string in case of failure. Ignored if NULL. 
+ * @return SUCCESS or an appropriate error code otherwise
+ *//*********************************************************************/
+OSC_ERR OscCfgGetStrRange(
+		const CFG_FILE_CONTENT_HANDLE hFileContent,
+		const struct CFG_KEY *pKey,
+		struct CFG_VAL_STR *pVal,
+		const uint32 len,
+		const char* pDefault);		
+		
+/*********************************************************************//*!
+ * @brief Read boolean from content structure
+ * 
+ * Allowed false strings: 0, false, FALSE
+ * Allowed true strings:  1, true, TRUE
+ * 
+ * @param hFileContent Handle to the File content.
+ * @param pKey The name of the section and tag.
+ * @param iVal Return value.
+ * @param def Use default value in case of failure. 
+ * @return SUCCESS or an appropriate error code otherwise
+ *//*********************************************************************/
+OSC_ERR OscCfgGetBool(
+		const CFG_FILE_CONTENT_HANDLE hFileContent,
+		const struct CFG_KEY *pKey,
+		bool *iVal,
+		const bool def);		
 
 #endif /*CFG_PUB_H_*/
