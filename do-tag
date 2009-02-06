@@ -99,8 +99,8 @@ update_files "$ARG_VERSION" "$VERSION_MAJOR" "$VERSION_MINOR" "$VERSION_PATCH" "
 		RELEASE_NOTE="+ Release $ARG_VERSION"
 		
 		if [ "$OPT_MAINTAIN_HISTORY_FILE" ]; then
-			VERSIONS_FILE="HISTORY"
-			TEMP_FILE="HISTORY.add"
+			HISTORY_FILE="HISTORY"
+			TEMP_FILE="$HISTORY_FILE.add"
 			
 			[ "$EDITOR" ] || EDITOR=$(git config "core.editor")
 			[ "$EDITOR" ] || fail "\$EDITOR is not set. Please set the EDITOR environment variable to input the release notes."
@@ -114,7 +114,7 @@ $RELEASE_NOTE
 
 # Please enter your release note above under the line with the version
 # information. This message without the commented text will be included as the
-# commit message for this release and added to the '$VERSIONS_FILE' file.
+# commit message for this release and added to the '$HISTORY_FILE' file.
 
 # To abort the commit, empty this file before exiting your editor.
 EOF
@@ -136,14 +136,14 @@ EOF
 				fail "Commit aborted due to empty commit message."
 			fi
 			
-			echo "$RELEASE_NOTE" > "$VERSIONS_FILE"
-			if git show "HEAD:$VERSIONS_FILE" > /dev/null 2>&1; then
-				echo -e '\n' >> $VERSIONS_FILE
-				git show "HEAD:$VERSIONS_FILE" >> $VERSIONS_FILE
+			echo "$RELEASE_NOTE" > "$HISTORY_FILE"
+			if git show "HEAD:$HISTORY_FILE" > /dev/null 2>&1; then
+				echo -e '\n' >> $HISTORY_FILE
+				git show "HEAD:$HISTORY_FILE" >> $HISTORY_FILE
 			fi
 			
-			git add "$VERSIONS_FILE" || exit $?
-			UPDATED_FILES=("${UPDATED_FILES[@]}" "$VERSIONS_FILE")
+			git add "$HISTORY_FILE" || exit $?
+			UPDATED_FILES=("${UPDATED_FILES[@]}" "$HISTORY_FILE")
 		fi
 	else
 		RELEASE_NOTE="+ Beta version $ARG_VERSION"
