@@ -384,10 +384,7 @@ OSC_ERR OscCfgGetIntRange(
 	OSC_ERR err;
 	int32 tmpVal;
 	err = OscCfgGetInt32Range(hFileContent, pKey, &tmpVal, min, max, (int32)def);
-	if (err == SUCCESS)
-	{
-			*iVal = (int16)tmpVal;
-	}
+	*iVal = (int16)tmpVal;
 	return err;
 }
 
@@ -402,10 +399,7 @@ OSC_ERR OscCfgGetUInt16Range(
 	OSC_ERR err;
 	uint32 tmpVal;
 	err = OscCfgGetUInt32Range(hFileContent, pKey, &tmpVal, min, max, (uint32)def);
-	if (err == SUCCESS)
-	{
-			*iVal = (uint16)tmpVal;
-	}
+	*iVal = (uint16)tmpVal;
 	return err;
 }
 
