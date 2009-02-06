@@ -38,7 +38,7 @@
 
 /*! @brief Prevent an infinite stall on waiting for the DMA if it does
  * finish (likely caused by Blackfin anomaly. */
-/*#define DMA_TIMEOUT_WORKAROUND*/
+#define DMA_TIMEOUT_WORKAROUND
 /*! @brief Milliseconds to wait for the DMA to finish. */
 #define DMA_TIMEOUT 20000
 /*! @brief The frequency (in CPU cycles) with which the DMA is polled
