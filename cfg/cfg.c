@@ -517,23 +517,23 @@ OSC_ERR OscCfgGetBool(
 		const bool def)
 {
 	OSC_ERR err;
-	struct CFG_VAL_STR *pVal;
+	struct CFG_VAL_STR val;
 	
-	err = OscCfgGetStr( hFileContent, pKey, pVal);
+	err = OscCfgGetStr( hFileContent, pKey, &val);
 	if( err != SUCCESS)
 	{
-		strcpy( pVal->str, "0"); // if default
+		strcpy( val.str, "0"); // if default
 	}
 	
-	if( (0 == strcasecmp( pVal->str, "TRUE"))  || 
-		(0 == strcmp( pVal->str, "1")) )
+	if( (0 == strcasecmp( val.str, "TRUE"))  || 
+		(0 == strcmp( val.str, "1")) )
 	{	
 		*iVal = TRUE;
 	}
 	else
 	{
-		if( (0 == strcasecmp( pVal->str, "FALSE")) || 
-			(0 == strcmp( pVal->str, "0")) )
+		if( (0 == strcasecmp( val.str, "FALSE")) || 
+			(0 == strcmp( val.str, "0")) )
 		{	
 			*iVal = FALSE;
 		}		
