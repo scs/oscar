@@ -61,15 +61,23 @@ ifeq '' '$(filter $(MAKECMDGOALS), clean distclean config doc)'
   
   # The type of the hardware platform. Must be either of the following:
   # TARGET_TYPE_INDXCAM		Industrial OpenSourceCamera Platform
-  # TARGET_TYPE_LEANXCAM		Original OpenSourceCamera Platform
+  # TARGET_TYPE_LEANXCAM	Original OpenSourceCamera Platform
+  # TARGET_TYPE_MESA-SR4k	MESA-Imaging 3D-Camera SR4000
   ifeq '$(CONFIG_BOARD)' 'INDXCAM'
     TARGET_TYPE = TARGET_TYPE_INDXCAM
   else ifeq '$(CONFIG_BOARD)' 'LEANXCAM'
     TARGET_TYPE = TARGET_TYPE_LEANXCAM
+  else ifeq '$(CONFIG_BOARD)' 'MESA-SR4k'
+    TARGET_TYPE = TARGET_TYPE_MESA-SR4k
   else
-    $(error Neither INDXCAM nor LEANXCAM has been configured as target)
+    $(error No known target architecture has been configured)
   endif
   
+  # For MESA-SR4k only a limited set of modules are required
+  ifeq '$(CONFIG_BOARD)' 'MESA-SR4k'
+	MODULES := $(filter-out cam cpld sim bmp swr srd sup frd hsm cfg clb vis gpio , $(MODULES))
+  endif
+
   # This may need to be generalized by a board-to-feature-mapping table
   ifeq '$(CONFIG_BOARD)' 'INDXCAM'
     ifeq '' '$(CONFIG_FIRMWARE)'
