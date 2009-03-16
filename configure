@@ -73,7 +73,7 @@ ask_config() {
 # global parameters
 CONFIG_FILE=".config"
 CONFIG_NAMES=(CONFIG_BOARD CONFIG_FIRMWARE)
-CONFIG_PROMPTS=("Select the board you are using (INDXCAM/LEANXCAM/MESA-SR4k)", "Enter the path to the firmware you want to use, leave blank to disable cpld functionality")
+CONFIG_PROMPTS=("Select the board you are using (INDXCAM/LEANXCAM/MESA_SR4K)", "Enter the path to the firmware you want to use, leave blank to disable cpld functionality")
 CONFIG_VALUES=("LEANXCAM" "")
 
  #echo $(get_config "$CONFIG_FILE" "CONFIG_VAR_1")

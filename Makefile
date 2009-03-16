@@ -62,20 +62,20 @@ ifeq '' '$(filter $(MAKECMDGOALS), clean distclean config doc)'
   # The type of the hardware platform. Must be either of the following:
   # TARGET_TYPE_INDXCAM		Industrial OpenSourceCamera Platform
   # TARGET_TYPE_LEANXCAM	Original OpenSourceCamera Platform
-  # TARGET_TYPE_MESA-SR4k	MESA-Imaging 3D-Camera SR4000
+  # TARGET_TYPE_MESA_SR4K	MESA-Imaging 3D-Camera SR4000
   ifeq '$(CONFIG_BOARD)' 'INDXCAM'
     TARGET_TYPE = TARGET_TYPE_INDXCAM
   else ifeq '$(CONFIG_BOARD)' 'LEANXCAM'
     TARGET_TYPE = TARGET_TYPE_LEANXCAM
-  else ifeq '$(CONFIG_BOARD)' 'MESA-SR4k'
-    TARGET_TYPE = TARGET_TYPE_MESA-SR4k
+  else ifeq '$(CONFIG_BOARD)' 'MESA_SR4K'
+    TARGET_TYPE = TARGET_TYPE_MESA_SR4K
   else
     $(error No known target architecture has been configured)
   endif
   
-  # For MESA-SR4k only a limited set of modules are required
-  ifeq '$(CONFIG_BOARD)' 'MESA-SR4k'
-	MODULES := $(filter-out cam cpld sim bmp swr srd sup frd hsm cfg clb vis gpio , $(MODULES))
+  # For MESA_SR4K only a limited set of modules are required
+  ifeq '$(CONFIG_BOARD)' 'MESA_SR4K'
+	MODULES := $(filter-out cam cpld sim swr srd sup frd hsm cfg clb vis gpio , $(MODULES))
   endif
 
   # This may need to be generalized by a board-to-feature-mapping table
@@ -108,11 +108,11 @@ TARGET_CREATE_LIB = bfin-uclinux-ar rcs
 
 # Host-Compiler executables and flags
 HOST_CC = gcc 
-HOST_CFLAGS = $(HOST_FEATURES) -Wall -Wno-long-long -pedantic -O2 -I./ -DOSC_HOST -g 
+HOST_CFLAGS = $(HOST_FEATURES) -Wall -Wno-long-long -pedantic -std=gnu99 -O2 -I./ -DOSC_HOST -g 
 
 # Cross-Compiler executables and flags
 TARGET_CC = bfin-uclinux-gcc 
-TARGET_CFLAGS = -Wall -Wno-long-long -pedantic -ggdb3 -I./ -DOSC_TARGET
+TARGET_CFLAGS = -Wall -Wno-long-long -pedantic -ggdb3 -std=gnu99 -I./ -DOSC_TARGET
 
 # Source files of the camera module
 SOURCES = oscar.c

@@ -95,24 +95,26 @@ OSC_ERR OscGetVersionString(char *hVersion);
  * module.
  */
 #include "log_pub.h"
-#include "cam_pub.h"
-#include "cpld_pub.h"
-#ifdef TARGET_TYPE_INDXCAM
-	#include "lgx_pub.h"
-#endif
-#include "sim_pub.h"
-#include "bmp_pub.h"
-#include "swr_pub.h"
-#include "srd_pub.h"
-#include "ipc_pub.h"
-#include "sup_pub.h"
-#include "frd_pub.h"
 #include "dspl_pub.h"
 #include "dma_pub.h"
+#include "ipc_pub.h"
+#include "bmp_pub.h"
+#ifdef TARGET_TYPE_INDXCAM
+#include "lgx_pub.h"
+#endif
+#ifndef TARGET_TYPE_MESA_SR4K
+#include "cam_pub.h"
+#include "cpld_pub.h"
+#include "sim_pub.h"
+#include "swr_pub.h"
+#include "srd_pub.h"
+#include "sup_pub.h"
+#include "frd_pub.h"
 #include "hsm_pub.h"
 #include "cfg_pub.h"
 #include "clb_pub.h"
 #include "vis_pub.h"
 #include "gpio_pub.h"
+#endif
 
 #endif /*OSCAR_H_*/
