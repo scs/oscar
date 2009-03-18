@@ -99,6 +99,7 @@ OSC_ERR OscGetVersionString(char *hVersion);
 #include "dma_pub.h"
 #include "ipc_pub.h"
 #include "bmp_pub.h"
+#include "sup_pub.h"
 #ifdef TARGET_TYPE_INDXCAM
 #include "lgx_pub.h"
 #endif
@@ -108,7 +109,6 @@ OSC_ERR OscGetVersionString(char *hVersion);
 #include "sim_pub.h"
 #include "swr_pub.h"
 #include "srd_pub.h"
-#include "sup_pub.h"
 #include "frd_pub.h"
 #include "hsm_pub.h"
 #include "cfg_pub.h"

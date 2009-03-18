@@ -75,7 +75,7 @@ ifeq '' '$(filter $(MAKECMDGOALS), clean distclean config doc)'
   
   # For MESA_SR4K only a limited set of modules are required
   ifeq '$(CONFIG_BOARD)' 'MESA_SR4K'
-	MODULES := $(filter-out cam cpld sim swr srd sup frd hsm cfg clb vis gpio , $(MODULES))
+	MODULES := $(filter-out cam cpld sim swr srd frd hsm cfg clb vis gpio , $(MODULES))
   endif
 
   # This may need to be generalized by a board-to-feature-mapping table
