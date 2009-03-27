@@ -16,6 +16,13 @@
 # with this library; if not, write to the Free Software Foundation, Inc., 51
 # Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
+print() { echo "$1" >&2; }
+inform() { print "$0: $1"; }
+warn() { print "Warning: $1"; }
+error() { inform "Error: $1"; }
+fail() { error "$1"; exit 1; }
+status() { echo -n "$1" >&2; }
+
 trim() {
 	# trim $1: cut of leading and trailing white space
 	# $1: the string to trim
@@ -23,21 +30,39 @@ trim() {
 	echo $1
 }
 
+get_config_index() {
+	# get_config_index: $1: Get the index of a configuration variable name in the CONFIG_NAMES array.
+	# $1: Name of the configuration variable.
+	
+	local NAME=$1
+	
+	for i in ${!CONFIG_NAMES[*]}; do
+		[ "${CONFIG_NAMES[$i]}" == "$NAME" ] && echo $i && return 0
+	done
+	
+	return 1
+}
+
 get_config() {
 	# get_config $1 $2: load a configuration from a configuration file
 	# $1: the name of the configuration file
-	# $2: name of the configuration
+	# $2: name of the configuration variable
 	
-	if [ -e "$1" ]; then
-		trim "$(grep -E "^$2" < $1 | cut -d "=" -f 2)"
-	fi
+	local CONFIG_FILE=$1 NAME=$2
+	
+	local VALUE
+	
+	[ -e "$CONFIG_FILE" ] && VALUE=$(trim "$(grep -E "^$NAME" < $CONFIG_FILE | cut -d "=" -f 2)")
+	[ $VALUE ] || VALUE=${CONFIG_DFAULTS["$(get_config_index "$NAME")"]}
+	
+	echo "$VALUE"
 }
 
 read_config() {
 	# read_config $1: read settings from a configuration file
 	# $1: name of the configuration file
 	
-	local NAME, VALUE
+	local NAME VALUE
 	
 	cat "$1" | while read i; do
 		NAME=$(trim $(echo $i | cut -d "=" -f 1))
@@ -53,50 +78,77 @@ ask() {
 	# $2: the prompt
 	
 	read -e -p "$2 [$1]: " 
-	if [ "$REPLY" ]; then
-		echo $REPLY
-	else
-		echo $1
-	fi
+	[ "$REPLY" ] && echo $REPLY || echo $1
 }
 
-ask_config() {
-	# ask_config $1 $2: ask the user about a configuration setting
-	# $1: the name of the variable to use as default and set
-	# $2 the promt to ask the user with
+enable_match() {
+	# enable_match $1 $2: return true if the contents of the configuration variable $1 are matched by the regex $2
 	
-	local ANSWER
+	local NAME=$1 EXPR=$2
 	
-	ANSWER=$(ask $(eval \$$1) "$2")
+	echo "${CONFIG_VALUES["$(get_config_index "$NAME")"]}" | grep -xqE "$EXPR" && return 0 || return 1
 }
 
 # global parameters
 CONFIG_FILE=".config"
-CONFIG_NAMES=(CONFIG_BOARD CONFIG_FIRMWARE)
-CONFIG_PROMPTS=("Select the board you are using (INDXCAM/LEANXCAM/MESA_SR4K)", "Enter the path to the firmware you want to use, leave blank to disable cpld functionality")
-CONFIG_VALUES=("MESA_SR4K" "")
+CONFIG_NAMES=('CONFIG_BOARD' 'CONFIG_USE_FIRMWARE' 'CONFIG_FIRMWARE_PATH')
+CONFIG_PROMPTS=("Select the board you are using (INDXCAM/LEANXCAM/MESA_SR4K)." "Do you want to use an external cpld firmware (y/n)?" "Enter the path to the cpld firmware.")
+CONFIG_ENABLE=('' 'enable_match CONFIG_BOARD INDXCAM' 'enable_match CONFIG_USE_FIRMWARE y')
+CONFIG_CHECK=('INDXCAM|LEANXCAM|MESA_SR4K' 'y|n' '.+')
+CONFIG_DFAULTS=("MESA_SR4K" "n" "../cpld")
 
- #echo $(get_config "$CONFIG_FILE" "CONFIG_VAR_1")
+# Read the configurations set on the command line
+while [ "$1" ]; do
+	NAME=$(echo "$1" | cut -d "=" -f 1)
+	VALUE=$(echo "$1" | cut -d "=" -f 2)
+	INDEX=$(get_config_index "$NAME")
+	
+	[ "$INDEX" ] && CONFIG_VALUES[$INDEX]=$VALUE || fail "Unknown option: $NAME"
+	
+	shift
+done
 
 # ask the user about configurations
 for i in ${!CONFIG_NAMES[*]}; do
 	NAME=${CONFIG_NAMES[$i]}
-	PROMPT=${CONFIG_PROMPTS[$i]}
-	VALUE=$(get_config $CONFIG_FILE $NAME)
-	if ! [ $VALUE ]; then
-		VALUE=${CONFIG_VALUES[$i]}
-	fi
 	
-	VALUE=$(ask "$VALUE" "$PROMPT")
-	CONFIG_VALUES[$i]=$VALUE
+	# Check if the variable was set on the command line.
+	if ! [ "${CONFIG_VALUES[$i]}" ]; then
+		# Check wether the configuration should be asked.
+		
+		if [ "${CONFIG_ENABLE[$i]}" ]; then
+			${CONFIG_ENABLE[$i]} || DO_NOT_ASK=1
+		fi
+		
+		if [ "$DO_NOT_ASK" ]; then
+			CONFIG_NAMES[$i]=
+		else
+			VALUE=$(get_config $CONFIG_FILE $NAME)
+			PROMPT=${CONFIG_PROMPTS[$i]}
+			
+			while true; do
+				VALUE_NEW=$(ask "$VALUE" "$PROMPT")
+				
+				if [ "${CONFIG_CHECK[$i]}" ]; then
+					echo "$VALUE_NEW" | grep -xqE "${CONFIG_CHECK[$i]}" && break
+					
+					print "The configuration is not valid: $VALUE_NEW"
+				else
+					break
+				fi
+			done
+			
+			CONFIG_VALUES[$i]=$VALUE_NEW
+		fi
+	fi
 done
 
 # write the configuration file
-rm -f "${CONFIG_FILE}_new"
+rm -f "${CONFIG_FILE}~"
 for i in ${!CONFIG_NAMES[*]}; do
 	NAME=${CONFIG_NAMES[$i]}
 	VALUE=${CONFIG_VALUES[$i]}
 	
-	echo "$NAME = $VALUE" >> "${CONFIG_FILE}_new"
+	[ "$NAME" ] && echo "$NAME = $VALUE" >> "${CONFIG_FILE}~"
 done
-mv -f "${CONFIG_FILE}_new" "${CONFIG_FILE}"
+mv -f "${CONFIG_FILE}~" "${CONFIG_FILE}"

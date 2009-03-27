@@ -54,24 +54,11 @@ ifeq '' '$(filter $(MAKECMDGOALS), clean distclean config doc)'
     $(error "Cannot make the target '$(MAKECMDGOALS)' without configuring the framework. Please run make config to do this.")
   endif
   
-# Prevent using a cpld firmware when compiling for the LEANXCAM target
-  ifeq '$(CONFIG_BOARD)' 'LEANXCAM'
-    CONFIG_FIRMWARE =
-  endif
-  
   # The type of the hardware platform. Must be either of the following:
   # TARGET_TYPE_INDXCAM		Industrial OpenSourceCamera Platform
   # TARGET_TYPE_LEANXCAM	Original OpenSourceCamera Platform
   # TARGET_TYPE_MESA_SR4K	MESA-Imaging 3D-Camera SR4000
-  ifeq '$(CONFIG_BOARD)' 'INDXCAM'
-    TARGET_TYPE = TARGET_TYPE_INDXCAM
-  else ifeq '$(CONFIG_BOARD)' 'LEANXCAM'
-    TARGET_TYPE = TARGET_TYPE_LEANXCAM
-  else ifeq '$(CONFIG_BOARD)' 'MESA_SR4K'
-    TARGET_TYPE = TARGET_TYPE_MESA_SR4K
-  else
-    $(error No known target architecture has been configured)
-  endif
+  TARGET_TYPE := TARGET_TYPE_$(CONFIG_BOARD)
   
   # For MESA_SR4K only a limited set of modules are required
   ifeq '$(CONFIG_BOARD)' 'MESA_SR4K'
@@ -80,13 +67,13 @@ ifeq '' '$(filter $(MAKECMDGOALS), clean distclean config doc)'
 
   # This may need to be generalized by a board-to-feature-mapping table
   ifeq '$(CONFIG_BOARD)' 'INDXCAM'
-    ifeq '' '$(CONFIG_FIRMWARE)'
+    ifeq '$(CONFIG_USE_FIRMWARE)' 'n'
       $(error The INDXCAM target requires a firmware.)
     endif
   endif
   
   # The lgx module may be configured to not being used, so it needs special treatment
-  ifneq '' '$(CONFIG_FIRMWARE)'
+  ifeq '$(CONFIG_USE_FIRMWARE)' 'y'
     MODULES += lgx
   endif
 endif
@@ -225,12 +212,10 @@ config:
 # Target to get the lgx framework explicitly
 .PHONY: get_lgx
 get_lgx: .config
-ifeq '' '$(CONFIG_FIRMWARE)'
-	@ echo "No firmware has been configured."
-else
-	@ echo "Copying the lgx firmware from $(CONFIG_FIRMWARE)"
+ifeq '$(CONFIG_USE_FIRMWARE)' 'y'
+	@ echo "Copying the lgx firmware from $(CONFIG_FIRMWARE_PATH)"
 	@ [ -e "lgx" ] && rm -rf "lgx"; exit 0
-	@ cp -r $(CONFIG_FIRMWARE)/lgx .
+	@ cp -r $(CONFIG_FIRMWARE_PATH)/lgx .
 endif
 
 .PHONY: set_target
