@@ -91,7 +91,7 @@ enable_match() {
 
 # global parameters
 CONFIG_FILE=".config"
-CONFIG_NAMES=('CONFIG_BOARD' 'CONFIG_USE_FIRMWARE' 'CONFIG_FIRMWARE_PATH')
+CONFIG_NAMES=(CONFIG_BOARD CONFIG_USE_FIRMWARE CONFIG_FIRMWARE_PATH)
 CONFIG_PROMPTS=("Select the board you are using (INDXCAM/LEANXCAM/MESA_SR4K)." "Do you want to use an external cpld firmware (y/n)?" "Enter the path to the cpld firmware.")
 CONFIG_ENABLE=('' 'enable_match CONFIG_BOARD INDXCAM' 'enable_match CONFIG_USE_FIRMWARE y')
 CONFIG_CHECK=('INDXCAM|LEANXCAM|MESA_SR4K' 'y|n' '.+')
@@ -116,6 +116,7 @@ for i in ${!CONFIG_NAMES[*]}; do
 	if ! [ "${CONFIG_VALUES[$i]}" ]; then
 		# Check wether the configuration should be asked.
 		
+		DO_NOT_ASK=
 		if [ "${CONFIG_ENABLE[$i]}" ]; then
 			${CONFIG_ENABLE[$i]} || DO_NOT_ASK=1
 		fi
@@ -152,3 +153,5 @@ for i in ${!CONFIG_NAMES[*]}; do
 	[ "$NAME" ] && echo "$NAME = $VALUE" >> "${CONFIG_FILE}~"
 done
 mv -f "${CONFIG_FILE}~" "${CONFIG_FILE}"
+
+make --no-print-directory reconfigure

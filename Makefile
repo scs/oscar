@@ -200,8 +200,9 @@ lib_host:
 .PHONY: config
 config:
 	@ ./configure
-	@ $(MAKE) --no-print-directory get_lgx
-	@ $(MAKE) --no-print-directory set_target
+
+.PHONY: reconfigure
+reconfigure: get_lgx set_target
 
 # Target to implicitly start the configuration process
 #.config:
