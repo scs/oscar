@@ -101,7 +101,7 @@ OSC_ERR OscSupWdtClose();
  * 
  * Host: No functionality.
  *//*********************************************************************/
-inline void OscSupWdtKeepAlive();
+void OscSupWdtKeepAlive();
 
 /*---------------------------- Cycles ----------------------------------*/
 
@@ -121,7 +121,7 @@ inline void OscSupWdtKeepAlive();
  * 
  * @return The current cycle count (wraps).
  *//*********************************************************************/
-inline uint32 OscSupCycGet();
+uint32 OscSupCycGet();
 
 /*********************************************************************//*!
  * @brief Get the current 64 bit cycle count to measure time.
@@ -139,7 +139,7 @@ inline uint32 OscSupCycGet();
  *
  * @return The current cycle count (wraps).
  *//*********************************************************************/
-inline long long OscSupCycGet64();
+long long OscSupCycGet64();
 
 /*********************************************************************//*!
  * @brief Convert a 32-bit cycle count to microseconds.
@@ -153,7 +153,7 @@ inline long long OscSupCycGet64();
  * @param cycles Cycle count to be converted.
  * @return Microseconds corresponding to supplied cycle count.
  *//*********************************************************************/
-inline uint32 OscSupCycToMicroSecs(uint32 cycles);
+uint32 OscSupCycToMicroSecs(uint32 cycles);
 
 /*********************************************************************//*!
  * @brief Convert a 32-bit cycle count to milliseconds.
@@ -167,7 +167,7 @@ inline uint32 OscSupCycToMicroSecs(uint32 cycles);
  * @param cycles Cycle count to be converted.
  * @return Microseconds corresponding to supplied cycle count.
  *//*********************************************************************/
-inline uint32 OscSupCycToMilliSecs(uint32 cycles);
+uint32 OscSupCycToMilliSecs(uint32 cycles);
 
 /*********************************************************************//*!
  * @brief Convert a 32-bit cycle count to seconds.
@@ -181,7 +181,7 @@ inline uint32 OscSupCycToMilliSecs(uint32 cycles);
  * @param cycles Cycle count to be converted.
  * @return Microseconds corresponding to supplied cycle count.
  *//*********************************************************************/
-inline uint32 OscSupCycToSecs(uint32 cycles);
+uint32 OscSupCycToSecs(uint32 cycles);
 
 /*********************************************************************//*!
  * @brief Convert a 64-bit cycle count to microseconds.
@@ -195,7 +195,7 @@ inline uint32 OscSupCycToSecs(uint32 cycles);
  * @param cycles Cycle count to be converted.
  * @return Microseconds corresponding to supplied cycle count.
  *//*********************************************************************/
-inline long long OscSupCycToMicroSecs64(long long cycles);
+long long OscSupCycToMicroSecs64(long long cycles);
 
 /*********************************************************************//*!
  * @brief Convert a 64-bit cycle count to milliseconds.
@@ -209,7 +209,7 @@ inline long long OscSupCycToMicroSecs64(long long cycles);
  * @param cycles Cycle count to be converted.
  * @return Microseconds corresponding to supplied cycle count.
  *//*********************************************************************/
-inline long long OscSupCycToMilliSecs64(long long cycles);
+long long OscSupCycToMilliSecs64(long long cycles);
 
 /*********************************************************************//*!
  * @brief Convert a 64-bit cycle count to seconds.
@@ -223,7 +223,7 @@ inline long long OscSupCycToMilliSecs64(long long cycles);
  * @param cycles Cycle count to be converted.
  * @return Microseconds corresponding to supplied cycle count.
  *//*********************************************************************/
-inline long long OscSupCycToSecs64(long long cycles);
+long long OscSupCycToSecs64(long long cycles);
 
 /*------------------------------ SRAM ----------------------------------*/
 

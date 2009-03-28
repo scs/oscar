@@ -79,7 +79,7 @@ void OscLogDestroy(void *hFw);
  * 
  * @param level The log level to set.
  *//*********************************************************************/
-inline void OscLogSetConsoleLogLevel(const enum EnOscLogLevel level);
+void OscLogSetConsoleLogLevel(const enum EnOscLogLevel level);
 
 /*********************************************************************//*!
  * @brief Sets the highest log level to be output to the log file
@@ -88,7 +88,7 @@ inline void OscLogSetConsoleLogLevel(const enum EnOscLogLevel level);
  * 
  * @param level The log level to set.
  *//*********************************************************************/
-inline void OscLogSetFileLogLevel(const enum EnOscLogLevel level);
+void OscLogSetFileLogLevel(const enum EnOscLogLevel level);
 
 /*********************************************************************//*!
  * @brief Logs a message.

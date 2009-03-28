@@ -82,7 +82,7 @@ void OscDsplDestroy(void *hFw);
  * @param n Fract16 number
  * @return Float equivalent of the supplied number.
  *//*********************************************************************/
-inline float OscDsplFr16ToFloat(fract16 n);
+float OscDsplFr16ToFloat(fract16 n);
 
 /*********************************************************************//*!
  * @brief Convert float to fract16 (saturating)
@@ -90,7 +90,7 @@ inline float OscDsplFr16ToFloat(fract16 n);
  * @param n float number
  * @return Fract16 equivalent of the supplied float.
  *//*********************************************************************/
-inline fract16 OscDsplFloatToFr16(float n);
+fract16 OscDsplFloatToFr16(float n);
 
 
 #ifdef OSC_TARGET
