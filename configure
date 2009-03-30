@@ -82,20 +82,33 @@ ask() {
 }
 
 enable_match() {
-	# enable_match $1 $2: return true if the contents of the configuration variable $1 are matched by the regex $2
+	# enable_match $1 $2: return true if the contents of the configuration variable $1 are matched by the regex $2.
+	# $1: The name of the variable
+	# $2: Regex the variable has to match with grep -xE
 	
 	local NAME=$1 EXPR=$2
 	
 	echo "${CONFIG_VALUES["$(get_config_index "$NAME")"]}" | grep -xqE "$EXPR" && return 0 || return 1
 }
 
-# global parameters
+# Configuration Parameters
+# Each of the arrays has the same length and contain at the same index information for one configuration variable. It's a mess, I know.
+
+# Name of the configuration file relative to this script
 CONFIG_FILE=".config"
+# Names of the confguration variables as they can be accessed from a Makefile
 CONFIG_NAMES=(CONFIG_BOARD CONFIG_USE_FIRMWARE CONFIG_FIRMWARE_PATH)
-CONFIG_PROMPTS=("Select the board you are using (INDXCAM/LEANXCAM/MESA_SR4K)." "Do you want to use an external cpld firmware (y/n)?" "Enter the path to the cpld firmware.")
+# Prompts displayed when asking for a configuration
+CONFIG_PROMPTS=("Select the board you are using (LEANXCAM/INDXCAM/MESA_SR4K)." "Do you want to use an external cpld firmware (y/n)?" "Enter the path to the cpld firmware.")
+# Functions to run to find out whether a configuration will be asked for. The empty string is equivalent to "true" (always ask).
 CONFIG_ENABLE=('' 'enable_match CONFIG_BOARD INDXCAM' 'enable_match CONFIG_USE_FIRMWARE y')
-CONFIG_CHECK=('INDXCAM|LEANXCAM|MESA_SR4K' 'y|n' '.+')
-CONFIG_DFAULTS=("LEANXCAM" "n" "../cpld")
+# Regular expressions to match an answer to with grep -xE to find out whether an answer is valid. The empty string is equivalent to ".*" (everything goes).
+CONFIG_CHECK=('LEANXCAM|INDXCAM|MESA_SR4K' 'y|n' '.+')
+# Default answers to new questions.
+CONFIG_DFAULTS=("LEANXCAM" "y" "../cpld")
+
+SCRIPT_DIR=$(dirname "$BASH_SOURCE")
+CONFIG_FILE_PATH=$(readlink -f "$SCRIPT_DIR/$CONFIG_FILE")
 
 # Read the configurations set on the command line
 while [ "$1" ]; do
@@ -124,7 +137,7 @@ for i in ${!CONFIG_NAMES[*]}; do
 		if [ "$DO_NOT_ASK" ]; then
 			CONFIG_NAMES[$i]=
 		else
-			VALUE=$(get_config $CONFIG_FILE $NAME)
+			VALUE=$(get_config $CONFIG_FILE_PATH $NAME)
 			PROMPT=${CONFIG_PROMPTS[$i]}
 			
 			while true; do
@@ -145,13 +158,13 @@ for i in ${!CONFIG_NAMES[*]}; do
 done
 
 # write the configuration file
-rm -f "${CONFIG_FILE}~"
+rm -f "${CONFIG_FILE_PATH}~"
 for i in ${!CONFIG_NAMES[*]}; do
 	NAME=${CONFIG_NAMES[$i]}
 	VALUE=${CONFIG_VALUES[$i]}
 	
-	[ "$NAME" ] && echo "$NAME = $VALUE" >> "${CONFIG_FILE}~"
+	[ "$NAME" ] && echo "$NAME = $VALUE" >> "${CONFIG_FILE_PATH}~"
 done
-mv -f "${CONFIG_FILE}~" "${CONFIG_FILE}"
+mv -f "${CONFIG_FILE_PATH}~" "${CONFIG_FILE_PATH}"
 
-make --no-print-directory reconfigure
+make -C "$SCRIPT_DIR" --no-print-directory reconfigure
