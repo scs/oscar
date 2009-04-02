@@ -52,8 +52,8 @@ get_config() {
 	
 	local VALUE
 	
-	[ -e "$CONFIG_FILE" ] && VALUE=$(trim "$(grep -E "^$NAME" < $CONFIG_FILE | cut -d "=" -f 2)")
-	[ $VALUE ] || VALUE=${CONFIG_DFAULTS["$(get_config_index "$NAME")"]}
+	[ -e "$CONFIG_FILE" ] && VALUE=$(trim "$(grep -E "^$NAME[\t ]*=" < $CONFIG_FILE | cut -d "=" -f 2)")
+	[ "$VALUE" ] || VALUE=${CONFIG_DFAULTS["$(get_config_index "$NAME")"]}
 	
 	echo "$VALUE"
 }
@@ -137,7 +137,7 @@ for i in ${!CONFIG_NAMES[*]}; do
 		if [ "$DO_NOT_ASK" ]; then
 			CONFIG_NAMES[$i]=
 		else
-			VALUE=$(get_config $CONFIG_FILE_PATH $NAME)
+			VALUE=$(get_config "$CONFIG_FILE_PATH" "$NAME")
 			PROMPT=${CONFIG_PROMPTS[$i]}
 			
 			while true; do
