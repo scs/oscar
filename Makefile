@@ -46,6 +46,7 @@ MAKEFLAGS += -r
   MODULES += clb
   MODULES += vis
   MODULES += gpio
+  MODULES += dmtx
   
 # decide whether we are building or dooing something other like cleaning or configuring
 ifeq '' '$(filter $(MAKECMDGOALS), clean distclean config doc)'
