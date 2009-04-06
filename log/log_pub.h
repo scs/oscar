@@ -103,5 +103,15 @@ inline void OscLogSetFileLogLevel(const enum EnOscLogLevel level);
  *//*********************************************************************/
 void OscLog(const enum EnOscLogLevel level, const char * strFormat, ...);
 
+/*********************************************************************//*!
+ * @brief Logs a fatal error and terminates program.
+ * 
+ * This is only for fatal errors where the program has to be stopped
+ * 
+ * @param strFormat Format string of the message.
+ * @param ... Format parameters of the message.
+ *//*********************************************************************/
+void OscFatalErr(const char * strFormat, ...);
+
 
 #endif /*LOG_PUB_H_*/

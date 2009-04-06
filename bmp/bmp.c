@@ -394,3 +394,24 @@ static OSC_ERR OscBmpReverseRowOrder(struct OSC_PICTURE *pPic)
 	free(pTempRow);
 	return 0;
 }
+
+uint8 OSC_PICTURE_TYPE_COLOR_DEPTH(enum EnOscPictureType enType)
+{
+	switch (enType) 
+	{
+	case OSC_PICTURE_BGR_24:
+		return 24;
+	case OSC_PICTURE_RGB_24:
+		return 24;
+	case OSC_PICTURE_YUV_444:
+		return 24;
+	case OSC_PICTURE_YUV_422:
+		return 16;
+	case OSC_PICTURE_YUV_420:
+		return 24;
+	case OSC_PICTURE_YUV_400:
+		return 8;
+	default:
+		return 8;
+	}
+}
