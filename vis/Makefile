@@ -11,15 +11,15 @@ HOST_FEATURES += -DOSC_HOST
 
 # Host-Compiler executables and flags
 HOST_CC = gcc 
-HOST_CFLAGS = $(HOST_FEATURES) -Wall -O2 -I.. -g $(EXTRA_CFLAGS)
+HOST_CFLAGS = $(HOST_FEATURES) -Wall -Wno-long-long -pedantic -O2 -I.. -g $(EXTRA_CFLAGS)
 
 # Cross-Compiler executables and flags
 TARGET_CC = bfin-uclinux-gcc 
-TARGET_CFLAGS = $(TARGET_FEATURES) -Wall -pedantic -O2 -I.. $(EXTRA_CFLAGS)
+TARGET_CFLAGS = $(TARGET_FEATURES) -Wall -Wno-long-long -pedantic -O2 -I.. $(EXTRA_CFLAGS)
 
 # Source files of the vision module
-SOURCES_TARGET = vis.c bayer_lincorr.c
-SOURCES_HOST = vis.c bayer_lincorr.c 
+SOURCES_TARGET = vis.c bayer_fast.c transform.c bayer_lincorr.c
+SOURCES_HOST = vis.c bayer_fast.c transform.c bayer_lincorr.c 
 
 
 all: target host
@@ -30,7 +30,7 @@ host: objects_host
 
 clean:
 	rm -f *.o *.elf *.gdb
-	
+
 ############################# Host object files ####################################
 objects_host: *.c *.h ../oscar*.h
 	@echo "Compiling vision Module for host."
@@ -39,7 +39,7 @@ objects_host: *.c *.h ../oscar*.h
 		x=`echo "$${i}" | sed 's/.c$$//' ` ; \
 		$(HOST_CC) $(HOST_CFLAGS) -c $${i} -o $${x}_host.o || exit $? ;\
 	done
-	
+
 ########################### Target object files ####################################
 objects_target: *.c *.h ../oscar*.h
 	@echo "Compiling vision Module for target."
@@ -51,4 +51,4 @@ objects_target: *.c *.h ../oscar*.h
 	for x in `ls -d *_target.o | sed 's/_target.o$$//' ` ; \
 		do cp $${x}_target.o $${x}_sim.o; \
 	done
-	
+

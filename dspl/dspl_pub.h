@@ -82,7 +82,7 @@ void OscDsplDestroy(void *hFw);
  * @param n Fract16 number
  * @return Float equivalent of the supplied number.
  *//*********************************************************************/
-inline float OscDsplFr16ToFloat(fract16 n);
+float OscDsplFr16ToFloat(fract16 n);
 
 /*********************************************************************//*!
  * @brief Convert float to fract16 (saturating)
@@ -90,7 +90,7 @@ inline float OscDsplFr16ToFloat(fract16 n);
  * @param n float number
  * @return Fract16 equivalent of the supplied float.
  *//*********************************************************************/
-inline fract16 OscDsplFloatToFr16(float n);
+fract16 OscDsplFloatToFr16(float n);
 
 
 #ifdef OSC_TARGET
@@ -126,9 +126,49 @@ fract16 low_of_fr2x16(fract2x16 x);
  * @return The high part.
  *//*********************************************************************/
 fract16 OscDsplLow_of_fr2x16(fract2x16 x);
-
 #endif /* OSC_HOST */
 
+#ifdef OSC_TARGET
+/*! @brief Target only: Redirect the call to the DSP runtime library */
+fract16 shl_fr1x16(fract16 x, int y);
+#define OscDsplShl_fr1x16 shl_fr1x16
+#endif /* OSC_TARGET */
+#ifdef OSC_HOST
+/*********************************************************************//*!
+ * @brief Arithmetically shift left src variable by shft places.
+ * 
+ * Equivalent to shl_fr1x16 from the ADI DSP library.
+ * The empty bits are zero-filled. If shft is negative, the sift is to
+ * the right by abs(shft) places with sign extension.
+ * 
+ * @param x Source data
+ * @param y	Number of places to shift
+ * @return The high part.
+ *//*********************************************************************/
+fract16 OscDsplShl_fr1x16(fract16 x, int y);
+#endif /* OSC_HOST */
+
+#ifdef OSC_TARGET
+/*! @brief Target only: Redirect the call to the DSP runtime library */
+fract2x16 shl_fr2x16(fract2x16 x, int y);
+#define OscDsplShl_fr2x16 shl_fr2x16
+#endif /* OSC_TARGET */
+#ifdef OSC_HOST
+/*********************************************************************//*!
+ * @brief Arithmetically shift left packed fr16 by shft places.
+ * 
+ * Equivalent to shl_fr2x16 from the ADI DSP library.
+ * 
+ * Arithmetically shifts both fract16s in the fract2x16 left by _y places,and 
+ * returns the packed result.  The empty bits are zero filled.  If shft is 
+ * negative, the shift is to the right by abs(shft) places with sign extension.
+ * 
+ * @param x Source data
+ * @param y	Number of places to shift
+ * @return The high part.
+ *//*********************************************************************/
+fract2x16 OscDsplShl_fr2x16(fract2x16 x, int y);
+#endif /* OSC_HOST */
 
 #ifdef OSC_TARGET
 /*! @brief Target only: Redirect the call to the DSP runtime library */

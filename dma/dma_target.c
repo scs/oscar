@@ -50,7 +50,7 @@ void OscDmaStart(void *hChainHandle)
 {
 	uint32 config;
 	struct DMA_CHAIN *pChain = (struct DMA_CHAIN*)hChainHandle;
-	
+
 	/* Set the stop flag to zero */
 	pChain->syncFlag = 0;
 	FLUSHINV(&pChain->syncFlag);
@@ -73,15 +73,14 @@ OSC_ERR OscDmaSync(void *hChainHandle)
 	uint32 waitCyc;
 	
 #ifdef DMA_TIMEOUT_WORKAROUND
-	uint32 startCyc = OscSupCycGet();
-	
+	uint32 startCyc = OscSupCycGet();	
 	while(OscSupCycToMicroSecs(OscSupCycGet() - startCyc) < DMA_TIMEOUT)
 	{
 		FLUSHINV(&pChain->syncFlag);
 		if(pChain->syncFlag != 0)
 			return SUCCESS;
 		waitCyc = OscSupCycGet();
-		while(OscSupCycToMicroSecs(OscSupCycGet() - waitCyc) < DMA_WAIT_POLL_FREQ_CYCLES)
+		while(OscSupCycGet() - waitCyc < DMA_WAIT_POLL_FREQ_CYCLES)
 		{
 			asm("nop;");
 			asm("nop;");

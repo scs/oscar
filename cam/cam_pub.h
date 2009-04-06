@@ -254,7 +254,7 @@ OSC_ERR OscCamCreateMultiBuffer(const uint8 multiBufferDepth,
  * 
  * @return SUCCESS or an appropriate error code
  *//*********************************************************************/
-inline OSC_ERR OscCamDeleteMultiBuffer();
+OSC_ERR OscCamDeleteMultiBuffer();
 
 /*********************************************************************//*!
  * @brief Set one of the frame buffers used by the camera driver
@@ -339,8 +339,7 @@ OSC_ERR OscCamCancelCapture();
  * @param timeout Timeout in milliseconds. 0 means no timeout.
  * @return SUCCESS or an appropriate error code.
  *//*********************************************************************/
-OSC_ERR OscCamReadPicture(const uint8 fbID, void ** ppPic,
-		const uint16 maxAge, const uint16 timeout);
+OSC_ERR OscCamReadPicture(const uint8 fbID, uint8 ** ppPic, const uint16 maxAge, const uint16 timeout);
 
 /*********************************************************************//*!
  * @brief Returns the latest picture from the camera

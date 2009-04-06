@@ -203,8 +203,8 @@ OSC_ERR OscCfgGetStr(
 	/* function may return null pointer */
 	else if(pStrVal == NULL)
 	{
-		OscLog(WARN, "%s: tag or section not found (%s)!\n",
-				__func__, pKey->strTag);
+		/*OscLog(WARN, "%s: tag or section not found (%s)!\n",
+				__func__, pKey->strTag);*/
 		return -ECFG_INVALID_KEY;
 	}
 	
@@ -221,6 +221,27 @@ OSC_ERR OscCfgGetStr(
 	return SUCCESS;
 }
 
+OSC_ERR OscCfgGetStrRange(
+		const CFG_FILE_CONTENT_HANDLE hFileContent,
+		const struct CFG_KEY *pKey,
+		struct CFG_VAL_STR *pVal,
+		const uint32 len,
+		const char* pDefault)
+{
+	OSC_ERR err;
+	err = OscCfgGetStr( hFileContent, pKey, pVal);
+	
+    if( (err == SUCCESS) && (strlen(pVal->str) > len) && (len != -1))
+    {
+    	err = ECFG_INVALID_RANGE;
+	}  
+	if( err != SUCCESS)
+	{
+    	strcpy( pVal->str, pDefault);
+    	err = ECFG_USED_DEFAULT;
+	}	
+	return err;
+}
 
 OSC_ERR OscCfgSetStr(
 		const CFG_FILE_CONTENT_HANDLE hFileContent,
@@ -293,6 +314,34 @@ OSC_ERR OscCfgSetStr(
 	return err;
 }
 
+OSC_ERR OscCfgSetBool(
+		const CFG_FILE_CONTENT_HANDLE hFileContent,
+		const struct CFG_KEY *pKey,
+		const bool val)
+{
+	OSC_ERR err;
+	if(val)
+	{
+		err = OscCfgSetStr( hFileContent, pKey, "TRUE");
+	}
+	else
+	{
+		err = OscCfgSetStr( hFileContent, pKey, "FALSE");
+	}		
+	return err;
+}		
+
+OSC_ERR OscCfgSetInt(
+		const CFG_FILE_CONTENT_HANDLE hFileContent,
+		const struct CFG_KEY *pKey,
+		const int val)
+{
+	char strVal[ CONFIG_VAL_MAX_SIZE];
+	
+	sprintf( strVal, "%d", val);
+	return OscCfgSetStr( hFileContent, pKey, strVal);
+}		
+
 OSC_ERR OscCfgGetInt(
 		const CFG_FILE_CONTENT_HANDLE hFileContent,
 		const struct CFG_KEY *pKey,
@@ -329,15 +378,13 @@ OSC_ERR OscCfgGetIntRange(
 		const struct CFG_KEY *pKey,
 		int16 *iVal,
 		const int16 min,
-		const int16 max)
+		const int16 max,
+		const int16 def)
 {
 	OSC_ERR err;
 	int32 tmpVal;
-	err = OscCfgGetInt32Range(hFileContent, pKey, &tmpVal, min, max);
-	if (err == SUCCESS)
-	{
-			*iVal = (int16)tmpVal;
-	}
+	err = OscCfgGetInt32Range(hFileContent, pKey, &tmpVal, min, max, (int32)def);
+	*iVal = (int16)tmpVal;
 	return err;
 }
 
@@ -346,15 +393,13 @@ OSC_ERR OscCfgGetUInt16Range(
 		const struct CFG_KEY *pKey,
 		uint16 *iVal,
 		const uint16 min,
-		const uint16 max)
+		const uint16 max,
+		const uint16 def)
 {
 	OSC_ERR err;
 	uint32 tmpVal;
-	err = OscCfgGetUInt32Range(hFileContent, pKey, &tmpVal, min, max);
-	if (err == SUCCESS)
-	{
-			*iVal = (uint16)tmpVal;
-	}
+	err = OscCfgGetUInt32Range(hFileContent, pKey, &tmpVal, min, max, (uint32)def);
+	*iVal = (uint16)tmpVal;
 	return err;
 }
 
@@ -410,19 +455,25 @@ OSC_ERR OscCfgGetInt32Range(
 		const struct CFG_KEY *pKey,
 		int32 *iVal,
 		const int32 min,
-		const int32 max)
+		const int32 max,
+		const int32 def)
 {
 	OSC_ERR err;
 	err = OscCfgGetInt32(hFileContent, pKey, iVal);
 	if ((max > min) && (err == SUCCESS))
 	{
-		if ((*iVal < min) || (*iVal > max))
+		if( ((*iVal < min) || (*iVal > max)) && (max!=-1) )
 		{
 			OscLog(WARN, "%s: Value out of range (%s: %d)!\n",
 					__func__, pKey->strTag, *iVal);
-			return -ECFG_INVALID_VAL;
+			err = -ECFG_INVALID_VAL;
 		}
 	}
+	if( err != SUCCESS)
+	{
+		*iVal = def;
+		err = ECFG_USED_DEFAULT;
+	}	
 	return err;
 }
 
@@ -431,24 +482,67 @@ OSC_ERR OscCfgGetUInt32Range(
 		const struct CFG_KEY *pKey,
 		uint32 *iVal,
 		const uint32 min,
-		const uint32 max)
+		const uint32 max,
+		const uint32 def)
 {
 	OSC_ERR err;
 	err = OscCfgGetUInt32(hFileContent, pKey, iVal);
 	if ((max > min) && (err == SUCCESS))
 	{
-		if ((*iVal < min) || (*iVal > max))
+		if( ((*iVal < min) || (*iVal > max)) && (max!=-1) )
 		{
 			OscLog(WARN, "%s: Value out of range (%s: %d)!\n",
 					__func__, pKey->strTag, *iVal);
-			return -ECFG_INVALID_VAL;
+			err = -ECFG_INVALID_VAL;
 		}
+	}
+	if( err != SUCCESS)
+	{
+		*iVal = def;
+    	err = ECFG_USED_DEFAULT;		
 	}
 	return err;
 }
 
-
-
+OSC_ERR OscCfgGetBool(
+		const CFG_FILE_CONTENT_HANDLE hFileContent,
+		const struct CFG_KEY *pKey,
+		bool *iVal,
+		const bool def)
+{
+	OSC_ERR err;
+	struct CFG_VAL_STR val;
+	
+	err = OscCfgGetStr( hFileContent, pKey, &val);
+	if( err != SUCCESS)
+	{
+		strcpy( val.str, "0"); // if default
+	}
+	
+	if( (0 == strcasecmp( val.str, "TRUE"))  || 
+		(0 == strcmp( val.str, "1")) )
+	{	
+		*iVal = TRUE;
+	}
+	else
+	{
+		if( (0 == strcasecmp( val.str, "FALSE")) || 
+			(0 == strcmp( val.str, "0")) )
+		{	
+			*iVal = FALSE;
+		}		
+		else
+		{
+			err = -ECFG_INVALID_VAL;
+		}
+	}  
+	if( err != SUCCESS)
+	{
+		*iVal = def;
+    	err = ECFG_USED_DEFAULT;		
+	}
+	return err;		
+}
 
 
 /*======================= Private methods ==============================*/

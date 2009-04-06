@@ -28,59 +28,54 @@ MAKEFLAGS += -r
 # MAKEFILES += .config
 -include .config
 
-  # The names of the subfolders with the modules
-  MODULES = cam
-  MODULES += log
-  MODULES += cpld
-  MODULES += sim
-  MODULES += bmp
-  MODULES += swr
-  MODULES += srd
-  MODULES += ipc
-  MODULES += sup
-  MODULES += frd
-  MODULES += dspl
-  MODULES += dma
-  MODULES += hsm
-  MODULES += cfg
-  MODULES += clb
-  MODULES += vis
-  MODULES += gpio
-  MODULES += jpg
-  
+# The names of the subfolders with the modules
+MODULES = cam
+MODULES += log
+MODULES += cpld
+MODULES += sim
+MODULES += bmp
+MODULES += swr
+MODULES += srd
+MODULES += ipc
+MODULES += sup
+MODULES += frd
+MODULES += dspl
+MODULES += dma
+MODULES += hsm
+MODULES += cfg
+MODULES += clb
+MODULES += vis
+MODULES += gpio
+MODULES += dmtx
+MODULES += jpg
+
 # decide whether we are building or dooing something other like cleaning or configuring
 ifeq '' '$(filter $(MAKECMDGOALS), clean distclean config doc)'
   # check whether a .config file has been found
-  $(info $(MAKEFILE_LIST))
   ifeq '' '$(filter .config,$(MAKEFILE_LIST))'
     $(error "Cannot make the target '$(MAKECMDGOALS)' without configuring the framework. Please run make config to do this.")
   endif
   
-# Prevent using a cpld firmware when compiling for the LEANXCAM target
-  ifeq '$(CONFIG_BOARD)' 'LEANXCAM'
-    CONFIG_FIRMWARE =
-  endif
-  
   # The type of the hardware platform. Must be either of the following:
   # TARGET_TYPE_INDXCAM		Industrial OpenSourceCamera Platform
-  # TARGET_TYPE_LEANXCAM		Original OpenSourceCamera Platform
-  ifeq '$(CONFIG_BOARD)' 'INDXCAM'
-    TARGET_TYPE = TARGET_TYPE_INDXCAM
-  else ifeq '$(CONFIG_BOARD)' 'LEANXCAM'
-    TARGET_TYPE = TARGET_TYPE_LEANXCAM
-  else
-    $(error Neither INDXCAM nor LEANXCAM has been configured as target)
-  endif
+  # TARGET_TYPE_LEANXCAM	Original OpenSourceCamera Platform
+  # TARGET_TYPE_MESA_SR4K	MESA-Imaging 3D-Camera SR4000
+  TARGET_TYPE := TARGET_TYPE_$(CONFIG_BOARD)
   
+  # For MESA_SR4K only a limited set of modules are required
+  ifeq '$(CONFIG_BOARD)' 'MESA_SR4K'
+	MODULES := $(filter-out cam cpld sim swr srd frd hsm cfg clb vis gpio , $(MODULES))
+  endif
+
   # This may need to be generalized by a board-to-feature-mapping table
   ifeq '$(CONFIG_BOARD)' 'INDXCAM'
-    ifeq '' '$(CONFIG_FIRMWARE)'
+    ifeq '$(CONFIG_USE_FIRMWARE)' 'n'
       $(error The INDXCAM target requires a firmware.)
     endif
   endif
   
   # The lgx module may be configured to not being used, so it needs special treatment
-  ifneq '' '$(CONFIG_FIRMWARE)'
+  ifeq '$(CONFIG_USE_FIRMWARE)' 'y'
     MODULES += lgx
   endif
 endif
@@ -102,11 +97,11 @@ TARGET_CREATE_LIB = bfin-uclinux-ar rcs
 
 # Host-Compiler executables and flags
 HOST_CC = gcc 
-HOST_CFLAGS = $(HOST_FEATURES) -Wall -pedantic -O2 -I./ -DOSC_HOST -g 
+HOST_CFLAGS = $(HOST_FEATURES) -Wall -Wno-long-long -pedantic -std=gnu99 -O2 -I./ -DOSC_HOST -g 
 
 # Cross-Compiler executables and flags
 TARGET_CC = bfin-uclinux-gcc 
-TARGET_CFLAGS = -Wall -pedantic -ggdb3 -I./ -DOSC_TARGET
+TARGET_CFLAGS = -Wall -Wno-long-long -pedantic -ggdb3 -std=gnu99 -I./ -DOSC_TARGET
 
 # Source files of the camera module
 SOURCES = oscar.c
@@ -207,8 +202,9 @@ lib_host:
 .PHONY: config
 config:
 	@ ./configure
-	@ $(MAKE) --no-print-directory get_lgx
-	@ $(MAKE) --no-print-directory set_target
+
+.PHONY: reconfigure
+reconfigure: get_lgx set_target
 
 # Target to implicitly start the configuration process
 #.config:
@@ -219,12 +215,10 @@ config:
 # Target to get the lgx framework explicitly
 .PHONY: get_lgx
 get_lgx: .config
-ifeq '' '$(CONFIG_FIRMWARE)'
-	@ echo "No firmware has been configured."
-else
-	@ echo "Copying the lgx firmware from $(CONFIG_FIRMWARE)"
+ifeq '$(CONFIG_USE_FIRMWARE)' 'y'
+	@ echo "Copying the lgx firmware from $(CONFIG_FIRMWARE_PATH)"
 	@ [ -e "lgx" ] && rm -rf "lgx"; exit 0
-	@ cp -r $(CONFIG_FIRMWARE)/lgx .
+	@ cp -r $(CONFIG_FIRMWARE_PATH)/lgx .
 endif
 
 .PHONY: set_target

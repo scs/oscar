@@ -105,10 +105,46 @@ inline uint32 OscSupCycGet()
 	return ((uint32)clock());
 }
 
+inline long long OscSupCycGet64()
+{
+	/* The host implementation uses the ANSI C function clock()
+	 * with much lower precision than on the blackfin.
+	 * The actual precision is dependent on the platform. */
+
+	/* ANSI C function, low resolution */
+	return ((long long)clock());
+}
+
 inline uint32 OscSupCycToMicroSecs(uint32 cycles)
 {
 	return (cycles/(CLOCKS_PER_SEC/1000000));
 }
+
+inline uint32 OscSupCycToMilliSecs(uint32 cycles)
+{
+	return (cycles/((CPU_FREQ/1000000)*1000));
+}
+
+inline uint32 OscSupCycToSecs(uint32 cycles)
+{
+	return (cycles/((CPU_FREQ/1000000)*1000000));
+}
+
+inline long long OscSupCycToMicroSecs64(long long cycles)
+{
+	return (cycles/(CPU_FREQ/1000000));
+}
+
+inline long long OscSupCycToMilliSecs64(long long cycles)
+{
+	return (cycles/((CPU_FREQ/1000000)*1000));
+}
+
+inline long long OscSupCycToSecs64(long long cycles)
+{
+	return (cycles/((CPU_FREQ/1000000)*1000000));
+}
+
 
 /*============================== SRAM =================================*/
 void* OscSupSramAllocL1DataA(unsigned int size)

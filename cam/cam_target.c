@@ -228,10 +228,6 @@ OSC_ERR OscCamSetAreaOfInterest(const uint16 lowX,
 		cam.curCamRowClks = CAM_MIN_ROW_CLKS;
 	}
 	
-	/* Recalculate and set the shutter width, since it changes when
-	 * changing the area of interest. */
-	OscCamSetShutterWidth(cam.curExpTime);
-	
 	OscLog(DEBUG, "%s: Area of interest set to %dx%d at %d/%d.\n",
 			__func__,
 			capWinNotMirror.width,
@@ -492,8 +488,8 @@ OSC_ERR OscCamCancelCapture()
 	return SUCCESS;
 }
 
-OSC_ERR OscCamReadPicture(const uint8 fbID,
-		void ** ppPic,
+OSC_ERR OscCamReadPicture(const uint8 fbID, 
+		uint8 ** ppPic, 
 		const uint16 maxAge,
 		const uint16 timeout)
 {

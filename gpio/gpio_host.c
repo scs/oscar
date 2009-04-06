@@ -201,6 +201,13 @@ OSC_ERR OscGpioTriggerImage()
 	return SUCCESS;
 }
 
+#ifdef TARGET_TYPE_INDXCAM
+OSC_ERR OscGpioSetTestLedColor(uint8 red, uint8 green)
+{
+	return SUCCESS;
+}
+#endif /* TARGET_TYPE_INDXCAM */
+
 #ifdef TARGET_TYPE_LEANXCAM
 OSC_ERR OscGpioSetTestLedColor(uint8 red, uint8 green)
 {
@@ -273,7 +280,7 @@ OSC_ERR OscGpioInitPins()
 		if(pPinConfig->defaultFlags & DIR_OUTPUT)
 		{
 #ifndef OSC_GPIO_LOG_RESERVED_PINS
-			if(!(pPinConfig->defaultFlags & FUN_RESERVED))
+			if((pPinConfig->defaultFlags & FUN_RESERVED))
 			{
 				err = SUCCESS;
 				goto skip_logging;

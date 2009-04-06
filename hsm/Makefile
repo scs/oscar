@@ -11,11 +11,11 @@ HOST_FEATURES += -DOSC_HOST
 
 # Host-Compiler executables and flags
 HOST_CC = gcc 
-HOST_CFLAGS = $(HOST_FEATURES) -Wall -pedantic -O2 -I.. -g
+HOST_CFLAGS = $(HOST_FEATURES) -Wall -Wno-long-long -pedantic -O2 -I.. -g
 
 # Cross-Compiler executables and flags
 TARGET_CC = bfin-uclinux-gcc 
-TARGET_CFLAGS = $(TARGET_FEATURES) -Wall -ggdb3 -I..
+TARGET_CFLAGS = $(TARGET_FEATURES) -Wall -Wno-long-long -ggdb3 -I..
 
 # Source files 
 SOURCES_TARGET = hsm.c

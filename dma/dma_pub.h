@@ -82,7 +82,7 @@ OSC_ERR OscDmaAllocChain(void **phChainHandle);
  * 
  * @param hChainHandle Handle to the DMA chain to be reset.
  *//*********************************************************************/
-inline void OscDmaResetChain(void *hChainHandle);
+void OscDmaResetChain(void *hChainHandle);
 
 /*********************************************************************//*!
  * @brief Add a 2D memory move to a DMA chain.
@@ -156,7 +156,7 @@ OSC_ERR OscDmaAdd2DMove(void *hChainHandle,
  * after each word.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-inline OSC_ERR OscDmaAdd1DMove(void *hChainHandle,
+OSC_ERR OscDmaAdd1DMove(void *hChainHandle,
 		const void *pDstAddr,
 		const enum EnDmaWdSize enDstWdSize,
 		const uint16 dstCount, const int32 dstModify,

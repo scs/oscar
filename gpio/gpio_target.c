@@ -233,6 +233,16 @@ OSC_ERR OscGpioToggleTestLed()
 }
 #endif /* TARGET_TYPE_LEANXCAM */
 
+#ifdef TARGET_TYPE_INDXCAM
+
+OSC_ERR OscGpioTriggerImage()
+{
+	/* Triggering is done over the CPLD and not over the GPIOs for indXcam. */
+	return -EUNSUPPORTED;
+}
+
+#else /* TARGET_TYPE_INDXCAM */
+
 OSC_ERR OscGpioTriggerImage()
 {
 	int ret;
@@ -286,6 +296,8 @@ exit_fail:
 			__func__, strerror(errno));
 	return -EDEVICE;
 }
+
+#endif /* TARGET_TYPE_INDXCAM*/
 
 OSC_ERR OscGpioInitPins()
 {
@@ -373,21 +385,31 @@ OSC_ERR OscGpioInitPins()
 	return SUCCESS;
 }
 
-#ifdef TARGET_TYPE_LEANXCAM
+#ifdef TARGET_TYPE_INDXCAM
+OSC_ERR OscGpioSetTestLedColor(uint8 red, uint8 green)
+{
+	return SUCCESS;
+}
+#endif /* TARGET_TYPE_INDXCAM */
 
+#ifdef TARGET_TYPE_LEANXCAM
 OSC_ERR OscGpioSetTestLedColor(uint8 red, uint8 green)
 {
 	int ret;
 	struct GPIO_PIN     *pRed = &gpio.pins[PIN_TESTLED_R_N];
 	struct GPIO_PIN     *pGreen = &gpio.pins[PIN_TESTLED_G_N];
+	bool				bRedOn, bGreenOn;
 	bool bRedPolarity, bGreenPolarity;
 	
 	bRedPolarity = ((pRed->flags & POL_LOWACTIVE) != 0);
 	bGreenPolarity = ((pGreen->flags & POL_LOWACTIVE) != 0);
 	
+	bRedOn = (red ? TRUE : FALSE);
+	bGreenOn = (green ? TRUE : FALSE);
+	
 	/* Color transitions currently not supported. */
-	ret = write(pRed->fd, ((red ^ bRedPolarity) ? &on : &off), 1);
-	ret |= write(pGreen->fd, ((green ^ bGreenPolarity) ? &on : &off), 2);
+	ret = write(pRed->fd, ((bRedOn ^ bRedPolarity) ? &on : &off), 1);
+	ret |= write(pGreen->fd, ((bGreenOn ^ bGreenPolarity) ? &on : &off), 1);
 	
 	if(ret < 0)
 	{

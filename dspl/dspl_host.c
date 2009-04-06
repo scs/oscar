@@ -99,6 +99,37 @@ fract16 OscDsplLow_of_fr2x16(fract2x16 x)
 	return (fract16)( 0xffff & x);
 }
 
+fract16 OscDsplShl_fr1x16(fract16 x, int y)
+{
+	if( y > 0 )
+	{
+		return x << y;
+	}
+	else
+	if (y < 0)
+	{
+		return x >> -y;
+	}
+}
+
+fract2x16 OscDsplShl_fr2x16(fract2x16 x, int y)
+{
+	fract16 low, high;
+	if( y > 0 )
+	{
+		low  = OscDsplLow_of_fr2x16(x) << y;		
+		high = OscDsplHigh_of_fr2x16(x) << y;		
+		return OscDsplCompose_fr2x16( high, low);
+	}
+	else
+	if (y < 0)
+	{
+		low  = OscDsplLow_of_fr2x16(x) >> -y;		
+		high = OscDsplHigh_of_fr2x16(x) >> -y;		
+		return OscDsplCompose_fr2x16( high, low);
+	}
+}
+
 fract2x16 OscDsplCompose_fr2x16(fract16 h, fract16 l)
 {
 	return (fract2x16)( (h << 16) | l );

@@ -114,7 +114,8 @@ OSC_ERR OscClbCreate(void *hFw)
 	/* Register correction function for camera module */
 	if( err == SUCCESS)
 	{
-		OscCamRegisterCorretionCallback( OscClbApplyCorrection);
+		/*! @TODO Implement this callback in the camera module. */
+		/*OscCamRegisterCorrectionCallback( OscClbApplyCorrection);*/
 	}
 	else
 	{

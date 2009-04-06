@@ -108,7 +108,6 @@ struct GPIO_PIN
 #ifdef TARGET_TYPE_INDXCAM
 	/* Pin mapping */
 	#define PIN_TESTLED_N       27
-	#define PIN_EXPOSURE        3
 #endif /* TARGET_TYPE_INDXCAM */
 
 #if defined(OSC_HOST) || defined(OSC_SIM)

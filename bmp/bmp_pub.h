@@ -32,6 +32,35 @@
 	#include "oscar_target.h"
 #endif /* OSC_HOST */
 
+/*! @brief Represents the color depth of a picture */
+enum EnOscPictureType {
+	OSC_PICTURE_GREYSCALE,
+	OSC_PICTURE_YUV_422,
+	OSC_PICTURE_CHROM_U,
+	OSC_PICTURE_CHROM_V,
+	OSC_PICTURE_HUE,
+	OSC_PICTURE_BGR_24,
+	OSC_PICTURE_RGB_24
+};
+
+/*! @brief Macro extracting the color depth from the EnOscPictureType
+ * @param enType Enumeration of type OSC_PICTURE_TYPE.
+ * @return The color depth of the specified type.*/
+#define OSC_PICTURE_TYPE_COLOR_DEPTH(enType)          \
+	(                                               \
+			(enType == OSC_PICTURE_BGR_24) ? 24 : \
+			((enType == OSC_PICTURE_RGB_24) ? 24 :  \
+			((enType == OSC_PICTURE_YUV_422) ? 16 : 8))   \
+	)
+		
+/*! @brief Structure representing an 8-bit picture */
+struct OSC_PICTURE {
+	void* data;                 /*!< @brief The actual image data */
+	unsigned short width;       /*!< @brief Width of the picture */
+	unsigned short height;      /*!< @brief Height of the picture */
+	enum EnOscPictureType type; /*!< @brief The type of the picture */
+};
+
 /*! @brief Module-specific error codes.
  * 
  * These are enumerated with the offset

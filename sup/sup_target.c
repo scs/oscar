@@ -158,6 +158,12 @@ OSC_ERR OscSupWdtClose()
 
 inline void OscSupWdtKeepAlive()
 {
+	if(sup.fdWatchdog <= 0)
+	{
+		/* No watchdog open. */
+		OscLog(WARN, "%s: Watchdog not initialized!\n", __func__);
+		return;
+	}
 	/* Write anything to the watchdog to disable it and
 	 * make sure it is flushed. */
 	write(sup.fdWatchdog, "\0", 1);
@@ -174,17 +180,58 @@ inline uint32 OscSupCycGet()
 	/* Read out the blackfin-internal cycle count register.
 	 * This is a running counter of the number of cycles since start.
 	 * Together with CYCLES2 this would actually be a 64 bit value,
-	 * but we currently only read out the lower 32 bits.
+	 * but in this function we only read out the lower 32 bits.
+	 * (See OscSupCycGet64 for full readout).
 	 * This yields a wrap-around time of around 8 secs with a 500 Mhz CPU,
 	 * which should be sufficient for most cases. */
 	__asm__ __volatile__ ("%0 = CYCLES;\n":"=d"(ret));
 	return ret;
 }
 
+inline long long OscSupCycGet64()
+{
+	unsigned long long t0;
+
+	/* Read out the blackfin-internal cycle count register.
+	 * This is a running counter of the number of cycles since start.
+	 * Together with CYCLES2 this gives actually be a 64 bit value.
+	 * The blackfin has a nice hardware mechanic that stores the current
+	 * value of CYCLES2 into a shadow register when CYCLES is read out.
+	 * Therefore, no overflow check is required. */
+	__asm__ __volatile__ ("%0=cycles; %H0=cycles2;" : "=d" (t0));
+	return t0;
+}
+
 inline uint32 OscSupCycToMicroSecs(uint32 cycles)
 {
 	return (cycles/(CPU_FREQ/1000000));
 }
+
+inline uint32 OscSupCycToMilliSecs(uint32 cycles)
+{
+	return (cycles/((CPU_FREQ/1000000)*1000));
+}
+
+inline uint32 OscSupCycToSecs(uint32 cycles)
+{
+	return (cycles/((CPU_FREQ/1000000)*1000000));
+}
+
+inline long long OscSupCycToMicroSecs64(long long cycles)
+{
+	return (cycles/(CPU_FREQ/1000000));
+}
+
+inline long long OscSupCycToMilliSecs64(long long cycles)
+{
+	return (cycles/((CPU_FREQ/1000000)*1000));
+}
+
+inline long long OscSupCycToSecs64(long long cycles)
+{
+	return (cycles/((CPU_FREQ/1000000)*1000000));
+}
+
 
 /*============================== SRAM =================================*/
 void* OscSupSramAllocL1DataA(unsigned int size)
