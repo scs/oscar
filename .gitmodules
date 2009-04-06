@@ -1,3 +1,0 @@
-[submodule "oscar"]
-	path = oscar
-	url = ssh://lemon.scs.ch/git/lcv/apps/oscar.git
