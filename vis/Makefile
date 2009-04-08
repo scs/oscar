@@ -10,45 +10,31 @@ TARGET_FEATURES += -DOSC_TARGET
 HOST_FEATURES += -DOSC_HOST
 
 # Host-Compiler executables and flags
-HOST_CC = gcc 
-HOST_CFLAGS = $(HOST_FEATURES) -Wall -Wno-long-long -pedantic -O2 -I.. -g $(EXTRA_CFLAGS)
+HOST_CC := gcc 
+HOST_CFLAGS := $(HOST_FEATURES) -Wall -Wno-long-long -pedantic -O2 -I.. -g $(EXTRA_CFLAGS)
 
 # Cross-Compiler executables and flags
-TARGET_CC = bfin-uclinux-gcc 
-TARGET_CFLAGS = $(TARGET_FEATURES) -Wall -Wno-long-long -pedantic -O2 -I.. $(EXTRA_CFLAGS)
+TARGET_CC := bfin-uclinux-gcc 
+TARGET_CFLAGS := $(TARGET_FEATURES) -Wall -Wno-long-long -pedantic -O2 -I.. $(EXTRA_CFLAGS)
 
 # Source files of the vision module
-SOURCES_TARGET = vis.c bayer_fast.c transform.c bayer_lincorr.c
-SOURCES_HOST = vis.c bayer_fast.c transform.c bayer_lincorr.c 
+SOURCES_HOST := vis.c bayer_fast.c transform.c bayer_lincorr.c 
+SOURCES_TARGET := vis.c bayer_fast.c transform.c bayer_lincorr.c
 
+OBJECTS_HOST := $(patsubst %.c, %_host.o, $(SOURCES_HOST))
+OBJECTS_TARGET := $(patsubst %.c, %_target.o, $(SOURCES_TARGET))
+OBJECTS_TARGET_SIM := $(patsubst %.c, %_target_sim.o, $(SOURCES_TARGET))
 
 all: target host
 
-target: objects_target
-
-host: objects_host
+host: $(OBJECTS_HOST) $(OBJECTS_TARGET_SIM)
+target: $(OBJECTS_TARGET)
 
 clean:
 	rm -f *.o *.elf *.gdb
 
-############################# Host object files ####################################
-objects_host: *.c *.h ../oscar*.h
-	@echo "Compiling vision Module for host."
-	for i in $(SOURCES_HOST) ; \
-	do \
-		x=`echo "$${i}" | sed 's/.c$$//' ` ; \
-		$(HOST_CC) $(HOST_CFLAGS) -c $${i} -o $${x}_host.o || exit $? ;\
-	done
+%_host.o: %.c *.h ../oscar*.h
+	$(HOST_CC) $(HOST_CFLAGS) -c $< -o $@
 
-########################### Target object files ####################################
-objects_target: *.c *.h ../oscar*.h
-	@echo "Compiling vision Module for target."
-	for i in $(SOURCES_TARGET) ; \
-	do \
-		x=`echo "$${i}" | sed 's/.c$$//' ` ; \
-		$(TARGET_CC) $(TARGET_CFLAGS) -c $${i} -o $${x}_target.o || exit $? ;\
-	done
-	for x in `ls -d *_target.o | sed 's/_target.o$$//' ` ; \
-		do cp $${x}_target.o $${x}_sim.o; \
-	done
-
+%_target.o %_target_sim.o: %.c *.h ../oscar*.h
+	$(TARGET_CC) $(TARGET_CFLAGS) -c $< -o $@
