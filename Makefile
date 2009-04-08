@@ -46,7 +46,6 @@ MODULES += cfg
 MODULES += clb
 MODULES += vis
 MODULES += gpio
-MODULES += dmtx
 MODULES += jpg
 
 # decide whether we are building or dooing something other like cleaning or configuring

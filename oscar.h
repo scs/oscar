@@ -115,7 +115,6 @@ OSC_ERR OscGetVersionString(char *hVersion);
 #include "clb_pub.h"
 #include "vis_pub.h"
 #include "gpio_pub.h"
-#include "dmtx_pub.h"
 #include "jpg_pub.h"
 #endif
 
