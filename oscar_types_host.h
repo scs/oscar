@@ -105,13 +105,14 @@ enum EnOscPictureType {
 	OSC_PICTURE_YUV_400,
 	OSC_PICTURE_CHROM_U,
 	OSC_PICTURE_CHROM_V,
+	OSC_PICTURE_HUE,
 	OSC_PICTURE_BGR_24,
 	OSC_PICTURE_RGB_24
 };
 
 /*! @brief Structure representing an 8-bit picture */
 struct OSC_PICTURE {
-	void* data;                 /*!< @brief The actual image data */
+	void * data;                /*!< @brief The actual image data */
 	unsigned short width;       /*!< @brief Width of the picture */
 	unsigned short height;      /*!< @brief Height of the picture */
 	enum EnOscPictureType type; /*!< @brief The type of the picture */
