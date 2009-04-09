@@ -16,30 +16,95 @@
 	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-/*! @file swr_host.c
- * @brief Stimuli writer module implementation for host.
- * 
-	************************************************************************/
+/*! @file swr_target.c
+ * @brief Stimuli writer module implementation.
+ */
 
+#include <string.h>
+#include <stdio.h>
 #include "oscar_intern.h"
 
 #include "swr_pub.h"
-#include "swr_priv.h"
+#include <log/log_pub.h>
 
+#ifdef OSC_HOST
+#include <oscar_types_host.h>
+#else
+#include <oscar_types_target.h>
+#endif /* OSC_HOST */
+
+#if defined(OSC_HOST) || defined(OSC_SIM)
 #include <sim/sim_pub.h>
+#else /* defined(OSC_HOST) || defined(OSC_SIM) */
+#include "oscar_types_target.h"
+#endif /* defined(OSC_HOST) || defined(OSC_SIM) */
+
+#if defined(OSC_HOST) || defined(OSC_SIM)
+/*! @brief Limited number of writer instances */
+#define MAX_NR_WRITER               10
+/*! @brief Limited number of signal instances per writer */
+#define MAX_NR_SIGNAL_PER_WRITER    20
+
+/*! @brief Limited string length for string type value */
+#define MAX_LENGTH_STRING_VALUE    200
+
+/*!@brief Union for signal value (function argument)*/
+union uOSC_SWR_VALUE
+{
+	int32 nValue;    /*!< @brief Integer coded value */
+	float fValue;    /*!< @brief Float coded value */
+	char strValue[MAX_LENGTH_STRING_VALUE]; /*!< @brief String coded value */
+};
+
+/*!@brief Signal object struct */
+struct OSC_SWR_SIGNAL
+{
+	char* strName;  /*!< @brief Signal name for stimuli file report*/
+	enum EnOscSwrSignalType type; /*!< @brief Signal value type*/
+	union uOSC_SWR_VALUE value; /*!< @brief Signal value */
+	char strFormat[20]; /*!< @brief logging format string */
+};
+
+/*!@brief Writer object struct */
+struct OSC_SWR_WRITER
+{
+	FILE* pFile;              /*!< @brief Handle to writer file */
+	char strFile[64];
+	uint16 nrOfSignals;       /*!< @brief Number of managed signals */
+	bool bDescriptorPrinted;  /*!< @brief File descripter line already printed */
+	bool bReportTime;
+	bool bReportCyclic;
+	/*! @brief Signal instance array*/
+	struct OSC_SWR_SIGNAL sig[ MAX_NR_SIGNAL_PER_WRITER];
+};
+
+void OscSwrCycleCallback( void);
+void OscSwrReport( const void* pWriter);
+#endif /* OSC_HOST or OSC_SIM*/
+
+/*!@brief Stimuli writer module object struct */
+struct OSC_SWR
+{
+	uint16 nrOfWriters;     /*!< @brief Number of managed writers */
+	/*! @brief Writer instance array */
+	#if defined(OSC_HOST) || defined(OSC_SIM)
+	/*! @brief Array of managed writers */
+	struct OSC_SWR_WRITER wr[ MAX_NR_WRITER];
+	#endif
+};
 
 struct OSC_SWR swr; /*!< Module singelton instance */
 
 /*! The dependencies of this module. */
 struct OSC_DEPENDENCY swr_deps[] = {
-		{"log", OscLogCreate, OscLogDestroy}
+	{"log", OscLogCreate, OscLogDestroy}
 };
 
 OSC_ERR OscSwrCreate(void *hFw)
 {
 	struct OSC_FRAMEWORK *pFw;
 	OSC_ERR err;
-
+	
 	pFw = (struct OSC_FRAMEWORK *)hFw;
 	if(pFw->swr.useCnt != 0)
 	{
@@ -47,12 +112,12 @@ OSC_ERR OscSwrCreate(void *hFw)
 		/* The module is already allocated */
 		return SUCCESS;
 	}
-
+	
 	/* Load the module swr_deps of this module. */
 	err = OscLoadDependencies(pFw,
 			swr_deps,
 			sizeof(swr_deps)/sizeof(struct OSC_DEPENDENCY));
-
+	
 	if(err != SUCCESS)
 	{
 		printf("%s: ERROR: Unable to load swr_deps! (%d)\n",
@@ -60,23 +125,27 @@ OSC_ERR OscSwrCreate(void *hFw)
 				err);
 		return err;
 	}
-
+	
 	memset(&swr, 0, sizeof(struct OSC_SWR));
-
+	
+#if defined(OSC_HOST) || defined(OSC_SIM)
 	OscSimRegisterCycleCallback( &OscSwrCycleCallback);
-
+#endif /* defined(OSC_HOST) || defined(OSC_SIM) */
+	
 	/* Increment the use count */
 	pFw->swr.hHandle = (void*)&swr;
 	pFw->swr.useCnt++;
-
+	
 	return SUCCESS;
 }
 
 void OscSwrDestroy(void *hFw)
 {
 	struct OSC_FRAMEWORK *pFw;
+#if defined(OSC_HOST) || defined(OSC_SIM)
 	uint16 wrId;
-
+#endif /* defined(OSC_HOST) || defined(OSC_SIM) */
+	
 	pFw = (struct OSC_FRAMEWORK *)hFw;
 	/* Check if we really need to release or whether we still
 	 * have users. */
@@ -85,11 +154,12 @@ void OscSwrDestroy(void *hFw)
 	{
 		return;
 	}
-
+	
 	OscUnloadDependencies(pFw,
 			swr_deps,
 			sizeof(swr_deps)/sizeof(struct OSC_DEPENDENCY));
-
+	
+#if defined(OSC_HOST) || defined(OSC_SIM)
 	/* close all files */
 	for( wrId = 0; wrId<swr.nrOfWriters; wrId++)
 	{
@@ -97,12 +167,12 @@ void OscSwrDestroy(void *hFw)
 		fclose( swr.wr[ wrId].pFile);
 		OscLog(INFO, "Close %s\n", &swr.wr[ wrId].strFile);
 	}
-	
+#endif /* defined(OSC_HOST) || defined(OSC_SIM) */
 	
 	memset(&swr, 0, sizeof(struct OSC_SWR));
 }
 
-
+#if defined(OSC_HOST) || defined(OSC_SIM)
 OSC_ERR OscSwrCreateWriter(
 		void** ppWriter,
 		const char* strFile,
@@ -280,4 +350,4 @@ void OscSwrCycleCallback( void)
 
 	return;
 }
-
+#endif /* defined(OSC_HOST) || defined(OSC_SIM) */
