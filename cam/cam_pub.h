@@ -24,7 +24,6 @@
 #define CAM_PUB_H_
 
 #include "oscar_error.h"
-#include "bayer_pub.h"
 
 /*! Module-specific error codes.
  * These are enumerated with the offset
