@@ -1054,7 +1054,7 @@ OSC_ERR OscVisDebayerSpot(uint8 const * const pRaw, uint16 const width, uint16 c
 	
 	/* Adjust pattern for an unaligned spot. */
 	
-	bTopLeftIsGreen = (enBayerOrderFirstRow == ROW_GBGB || enBayerOrderFirstRow == ROW_GRGR) == IS_EVEN(xPos) == IS_EVEN(yPos);
+	bTopLeftIsGreen = (enBayerOrderFirstRow == ROW_GBGB || enBayerOrderFirstRow == ROW_GRGR) == (IS_EVEN(xPos) == IS_EVEN(yPos));
 	bTopRowIsRed = (enBayerOrderFirstRow == ROW_RGRG || enBayerOrderFirstRow == ROW_GRGR) == IS_EVEN(yPos);
 	
 	if (bTopLeftIsGreen)

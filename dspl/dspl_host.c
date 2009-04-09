@@ -110,6 +110,10 @@ fract16 OscDsplShl_fr1x16(fract16 x, int y)
 	{
 		return x >> -y;
 	}
+	else
+	{
+		return x;
+	}
 }
 
 fract2x16 OscDsplShl_fr2x16(fract2x16 x, int y)
@@ -127,6 +131,10 @@ fract2x16 OscDsplShl_fr2x16(fract2x16 x, int y)
 		low  = OscDsplLow_of_fr2x16(x) >> -y;		
 		high = OscDsplHigh_of_fr2x16(x) >> -y;		
 		return OscDsplCompose_fr2x16( high, low);
+	}
+	else
+	{
+		return x;
 	}
 }
 

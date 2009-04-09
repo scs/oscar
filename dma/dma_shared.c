@@ -104,6 +104,13 @@ void OscDmaDestroy(void *hFw)
 	memset(&dma, 0, sizeof(struct OSC_DMA));
 }
 
+inline void OscDmaResetChain(void *hChainHandle)
+{
+	struct DMA_CHAIN *pChain = (struct DMA_CHAIN*)hChainHandle;
+	
+	pChain->nMoves = 0;
+}
+
 OSC_ERR OscDmaAllocChain(void **phChainHandle)
 {
 	struct DMA_CHAIN ** pChain;
@@ -129,13 +136,6 @@ OSC_ERR OscDmaAllocChain(void **phChainHandle)
 	OscDmaResetChain(*pChain);
 	
 	return SUCCESS;
-}
-
-inline void OscDmaResetChain(void *hChainHandle)
-{
-	struct DMA_CHAIN *pChain = (struct DMA_CHAIN*)hChainHandle;
-	
-	pChain->nMoves = 0;
 }
 
 OSC_ERR OscDmaAdd2DMove(void *hChainHandle,

@@ -27,6 +27,7 @@
 #include "log_priv.h"
 #include "oscar_intern.h"
 #include <unistd.h>
+#include <syslog.h>
 
 /*! @brief The module singelton instance.
  * 
@@ -145,7 +146,7 @@ void OscLog(const enum EnOscLogLevel level, const char * strFormat, ...)
 
 void OscFatalErr(const char * strFormat, ...)
 {
-	uint16 len;
+	uint16 len = 0;
 	va_list ap; /*< The dynamic argument list */
 
 	osc_log.strTemp[0] = 0; /* Mark the string as empty */

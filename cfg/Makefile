@@ -10,11 +10,11 @@ HOST_FEATURES += -DOSC_HOST
 
 # Host-Compiler executables and flags
 HOST_CC = gcc 
-HOST_CFLAGS = $(HOST_FEATURES) -Wall -Wno-long-long -O2 -I.. -g $(EXTRA_CFLAGS)
+HOST_CFLAGS = $(HOST_FEATURES) -std=gnu99 -Wall -Wno-long-long -O2 -I.. -g $(EXTRA_CFLAGS)
 
 # Cross-Compiler executables and flags
 TARGET_CC = bfin-uclinux-gcc 
-TARGET_CFLAGS = $(TARGET_FEATURES) -Wall -Wno-long-long -pedantic -ggdb3 -I.. $(EXTRA_CFLAGS)
+TARGET_CFLAGS = $(TARGET_FEATURES) -std=gnu99 -Wall -Wno-long-long -pedantic -ggdb3 -I.. $(EXTRA_CFLAGS)
 
 # Source files of the config module
 SOURCES_TARGET = cfg.c
