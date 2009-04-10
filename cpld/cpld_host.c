@@ -23,8 +23,8 @@
 
 #include "oscar_types_host.h"
 
-#include "cpld_pub.h"
-#include "cpld_priv.h"
+#include "include/cpld.h"
+#include "cpld.h"
 #include "oscar_intern.h"
 
 struct OSC_CPLD cpld; /*!< The cpld module singelton instance */

@@ -23,8 +23,8 @@
 
 #include "oscar_types_target.h"
 
-#include "cpld_pub.h"
-#include "cpld_priv.h"
+#include "include/cpld.h"
+#include "cpld.h"
 #include "oscar_intern.h"
 #include <sys/ioctl.h>
 #include <unistd.h>

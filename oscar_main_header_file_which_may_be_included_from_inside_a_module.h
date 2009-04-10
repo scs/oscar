@@ -105,7 +105,7 @@ OSC_ERR OscGetVersionString(char *hVersion);
 #endif
 #ifndef TARGET_TYPE_MESA_SR4K
 #include "include/cam.h"
-#include "cpld/cpld_pub.h"
+#include "include/cpld.h"
 #include "sim/sim_pub.h"
 #include "swr/swr_pub.h"
 #include "srd/srd_pub.h"
