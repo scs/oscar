@@ -22,10 +22,21 @@
 	************************************************************************/
 
 #include "hsm_pub.h"
-#include "hsm_priv.h"
 #include "oscar_intern.h"
 
-struct OSC_HSM hsm; /*!< Module singelton instance */
+#include <string.h>
+#include <stdio.h>
+
+#include <log/log_pub.h>
+
+#ifdef OSC_HOST
+#include <oscar_types_host.h>
+#else
+#include <oscar_types_target.h>
+#endif /* OSC_HOST */
+
+/*!@brief object struct */
+struct { } hsm; /*!< Module singelton instance */
 
 /*! The dependencies of this module. */
 struct OSC_DEPENDENCY hsm_deps[] = {
@@ -58,7 +69,7 @@ OSC_ERR OscHsmCreate(void *hFw)
 		return err;
 	}
 	
-	memset(&hsm, 0, sizeof(struct OSC_HSM));
+	memset(&hsm, 0, sizeof hsm);
 	
 	
 	/* Increment the use count */
@@ -86,7 +97,7 @@ void OscHsmDestroy(void *hFw)
 			sizeof(hsm_deps)/sizeof(struct OSC_DEPENDENCY));
 	
 	
-	memset(&hsm, 0, sizeof(struct OSC_HSM));
+	memset(&hsm, 0, sizeof hsm);
 }
 
 
