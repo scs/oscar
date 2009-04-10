@@ -26,7 +26,7 @@
 #include "jpg_pub.h"
 #include "jpg_priv.h"
 #include "oscar_intern.h"
-#include "bmp/bmp_pub.h"
+#include "oscar_main_header_file_which_may_be_included_from_inside_a_module.h"
 #include <stdlib.h>
 #include <string.h>
 

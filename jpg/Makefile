@@ -1,56 +1,34 @@
-############################################################################
-#
 # Makefile for the jpg module of the Oscar framework
-#
-# 
-############################################################################
 
 # Defines for C files
-TARGET_FEATURES += -DOSC_TARGET
 HOST_FEATURES += -DOSC_HOST
+TARGET_FEATURES += -DOSC_TARGET
+TARGET_SIM_FEATURES += -DOSC_TARGET -DOSC_SIM
 
 # Host-Compiler executables and flags
-HOST_CC = gcc 
-HOST_CFLAGS = $(HOST_FEATURES) -Wall -O2 -I.. -g $(EXTRA_CFLAGS)
+HOST_CC := gcc -std=gnu99 -Wall -Wno-long-long -pedantic -O2 -I.. -g
 
 # Cross-Compiler executables and flags
-TARGET_CC = bfin-uclinux-gcc 
-TARGET_CFLAGS = $(TARGET_FEATURES) -Wall -pedantic -ggdb3 -I.. $(EXTRA_CFLAGS)
+TARGET_CC := bfin-uclinux-gcc -std=gnu99 -Wall -Wno-long-long -ggdb3 -I..
 
-# Source files of the logging module
-SOURCES = jpg_dct_.c jpg_huffman_.c jpg_quant_.c jpg_encoder_.c jpg_marker_.c jpg_readYUV_.c
+.PHONY: all host target clean
+all: target host
 
-all: target host 
+SOURCES := jpg_dct jpg_huffman jpg_quant jpg_encoder jpg_marker jpg_readYUV
 
-target: target1 sim1
+host: $(addsuffix _host.o, $(SOURCES))
+target: $(addsuffix _target.o, $(SOURCES)) $(addsuffix _target_sim.o, $(SOURCES))
 
 clean:
 	rm -f *.o *.elf *.gdb
 	
-############################# Host object file ####################################
-host: *.c *.h ../oscar*.h
-	@echo "Compiling JPG Module for host."
-	@rm -f *_host.o
-	$(HOST_CC) $(HOST_CFLAGS) -c $(SOURCES) 
-	@rename "s/\_.o/_host\.o/" *_.o
-#	mv jpg_shared.o jpg_shared_host.o
+# Host object file
+%_host.o: %.c *.h
+	$(HOST_CC) $(HOST_FEATURES) -c $< -o $@
 	
-########################### Target object file ####################################
-target1: *.c *.h ../oscar*.h
-	@echo "Compiling JPG Module for target."
-	@rm -f *_target.o
-	$(TARGET_CC) $(TARGET_CFLAGS) -c $(SOURCES)
-	@rename "s/\_.o/_target\.o/" *_.o
-#	@mv ipc_shared.o ipc_shared_target.o
-#	@cp ipc_shared_target.o ipc_shared_target_sim.o
-#	@cp ipc_target.o ipc_target_sim.o
-	
-sim1: *.c *.h ../oscar*.h
-	@echo "Compiling JPG Module for target."
-	@rm -f *_target_sim.o
-	$(TARGET_CC) $(TARGET_CFLAGS) -c $(SOURCES)
-	@rename "s/\_.o/_target_sim\.o/" *_.o
-#	@mv ipc_shared.o ipc_shared_target.o
-#	@cp ipc_shared_target.o ipc_shared_target_sim.o
-#	@cp ipc_target.o ipc_target_sim.o
-	
+# Target object file
+%_target.o: %.c *.h
+	$(TARGET_CC) $(TARGET_FEATURES) -c $< -o $@
+
+%_target_sim.o: %.c *.h
+	$(TARGET_CC) $(TARGET_SIM_FEATURES) -c $< -o $@

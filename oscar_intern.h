@@ -25,6 +25,7 @@
 
 #include "oscar_dependencies.h"
 #include "oscar_version.h"
+#include "oscar_main_header_file_which_may_be_included_from_inside_a_module.h"
 
 #ifdef OSC_HOST
 	#include "oscar_types_host.h"
