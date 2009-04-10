@@ -30,8 +30,8 @@
 
 #include "oscar_intern.h"
 
-#include "gpio_pub.h"
-#include "gpio_priv.h"
+#include "include/gpio.h"
+#include "gpio.h"
 
 #if defined(OSC_HOST) || defined(OSC_SIM)
 #include "../srd/srd_pub.h"

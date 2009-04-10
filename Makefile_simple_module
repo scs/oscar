@@ -11,13 +11,17 @@ HOST_CC := gcc -std=gnu99 -Wall -Wno-long-long -pedantic -O2 -I.. -g
 # Cross-Compiler executables and flags
 TARGET_CC := bfin-uclinux-gcc -std=gnu99 -Wall -Wno-long-long -ggdb3 -I..
 
-SOURCES := $(wildcard *.c)
+SOURCES_host := $(wildcard *_host.c)
+SOURCES_target := $(wildcard *_target.c)
+SOURCES := $(filter-out $(SOURCES_host) $(SOURCES_target), $(wildcard *.c))
+SOURCES_host += $(SOURCES)
+SOURCES_target += $(SOURCES)
 
 .PHONY: all host target clean
 all: target host
 
-host: $(SOURCES:.c=_host.o)
-target: $(SOURCES:.c=_target.o) $(SOURCES:.c=_target_sim.o)
+host: $(SOURCES_host:.c=_host.o)
+target: $(SOURCES_target:.c=_target.o) $(SOURCES_target:.c=_target_sim.o)
 
 clean:
 	rm -f *.o *.elf *.gdb

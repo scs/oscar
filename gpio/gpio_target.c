@@ -24,8 +24,8 @@
 #include "oscar_types_target.h"
 #include "oscar_intern.h"
 
-#include "gpio_pub.h"
-#include "gpio_priv.h"
+#include "include/gpio.h"
+#include "gpio.h"
 
 #include <sys/stat.h>
 #include <sys/types.h>
