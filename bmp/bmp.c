@@ -21,8 +21,8 @@
  * 
  */
 
-#include "bmp_pub.h"
-#include "bmp_priv.h"
+#include "include/bmp.h"
+#include "bmp.h"
 #include "oscar_intern.h"
 
 /*! @brief The module singelton instance. */
@@ -88,6 +88,157 @@ void OscBmpDestroy(void *hFw)
 			sizeof(bmp_deps)/sizeof(struct OSC_DEPENDENCY));
 	
 	memset(&bmp, 0, sizeof(struct OSC_BMP));
+}
+
+/*********************************************************************//*!
+ * @brief Extract all necessary information from a RGB BMP Header
+ * 
+ * Read the interesting fields from the header and swap endianness if
+ * necessary.
+ * 
+ * @param pHdr Pointer to the BMP header in memory.
+ * @param pWidth Where to store the extracted picture width.
+ * @param pHeight Where to store the extracted picture height.
+ * @param pDataOffset Where to store the extracted data offset.
+ * @param pColorDepth Where to store the extracted color depth.
+ *//*********************************************************************/
+static inline void OscBmpReadHdrInfo(const uint8 *pHdr,
+		int32 * pWidth, int32 * pHeight, int32 *pDataOffset,
+		int16 * pColorDepth)
+{
+#ifdef CPU_LITTLE_ENDIAN
+	*pDataOffset = LD_INT32(&pHdr[BMP_HEADER_FIELD_DATA_OFFSET]);
+	*pWidth = LD_INT32(&pHdr[BMP_HEADER_FIELD_WIDTH]);
+	*pHeight = LD_INT32(&pHdr[BMP_HEADER_FIELD_HEIGHT]);
+	*pColorDepth = LD_INT16(&pHdr[BMP_HEADER_FIELD_COLOR_DEPTH]);
+	/* BMP uses little endian format */
+#else /* CPU_LITTLE_ENDIAN */
+	/* For a big endian CPU we need to swap endianness */
+	*pDataOffset =
+		ENDIAN_SWAP_32(LD_INT32((&pHdr[BMP_HEADER_FIELD_DATA_OFFSET])));
+	*pWidth =
+		ENDIAN_SWAP_32(LD_INT32(&pHdr[BMP_HEADER_FIELD_WIDTH]));
+	*pHeight =
+		ENDIAN_SWAP_32(LD_INT32(&pHdr[BMP_HEADER_FIELD_HEIGHT]));
+	*pColorDepth =
+		ENDIAN_SWAP_16(LD_INT16(&pHdr[BMP_HEADER_FIELD_COLOR_DEPTH]));
+#endif /* CPU_LITTLE_ENDIAN */
+}
+
+/*********************************************************************//*!
+ * @brief Write all necessary information to a RGB BMP Header
+ * 
+ * Write the interesting fields to the header and swap endianness if
+ * necessary.
+ * 
+ * @param pHdr Pointer to the BMP header in memory.
+ * @param width Desired width field content.
+ * @param height Desired height field content.
+ * @param colorDepth Desired color depth.
+ * @param headerSize Size of the bitmap header used.
+ *//*********************************************************************/
+static inline void OscBmpWriteHdrInfo(uint8 *pHdr,
+		const int32 width, const int32 height, const int16 colorDepth,
+		const int32 headerSize)
+{
+	int32           imageSize, dataOffset, fileSize;
+	
+	imageSize = (((int32)width*(colorDepth/8) + 3)/4)*4*height;
+	fileSize = imageSize + headerSize;
+	dataOffset = headerSize;
+	
+	/* BMP uses little endian format */
+#ifdef CPU_LITTLE_ENDIAN
+	/* Data is already lying correctly in memory */
+	ST_INT32(&pHdr[BMP_HEADER_FIELD_FILE_SIZE], fileSize);
+	ST_INT32(&pHdr[BMP_HEADER_FIELD_DATA_OFFSET], dataOffset);
+	ST_INT32(&pHdr[BMP_HEADER_FIELD_WIDTH], width);
+	ST_INT32(&pHdr[BMP_HEADER_FIELD_HEIGHT], height);
+	ST_INT16(&pHdr[BMP_HEADER_FIELD_COLOR_DEPTH], colorDepth);
+	ST_INT32(&pHdr[BMP_HEADER_FIELD_IMAGE_SIZE], imageSize);
+#else /* CPU_LITTLE_ENDIAN */
+	/* For a big endian CPU we need to swap endianness */
+	ST_INT32(&pHdr[BMP_HEADER_FIELD_FILE_SIZE],
+			ENDIAN_SWAP_32(fileSize));
+	ST_INT32(&pHdr[BMP_HEADER_FIELD_DATA_OFFSET],
+			ENDIAN_SWAP_32(dataOffset));
+	ST_INT32(&pHdr[BMP_HEADER_FIELD_WIDTH],
+			ENDIAN_SWAP_32(width));
+	ST_INT32(&pHdr[BMP_HEADER_FIELD_HEIGHT],
+			ENDIAN_SWAP_32(height));
+	ST_INT16(&pHdr[BMP_HEADER_FIELD_COLOR_DEPTH],
+			ENDIAN_SWAP_16(colorDepth));
+	ST_INT32(&pHdr[BMP_HEADER_FIELD_IMAGE_SIZE],
+			ENDIAN_SWAP_32(imageSize));
+#endif /* CPU_LITTLE_ENDIAN */
+}
+
+/*********************************************************************//*!
+ * @brief Reverse the row order of an OSC_PICTURE
+ * 
+ * @param pPic Pointer to the fully initialized OSC picture.
+ * @return SUCCESS or an appropriate error code otherwise
+ *//*********************************************************************/
+static OSC_ERR OscBmpReverseRowOrder(struct OSC_PICTURE *pPic)
+{
+	void        *pTempRow;
+	uint8       bytesPerPixel;
+	uint32      rowLength;
+	int         i;
+	uint32      curFIndex, curBIndex;
+	uint8       *pData = (uint8*)pPic->data;
+	
+	if(pPic->type == OSC_PICTURE_BGR_24)
+	{
+		bytesPerPixel = 3;
+	} else if(pPic->type == OSC_PICTURE_GREYSCALE) {
+		bytesPerPixel = 1;
+	} else {
+		return -EUNSUPPORTED_FORMAT;
+	}
+	
+	/* Temporary buffer to store one row */
+	rowLength = pPic->width * bytesPerPixel;
+	pTempRow = (void*)malloc(rowLength);
+	if(!pTempRow)
+	{
+		OscLog(CRITICAL, "%s: Memory allocation failed!\n", __func__);
+		return -EOUT_OF_MEMORY;
+	}
+	
+	for(i = 0; i < pPic->height/2; i++)
+	{
+		/* Swap the rows */
+		curFIndex = i * rowLength;
+		curBIndex = (pPic->height - i - 1) * rowLength;
+		memcpy(pTempRow, &pData[curFIndex], rowLength);
+		memcpy(&pData[curFIndex], &pData[curBIndex], rowLength);
+		memcpy(&pData[curBIndex], pTempRow, rowLength);
+	}
+	
+	free(pTempRow);
+	return 0;
+}
+
+uint8 OSC_PICTURE_TYPE_COLOR_DEPTH(enum EnOscPictureType enType)
+{
+	switch (enType) 
+	{
+	case OSC_PICTURE_BGR_24:
+		return 24;
+	case OSC_PICTURE_RGB_24:
+		return 24;
+	case OSC_PICTURE_YUV_444:
+		return 24;
+	case OSC_PICTURE_YUV_422:
+		return 16;
+	case OSC_PICTURE_YUV_420:
+		return 24;
+	case OSC_PICTURE_YUV_400:
+		return 8;
+	default:
+		return 8;
+	}
 }
 
 OSC_ERR OscBmpRead(struct OSC_PICTURE *pPic, const char *strFileName)
@@ -293,125 +444,4 @@ OSC_ERR OscBmpWrite(const struct OSC_PICTURE *pPic,
 	fclose(pPicFile);
 	
 	return SUCCESS;
-}
-
-static inline void OscBmpReadHdrInfo(const uint8 *pHdr,
-		int32 * pWidth, int32 * pHeight, int32 *pDataOffset,
-		int16 * pColorDepth)
-{
-#ifdef CPU_LITTLE_ENDIAN
-	*pDataOffset = LD_INT32(&pHdr[BMP_HEADER_FIELD_DATA_OFFSET]);
-	*pWidth = LD_INT32(&pHdr[BMP_HEADER_FIELD_WIDTH]);
-	*pHeight = LD_INT32(&pHdr[BMP_HEADER_FIELD_HEIGHT]);
-	*pColorDepth = LD_INT16(&pHdr[BMP_HEADER_FIELD_COLOR_DEPTH]);
-	/* BMP uses little endian format */
-#else /* CPU_LITTLE_ENDIAN */
-	/* For a big endian CPU we need to swap endianness */
-	*pDataOffset =
-		ENDIAN_SWAP_32(LD_INT32((&pHdr[BMP_HEADER_FIELD_DATA_OFFSET])));
-	*pWidth =
-		ENDIAN_SWAP_32(LD_INT32(&pHdr[BMP_HEADER_FIELD_WIDTH]));
-	*pHeight =
-		ENDIAN_SWAP_32(LD_INT32(&pHdr[BMP_HEADER_FIELD_HEIGHT]));
-	*pColorDepth =
-		ENDIAN_SWAP_16(LD_INT16(&pHdr[BMP_HEADER_FIELD_COLOR_DEPTH]));
-#endif /* CPU_LITTLE_ENDIAN */
-}
-
-static inline void OscBmpWriteHdrInfo(uint8 *pHdr,
-		const int32 width, const int32 height, const int16 colorDepth,
-		const int32 headerSize)
-{
-	int32           imageSize, dataOffset, fileSize;
-	
-	imageSize = (((int32)width*(colorDepth/8) + 3)/4)*4*height;
-	fileSize = imageSize + headerSize;
-	dataOffset = headerSize;
-	
-	/* BMP uses little endian format */
-#ifdef CPU_LITTLE_ENDIAN
-	/* Data is already lying correctly in memory */
-	ST_INT32(&pHdr[BMP_HEADER_FIELD_FILE_SIZE], fileSize);
-	ST_INT32(&pHdr[BMP_HEADER_FIELD_DATA_OFFSET], dataOffset);
-	ST_INT32(&pHdr[BMP_HEADER_FIELD_WIDTH], width);
-	ST_INT32(&pHdr[BMP_HEADER_FIELD_HEIGHT], height);
-	ST_INT16(&pHdr[BMP_HEADER_FIELD_COLOR_DEPTH], colorDepth);
-	ST_INT32(&pHdr[BMP_HEADER_FIELD_IMAGE_SIZE], imageSize);
-#else /* CPU_LITTLE_ENDIAN */
-	/* For a big endian CPU we need to swap endianness */
-	ST_INT32(&pHdr[BMP_HEADER_FIELD_FILE_SIZE],
-			ENDIAN_SWAP_32(fileSize));
-	ST_INT32(&pHdr[BMP_HEADER_FIELD_DATA_OFFSET],
-			ENDIAN_SWAP_32(dataOffset));
-	ST_INT32(&pHdr[BMP_HEADER_FIELD_WIDTH],
-			ENDIAN_SWAP_32(width));
-	ST_INT32(&pHdr[BMP_HEADER_FIELD_HEIGHT],
-			ENDIAN_SWAP_32(height));
-	ST_INT16(&pHdr[BMP_HEADER_FIELD_COLOR_DEPTH],
-			ENDIAN_SWAP_16(colorDepth));
-	ST_INT32(&pHdr[BMP_HEADER_FIELD_IMAGE_SIZE],
-			ENDIAN_SWAP_32(imageSize));
-#endif /* CPU_LITTLE_ENDIAN */
-}
-
-static OSC_ERR OscBmpReverseRowOrder(struct OSC_PICTURE *pPic)
-{
-	void        *pTempRow;
-	uint8       bytesPerPixel;
-	uint32      rowLength;
-	int         i;
-	uint32      curFIndex, curBIndex;
-	uint8       *pData = (uint8*)pPic->data;
-	
-	if(pPic->type == OSC_PICTURE_BGR_24)
-	{
-		bytesPerPixel = 3;
-	} else if(pPic->type == OSC_PICTURE_GREYSCALE) {
-		bytesPerPixel = 1;
-	} else {
-		return -EUNSUPPORTED_FORMAT;
-	}
-	
-	/* Temporary buffer to store one row */
-	rowLength = pPic->width * bytesPerPixel;
-	pTempRow = (void*)malloc(rowLength);
-	if(!pTempRow)
-	{
-		OscLog(CRITICAL, "%s: Memory allocation failed!\n", __func__);
-		return -EOUT_OF_MEMORY;
-	}
-	
-	for(i = 0; i < pPic->height/2; i++)
-	{
-		/* Swap the rows */
-		curFIndex = i * rowLength;
-		curBIndex = (pPic->height - i - 1) * rowLength;
-		memcpy(pTempRow, &pData[curFIndex], rowLength);
-		memcpy(&pData[curFIndex], &pData[curBIndex], rowLength);
-		memcpy(&pData[curBIndex], pTempRow, rowLength);
-	}
-	
-	free(pTempRow);
-	return 0;
-}
-
-uint8 OSC_PICTURE_TYPE_COLOR_DEPTH(enum EnOscPictureType enType)
-{
-	switch (enType) 
-	{
-	case OSC_PICTURE_BGR_24:
-		return 24;
-	case OSC_PICTURE_RGB_24:
-		return 24;
-	case OSC_PICTURE_YUV_444:
-		return 24;
-	case OSC_PICTURE_YUV_422:
-		return 16;
-	case OSC_PICTURE_YUV_420:
-		return 24;
-	case OSC_PICTURE_YUV_400:
-		return 8;
-	default:
-		return 8;
-	}
 }

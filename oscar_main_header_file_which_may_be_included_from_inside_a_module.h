@@ -98,7 +98,7 @@ OSC_ERR OscGetVersionString(char *hVersion);
 #include "dspl/dspl_pub.h"
 #include "dma/dma_pub.h"
 #include "ipc/ipc_pub.h"
-#include "bmp/bmp_pub.h"
+#include "include/bmp.h"
 #include "sup/sup_pub.h"
 #ifdef TARGET_TYPE_INDXCAM
 #include "lgx/lgx_pub.h"

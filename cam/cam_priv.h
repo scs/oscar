@@ -37,7 +37,7 @@
 
 #if defined(OSC_HOST) || defined(OSC_SIM)
 /* To load test images from bmp's */
-#include "bmp/bmp_pub.h"
+#include "include/bmp.h"
 /* Generate file names for test images depending on time step */
 #include "frd/frd_pub.h"
 #endif /* OSC_HOST  or OSC_SIM*/
