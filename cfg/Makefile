@@ -1,42 +1,32 @@
-############################################################################
-#
-# Makefile for the config Module of the Oscar framework
-# 
-############################################################################
+# Makefile for the cfg module of the Oscar framework
 
 # Defines for C files
-TARGET_FEATURES += -DOSC_TARGET
 HOST_FEATURES += -DOSC_HOST
+TARGET_FEATURES += -DOSC_TARGET
+TARGET_SIM_FEATURES += -DOSC_TARGET -DOSC_SIM
 
 # Host-Compiler executables and flags
-HOST_CC = gcc 
-HOST_CFLAGS = $(HOST_FEATURES) -std=gnu99 -Wall -Wno-long-long -O2 -I.. -g $(EXTRA_CFLAGS)
+HOST_CC := gcc -std=gnu99 -Wall -Wno-long-long -pedantic -O2 -I.. -g
 
 # Cross-Compiler executables and flags
-TARGET_CC = bfin-uclinux-gcc 
-TARGET_CFLAGS = $(TARGET_FEATURES) -std=gnu99 -Wall -Wno-long-long -pedantic -ggdb3 -I.. $(EXTRA_CFLAGS)
+TARGET_CC := bfin-uclinux-gcc -std=gnu99 -Wall -Wno-long-long -ggdb3 -I..
 
-# Source files of the config module
-SOURCES_TARGET = cfg.c
-SOURCES_HOST = cfg.c 
-
+.PHONY: all host target clean
 all: target host
 
-target: cfg_target.o
-
 host: cfg_host.o
+target: cfg_target.o cfg_target_sim.o
 
 clean:
 	rm -f *.o *.elf *.gdb
+	
+# Host object file
+%_host.o: %.c *.h
+	$(HOST_CC) $(HOST_FEATURES) -c $< -o $@
+	
+# Target object file
+%_target.o: %.c *.h
+	$(TARGET_CC) $(TARGET_FEATURES) -c $< -o $@
 
-############################# Host object file ####################################
-cfg_host.o: *.c *.h ../oscar*.h
-	@echo "Compiling config Module for host."
-	$(HOST_CC) $(HOST_CFLAGS) -c $(SOURCES_HOST) -o cfg_host.o
-
-########################### Target object file ####################################
-cfg_target.o: *.c *.h ../oscar*.h
-	@echo "Compiling config Module for target."
-	$(TARGET_CC) $(TARGET_CFLAGS) -c $(SOURCES_TARGET) -o cfg_target.o
-	@cp cfg_target.o cfg_target_sim.o
-
+%_target_sim.o: %.c *.h
+	$(TARGET_CC) $(TARGET_SIM_FEATURES) -c $< -o $@
