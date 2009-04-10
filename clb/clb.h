@@ -68,26 +68,6 @@ struct OSC_CLB_CALIBRATION_DATA
 	struct VEC_2D hotpixels[MAX_NR_HOTPIXEL];
 };
 
-/*! @brief Object struct of the clb module. This
- * sturcture root is placed cache alined. */
-struct OSC_CLB
-{
-#ifdef OSC_TARGET
-	/*! Sensor calibration configuration data.
-	 * Must be cache-line aligned! */
-	struct OSC_CLB_CALIBRATION_DATA calibData;
-	
-	/*! @brief Model for slope calibration correction */
-	enum EnOscClbCalibrateSlope calibSlope;
-	/*! @brief Enable hotpixel removal */
-	bool bHotpixel;
-	
-	/*! @brief The current 'area-of-interest' capture window */
-	struct capture_window capWin;
-#endif /*OSC_TARGET*/
-	uint16 dummy;
-};
-
 /*======================= Private methods ==============================*/
 
 #ifdef OSC_TARGET

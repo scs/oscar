@@ -17,23 +17,19 @@
 */
 
 /*! @file clb_host.c
- * @brief Calibration module implementation for host
+ * @brief Calibration module implementation
  * 
  * No calibration is applied to host pictures.
- * 
  */
 #include "oscar_intern.h"
-#include "clb_pub.h"
-#include "clb_priv.h"
+#include "include/clb.h"
+#include "clb.h"
 #include <stdlib.h>
 
 /*! @brief The dependencies of this module. */
 struct OSC_DEPENDENCY clb_deps[] = {
 		{"log", OscLogCreate, OscLogDestroy}
 };
-
-struct OSC_CLB clb; /*!< @brief The clbera module singelton instance */
-
 
 OSC_ERR OscClbCreate(void *hFw)
 {
@@ -59,11 +55,9 @@ OSC_ERR OscClbCreate(void *hFw)
 				err);
 		return err;
 	}
-		
-	memset(&clb, 0, sizeof(struct OSC_CLB));
-
+	
 	/* Increment the use count */
-	pFw->clb.hHandle = (void*)&clb;
+	pFw->clb.hHandle = NULL;
 	pFw->clb.useCnt++;
 	
 	return SUCCESS;
@@ -86,8 +80,6 @@ void OscClbDestroy(void *hFw)
 	OscUnloadDependencies(pFw,
 			clb_deps,
 			sizeof(clb_deps)/sizeof(struct OSC_DEPENDENCY));
-	
-	memset(&clb, 0, sizeof(struct OSC_CLB));
 }
 
 OSC_ERR OscClbSetupCalibrate(

@@ -23,10 +23,9 @@
 
 #include "oscar_types_target.h"
 
-#include "clb_pub.h"
-#include "clb_priv.h"
-#include "sup/sup_pub.h"
-#include "include/cam.h"
+#include "include/clb.h"
+#include "clb.h"
+#include "oscar_main_header_file_which_may_be_included_from_inside_a_module.h"
 #include "oscar_intern.h"
 #include <sys/ioctl.h>
 #include <fcntl.h>
@@ -41,14 +40,26 @@ struct OSC_DEPENDENCY clb_deps[] = {
 		{"cam", OscCamCreate, OscCamDestroy}
 };
 
+/*! @brief Object struct of the clb module. This
+ * sturcture root is placed cache alined. */
+struct {
+	/*! Sensor calibration configuration data.
+	 * Must be cache-line aligned! */
+	struct OSC_CLB_CALIBRATION_DATA calibData;
+	
+	/*! @brief Model for slope calibration correction */
+	enum EnOscClbCalibrateSlope calibSlope;
+	/*! @brief Enable hotpixel removal */
+	bool bHotpixel;
+	
+	/*! @brief The current 'area-of-interest' capture window */
+	struct capture_window capWin;
+} * pClb;
+
 /*! @brief Memory for the CLB object structure plus some reserve.
  * The actual structure will be manually cache-aligned within this
  * memory. */
-uint8 unalignedMem[sizeof(struct OSC_CLB) + CACHE_LINE_LEN];
-
-/*! @brief This stores all variables needed by the algorithm. */
-struct OSC_CLB *pClb;
-
+uint8 unalignedMem[sizeof(*pClb) + CACHE_LINE_LEN];
 
 /*********************************************************************//*!
  * @brief Manually align the CLB structure to a cache line since
@@ -58,7 +69,7 @@ static void AlignMemory()
 {
 	uint32 temp = ROUND_UP_DIVISION((uint32)unalignedMem, CACHE_LINE_LEN);
 	
-	pClb = (struct OSC_CLB*)(temp * CACHE_LINE_LEN);
+	pClb = (typeof (pClb)) (temp * CACHE_LINE_LEN);
 }
 
 OSC_ERR OscClbCreate(void *hFw)
@@ -91,7 +102,7 @@ OSC_ERR OscClbCreate(void *hFw)
 	 * structure. */
 	AlignMemory();
 			
-	memset(pClb, 0, sizeof(struct OSC_CLB));
+	memset(pClb, 0, sizeof(*pClb));
 	pClb->calibSlope = OSC_CLB_CALIBRATE_OFF;
 	pClb->bHotpixel = FALSE;
 
@@ -148,7 +159,7 @@ void OscClbDestroy(void *hFw)
 			clb_deps,
 			sizeof(clb_deps)/sizeof(struct OSC_DEPENDENCY));
 	
-	memset(pClb, 0, sizeof(struct OSC_CLB));
+	memset(pClb, 0, sizeof(*pClb));
 }
 
 
