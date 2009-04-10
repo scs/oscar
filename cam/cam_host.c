@@ -24,8 +24,8 @@
  * 
  */
 #include "oscar_intern.h"
-#include "cam_pub.h"
-#include "cam_priv.h"
+#include "include/cam.h"
+#include "cam.h"
 #include <unistd.h>
 #include <stdlib.h>
 

@@ -25,7 +25,7 @@
  */
 #include "cam_multibuffer.h"
 /* For defines */
-#include "cam_pub.h"
+#include "include/cam.h"
 /* For logging */
 #include <log/log_pub.h>
 #include <string.h>

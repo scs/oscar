@@ -112,9 +112,9 @@ OSC_ERR OscGetVersionString(char *hVersion);
 #include "frd_pub.h"
 #include "hsm_pub.h"
 #include "cfg_pub.h"
-#include "clb_pub.h"
+#include "include/clb.h"
 #include "vis_pub.h"
-#include "gpio_pub.h"
+#include "include/gpio.h"
 #include "jpg_pub.h"
 #endif
 

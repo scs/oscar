@@ -26,8 +26,8 @@
 
 #include "oscar_types_target.h"
 
-#include "cam_pub.h"
-#include "cam_priv.h"
+#include "include/cam.h"
+#include "cam.h"
 #include "oscar_intern.h"
 #include <sys/ioctl.h>
 #include <unistd.h>

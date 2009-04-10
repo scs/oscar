@@ -26,7 +26,7 @@
 #include "clb_pub.h"
 #include "clb_priv.h"
 #include "sup/sup_pub.h"
-#include "cam/cam_pub.h"
+#include "include/cam.h"
 #include "oscar_intern.h"
 #include <sys/ioctl.h>
 #include <fcntl.h>
