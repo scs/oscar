@@ -25,7 +25,7 @@
 
 #include "include/clb.h"
 #include "clb.h"
-#include "oscar_main_header_file_which_may_be_included_from_inside_a_module.h"
+#include "include/oscar.h"
 #include "oscar_intern.h"
 #include <sys/ioctl.h>
 #include <fcntl.h>

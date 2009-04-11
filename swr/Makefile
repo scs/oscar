@@ -1,1 +1,1 @@
-../Makefile_simple_module
+../Makefile_module
