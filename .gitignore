@@ -1,15 +1,12 @@
-# Ignore generated binaries
-*.[oa]
+# Ignore generated files
+*.[oad]
 *.gdb
 
 # Ignore files used by the build system
-staging
-doc
-lgx
-.metadata
-.settings
-.config
-oscar_target_type.h
-
-# Mac OS X meta data on filesystems that do not support it
-._*
+/staging
+/doc
+/lgx
+/.metadata
+/.settings
+/.config
+/oscar_target_type.h
