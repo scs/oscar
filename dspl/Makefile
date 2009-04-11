@@ -25,7 +25,7 @@ SOURCES_HOST = dspl_host.c
 
 all: target host
 
-target: dspl_target.o
+target target_sim: dspl_target.o
 
 host: dspl_host.o
 

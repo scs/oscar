@@ -26,7 +26,7 @@ SOURCES_HOST = cpld_host.c
 
 all: target host
 
-target: cpld_target
+target target_sim: cpld_target
 
 host: cpld_host
 

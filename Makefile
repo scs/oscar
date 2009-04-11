@@ -22,7 +22,7 @@ TARGET_SUFFIX = _target.a
 TARGET_SIM_SUFFIX = _target_sim.a
 
 # Disable make's built-in rules
-MAKEFLAGS += -r
+MAKE += -rL --no-print-directory
 SHELL := $(shell which bash)
 
 # this includes the framework configuration
@@ -131,7 +131,7 @@ oscar_target.o oscar_target_sim.o: $(SOURCES) *.h
 # Compile the modules
 .PHONY: modules_host modules_target modules_target_sim
 modules_target_sim: modules_target
-modules_host modules_target: modules_%: $(addsuffix /%, $(MODULES))
+modules_host modules_target modules_target_sim: modules_%: $(addsuffix /%, $(MODULES))
 
 # This rule allows us to call a target like dir/foo and have make called in the directory dir with the target foo.
 SUBDIR_TARGETS := host target target_sim clean

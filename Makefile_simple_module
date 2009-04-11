@@ -1,43 +1,47 @@
 # Generic makefile for simple modules.
 
-# Defines for C files
-HOST_FEATURES += -DOSC_HOST
-TARGET_FEATURES += -DOSC_TARGET
-TARGET_SIM_FEATURES += -DOSC_TARGET -DOSC_SIM
-
 # Host-Compiler executables and flags
-HOST_CC := gcc -std=gnu99 -Wall -Wno-long-long -pedantic -O2 -I.. -g
+CC_host_ := gcc -DOSC_HOST -std=gnu99 -Wall -Wno-long-long -pedantic -O2 -I..
+CC_host := $(CC_host_) -O2
+CC_host_dbg := $(CC_host_) -g
 
 # Cross-Compiler executables and flags
-TARGET_CC := bfin-uclinux-gcc -std=gnu99 -Wall -Wno-long-long -ggdb3 -I..
+CC_target_ := bfin-uclinux-gcc -DOSC_TARGET -std=gnu99 -Wall -Wno-long-long -ggdb3 -I..
+CC_target := $(CC_target_) -O2
+CC_target_dbg := $(CC_target_) -ggdb3
+CC_target_sim := $(CC_target_) -DOSC_SIM -O2
+CC_target_sim_dbg := $(CC_target_) -DOSC_SIM -ggdb3
 
+# Listings of source files for the different modes.
 SOURCES_host := $(wildcard *_host.c)
 SOURCES_target := $(wildcard *_target.c)
 SOURCES := $(filter-out $(SOURCES_host) $(SOURCES_target), $(wildcard *.c))
 SOURCES_host += $(SOURCES)
 SOURCES_target += $(SOURCES)
 
-.PHONY: all host target clean
-all: host target
+# Modes to compile this module in.
+MODES := host target target_sim
 
-host: $(SOURCES_host:.c=_host.o)
-target: $(SOURCES_target:.c=_target.o) $(SOURCES_target:.c=_target_sim.o)
+# Helper function to access stacked, mode-dependent variables.
+varnames = $(foreach i, $(shell seq 1 $(words $(subst _, , $(1)))), $(subst $() ,_,$(wordlist 1, $i, $(subst _, , $(1)))))
+firstvar = $($(lastword $(filter $(call varnames, $(1)), $(.VARIABLES))))
+allvars = $(foreach i, $(filter $(call varnames, $(1)), $(.VARIABLES)), $($i))
+
+.PHONY: all $(MODES) clean
+all: $(MODES)
+
+# Including depency files and optional local Makefile.
+-include Makefile.local *.d
+
+#Defining and expanding the build targets.
+define build_rules
+$(1): $(patsubst %.c, %_$(1).o, $(call allvars, SOURCES_$(1)))
+%_$(1).o: CC = $(call firstvar, CC_$(1))
+%_$(1).o: %.c $(MAKEFILE_LIST)
+	$$(CC) -MD -c $$< -o $$@
+	@ { cat $$(@:.o=.d); sed 's/#.*//; s/^[^:]*: *//; s/ *\\$$$$//; /^$$$$/ d; s/$$$$/ :/' < $$(@:.o=.d); } >> $$(@:.o=.d~); mv -f $$(@:.o=.d){~,}
+endef
+$(foreach i, $(MODES), $(eval $(call build_rules,$(i))))
 
 clean:
-	rm -f *.o *.d *.gdb
-	
-# Host object file
-%_host.o: %.c
-	$(HOST_CC) -MD $(HOST_FEATURES) -c $< -o $@
-	@ { cat $(@:.o=.d); sed 's/#.*//; s/^[^:]*: *//; s/ *\\$$//; /^$$/ d; s/$$/ :/' < $(@:.o=.d); } >> $(@:.o=.d~); mv -f $(@:.o=.d){~,}
-
-# Target object file
-%_target.o: %.c
-	$(TARGET_CC) -MD $(TARGET_FEATURES) -c $< -o $@
-	@ { cat $(@:.o=.d); sed 's/#.*//; s/^[^:]*: *//; s/ *\\$$//; /^$$/ d; s/$$/ :/' < $(@:.o=.d); } >> $(@:.o=.d~); mv -f $(@:.o=.d){~,}
-
-%_target_sim.o: %.c
-	$(TARGET_CC) -MD $(TARGET_SIM_FEATURES) -c $< -o $@
-	@ { cat $(@:.o=.d); sed 's/#.*//; s/^[^:]*: *//; s/ *\\$$//; /^$$/ d; s/$$/ :/' < $(@:.o=.d); } >> $(@:.o=.d~); mv -f $(@:.o=.d){~,}
-
--include *.d
+	rm -rf -- *.{o,d}
