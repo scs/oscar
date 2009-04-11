@@ -18,21 +18,26 @@ SOURCES_host += $(SOURCES)
 SOURCES_target += $(SOURCES)
 
 .PHONY: all host target clean
-all: target host
+all: host target
 
 host: $(SOURCES_host:.c=_host.o)
 target: $(SOURCES_target:.c=_target.o) $(SOURCES_target:.c=_target_sim.o)
 
 clean:
-	rm -f *.o *.elf *.gdb
+	rm -f *.o *.d *.gdb
 	
 # Host object file
-%_host.o: %.c *.h
-	$(HOST_CC) $(HOST_FEATURES) -c $< -o $@
-	
-# Target object file
-%_target.o: %.c *.h
-	$(TARGET_CC) $(TARGET_FEATURES) -c $< -o $@
+%_host.o: %.c
+	$(HOST_CC) -MD $(HOST_FEATURES) -c $< -o $@
+	@ { cat $(@:.o=.d); sed 's/#.*//; s/^[^:]*: *//; s/ *\\$$//; /^$$/ d; s/$$/ :/' < $(@:.o=.d); } >> $(@:.o=.d~); mv -f $(@:.o=.d){~,}
 
-%_target_sim.o: %.c *.h
-	$(TARGET_CC) $(TARGET_SIM_FEATURES) -c $< -o $@
+# Target object file
+%_target.o: %.c
+	$(TARGET_CC) -MD $(TARGET_FEATURES) -c $< -o $@
+	@ { cat $(@:.o=.d); sed 's/#.*//; s/^[^:]*: *//; s/ *\\$$//; /^$$/ d; s/$$/ :/' < $(@:.o=.d); } >> $(@:.o=.d~); mv -f $(@:.o=.d){~,}
+
+%_target_sim.o: %.c
+	$(TARGET_CC) -MD $(TARGET_SIM_FEATURES) -c $< -o $@
+	@ { cat $(@:.o=.d); sed 's/#.*//; s/^[^:]*: *//; s/ *\\$$//; /^$$/ d; s/$$/ :/' < $(@:.o=.d); } >> $(@:.o=.d~); mv -f $(@:.o=.d){~,}
+
+-include *.d
