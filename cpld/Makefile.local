@@ -1,0 +1,3 @@
+SOURCES_host = cpld_host.c
+SOURCES_target = cpld_target.c
+SOURCES_target_sim = cpld_host.c
