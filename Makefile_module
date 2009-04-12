@@ -61,7 +61,7 @@ define build_rules
 $(1): $(patsubst %.c, %_$(1).o, $(call allvars, SOURCES_$(1)))
 %_$(1).o: %.c $(filter-out %.d, $(MAKEFILE_LIST))
 	$$(call firstvar, CC_$(1)) -MD $$< -o $$@
-	@ { cat $$(@:.o=.d); sed 's/#.*//; s/^[^:]*: *//; s/ *\\$$$$//; /^$$$$/ d; s/$$$$/ :/' < $$(@:.o=.d); } >> $$(@:.o=.d~); mv -f $$(@:.o=.d){~,}
+	@ grep -oE '[^ \\]+' < $$(@:.o=.d) | sed -r '/:$$$$/d; s/^.*$$$$/$$@: \0\n\0:/' > $$(@:.o=.d~); mv -f $$(@:.o=.d){~,}
 endef
 $(foreach i, $(MODES), $(eval $(call build_rules,$(i))))
 
