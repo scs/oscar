@@ -1,4 +1,4 @@
-# Makefile for the Oscar Framework.
+# Makefile for simple modules in the Oscar Framework.
 # Copyright (C) 2008 Supercomputing Systems AG
 # 
 # This library is free software; you can redistribute it and/or modify it under
@@ -15,24 +15,22 @@
 # with this library; if not, write to the Free Software Foundation, Inc., 51
 # Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-# Generic makefile for simple modules.
-
-# Disable make's built-in rules
+# Disable make's built-in rules.
 MAKE += -RL --no-print-directory
 SHELL := $(shell which bash)
 
-# This includes the framework configuration
+# This includes the framework configuration.
 include $(dir $(shell readlink $(lastword $(MAKEFILE_LIST)))).config
 
 # Generic flags for the C compiler.
 CFLAGS := -c -std=gnu99 -Wall -pedantic -I. -I..
 
-# Host-Compiler executables and flags
+# Host-Compiler executables and flags.
 CC_host_ := gcc $(CFLAGS) -DOSC_HOST
 CC_host := $(CC_host_) -O2
 CC_host_dbg := $(CC_host_) -g
 
-# Cross-Compiler executables and flags
+# Cross-Compiler executables and flags.
 CC_target_ := bfin-uclinux-gcc $(CFLAGS) -DOSC_TARGET
 CC_target := $(CC_target_) -O2
 CC_target_dbg := $(CC_target_) -ggdb3
@@ -68,5 +66,6 @@ $(1): $(patsubst %.c, %_$(1).o, $(call allvars, SOURCES_$(1)))
 endef
 $(foreach i, $(MODES), $(eval $(call build_rules,$(i))))
 
+# Cleans the module.
 clean:
 	rm -rf -- *.{o,d}
