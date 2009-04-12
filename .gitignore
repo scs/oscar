@@ -1,6 +1,7 @@
 # Ignore generated files
 *.[oad]
 *.gdb
+*~
 
 # Ignore files used by the build system
 /staging
