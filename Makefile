@@ -58,7 +58,7 @@ all: $(MODES)
 $(MODES): %: copy_headers staging/lib/libosc_%.a
 staging/lib/libosc_%.a: modules_% oscar_%
 	mkdir -p $(dir $@)
-	$(call firstvar, AR_$*) $@ $(addsuffix /*_$*.o, $(MODULES) .)
+	$(call firstvar, AR_$*) $@ $(addsuffix /build/*_$*.o, $(MODULES) .)
 
 # Copy all neccessary header files to the staging directory.
 .PHONY: copy_headers

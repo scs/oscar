@@ -59,8 +59,9 @@ all: $(MODES)
 
 #Defining and expanding the build targets.
 define build_rules
-$(1): $(patsubst %.c, %_$(1).o, $(call firstvar, SOURCES_$(1)))
-%_$(1).o: %.c $(filter-out %.d, $(MAKEFILE_LIST))
+$(1): $(patsubst %.c, build/%_$(1).o, $(call firstvar, SOURCES_$(1)))
+build/%_$(1).o: %.c $(filter-out %.d, $(MAKEFILE_LIST))
+	@ mkdir -p $$(dir $$@)
 	$$(call firstvar, CC_$(1)) -MD $$< -o $$@
 	@ grep -oE '[^ \\]+' < $$(@:.o=.d) | sed -r '/:$$$$/d; s/^.*$$$$/$$@: \0\n\0:/' > $$(@:.o=.d~); mv -f $$(@:.o=.d){~,}
 endef
@@ -68,4 +69,4 @@ $(foreach i, $(MODES), $(eval $(call build_rules,$(i))))
 
 # Cleans the module.
 clean:
-	rm -rf -- *.{o,d}
+	rm -rf build
