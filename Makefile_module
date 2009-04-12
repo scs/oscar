@@ -38,9 +38,9 @@ CC_target_sim := $(CC_target_) -DOSC_SIM -O2
 CC_target_sim_dbg := $(CC_target_) -DOSC_SIM -ggdb3
 
 # Listings of source files for the different modes.
-SOURCES_host := $(wildcard *_host.c)
-SOURCES_target := $(wildcard *_target.c)
-SOURCES := $(filter-out $(SOURCES_host) $(SOURCES_target), $(wildcard *.c))
+SOURCES := $(filter-out %_host.c %_target.c, $(wildcard *.c))
+SOURCES_host += $(SOURCES) $(wildcard *_host.c)
+SOURCES_target += $(SOURCES) $(wildcard *_target.c)
 
 # Modes to compile this module in.
 MODES := host target target_sim
@@ -59,7 +59,7 @@ all: $(MODES)
 
 #Defining and expanding the build targets.
 define build_rules
-$(1): $(patsubst %.c, %_$(1).o, $(call allvars, SOURCES_$(1)))
+$(1): $(patsubst %.c, %_$(1).o, $(call firstvar, SOURCES_$(1)))
 %_$(1).o: %.c $(filter-out %.d, $(MAKEFILE_LIST))
 	$$(call firstvar, CC_$(1)) -MD $$< -o $$@
 	@ grep -oE '[^ \\]+' < $$(@:.o=.d) | sed -r '/:$$$$/d; s/^.*$$$$/$$@: \0\n\0:/' > $$(@:.o=.d~); mv -f $$(@:.o=.d){~,}
