@@ -1,12 +1,36 @@
+# Makefile for the Oscar Framework.
+# Copyright (C) 2008 Supercomputing Systems AG
+# 
+# This library is free software; you can redistribute it and/or modify it under
+# the terms of the GNU Lesser General Public License as published by the Free
+# Software Foundation; either version 2.1 of the License, or (at your option)
+# any later version.
+# 
+# This library is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more
+# details.
+# 
+# You should have received a copy of the GNU Lesser General Public License along
+# with this library; if not, write to the Free Software Foundation, Inc., 51
+# Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+
 # Generic makefile for simple modules.
 
+# Disable make's built-in rules
+MAKE += -rL --no-print-directory
+SHELL := $(shell which bash)
+
+# This includes the framework configuration
+include $(dir $(shell readlink $(lastword $(MAKEFILE_LIST)))).config
+
 # Host-Compiler executables and flags
-CC_host_ := gcc -DOSC_HOST -std=gnu99 -Wall -Wno-long-long -pedantic -O2 -I..
+CC_host_ := gcc -c -DOSC_HOST -std=gnu99 -Wall -pedantic -I. -I..
 CC_host := $(CC_host_) -O2
 CC_host_dbg := $(CC_host_) -g
 
 # Cross-Compiler executables and flags
-CC_target_ := bfin-uclinux-gcc -DOSC_TARGET -std=gnu99 -Wall -Wno-long-long -ggdb3 -I..
+CC_target_ := bfin-uclinux-gcc -c -DOSC_TARGET -std=gnu99 -Wall -I. -I..
 CC_target := $(CC_target_) -O2
 CC_target_dbg := $(CC_target_) -ggdb3
 CC_target_sim := $(CC_target_) -DOSC_SIM -O2
@@ -16,11 +40,10 @@ CC_target_sim_dbg := $(CC_target_) -DOSC_SIM -ggdb3
 SOURCES_host := $(wildcard *_host.c)
 SOURCES_target := $(wildcard *_target.c)
 SOURCES := $(filter-out $(SOURCES_host) $(SOURCES_target), $(wildcard *.c))
-SOURCES_host += $(SOURCES)
-SOURCES_target += $(SOURCES)
 
 # Modes to compile this module in.
 MODES := host target target_sim
+MODES += $(addsuffix _dbg, $(MODES))
 
 # Helper function to access stacked, mode-dependent variables.
 varnames = $(foreach i, $(shell seq 1 $(words $(subst _, , $(1)))), $(subst $() ,_,$(wordlist 1, $i, $(subst _, , $(1)))))
@@ -36,9 +59,8 @@ all: $(MODES)
 #Defining and expanding the build targets.
 define build_rules
 $(1): $(patsubst %.c, %_$(1).o, $(call allvars, SOURCES_$(1)))
-%_$(1).o: CC = $(call firstvar, CC_$(1))
-%_$(1).o: %.c $(MAKEFILE_LIST)
-	$$(CC) -MD -c $$< -o $$@
+%_$(1).o: %.c $(filter-out %.d, $(MAKEFILE_LIST))
+	$$(call firstvar, CC_$(1)) -MD $$< -o $$@
 	@ { cat $$(@:.o=.d); sed 's/#.*//; s/^[^:]*: *//; s/ *\\$$$$//; /^$$$$/ d; s/$$$$/ :/' < $$(@:.o=.d); } >> $$(@:.o=.d~); mv -f $$(@:.o=.d){~,}
 endef
 $(foreach i, $(MODES), $(eval $(call build_rules,$(i))))
