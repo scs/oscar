@@ -45,7 +45,7 @@ AR_target = bfin-uclinux-ar -rcs
 MODES := host target target_sim
 MODES += $(addsuffix _dbg, $(MODES))
 
-# Helper function to access stacked, mode-dependent variables.
+# Helper function to access stacked, eg. mode-dependent variables.
 varnames = $(filter $(.VARIABLES), $(foreach i, $(shell seq 1 $(words $(subst _, , $(1)))), $(subst $() ,_,$(wordlist 1, $i, $(subst _, , $(1))))))
 firstvar = $($(lastword $(call varnames, $(1))))
 allvars = $(foreach i, $(call varnames, $(1)), $($i))
@@ -55,28 +55,28 @@ allvars = $(foreach i, $(call varnames, $(1)), $($i))
 all: $(MODES)
 
 # Targets to build in a specific build mode and create the library.
-$(MODES): %: copy_headers staging/lib/libosc_%.a needs_config
+$(MODES): %: copy_headers staging/lib/libosc_%.a
 staging/lib/libosc_%.a: modules_% oscar_%
 	mkdir -p $(dir $@)
 	$(call firstvar, AR_$*) $@ $(addsuffix /*_$*.o, $(MODULES) .)
 
-# Routing individual object file requests directly to the compile Makefile
-.PHONY: %.o
-%.o:
-	$(MAKE) -f Makefile_module $@
-
 # Copy all neccessary header files to the staging directory.
 .PHONY: copy_headers
-copy_headers:
+copy_headers: needs_config
 	rm -rf staging/inc
 	mkdir -p staging/inc
 	cp -r $(HEADERS) include staging/inc
 	cp $(wildcard $(addsuffix /*_pub.h, $(MODULES))) staging/inc
 
-# Targets to compile only the modules in a specific mode.
+# Targets to compile the modules only in a specific mode.
 MODULE_TARGETS := $(addprefix modules_, $(MODES))
 .PHONY: $(MODULE_TARGETS)
 $(MODULE_TARGETS): modules_%: $(addsuffix /%, $(MODULES)) needs_config
+
+# Allow a module to be given on the command line build that module.
+.PHONY: $(MODULES)
+$(MODULES):
+	$(MAKE) -C $@
 
 # Call this as oscar_$(MODE) to only build them main oscar files.
 .PHONY: oscar_%
@@ -85,15 +85,22 @@ oscar_%:
 
 # Produce a target of the form "foo/%" for every directory foo that contains a Makefile
 define subdir_target
+.PHONY: $(1)%
 $(1)%:
 	$(MAKE) -C $(1) $$*
 endef
 $(foreach i, $(wildcard */Makefile), $(eval $(call subdir_target,$(dir $(i)))))
 
+# Routing individual object file requests directly to the compile Makefile
+.PHONY: %.o
+%.o: needs_config
+	$(MAKE) -f Makefile_module $@
+
 # Use this target as a prerequisite in a target that should fail if the framework has not yet been configured.
 .PHONY: needs_config
 needs_config:
-	@ [ -e ".config" ] || { echo "The framework has not yet been configured. The configuration process starts now."; ./configure; }
+	@ [ -e ".config" ] || { echo "The framework has to be configured using 'make config' first!"; false; }
+$(sort $(MAKEFILE_LIST) .config):;
 
 # Target to explicitly start the configuration process.
 .PHONY: config
@@ -102,7 +109,7 @@ config:
 
 # Target that gets called by the configure script after the configuration.
 .PHONY: reconfigure
-reconfigure:
+reconfigure: needs_config
 	{ echo "/* Automatically generated file. Do not edit. */"; echo "#define TARGET_TYPE_$(CONFIG_BOARD)"; } > oscar_target_type.h
 ifeq '$(CONFIG_USE_FIRMWARE)' 'y'
 	rm -rf "lgx"
