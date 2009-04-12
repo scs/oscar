@@ -16,7 +16,7 @@
 # Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 # Disable make's built-in rules
-MAKE += -rL --no-print-directory
+MAKE += -RL --no-print-directory
 SHELL := $(shell which bash)
 
 # This includes the framework configuration
@@ -46,9 +46,9 @@ MODES := host target target_sim
 MODES += $(addsuffix _dbg, $(MODES))
 
 # Helper function to access stacked, mode-dependent variables.
-varnames = $(foreach i, $(shell seq 1 $(words $(subst _, , $(1)))), $(subst $() ,_,$(wordlist 1, $i, $(subst _, , $(1)))))
-firstvar = $($(lastword $(filter $(call varnames, $(1)), $(.VARIABLES))))
-allvars = $(foreach i, $(filter $(call varnames, $(1)), $(.VARIABLES)), $($i))
+varnames = $(filter $(.VARIABLES), $(foreach i, $(shell seq 1 $(words $(subst _, , $(1)))), $(subst $() ,_,$(wordlist 1, $i, $(subst _, , $(1))))))
+firstvar = $($(lastword $(call varnames, $(1))))
+allvars = $(foreach i, $(call varnames, $(1)), $($i))
 
 # Default target which builds all modules for the selected board configuration.
 .PHONY: all $(MODES)
@@ -58,7 +58,7 @@ all: $(MODES)
 $(MODES): %: copy_headers staging/lib/libosc_%.a needs_config
 staging/lib/libosc_%.a: modules_% oscar_%
 	mkdir -p $(dir $@)
-	$(call firstvar, AR_$*) $@ $(addsuffix /*_$*.o, $(MODULES))
+	$(call firstvar, AR_$*) $@ $(addsuffix /*_$*.o, $(MODULES) .)
 
 # Routing individual object file requests directly to the compile Makefile
 .PHONY: %.o
@@ -70,8 +70,7 @@ staging/lib/libosc_%.a: modules_% oscar_%
 copy_headers:
 	rm -rf staging/inc
 	mkdir -p staging/inc
-	cp -r include staging/inc
-	cp $(HEADERS) staging/inc
+	cp -r $(HEADERS) include staging/inc
 	cp $(wildcard $(addsuffix /*_pub.h, $(MODULES))) staging/inc
 
 # Targets to compile only the modules in a specific mode.
@@ -106,7 +105,7 @@ config:
 reconfigure:
 	{ echo "/* Automatically generated file. Do not edit. */"; echo "#define TARGET_TYPE_$(CONFIG_BOARD)"; } > oscar_target_type.h
 ifeq '$(CONFIG_USE_FIRMWARE)' 'y'
-	[ -e "lgx" ] && rm -rf "lgx" || true
+	rm -rf "lgx"
 	cp -r $(CONFIG_FIRMWARE_PATH)/lgx .
 endif
 
