@@ -15,181 +15,113 @@
 # with this library; if not, write to the Free Software Foundation, Inc., 51
 # Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-# The Library name is suffix depending on the target
-OUT = libosc
-HOST_SUFFIX = _host.a
-TARGET_SUFFIX = _target.a
-TARGET_SIM_SUFFIX = _target_sim.a
-
 # Disable make's built-in rules
 MAKE += -rL --no-print-directory
 SHELL := $(shell which bash)
 
-# this includes the framework configuration
-# MAKEFILES += .config
+# This includes the framework configuration
 -include .config
 
-# The names of the subfolders with the modules
-MODULES = cam
-MODULES += log
-MODULES += cpld
-MODULES += sim
-MODULES += bmp
-MODULES += swr
-MODULES += srd
-MODULES += ipc
-MODULES += sup
-MODULES += frd
-MODULES += dspl
-MODULES += dma
-MODULES += hsm
-MODULES += cfg
-MODULES += clb
-MODULES += vis
-MODULES += gpio
-MODULES += jpg
+# All the supported board configurations.
+BOARDS := LEANXCAM INDXCAM MESA_SR4K
 
-# decide whether we are building or dooing something other like cleaning or configuring
-ifeq '' '$(filter $(MAKECMDGOALS), clean distclean config doc)'
-  # check whether a .config file has been found
-  ifeq '' '$(filter .config,$(MAKEFILE_LIST))'
-    $(error "Cannot make the target '$(MAKECMDGOALS)' without configuring the framework. Please run make config to do this.")
-  endif
-  
-  # The type of the hardware platform. Must be either of the following:
-  # TARGET_TYPE_INDXCAM		Industrial OpenSourceCamera Platform
-  # TARGET_TYPE_LEANXCAM	Original OpenSourceCamera Platform
-  # TARGET_TYPE_MESA_SR4K	MESA-Imaging 3D-Camera SR4000
-  TARGET_TYPE := TARGET_TYPE_$(CONFIG_BOARD)
-  
-  # For MESA_SR4K only a limited set of modules are required
-  ifeq '$(CONFIG_BOARD)' 'MESA_SR4K'
-	MODULES := $(filter-out cam cpld sim swr srd frd hsm cfg clb vis gpio , $(MODULES))
-  endif
+# Module lists for each board configuration.
+MODULES_MESA_SR4K := log bmp ipc sup dspl dma
+MODULES_LEANXCAM := $(MODULES_MESA_SR4K) cam cpld sim swr srd frd hsm cfg clb vis gpio jpg
+MODULES_INDXCAM := $(MODULES_LEANXCAM) lgx
 
-  # This may need to be generalized by a board-to-feature-mapping table
-  ifeq '$(CONFIG_BOARD)' 'INDXCAM'
-    ifeq '$(CONFIG_USE_FIRMWARE)' 'n'
-      $(error The INDXCAM target requires a firmware.)
-    endif
-  endif
-  
-  # The lgx module may be configured to not being used, so it needs special treatment
-  ifeq '$(CONFIG_USE_FIRMWARE)' 'y'
-    MODULES += lgx
-  endif
-endif
-
-# Directories where the library and header files are placed after 
-# compilation
-STAGING_DIR = staging
+# Generate list modules for the chosen board configuration and a list with all possible moduels (for clean and such).
+MODULES := $(MODULES_$(CONFIG_BOARD))
+MODULES_ALL := $(sort $(wildcard $(foreach i, $(BOARDS), $(MODULES_$(i)))))
 
 # Header files needed by an application using this framework
-FW_HEADERS_TARGET = oscar_types_target.h oscar_target.h oscar.h oscar_error.h oscar_dependencies.h oscar_version.h oscar_target_type.h
-FW_HEADERS_HOST = oscar_types_host.h oscar_host.h oscar.h oscar_error.h oscar_dependencies.h oscar_version.h oscar_target_type.h
-
-# Header file suffix for headers marked as public by modules
-MOD_HEADER_SUFFIX = _pub.h
+HEADERS = oscar_types_host.h oscar_types_target.h oscar_host.h oscar_target.h oscar.h oscar_error.h oscar_dependencies.h oscar_version.h oscar_target_type.h
 
 # Executable to create the static library
-HOST_CREATE_LIB = ar -rcs
-TARGET_CREATE_LIB = bfin-uclinux-ar -rcs
+AR_host = ar -rcs
+AR_target = bfin-uclinux-ar -rcs
 
-# Host-Compiler executables and flags
-HOST_CC = gcc 
-HOST_CFLAGS = $(HOST_FEATURES) -Wall -Wno-long-long -pedantic -std=gnu99 -O2 -I./ -DOSC_HOST -g 
+# Modes to compile this module in.
+MODES := host target target_sim
+MODES += $(addsuffix _dbg, $(MODES))
 
-# Cross-Compiler executables and flags
-TARGET_CC = bfin-uclinux-gcc 
-TARGET_CFLAGS = -Wall -Wno-long-long -pedantic -ggdb3 -std=gnu99 -I./ -DOSC_TARGET
+# Helper function to access stacked, mode-dependent variables.
+varnames = $(foreach i, $(shell seq 1 $(words $(subst _, , $(1)))), $(subst $() ,_,$(wordlist 1, $i, $(subst _, , $(1)))))
+firstvar = $($(lastword $(filter $(call varnames, $(1)), $(.VARIABLES))))
+allvars = $(foreach i, $(filter $(call varnames, $(1)), $(.VARIABLES)), $($i))
 
-# Source files of the camera module
-SOURCES = oscar.c
+# Default target which builds all modules for the selected board configuration.
+.PHONY: all $(MODES)
+all: $(MODES)
 
-# Default target
-.PHONY: all
-all: $(OUT)
+# Targets to build in a specific build mode and create the library.
+$(MODES): %: copy_headers staging/lib/libosc_%.a needs_config
+staging/lib/libosc_%.a: modules_% oscar_%
+	mkdir -p $(dir $@)
+	$(call firstvar, AR_$*) $@ $(addsuffix /*_$*.o, $(MODULES))
 
-$(OUT): target host target_sim
+# Routing individual object file requests directly to the compile Makefile
+.PHONY: %.o
+%.o:
+	$(MAKE) -f Makefile_module $@
 
-.PHONY: target host target_sim
-target host target_sim: %: copy_headers oscar_%.o modules_% staging/lib/libosc_%.a
-
+# Copy all neccessary header files to the staging directory.
 .PHONY: copy_headers
 copy_headers:
-	mkdir -p $(STAGING_DIR)/inc
+	rm -rf staging/inc
+	mkdir -p staging/inc
 	cp -r include staging/inc
-	cp $(sort $(FW_HEADERS_TARGET) $(FW_HEADERS_HOST)) $(wildcard $(addsuffix /*$(MOD_HEADER_SUFFIX), $(MODULES))) $(STAGING_DIR)/inc/
+	cp $(HEADERS) staging/inc
+	cp $(wildcard $(addsuffix /*_pub.h, $(MODULES))) staging/inc
 
-# Compile the framework main object file
-oscar_host.o: $(SOURCES) *.h
-	$(HOST_CC) $(HOST_CFLAGS) -c $(SOURCES) -o $@
+# Targets to compile only the modules in a specific mode.
+MODULE_TARGETS := $(addprefix modules_, $(MODES))
+.PHONY: $(MODULE_TARGETS)
+$(MODULE_TARGETS): modules_%: $(addsuffix /%, $(MODULES)) needs_config
 
-oscar_target.o oscar_target_sim.o: $(SOURCES) *.h
-	$(TARGET_CC) $(TARGET_CFLAGS) -c $(SOURCES) -o $@
+# Call this as oscar_$(MODE) to only build them main oscar files.
+.PHONY: oscar_%
+oscar_%:
+	$(MAKE) -f Makefile_module $*
 
-# Compile the modules
-.PHONY: modules_host modules_target modules_target_sim
-modules_target_sim: modules_target
-modules_host modules_target modules_target_sim: modules_%: $(addsuffix /%, $(MODULES))
+# Produce a target of the form "foo/%" for every directory foo that contains a Makefile
+define subdir_target
+$(1)%:
+	$(MAKE) -C $(1) $$*
+endef
+$(foreach i, $(wildcard */Makefile), $(eval $(call subdir_target,$(dir $(i)))))
 
-# This rule allows us to call a target like dir/foo and have make called in the directory dir with the target foo.
-SUBDIR_TARGETS := host target target_sim clean
-$(foreach i, $(shell find -L * -maxdepth 0 -type d), $(addprefix $(i)/, $(SUBDIR_TARGETS)))::
-	$(MAKE) -C $(dir $@) $(notdir $@)
+# Use this target as a prerequisite in a target that should fail if the framework has not yet been configured.
+.PHONY: needs_config
+needs_config:
+	@ [ -e ".config" ] || { echo "The framework has not yet been configured. The configuration process starts now."; ./configure; }
 
-# Create the library
-staging/lib/libosc_%.a: modules_%
-	mkdir -p $(dir $@)
-	$(TARGET_CREATE_LIB) $@ $(addsuffix /*_$*.o, $(MODULES))
-
-# Target to explicitly start the configuration process
+# Target to explicitly start the configuration process.
 .PHONY: config
 config:
 	@ ./configure
 
+# Target that gets called by the configure script after the configuration.
 .PHONY: reconfigure
-reconfigure: get_lgx set_target
-
-# Target to implicitly start the configuration process
-#.config:
-#	@ echo "No config file has been found. Starting the configuration process now:"
-#	@ ./configure
-#	@ $(MAKE) --no-print-directory get_lgx
-
-# Target to get the lgx framework explicitly
-.PHONY: get_lgx
-get_lgx: .config
+reconfigure:
+	{ echo "/* Automatically generated file. Do not edit. */"; echo "#define TARGET_TYPE_$(CONFIG_BOARD)"; } > oscar_target_type.h
 ifeq '$(CONFIG_USE_FIRMWARE)' 'y'
-	@ echo "Copying the lgx firmware from $(CONFIG_FIRMWARE_PATH)"
-	@ [ -e "lgx" ] && rm -rf "lgx"; exit 0
-	@ cp -r $(CONFIG_FIRMWARE_PATH)/lgx .
+	[ -e "lgx" ] && rm -rf "lgx" || true
+	cp -r $(CONFIG_FIRMWARE_PATH)/lgx .
 endif
 
-.PHONY: set_target
-set_target: .config
-	@ echo "/* Automatically generated file. Do not edit. */" > oscar_target_type.h
-	@ echo "#define $(TARGET_TYPE)" >> oscar_target_type.h
-	@ echo "'oscar_target_type.h' generated."
-
-## Target to get the lgx framework implicitly
-#lgx: 
-#	$(MAKE) get_lgx
-
+# Builds the doxygen documentation.
 .PHONY: doc
 doc:
 	rm -rf doc/{html,latex}
 	doxygen documentation/oscar.doxygen
 	ln -sf html/index.html documentation/index.html
 
-# Cleanup
+# Cleans the framework and all modules
 .PHONY: clean
-clean: %: $(addsuffix /%, $(MODULES))
-	rm -f $(OUT)$(HOST_SUFFIX) $(OUT)$(TARGET_SUFFIX)
-	rm -rf $(STAGING_DIR)
-	rm -f *.o
+clean: %: $(addsuffix /%, $(MODULES_ALL)) oscar_clean
+	rm -rf staging
 	rm -rf doc/{html,latex,index.html}
-	@echo "Directory cleaned"
 
 # Cleans everything not intended for source distribution
 .PHONY: distclean
