@@ -22,9 +22,9 @@
  * On the leanXcam, encoding a CIF-Image takes about 70ms
  */
 
-#include "jpg_priv.h"
-#include "jpg_pub.h"
-#include "jpg_priv.h"
+#include "jpg.h"
+#include "include/jpg.h"
+#include "jpg.h"
 #include "oscar_intern.h"
 #include "include/oscar.h"
 #include <stdlib.h>

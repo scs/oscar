@@ -16,7 +16,7 @@
 	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-/*! @file clb_priv.h
+/*! @file clb.h
  * @brief Private calibration module definitions
  * 
  */
@@ -26,7 +26,7 @@
 #include <string.h>
 #include <stdio.h>
 
-#include <log/log_pub.h>
+#include <include/log.h>
 
 #ifdef OSC_HOST
 #include <oscar_types_host.h>

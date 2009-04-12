@@ -23,8 +23,8 @@
 
 #include "oscar_types_host.h"
 
-#include "log_pub.h"
-#include "log_priv.h"
+#include "include/log.h"
+#include "log.h"
 #include "oscar_intern.h"
 #include <unistd.h>
 #include <syslog.h>

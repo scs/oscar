@@ -19,7 +19,7 @@
 */
 
 #include "oscar_intern.h"
-#include "jpg_priv.h"
+#include "jpg.h"
 #include "jpg_markdata.h"
 
 /* Header for JPEG Encoder */

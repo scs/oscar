@@ -16,7 +16,7 @@
 	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-/*! @file dspl_priv.h
+/*! @file dspl.h
  * @brief Private module definition for the Blackfin DSP runtime library.
  * 
  */

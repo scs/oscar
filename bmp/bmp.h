@@ -16,7 +16,7 @@
 	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-/*! @file bmp_priv.h
+/*! @file bmp.h
  * @brief Private bitmap module definitions with object structure
  * 
  */
@@ -34,7 +34,7 @@
 	#include <oscar_types_target.h>
 #endif /* OSC_HOST */
 
-#include <log/log_pub.h>
+#include <include/log.h>
 
 /*! @brief Offset of the file size field in BMP header */
 #define BMP_HEADER_FIELD_FILE_SIZE  2

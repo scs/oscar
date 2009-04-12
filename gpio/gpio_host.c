@@ -28,8 +28,8 @@
 #include "gpio.h"
 #include <time.h>
 
-#include "../srd/srd_pub.h"
-#include "../swr/swr_pub.h"
+#include "../include/srd.h"
+#include "../include/swr.h"
 
 /*! @brief The module singelton instance. */
 extern struct OSC_GPIO gpio;

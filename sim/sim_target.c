@@ -23,8 +23,8 @@
 
 #include "oscar_types_target.h"
 
-#include "sim_pub.h"
-#include "sim_priv.h"
+#include "include/sim.h"
+#include "sim.h"
 #include "oscar_intern.h"
 
 /*! @brief The module singelton instance. */

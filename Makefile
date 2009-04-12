@@ -35,7 +35,7 @@ MODULES := $(MODULES_$(CONFIG_BOARD))
 MODULES_ALL := $(sort $(wildcard $(foreach i, $(BOARDS), $(MODULES_$(i)))))
 
 # Header files needed by an application using this framework
-HEADERS = oscar_types_host.h oscar_types_target.h oscar_host.h oscar_target.h oscar.h oscar_error.h oscar_dependencies.h oscar_version.h oscar_target_type.h
+HEADERS = oscar_types_host.h oscar_types_target.h oscar_host.h oscar_target.h oscar_error.h oscar_dependencies.h oscar_version.h oscar_target_type.h
 
 # Executable to create the static library
 AR_host = ar -rcs
@@ -63,10 +63,8 @@ staging/lib/libosc_%.a: modules_% oscar_%
 # Copy all neccessary header files to the staging directory.
 .PHONY: copy_headers
 copy_headers: needs_config
-	rm -rf staging/inc
-	mkdir -p staging/inc
-	cp -r $(HEADERS) include staging/inc
-	cp $(wildcard $(addsuffix /*_pub.h, $(MODULES))) staging/inc
+	mkdir -p staging
+	ln -sf ../include staging/inc
 
 # Targets to compile the modules only in a specific mode.
 MODULE_TARGETS := $(addprefix modules_, $(MODES))

@@ -18,7 +18,7 @@
 	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include "jpg_priv.h"
+#include "jpg.h"
 
 void read_400_format (struct IMGDATA *img, JPEG_ENCODER_STRUCTURE *jpeg_encoder_structure, uint8 *input_ptr)
 {

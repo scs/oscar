@@ -19,8 +19,8 @@
 /*! @file transform.c
  * @brief Image transformation algorithms.
  */
-#include "vis_pub.h"
-#include "vis_priv.h"
+#include "include/vis.h"
+#include "vis.h"
 #include <stdio.h>
 #include <stdlib.h>
 

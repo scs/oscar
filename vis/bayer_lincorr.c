@@ -20,9 +20,9 @@
  * @brief Debayering using linear interpolation with 1st degree laplace
  * coefficients.
  */
-#include "vis_pub.h"
-#include "vis_priv.h"
-#include "sup/sup_pub.h"
+#include "include/vis.h"
+#include "vis.h"
+#include "include/sup.h"
 #include <stdio.h>
 #include <stdlib.h>
 

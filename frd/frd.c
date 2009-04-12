@@ -28,12 +28,12 @@
 #include "oscar_types_target.h"
 #endif
 
-#include "frd_pub.h"
-#include "frd_priv.h"
+#include "include/frd.h"
+#include "frd.h"
 #include "oscar_intern.h"
 #include <errno.h>
 
-#include <sim/sim_pub.h>
+#include <include/sim.h>
 
 struct OSC_FRD frd; /*!< Module singelton instance */
 

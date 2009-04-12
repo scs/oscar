@@ -23,8 +23,8 @@
 
 # include "oscar_types_target.h"
 
-#include "ipc_pub.h"
-#include "ipc_priv.h"
+#include "include/ipc.h"
+#include "ipc.h"
 #include "oscar_intern.h"
 
 /*! The camera module singelton instance. Declared in ipc_shared.c*/

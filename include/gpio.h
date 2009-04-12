@@ -25,15 +25,7 @@
 #ifndef GPIO_PUB_H_
 #define GPIO_PUB_H_
 
-#include "oscar_error.h"
-#ifdef OSC_HOST
-	#include "oscar_types_host.h"
-	#include "oscar_host.h"
-#else
-	#include "oscar_types_target.h"
-	#include "oscar_target.h"
-#endif /* OSC_HOST */
-
+#include "oscar.h"
 
 /*! @brief The GPIO pins that can be accessed from the application.
  * 

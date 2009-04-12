@@ -21,7 +21,7 @@
 #ifndef QUANTDATA_H
 #define QUANTDATA_H
 
-#include "jpg_priv.h"
+#include "jpg.h"
 
 uint8 zigzag_table [] =
 {

@@ -28,8 +28,8 @@
 
 #include "oscar_types_host.h"
 
-#include "dspl_pub.h"
-#include "dspl_priv.h"
+#include "include/dspl.h"
+#include "dspl.h"
 #include "oscar_intern.h"
 #include <math.h>
 

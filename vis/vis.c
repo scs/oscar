@@ -21,9 +21,9 @@
  * 
  */
 
-#include "vis_pub.h"
-#include "../dma/dma_pub.h"
-#include "vis_priv.h"
+#include "include/vis.h"
+#include "../include/dma.h"
+#include "vis.h"
 #include "oscar_intern.h"
 #include <stdio.h>
 #include <string.h>

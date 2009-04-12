@@ -18,7 +18,7 @@
 	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include "jpg_priv.h"
+#include "jpg.h"
 #include "jpg_quantdata.h"
 
 /*	This function implements 16 Step division for Q.15 format data */

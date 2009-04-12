@@ -33,7 +33,7 @@
  *
  */
 
-#include "oscar_priv.h"
+#include "oscar.h"
 #include "oscar_error.h"
 #include "oscar_version.h"
 

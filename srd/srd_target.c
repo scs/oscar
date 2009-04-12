@@ -23,8 +23,8 @@
 
 #include "oscar_types_target.h"
 
-#include "srd_pub.h"
-#include "srd_priv.h"
+#include "include/srd.h"
+#include "srd.h"
 #include "oscar_intern.h"
 
 struct OSC_SRD srd;     /*!< Module singelton instance */

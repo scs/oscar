@@ -23,8 +23,8 @@
 
 #include "oscar_types_host.h"
 
-#include "sup_pub.h"
-#include "sup_priv.h"
+#include "include/sup.h"
+#include "sup.h"
 #include "oscar_intern.h"
 #include <time.h>
 

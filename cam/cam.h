@@ -16,7 +16,7 @@
 	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-/*! @file cam_priv.h
+/*! @file cam.h
  * @brief Private camera module definitions
  * 
  */
@@ -26,7 +26,7 @@
 #include <string.h>
 #include <stdio.h>
 
-#include <log/log_pub.h>
+#include <include/log.h>
 
 #ifdef OSC_HOST
 #include <oscar_types_host.h>
@@ -39,7 +39,7 @@
 /* To load test images from bmp's */
 #include "include/bmp.h"
 /* Generate file names for test images depending on time step */
-#include "frd/frd_pub.h"
+#include "include/frd.h"
 #endif /* OSC_HOST  or OSC_SIM*/
 
 /*! @brief For communication with the frame capture device driver */

@@ -24,8 +24,8 @@
 #include <stdio.h>
 #include "oscar_intern.h"
 
-#include "swr_pub.h"
-#include <log/log_pub.h>
+#include "include/swr.h"
+#include <include/log.h>
 
 #ifdef OSC_HOST
 #include <oscar_types_host.h>
@@ -34,7 +34,7 @@
 #endif /* OSC_HOST */
 
 #if defined(OSC_HOST) || defined(OSC_SIM)
-#include <sim/sim_pub.h>
+#include <include/sim.h>
 #else /* defined(OSC_HOST) || defined(OSC_SIM) */
 #include "oscar_types_target.h"
 #endif /* defined(OSC_HOST) || defined(OSC_SIM) */

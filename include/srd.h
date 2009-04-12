@@ -16,14 +16,14 @@
 	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-/*! @file swr_pub.h
- * @brief API definition for stimuli writer module
+/*! @file srd_pub.h
+ * @brief API definition for stimuli reader module
  * 
- * Swr allows to log signal values to a stimuli report file
- * One writer instance is required per stimuli file while a writer
+ * Srd allows to read signal values from a stimuli file.
+ * One reader instance is required per stimuli file while a reader
  * may contain multiple signal instances.
  * 
- * The stimuli file follows the following syntax. A example
+ * The stimuli file must fullfill following syntax rules. A example
  * is give first:
  * 
  *   !    Time   ExampleA     ExampleB
@@ -36,27 +36,22 @@
  * 
  *   @ tab {time} tab  {val}          tab  {val}         (instruction line)
  * 
+ * The order of signal names has to match with the order of signal
+ * registration to the reader.
+ * 
 	************************************************************************/
-#ifndef SWR_PUB_H_
-#define SWR_PUB_H_
+#ifndef SRD_PUB_H_
+#define SRD_PUB_H_
 
-#include "oscar_error.h"
+#include "oscar.h"
 
 /*! Module-specific error codes.
  * These are enumerated with the offset
  * assigned to each module, so a distinction over
  * all modules can be made */
-enum EnOscSwrErrors
+enum EnOscSrdErrors
 {
-	ESWR_PARSING_FAILURE = OSC_SWR_ERROR_OFFSET
-};
-
-/*! Signal type */
-enum EnOscSwrSignalType
-{
-	SWR_INTEGER,
-	SWR_FLOAT,
-	SWR_STRING
+	ESRD_PARSING_FAILURE = OSC_SRD_ERROR_OFFSET
 };
 
 /*====================== API functions =================================*/
@@ -67,70 +62,46 @@ enum EnOscSwrSignalType
  * @param hFw Pointer to the handle of the framework.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-OSC_ERR OscSwrCreate(void *hFw);
+OSC_ERR OscSrdCreate(void *hFw);
 
 /*********************************************************************//*!
  * @brief Destructor
  * 
  * @param hFw Pointer to the handle of the framework.
  *//*********************************************************************/
-void OscSwrDestroy(void *hFw);
+void OscSrdDestroy(void *hFw);
 
 /*********************************************************************//*!
- * @brief Create Stimuli Writer (host only)
+ * @brief Create Stimuli Reader (host only)
  * 
- * @param ppWriter       O: handle to writer instance
- * @param strFile        I: output file name
- * @param bReportTime    I: TRUE: report time step information
- * @param bReportCyclic  I: TRUE: autonomous cyclic reporting
+ * @param strFile           I: output file name
+ * @param pUpdateCallback   I: callback fxn to notify a value change
+ * @param ppReader          O: handle to reader instance
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-OSC_ERR OscSwrCreateWriter(
-		void** ppWriter,
-		const char* strFile,
-		const bool bReportTime,
-		const bool bReportCyclic );
+OSC_ERR OscSrdCreateReader( char* strFile,
+		void (*pUpdateCallback)(void),
+		void** ppReader);
 
 /*********************************************************************//*!
- * @brief Register a signal to writer (host only)
+ * @brief Register a signal to reader (host only)
  * 
- * @param ppSignal      O: handle to signal instance
- * @param pWriter       I: handle to writer
- * @param strSignal     I: signal name
- * @param type          I: value type: Interger, Float, String
- * @param pDefaultValue I: default output value
- *                         only used for cyclic reporting
- * @param strFormat     I: log format as fprintf format instruction string
+ * @param pReader   I: handle to reader
+ * @param strSignal I: signal name
+ * @param ppSignal  O: handle to signal instance
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-OSC_ERR OscSwrRegisterSignal(
-		void** ppSignal,
-		const void* pWriter,
-		const char* strSignal,
-		const enum EnOscSwrSignalType type,
-		const void* pDefaultValue,
-		const char* strFormat );
+OSC_ERR OscSrdRegisterSignal( void* pReader, char* strSignal, void** ppSignal);
 
 /*********************************************************************//*!
- * @brief Update Signal value (host only)
+ * @brief GetUpdateSignal (host only)
  * 
- * @param pSignal   I: handle to signal writer
- * @param pValue    I: source pointer of value to set
- *                     Depending on the signal type this will be
- *                     interpreted as in32, float or string.
+ * @param pSignal   I: handle to signal
+ * @param pbValue   O: return active signal value
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-OSC_ERR OscSwrUpdateSignal(
-		const void* pSignal,
-		const void* pValue);
-
-/*********************************************************************//*!
- * @brief Manual report (host only)
- * 
- * @param pWriter   I: handle to writer
- * @return SUCCESS or an appropriate error code otherwise
- *//*********************************************************************/
-OSC_ERR OscSwrManualReport( const void* pWriter);
+OSC_ERR OscSrdGetUpdateSignal( void* pSignal, bool* pbValue);
 
 
-#endif /*SWR_PUB_H_*/
+
+#endif /*SRD_PUB_H_*/

@@ -21,7 +21,7 @@
  * 
  */
 
-#include "cfg_pub.h"
+#include "include/cfg.h"
 #include "oscar_intern.h"
 
 #include <stdio.h>
@@ -35,7 +35,7 @@
 	#include <oscar_types_target.h>
 #endif /* OSC_HOST */
 
-#include <log/log_pub.h>
+#include <include/log.h>
 
 /*! @brief Macro defining the maximal number of open configuration files */
 #define CONFIG_FILE_MAX_NUM 3

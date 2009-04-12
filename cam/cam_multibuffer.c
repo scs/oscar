@@ -27,7 +27,7 @@
 /* For defines */
 #include "include/cam.h"
 /* For logging */
-#include <log/log_pub.h>
+#include <include/log.h>
 #include <string.h>
 
 /*==================== Private method prototypes =======================*/

@@ -16,14 +16,14 @@
 	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-/*! @file sim_priv.h
+/*! @file sim.h
  * @brief Private simulation module definition
  * 
  */
 #ifndef SIM_PRIV_H_
 #define SIM_PRIV_H_
 
-#include <log/log_pub.h>
+#include <include/log.h>
 
 #include <stdio.h>
 #include <stdarg.h>

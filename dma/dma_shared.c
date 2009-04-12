@@ -29,12 +29,12 @@
 #include "oscar_types_host.h"
 #endif /* OSC_HOST */
 
-#include "dma_pub.h"
-#include "dma_priv.h"
+#include "include/dma.h"
+#include "dma.h"
 #include "oscar_intern.h"
 
-#include "sup/sup_pub.h"
-#include "log/log_pub.h"
+#include "include/sup.h"
+#include "include/log.h"
 
 /*! @brief The module singelton instance. */
 struct OSC_DMA dma;

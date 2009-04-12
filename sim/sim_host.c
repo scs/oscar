@@ -23,8 +23,8 @@
 
 #include "oscar_intern.h"
 
-#include "sim_pub.h"
-#include "sim_priv.h"
+#include "include/sim.h"
+#include "sim.h"
 
 /*! @brief The module singelton instance. */
 struct OSC_SIM_OBJ sim;

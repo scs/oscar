@@ -29,10 +29,10 @@
 #endif
 #include "oscar_intern.h"
 
-#include "srd_pub.h"
-#include "srd_priv.h"
+#include "include/srd.h"
+#include "srd.h"
 
-#include <sim/sim_pub.h>
+#include <include/sim.h>
 
 struct OSC_SRD srd; /*!< Module singelton instance */
 

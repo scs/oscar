@@ -18,7 +18,7 @@
 	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include "jpg_priv.h"
+#include "jpg.h"
 
 /* Level shifting to get 8 bit SIGNED values for the data  */
 void levelshift (int16* const data)

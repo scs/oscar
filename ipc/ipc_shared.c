@@ -35,8 +35,8 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <errno.h>
-#include "ipc_pub.h"
-#include "ipc_priv.h"
+#include "include/ipc.h"
+#include "ipc.h"
 #include "oscar_intern.h"
 
 /*! The camera module singelton instance. */

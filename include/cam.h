@@ -23,7 +23,7 @@
 #ifndef CAM_PUB_H_
 #define CAM_PUB_H_
 
-#include "oscar_error.h"
+#include "oscar.h"
 
 /*! Module-specific error codes.
  * These are enumerated with the offset

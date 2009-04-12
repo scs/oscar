@@ -16,7 +16,7 @@
 	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-/*! @file ipc_priv.h
+/*! @file ipc.h
  * @brief Private interprocess communication module definition
  * 
  */
@@ -35,7 +35,7 @@
 #include <unistd.h>
 #include <errno.h>
 
-#include "log/log_pub.h"
+#include "include/log.h"
 
 /*! @brief The maximum number of IPC channels at any time. */
 #define MAX_NR_IPC_CHANNELS 2

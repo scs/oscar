@@ -25,15 +25,7 @@
 #ifndef SUP_PUB_H_
 #define SUP_PUB_H_
 
-#include "oscar_error.h"
-#ifdef OSC_HOST
-	#include "oscar_types_host.h"
-	#include "oscar_host.h"
-#else
-	#include "oscar_types_target.h"
-	#include "oscar_target.h"
-#endif /* OSC_HOST */
-
+#include "oscar.h"
 
 /*======================== API functions ===============================*/
 

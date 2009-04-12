@@ -23,8 +23,8 @@
 
 #include "oscar_types_target.h"
 
-#include "log_pub.h"
-#include "log_priv.h"
+#include "include/log.h"
+#include "log.h"
 #include "oscar_intern.h"
 #include <syslog.h>
 

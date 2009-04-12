@@ -18,7 +18,7 @@
 	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-/*! @file jpg_priv.h
+/*! @file jpg.h
  * @brief Private JPG module definition
  * 
  */
@@ -36,7 +36,7 @@
 	#include <oscar_types_target.h>
 #endif /* OSC_HOST */
 
-#include <log/log_pub.h>
+#include <include/log.h>
 
 #define		BLOCK_SIZE				64
 

@@ -21,13 +21,13 @@
  * 
 	************************************************************************/
 
-#include "hsm_pub.h"
+#include "include/hsm.h"
 #include "oscar_intern.h"
 
 #include <string.h>
 #include <stdio.h>
 
-#include <log/log_pub.h>
+#include <include/log.h>
 
 #ifdef OSC_HOST
 #include <oscar_types_host.h>

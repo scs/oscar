@@ -34,8 +34,8 @@
 #include "gpio.h"
 
 #if defined(OSC_HOST) || defined(OSC_SIM)
-#include "../srd/srd_pub.h"
-#include "../swr/swr_pub.h"
+#include "../include/srd.h"
+#include "../include/swr.h"
 #endif
 
 /*! @brief The module singelton instance. */
