@@ -24,13 +24,16 @@ SHELL := $(shell which bash)
 # This includes the framework configuration
 include $(dir $(shell readlink $(lastword $(MAKEFILE_LIST)))).config
 
+# Generic flags for the C compiler.
+CFLAGS := -c -std=gnu99 -Wall -pedantic -I. -I..
+
 # Host-Compiler executables and flags
-CC_host_ := gcc -c -DOSC_HOST -std=gnu99 -Wall -pedantic -I. -I..
+CC_host_ := gcc $(CFLAGS) -DOSC_HOST
 CC_host := $(CC_host_) -O2
 CC_host_dbg := $(CC_host_) -g
 
 # Cross-Compiler executables and flags
-CC_target_ := bfin-uclinux-gcc -c -DOSC_TARGET -std=gnu99 -Wall -I. -I..
+CC_target_ := bfin-uclinux-gcc $(CFLAGS) -DOSC_TARGET
 CC_target := $(CC_target_) -O2
 CC_target_dbg := $(CC_target_) -ggdb3
 CC_target_sim := $(CC_target_) -DOSC_SIM -O2
