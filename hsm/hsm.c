@@ -21,19 +21,10 @@
  * 
 	************************************************************************/
 
-#include "include/hsm.h"
-#include "oscar_intern.h"
-
 #include <string.h>
 #include <stdio.h>
 
-#include <include/log.h>
-
-#ifdef OSC_HOST
-#include <oscar_types_host.h>
-#else
-#include <oscar_types_target.h>
-#endif /* OSC_HOST */
+#include "oscar.h"
 
 /*!@brief object struct */
 struct { } hsm; /*!< Module singelton instance */

@@ -20,27 +20,25 @@
  * @brief API definition for Oscar framework
  * 
  * Must be included by the application.
- * 
  */
 
 #ifndef OSCAR_MAIN_HEADER_FILE_WHICH_MAY_BE_INCLUDED_FROM_INSIDE_A_MODULE_H_
 #define OSCAR_MAIN_HEADER_FILE_WHICH_MAY_BE_INCLUDED_FROM_INSIDE_A_MODULE_H_
 
-/* Include the correct type header file, depending on the target
- */
-#ifdef OSC_HOST
+/* Include the correct type header file, depending on the target */
+#if defined(OSC_HOST)
 	#include "../oscar_types_host.h"
 	#include "../oscar_host.h"
-#endif
-#ifdef OSC_TARGET
+#elif defined(OSC_TARGET)
 	#include "../oscar_types_target.h"
 	#include "../oscar_target.h"
+#else
+	#error "Neither OSC_HOST nor OSC_TARGET has been defined as a preprocessor macro!"
 #endif
 
 #include "../oscar_version.h"
 #include "../oscar_error.h"
 #include "../oscar_dependencies.h"
-
 
 /*********************************************************************//*!
  * @brief Constructor for framework

@@ -18,8 +18,8 @@
 
 /*! @file dspl.h
  * @brief Private module definition for the Blackfin DSP runtime library.
- * 
  */
+
 #ifndef DSPL_PRIV_H_
 #define DSPL_PRIV_H_
 
@@ -27,6 +27,8 @@
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "oscar.h"
 
 /*! @brief The object struct of the camera module */
 struct OSC_DSPL {

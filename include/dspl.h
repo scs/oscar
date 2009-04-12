@@ -23,9 +23,6 @@
 #ifndef DSPL_PUB_H_
 #define DSPL_PUB_H_
 
-#include "oscar.h"
-
-
 #ifdef OSC_TARGET
 /* Include the header files of the DSP runtime library
  * (part of the toolchain)*/

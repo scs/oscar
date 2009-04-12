@@ -28,13 +28,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef OSC_HOST
-	#include <oscar_types_host.h>
-#else
-	#include <oscar_types_target.h>
-#endif /* OSC_HOST */
-
-#include <include/log.h>
+#include "oscar.h"
 
 /*! @brief Offset of the file size field in BMP header */
 #define BMP_HEADER_FIELD_FILE_SIZE  2

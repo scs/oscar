@@ -18,8 +18,8 @@
 
 /*! @file sup.h
  * @brief Private support module definition
- * 
  */
+
 #ifndef SUP_PRIV_H_
 #define SUP_PRIV_H_
 
@@ -28,13 +28,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef OSC_HOST
-	#include <oscar_types_host.h>
-#else
-	#include <oscar_types_target.h>
-#endif /* OSC_HOST */
-
-#include <include/log.h>
+#include "oscar.h"
 
 /*! @brief The frequency of the target CPU in Hz. */
 #define CPU_FREQ 500000000

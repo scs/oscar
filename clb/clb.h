@@ -26,15 +26,7 @@
 #include <string.h>
 #include <stdio.h>
 
-#include <include/log.h>
-
-#ifdef OSC_HOST
-#include <oscar_types_host.h>
-#endif
-#ifdef OSC_TARGET
-#include <oscar_types_target.h>
-#endif
-
+#include "oscar.h"
 #include "../cam/mt9v032.h"
 
 /*! @brief The calibration data file */

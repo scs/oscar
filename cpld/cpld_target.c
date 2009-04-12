@@ -18,20 +18,15 @@
 
 /*! @file cpld_target.c
  * @brief Cpld module implementation for target.
- * 
-	************************************************************************/
+ */
 
-#include "oscar_types_target.h"
-
-#include "include/cpld.h"
-#include "cpld.h"
-#include "oscar_intern.h"
 #include <sys/ioctl.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <errno.h>
 #include <sys/mman.h>
 
+#include "cpld.h"
 
 struct OSC_CPLD cpld;       /*!< The cpld module singelton instance */
 

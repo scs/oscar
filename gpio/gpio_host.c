@@ -18,18 +18,11 @@
 
 /*! @file gpio_host.c
  * @brief GPIO module implementation for host
- * 
  */
 
-#include "oscar_types_host.h"
-
-#include "oscar_intern.h"
-#include "include/gpio.h"
-#include "gpio.h"
 #include <time.h>
 
-#include "../include/srd.h"
-#include "../include/swr.h"
+#include "gpio.h"
 
 /*! @brief The module singelton instance. */
 extern struct OSC_GPIO gpio;

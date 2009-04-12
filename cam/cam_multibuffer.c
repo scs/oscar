@@ -21,14 +21,10 @@
 	
  * Used to automatically manage multi
  * buffers (e.g. double buffers).
- * 
  */
-#include "cam_multibuffer.h"
-/* For defines */
-#include "include/cam.h"
-/* For logging */
-#include <include/log.h>
+
 #include <string.h>
+#include "cam_multibuffer.h"
 
 /*==================== Private method prototypes =======================*/
 /*********************************************************************//*!

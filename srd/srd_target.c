@@ -18,14 +18,9 @@
 
 /*! @file srd_target.c
  * @brief Stimuli reader module implementation for target.
- * 
-	************************************************************************/
+ */
 
-#include "oscar_types_target.h"
-
-#include "include/srd.h"
 #include "srd.h"
-#include "oscar_intern.h"
 
 struct OSC_SRD srd;     /*!< Module singelton instance */
 

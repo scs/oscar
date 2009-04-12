@@ -18,14 +18,7 @@
 
 /*! @file sup_target.c
  * @brief Support module implementation for host
- * 
  */
-
-#include "oscar_types_target.h"
-
-#include "include/sup.h"
-#include "sup.h"
-#include "oscar_intern.h"
 
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -35,6 +28,8 @@
 #include <linux/ioctl.h>
 #include <errno.h>
 #include <bfin_sram.h>
+
+#include "sup.h"
 
 /*! @brief The module singelton instance. */
 struct OSC_SUP sup;

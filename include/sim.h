@@ -21,12 +21,10 @@
  * 
  * Simulation is only used for host. Target implementation provides
  * stump function definition.
- * 
  */
+
 #ifndef SIM_PUB_H_
 #define SIM_PUB_H_
-
-#include "oscar.h"
 
 /*! @brief Module-specific error codes.
  * 

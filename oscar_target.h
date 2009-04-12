@@ -18,8 +18,8 @@
 
 /*! @file oscar_target.h
  * @brief General framework definitions for the target
- * 
  */
+
 #ifndef OSCAR_TARGET_H_
 #define OSCAR_TARGET_H_
 

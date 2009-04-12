@@ -35,12 +35,10 @@
  *   ! tab Time   tab  {SignalNameA}  tab  {SignalNameB} (descriptor line)
  * 
  *   @ tab {time} tab  {val}          tab  {val}         (instruction line)
- * 
-	************************************************************************/
+ */
+
 #ifndef SWR_PUB_H_
 #define SWR_PUB_H_
-
-#include "oscar.h"
 
 /*! Module-specific error codes.
  * These are enumerated with the offset

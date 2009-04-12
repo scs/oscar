@@ -23,8 +23,6 @@
 #ifndef DMA_PUB_H_
 #define DMA_PUB_H_
 
-#include "oscar.h"
-
 /*! Module-specific error codes.
  * These are enumerated with the offset
  * assigned to each module, so a distinction over

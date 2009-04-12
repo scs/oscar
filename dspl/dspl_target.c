@@ -23,18 +23,12 @@
  * be implemented for the host. The implementation for the target on the
  * other hand must not be done in the framework, since it already exists
  * in optimized form in the library.
- * 
  */
 
-#include "oscar_types_target.h"
-
-#include "include/dspl.h"
 #include "dspl.h"
-#include "oscar_intern.h"
 
-/*! @brief The module singelton instance.  */
+/*! @brief The module singelton instance. */
 struct OSC_DSPL osc_dspl;
-
 
 OSC_ERR OscDsplCreate(void *hFw)
 {

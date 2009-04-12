@@ -28,6 +28,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "oscar.h"
+
 /*! @brief The maximum number of transfers in a DMA chain. */
 #define MAX_MOVES_PER_CHAIN 4
 /*! @brief The maximum number of DMA chains that can be allocated. */

@@ -27,7 +27,8 @@
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
-#include "include/log.h"
+
+#include "oscar.h"
 
 /*! @brief The name of the log file for general messages */
 #define LOG_FILE_NAME "osc_log"

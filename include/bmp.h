@@ -22,8 +22,6 @@
  */
 #ifndef BMP_PUB_H_
 #define BMP_PUB_H_
-
-#include "oscar.h"
 		
 /*! @brief Module-specific error codes.
  * 

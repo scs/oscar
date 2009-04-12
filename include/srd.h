@@ -38,12 +38,10 @@
  * 
  * The order of signal names has to match with the order of signal
  * registration to the reader.
- * 
-	************************************************************************/
+ */
+
 #ifndef SRD_PUB_H_
 #define SRD_PUB_H_
-
-#include "oscar.h"
 
 /*! Module-specific error codes.
  * These are enumerated with the offset

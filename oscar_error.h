@@ -18,8 +18,8 @@
 
 /*! @file oscar_error.h
  * @brief Error declarations for Oscar framework
- * 
  */
+
 #ifndef OSCAR_ERROR_H_
 #define OSCAR_ERROR_H_
 

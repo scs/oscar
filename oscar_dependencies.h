@@ -19,12 +19,7 @@
 #ifndef OSCAR_DEPENDENCIES_H_
 #define OSCAR_DEPENDENCIES_H_
 
-#ifdef OSC_HOST
-	#include "oscar_types_host.h"
-#endif
-#ifdef OSC_TARGET
-	#include "oscar_types_target.h"
-#endif
+#include "include/oscar.h"
 
 /*! @brief Describes a module dependency of a module and all necessary
  * information to load and unload that module. */

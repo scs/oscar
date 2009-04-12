@@ -1,5 +1,4 @@
-/*	
-	JPEG encoder library
+/*	JPEG encoder library
 	Original Implementation by Nitin Gupta
 	Adapted to leanXcam by Reto Baettig
 	
@@ -20,8 +19,8 @@
 
 /*! @file jpg.h
  * @brief Private JPG module definition
- * 
  */
+
 #ifndef JPG_PRIV_H_
 #define JPG_PRIV_H_
 
@@ -30,13 +29,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef OSC_HOST
-	#include <oscar_types_host.h>
-#else
-	#include <oscar_types_target.h>
-#endif /* OSC_HOST */
-
-#include <include/log.h>
+#include "oscar.h"
 
 #define		BLOCK_SIZE				64
 

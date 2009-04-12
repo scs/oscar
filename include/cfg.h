@@ -60,8 +60,6 @@
 #ifndef CFG_PUB_H_
 #define CFG_PUB_H_
 
-#include "oscar.h"
-
 /*! @brief Module-specific error codes.
  * 
  * These are enumerated with the offset

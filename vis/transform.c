@@ -19,11 +19,11 @@
 /*! @file transform.c
  * @brief Image transformation algorithms.
  */
-#include "include/vis.h"
-#include "vis.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "vis.h"
 
 OSC_ERR OscVisSobel(const uint8 *pIn, uint8 *pOut, const uint16 width, const uint16 height, const uint8 exp)
 {

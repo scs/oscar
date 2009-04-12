@@ -4,7 +4,6 @@
 *~
 
 # Ignore files used by the build system
-/staging
 /doc
 /lgx
 /.metadata

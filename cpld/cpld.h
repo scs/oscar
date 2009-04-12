@@ -22,21 +22,15 @@
  * 
  * The CPLD interface (AMC bus, bank0) is provided by the amc static
  * module: drivers/char/bfin_amc.c out placed in the uclinux tree.
- * 
-	************************************************************************/
+ */
+
 #ifndef CPLD_PRIV_H_
 #define CPLD_PRIV_H_
 
 #include <string.h>
 #include <stdio.h>
 
-#include <include/log.h>
-
-#ifdef OSC_HOST
-#include <oscar_types_host.h>
-#else
-#include <oscar_types_target.h>
-#endif /* OSC_HOST */
+#include <oscar.h>
 
 /*! cpld device driver */
 /*#include <cpldDrv/osc_cpld.h> */ /* not required @@@ */

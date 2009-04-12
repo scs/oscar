@@ -22,11 +22,10 @@
 	
  * On the OSC-specific hardware featuring
  * a Micron MT9V032 CMOS image sensor.
- * 
  */
-#include "oscar_intern.h"
-#include "include/cam.h"
+
 #include "cam.h"
+
 #include <unistd.h>
 
 extern struct OSC_CAM cam;

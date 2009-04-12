@@ -18,18 +18,9 @@
 
 /*! @file dma_host.c
  * @brief Memory DMA module implementation for host
- * 
  */
 
-#include "oscar_types_host.h"
-
-#include "include/dma.h"
 #include "dma.h"
-#include "oscar_intern.h"
-
-#include "include/sup.h"
-#include "include/log.h"
-
 
 uint8 OscDmaExtractWdSize(const uint16 dmaConfigMask)
 {

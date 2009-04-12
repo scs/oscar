@@ -21,9 +21,6 @@
  * 
  */
 
-#include "oscar_intern.h"
-
-#include "include/sim.h"
 #include "sim.h"
 
 /*! @brief The module singelton instance. */

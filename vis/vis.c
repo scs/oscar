@@ -18,15 +18,12 @@
 
 /*! @file vis.c
  * @brief Vision module implementation for target and host
- * 
  */
 
-#include "include/vis.h"
-#include "../include/dma.h"
-#include "vis.h"
-#include "oscar_intern.h"
 #include <stdio.h>
 #include <string.h>
+
+#include "vis.h"
 
 /*! @brief The module singelton instance. */
 struct OSC_VIS vis;
@@ -36,7 +33,6 @@ struct OSC_DEPENDENCY vis_deps[] = {
 		{"log", OscLogCreate, OscLogDestroy},
 		{"dma", OscDmaCreate, OscDmaDestroy}
 };
-
 
 OSC_ERR OscVisCreate(void *hFw)
 {

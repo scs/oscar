@@ -18,21 +18,15 @@
 
 /*! @file frd.h
  * @brief Private filename reader module definition
- * 
-	************************************************************************/
+ */
+
 #ifndef FRD_PRIV_H_
 #define FRD_PRIV_H_
 
 #include <string.h>
 #include <stdio.h>
 
-#include <include/log.h>
-
-#ifdef OSC_HOST
-#include <oscar_types_host.h>
-#else
-#include <oscar_types_target.h>
-#endif /* OSC_HOST */
+#include <oscar.h>
 
 /*! @brief The maximum number of readers that can be registered. */
 #define MAX_NR_READERS 8

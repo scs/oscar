@@ -55,16 +55,9 @@ allvars = $(foreach i, $(call varnames, $(1)), $($i))
 all: $(MODES)
 
 # Targets to build in a specific build mode and create the library.
-$(MODES): %: copy_headers staging/lib/libosc_%.a
-staging/lib/libosc_%.a: modules_% oscar_%
-	mkdir -p $(dir $@)
+$(MODES): %: library/libosc_%.a
+library/libosc_%.a: modules_% oscar_%
 	$(call firstvar, AR_$*) $@ $(addsuffix /*_$*.o, $(MODULES) .)
-
-# Copy all neccessary header files to the staging directory.
-.PHONY: copy_headers
-copy_headers: needs_config
-	mkdir -p staging
-	ln -sf ../include staging/inc
 
 # Targets to compile the modules only in a specific mode.
 MODULE_TARGETS := $(addprefix modules_, $(MODES))
@@ -124,7 +117,7 @@ doc:
 # Cleans the framework and all modules
 .PHONY: clean
 clean: %: $(addsuffix /%, $(MODULES_ALL)) oscar_clean
-	rm -rf staging
+	rm -rf library/*.a
 	rm -rf doc/{html,latex,index.html}
 
 # Cleans everything not intended for source distribution

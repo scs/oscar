@@ -18,8 +18,8 @@
 
 /*! @file oscar_types_host.h
  * @brief Type definitions for the host.
- * 
  */
+
 #ifndef TYPES_H_
 #define TYPES_H_
 

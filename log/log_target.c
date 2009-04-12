@@ -18,15 +18,10 @@
 
 /*! @file log_target.c
  * @brief Logging module implementation for target
- * 
  */
 
-#include "oscar_types_target.h"
-
-#include "include/log.h"
-#include "log.h"
-#include "oscar_intern.h"
 #include <syslog.h>
+#include "log.h"
 
 /*! @brief The module singelton instance.
  * 
