@@ -36,8 +36,6 @@
 #ifndef FRD_PUB_H_
 #define FRD_PUB_H_
 
-#include "oscar_error.h"
-
 /*! Module-specific error codes.
  * These are enumerated with the offset
  * assigned to each module, so a distinction over

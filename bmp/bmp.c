@@ -18,12 +18,9 @@
 
 /*! @file bmp.c
  * @brief Bitmap module implementation for target and host
- * 
  */
 
-#include "include/bmp.h"
 #include "bmp.h"
-#include "oscar_intern.h"
 
 /*! @brief The module singelton instance. */
 struct OSC_BMP bmp;
@@ -32,7 +29,6 @@ struct OSC_BMP bmp;
 struct OSC_DEPENDENCY bmp_deps[] = {
 		{"log", OscLogCreate, OscLogDestroy}
 };
-
 
 OSC_ERR OscBmpCreate(void *hFw)
 {

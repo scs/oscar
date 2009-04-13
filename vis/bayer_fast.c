@@ -19,11 +19,11 @@
 /*! @file bayer_fast.c
  * @brief Fast debayering without interpolation.
  */
-#include "vis_pub.h"
-#include "vis_priv.h"
+ 
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "vis.h"
 
 OSC_ERR OscVisFastDebayerRGB(const struct OSC_PICTURE *pRaw, struct OSC_PICTURE *pOut) 
 {

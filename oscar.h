@@ -17,105 +17,49 @@
 */
 
 /*! @file oscar.h
- * @brief API definition for Oscar framework
- * 
- * Must be included by the application.
- * 
+ * @brief Private framework definitions
  */
+#ifndef OSCAR_PRIV_H_
+#define OSCAR_PRIV_H_
 
-#ifndef OSCAR_H_
-#define OSCAR_H_
+#include <string.h>
+#include "include/oscar.h"
 
-/* Include the correct type header file, depending on the target
- */
-#ifdef OSC_HOST
-	#include "oscar_types_host.h"
-	#include "oscar_host.h"
-#endif
-#ifdef OSC_TARGET
-	#include "oscar_types_target.h"
-	#include "oscar_target.h"
-#endif
+#define RND_MOD_Unbiased
+/*#define RND_MOD_Biased*/
 
-#include "oscar_version.h"
-#include "oscar_error.h"
-#include "oscar_dependencies.h"
+/*! @brief Describes an OSC module and keeps track of how many users
+ * hold references to it. */
+struct OSC_MODULE
+{
+	/*! @brief Handle to the module. */
+	void *      hHandle;
+	/*! @brief Used to prevent premature unloading. */
+	int         useCnt;
+};
 
+/*! @brief The Oscar framework object with handle to modules*/
+struct OSC_FRAMEWORK
+{
+	struct OSC_MODULE log;     /*!< @brief logging */
+	struct OSC_MODULE cam;     /*!< @brief camera */
+	struct OSC_MODULE cpld;    /*!< @brief cpld */
+	struct OSC_MODULE lgx;     /*!< @brief logic */
+	struct OSC_MODULE sim;     /*!< @brief simulation */
+	struct OSC_MODULE bmp;     /*!< @brief bitmap */
+	struct OSC_MODULE swr;     /*!< @brief stimulation writer */
+	struct OSC_MODULE srd;     /*!< @brief stimulation reader*/
+	struct OSC_MODULE ipc;     /*!< @brief interprocess communication */
+	struct OSC_MODULE sup;     /*!< @brief support */
+	struct OSC_MODULE frd;     /*!< @brief filename reader */
+	struct OSC_MODULE dspl;    /*!< @brief DSP runtime library */
+	struct OSC_MODULE dma;     /*!< @brief Memory DMA */
+	struct OSC_MODULE hsm;     /*!< @brief hierarchical state machine*/
+	struct OSC_MODULE cfg;     /*!< @brief configuration file reader and writer*/
+	struct OSC_MODULE clb;     /*!< @brief camera calibration*/
+	struct OSC_MODULE vis;     /*!< @brief Vision library*/
+	struct OSC_MODULE gpio;    /*!< @brief GPIO */
+	struct OSC_MODULE jpg;     /*!< @brief JPG*/
+};
 
-/*********************************************************************//*!
- * @brief Constructor for framework
- * 
- * @param phFw Pointer to the handle location for the framework
- * @return SUCCESS or appropriate error code otherwise
- *//*********************************************************************/
-OSC_ERR OscCreate(void ** phFw);
-
-/*********************************************************************//*!
- * @brief Destructor for framework
- * 
- * Fails if not all loaded modules have been destroyed.
- * 
- * @param hFw Pointer to the handle of the framework to be destroyed.
- * @return SUCCESS or an appropriate error code.
- *//*********************************************************************/
-OSC_ERR OscDestroy(void *hFw);
-
-/*********************************************************************//*!
- * @brief Get framework version numbers
- * 
- * Used scheme: major.minor[.revsion]
- * 
- * The major number is used for significant changes in functionality or 
- * supported plattform. Instable pre releases use a major number of 0.
- * The minor number decodes small feature changes.
- * The patch number is intended for bug fixes without changes of API.
- * 
- * @param hMajor Pointer to major version number.
- * @param hMinor Pointer to minor version number.
- * @param hPatch Pointer to patch number.
- * @return SUCCESS or an appropriate error code.
- *//*********************************************************************/
-OSC_ERR OscGetVersionNumber(char *hMajor, char *hMinor, char *hPatch);
-
-/*********************************************************************//*!
- * @brief Get framework version string
- * 
- * Version string format: v<major>.<minor>[-p<patch>]  eg: v1.3  or v1.3-p1
- * The patch number is not printed if no bug-fixes are available (patch=0).
- *  
- * See @see OscGetVersionNumber for number interpretation.
- * 
- * @param hMajor Pointer to formated version string.
- * @return SUCCESS or an appropriate error code.
- *//*********************************************************************/
-OSC_ERR OscGetVersionString(char *hVersion);
-
-/* Include the public header files of the different modules, which
- * contain the declarations of the API functions of the respective
- * module.
- */
-#include "log_pub.h"
-#include "dspl_pub.h"
-#include "dma_pub.h"
-#include "ipc_pub.h"
-#include "include/bmp.h"
-#include "sup_pub.h"
-#ifdef TARGET_TYPE_INDXCAM
-#include "lgx_pub.h"
-#endif
-#ifndef TARGET_TYPE_MESA_SR4K
-#include "cam_pub.h"
-#include "include/cpld.h"
-#include "sim_pub.h"
-#include "swr_pub.h"
-#include "srd_pub.h"
-#include "frd_pub.h"
-#include "hsm_pub.h"
-#include "cfg_pub.h"
-#include "include/clb.h"
-#include "vis_pub.h"
-#include "include/gpio.h"
-#include "jpg_pub.h"
-#endif
-
-#endif /*OSCAR_H_*/
+#endif /*OSCAR_PRIV_H_*/

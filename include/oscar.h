@@ -20,27 +20,25 @@
  * @brief API definition for Oscar framework
  * 
  * Must be included by the application.
- * 
  */
 
 #ifndef OSCAR_MAIN_HEADER_FILE_WHICH_MAY_BE_INCLUDED_FROM_INSIDE_A_MODULE_H_
 #define OSCAR_MAIN_HEADER_FILE_WHICH_MAY_BE_INCLUDED_FROM_INSIDE_A_MODULE_H_
 
-/* Include the correct type header file, depending on the target
- */
-#ifdef OSC_HOST
-	#include "oscar_types_host.h"
-	#include "oscar_host.h"
-#endif
-#ifdef OSC_TARGET
-	#include "oscar_types_target.h"
-	#include "oscar_target.h"
+/* Include the correct type header file, depending on the target */
+#if defined(OSC_HOST)
+	#include "../oscar_types_host.h"
+	#include "../oscar_host.h"
+#elif defined(OSC_TARGET)
+	#include "../oscar_types_target.h"
+	#include "../oscar_target.h"
+#else
+	#error "Neither OSC_HOST nor OSC_TARGET has been defined as a preprocessor macro!"
 #endif
 
-#include "oscar_version.h"
-#include "oscar_error.h"
-#include "oscar_dependencies.h"
-
+#include "../oscar_version.h"
+#include "../oscar_error.h"
+#include "../oscar_dependencies.h"
 
 /*********************************************************************//*!
  * @brief Constructor for framework
@@ -94,28 +92,28 @@ OSC_ERR OscGetVersionString(char *hVersion);
  * contain the declarations of the API functions of the respective
  * module.
  */
-#include "log/log_pub.h"
-#include "dspl/dspl_pub.h"
-#include "dma/dma_pub.h"
-#include "ipc/ipc_pub.h"
-#include "include/bmp.h"
-#include "sup/sup_pub.h"
-#ifdef TARGET_TYPE_INDXCAM
-#include "lgx/lgx_pub.h"
-#endif
+#include "log.h"
+#include "dspl.h"
+#include "dma.h"
+#include "ipc.h"
+#include "bmp.h"
+#include "sup.h"
 #ifndef TARGET_TYPE_MESA_SR4K
-#include "include/cam.h"
-#include "include/cpld.h"
-#include "sim/sim_pub.h"
-#include "swr/swr_pub.h"
-#include "srd/srd_pub.h"
-#include "frd/frd_pub.h"
-#include "hsm/hsm_pub.h"
-#include "cfg/cfg_pub.h"
-#include "include/clb.h"
-#include "vis/vis_pub.h"
-#include "include/gpio.h"
-#include "jpg/jpg_pub.h"
+#include "cam.h"
+#include "cpld.h"
+#include "sim.h"
+#include "swr.h"
+#include "srd.h"
+#include "frd.h"
+#include "hsm.h"
+#include "cfg.h"
+#include "clb.h"
+#include "vis.h"
+#include "gpio.h"
+#include "jpg.h"
+#endif
+#ifdef TARGET_TYPE_INDXCAM
+#include "../lgx/lgx_pub.h"
 #endif
 
 #endif /*OSCAR_MAIN_HEADER_FILE_WHICH_MAY_BE_INCLUDED_FROM_INSIDE_A_MODULE_H_*/

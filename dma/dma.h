@@ -16,7 +16,7 @@
 	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-/*! @file dma_priv.h
+/*! @file dma.h
  * @brief Private memory DMA module definition
  * 
  */
@@ -27,6 +27,8 @@
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "oscar.h"
 
 /*! @brief The maximum number of transfers in a DMA chain. */
 #define MAX_MOVES_PER_CHAIN 4

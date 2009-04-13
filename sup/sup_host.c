@@ -18,19 +18,13 @@
 
 /*! @file sup_host.c
  * @brief Support module implementation for host
- * 
  */
 
-#include "oscar_types_host.h"
-
-#include "sup_pub.h"
-#include "sup_priv.h"
-#include "oscar_intern.h"
 #include <time.h>
+#include "sup.h"
 
 /*! @brief The module singelton instance. */
 struct OSC_SUP sup;
-
 
 OSC_ERR OscSupCreate(void *hFw)
 {

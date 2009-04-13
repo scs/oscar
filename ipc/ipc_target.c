@@ -18,14 +18,9 @@
 
 /*! @file ipc_target.c
  * @brief Interprocess communication module implementation for host
- * 
  */
 
-# include "oscar_types_target.h"
-
-#include "ipc_pub.h"
-#include "ipc_priv.h"
-#include "oscar_intern.h"
+#include "ipc.h"
 
 /*! The camera module singelton instance. Declared in ipc_shared.c*/
 extern struct OSC_IPC ipc;

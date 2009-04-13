@@ -18,25 +18,9 @@
 
 /*! @file gpio_shared.c
  * @brief GPIO module code shared between host and target.
- * 
  */
-#ifdef OSC_HOST
-#include "oscar_types_host.h"
-#endif
 
-#ifdef OSC_TARGET
-#include "oscar_types_target.h"
-#endif
-
-#include "oscar_intern.h"
-
-#include "include/gpio.h"
 #include "gpio.h"
-
-#if defined(OSC_HOST) || defined(OSC_SIM)
-#include "../srd/srd_pub.h"
-#include "../swr/swr_pub.h"
-#endif
 
 /*! @brief The module singelton instance. */
 struct OSC_GPIO gpio;

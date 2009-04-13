@@ -18,17 +18,12 @@
 
 /*! @file cam_multibuffer.h
  * @brief Private multibuffer definitions
- * 
  */
+
 #ifndef CAM_MULTIBUFFER_H_
 #define CAM_MULTIBUFFER_H_
 
-#ifdef OSC_HOST
-#include <oscar_types_host.h>
-#else
-#include <oscar_types_target.h>
-#endif /* OSC_HOST */
-
+#include "include/oscar.h"
 #include "mt9v032.h"
 
 /*! @brief The structure representing a multibuffer.

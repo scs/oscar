@@ -22,22 +22,8 @@
 
 #include <string.h>
 #include <stdio.h>
-#include "oscar_intern.h"
 
-#include "swr_pub.h"
-#include <log/log_pub.h>
-
-#ifdef OSC_HOST
-#include <oscar_types_host.h>
-#else
-#include <oscar_types_target.h>
-#endif /* OSC_HOST */
-
-#if defined(OSC_HOST) || defined(OSC_SIM)
-#include <sim/sim_pub.h>
-#else /* defined(OSC_HOST) || defined(OSC_SIM) */
-#include "oscar_types_target.h"
-#endif /* defined(OSC_HOST) || defined(OSC_SIM) */
+#include "oscar.h"
 
 #if defined(OSC_HOST) || defined(OSC_SIM)
 /*! @brief Limited number of writer instances */

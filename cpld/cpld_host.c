@@ -18,14 +18,9 @@
 
 /*! @file cpld_host.c
  * @brief Cpld module implementation for host.
- * 
-	************************************************************************/
+ */
 
-#include "oscar_types_host.h"
-
-#include "include/cpld.h"
 #include "cpld.h"
-#include "oscar_intern.h"
 
 struct OSC_CPLD cpld; /*!< The cpld module singelton instance */
 

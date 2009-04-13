@@ -18,16 +18,12 @@
 
 /*! @file log_host.c
  * @brief Logging module implementation for host
- * 
  */
 
-#include "oscar_types_host.h"
-
-#include "log_pub.h"
-#include "log_priv.h"
-#include "oscar_intern.h"
 #include <unistd.h>
 #include <syslog.h>
+
+#include "log.h"
 
 /*! @brief The module singelton instance.
  * 

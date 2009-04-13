@@ -21,13 +21,12 @@
  * 
  * Simulation of the OSC-specific hardware featuring
  * a Micron MT9V032 CMOS image sensor.
- * 
  */
-#include "oscar_intern.h"
-#include "include/cam.h"
-#include "cam.h"
+
 #include <unistd.h>
 #include <stdlib.h>
+
+#include "cam.h"
 
 /*! @brief The dependencies of this module. */
 struct OSC_DEPENDENCY cam_deps[] = {

@@ -18,17 +18,9 @@
 
 /*! @file dma_target.c
  * @brief Memory DMA module implementation for target
- * 
  */
 
-#include "oscar_types_target.h"
-
-#include "dma_pub.h"
-#include "dma_priv.h"
-#include "oscar_intern.h"
-
-#include "sup/sup_pub.h"
-#include "log/log_pub.h"
+#include "dma.h"
 
 /*! @brief Raise exception, which will configure and start the DMA.
  * 

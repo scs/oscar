@@ -18,23 +18,9 @@
 
 /*! @file dma_shared.c
  * @brief Memory DMA module implementation shared by target and host.
- * 
  */
 
-#ifdef OSC_TARGET
-#include "oscar_types_target.h"
-#endif /* OSC_TARGET */
-
-#ifdef OSC_HOST
-#include "oscar_types_host.h"
-#endif /* OSC_HOST */
-
-#include "dma_pub.h"
-#include "dma_priv.h"
-#include "oscar_intern.h"
-
-#include "sup/sup_pub.h"
-#include "log/log_pub.h"
+#include "dma.h"
 
 /*! @brief The module singelton instance. */
 struct OSC_DMA dma;

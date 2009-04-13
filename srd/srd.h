@@ -16,7 +16,7 @@
 	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-/*! @file srd_priv.h
+/*! @file srd.h
  * @brief Private stimuli reader module definition
  * 
 	************************************************************************/
@@ -26,13 +26,7 @@
 #include <string.h>
 #include <stdio.h>
 
-#include <log/log_pub.h>
-
-#ifdef OSC_HOST
-#include <oscar_types_host.h>
-#else
-#include <oscar_types_target.h>
-#endif /* OSC_HOST */
+#include "oscar.h"
 
 #define MAX_NR_READER   10
 #define MAX_NR_SIGNAL_PER_READER    20

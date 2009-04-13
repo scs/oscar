@@ -21,21 +21,12 @@
  * 
  */
 
-#include "cfg_pub.h"
-#include "oscar_intern.h"
+#include "oscar.h"
 
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
-
-#ifdef OSC_HOST
-	#include <oscar_types_host.h>
-#else
-	#include <oscar_types_target.h>
-#endif /* OSC_HOST */
-
-#include <log/log_pub.h>
 
 /*! @brief Macro defining the maximal number of open configuration files */
 #define CONFIG_FILE_MAX_NUM 3
@@ -49,7 +40,6 @@
 #define CONFIG_FILE_LABEL_PREFIX "\n"
 /*! @brief Macro defining the escape characters for the string scanning */
 #define CONFIG_FILE_ESCAPE_CHARS "%1024[^\n]"
-
 
 /*! @brief Structure containing the file content */
 struct CFG_FILE_CONTENT {

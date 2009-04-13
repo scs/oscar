@@ -1,5 +1,4 @@
-/*	
-	JPEG encoder library
+/*	JPEG encoder library
 	Original Implementation by Nitin Gupta
 	Adapted to leanXcam by Reto Baettig
 	
@@ -18,8 +17,7 @@
 	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include "oscar_intern.h"
-#include "jpg_priv.h"
+#include "jpg.h"
 #include "jpg_markdata.h"
 
 /* Header for JPEG Encoder */

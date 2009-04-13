@@ -18,22 +18,10 @@
 
 /*! @file frd.c
  * @brief Filename reader module implementation.
- * 
-	************************************************************************/
-#ifdef OSC_HOST
-#include "oscar_types_host.h"
-#endif
+ */
 
-#ifdef OSC_TARGET
-#include "oscar_types_target.h"
-#endif
-
-#include "frd_pub.h"
-#include "frd_priv.h"
-#include "oscar_intern.h"
 #include <errno.h>
-
-#include <sim/sim_pub.h>
+#include "frd.h"
 
 struct OSC_FRD frd; /*!< Module singelton instance */
 

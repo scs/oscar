@@ -18,8 +18,8 @@
 
 /*! @file oscar_types_target.h
  * @brief Type definitions for the target.
- * 
  */
+
 #ifndef TYPES_H_
 #define TYPES_H_
 

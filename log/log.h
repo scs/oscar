@@ -16,7 +16,7 @@
 	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-/*! @file log_priv.h
+/*! @file log.h
  * @brief Private logging module definition
  * 
  */
@@ -27,7 +27,8 @@
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
-#include "log_pub.h"
+
+#include "oscar.h"
 
 /*! @brief The name of the log file for general messages */
 #define LOG_FILE_NAME "osc_log"

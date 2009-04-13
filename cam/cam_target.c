@@ -21,14 +21,10 @@
 	
  * On the OSC-specific hardware featuring
  * a Micron MT9V032 CMOS image sensor.
- * 
  */
 
-#include "oscar_types_target.h"
-
-#include "include/cam.h"
 #include "cam.h"
-#include "oscar_intern.h"
+
 #include <sys/ioctl.h>
 #include <unistd.h>
 #include <fcntl.h>

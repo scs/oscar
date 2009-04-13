@@ -16,7 +16,7 @@
 	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-/*! @file gpio_priv.h
+/*! @file gpio.h
  * @brief Private GPIO module definition
  * 
  */
@@ -28,13 +28,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef OSC_HOST
-	#include <oscar_types_host.h>
-#else
-	#include <oscar_types_target.h>
-#endif /* OSC_HOST */
-
-#include <log/log_pub.h>
+#include <oscar.h>
 
 /*! @brief How many GPIOs exist in hardware. */
 #define NR_OF_DSP_GPIOS 48

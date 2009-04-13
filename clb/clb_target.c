@@ -18,18 +18,13 @@
 
 /*! @file clb_target.c
  * @brief Calibration module implementation for target
- * 
  */
 
-#include "oscar_types_target.h"
-
-#include "include/clb.h"
-#include "clb.h"
-#include "include/oscar.h"
-#include "oscar_intern.h"
 #include <sys/ioctl.h>
 #include <fcntl.h>
 #include <errno.h>
+
+#include "clb.h"
 
 /*! @brief Return the result of x/y round up to the next full integer. */
 #define ROUND_UP_DIVISION(x, y) ((x + (y - 1))/y)

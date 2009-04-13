@@ -21,9 +21,9 @@
  * 
  * No calibration is applied to host pictures.
  */
-#include "oscar_intern.h"
-#include "include/clb.h"
+
 #include "clb.h"
+
 #include <stdlib.h>
 
 /*! @brief The dependencies of this module. */

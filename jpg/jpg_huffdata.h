@@ -1,5 +1,4 @@
-/*	
-	JPEG encoder library
+/*	JPEG encoder library
 	Original Implementation by Nitin Gupta
 	Adapted to leanXcam by Reto Baettig
 	

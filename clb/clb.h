@@ -16,7 +16,7 @@
 	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-/*! @file clb_priv.h
+/*! @file clb.h
  * @brief Private calibration module definitions
  * 
  */
@@ -26,15 +26,7 @@
 #include <string.h>
 #include <stdio.h>
 
-#include <log/log_pub.h>
-
-#ifdef OSC_HOST
-#include <oscar_types_host.h>
-#endif
-#ifdef OSC_TARGET
-#include <oscar_types_target.h>
-#endif
-
+#include "oscar.h"
 #include "../cam/mt9v032.h"
 
 /*! @brief The calibration data file */

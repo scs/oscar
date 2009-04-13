@@ -18,8 +18,8 @@
 
 /*! @file oscar_host.h
  * @brief General definitions for the host platform
- * 
  */
+
 #ifndef OSCAR_HOST_H_
 #define OSCAR_HOST_H_
 

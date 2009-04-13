@@ -18,14 +18,7 @@
 
 /*! @file gpio_target.c
  * @brief GPIO module implementation for host
- * 
  */
-
-#include "oscar_types_target.h"
-#include "oscar_intern.h"
-
-#include "include/gpio.h"
-#include "gpio.h"
 
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -34,6 +27,8 @@
 #include <sys/ioctl.h>
 #include <linux/ioctl.h>
 #include <errno.h>
+
+#include "gpio.h"
 
 /*! @brief The module singelton instance. */
 extern struct OSC_GPIO gpio;

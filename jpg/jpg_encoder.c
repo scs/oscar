@@ -1,5 +1,4 @@
-/*	
-	JPEG encoder library
+/*	JPEG encoder library
 	Original Implementation by Nitin Gupta
 	Adapted to leanXcam by Reto Baettig
 	
@@ -22,13 +21,10 @@
  * On the leanXcam, encoding a CIF-Image takes about 70ms
  */
 
-#include "jpg_priv.h"
-#include "jpg_pub.h"
-#include "jpg_priv.h"
-#include "oscar_intern.h"
-#include "include/oscar.h"
 #include <stdlib.h>
 #include <string.h>
+
+#include "jpg.h"
 
 uint8	Lqt [BLOCK_SIZE];
 uint8	Cqt [BLOCK_SIZE];

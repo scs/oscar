@@ -17,16 +17,9 @@
 */
 
 /*! @file ipc_shared.c
- * * @brief Interprocess communication module implementation shared
+ * @brief Interprocess communication module implementation shared
  * part for host and target
- * 
  */
-
-#ifdef OSC_HOST
-# include "oscar_types_host.h"
-#else /* OSC_HOST */
-# include "oscar_types_target.h"
-#endif /* OSC_HOST */
 
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -35,9 +28,8 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <errno.h>
-#include "ipc_pub.h"
-#include "ipc_priv.h"
-#include "oscar_intern.h"
+
+#include "ipc.h"
 
 /*! The camera module singelton instance. */
 struct OSC_IPC ipc;

@@ -16,31 +16,17 @@
 	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-/*! @file cam_priv.h
+/*! @file cam.h
  * @brief Private camera module definitions
- * 
  */
+
 #ifndef CAM_PRIV_H_
 #define CAM_PRIV_H_
 
 #include <string.h>
 #include <stdio.h>
 
-#include <log/log_pub.h>
-
-#ifdef OSC_HOST
-#include <oscar_types_host.h>
-#endif
-#ifdef OSC_TARGET
-#include <oscar_types_target.h>
-#endif
-
-#if defined(OSC_HOST) || defined(OSC_SIM)
-/* To load test images from bmp's */
-#include "include/bmp.h"
-/* Generate file names for test images depending on time step */
-#include "frd/frd_pub.h"
-#endif /* OSC_HOST  or OSC_SIM*/
+#include "oscar.h"
 
 /*! @brief For communication with the frame capture device driver */
 #include "mt9v032.h"

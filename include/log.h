@@ -16,35 +16,37 @@
 	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-/*! @file sim_pub.h
- * @brief API definition for simulation module
- * 
- * Simulation is only used for host. Target implementation provides
- * stump function definition.
+/*! @file log_pub.h
+ * @brief API definition for logging module
  * 
  */
-#ifndef SIM_PUB_H_
-#define SIM_PUB_H_
+#ifndef LOG_PUB_H_
+#define LOG_PUB_H_
 
-#include "oscar_error.h"
-#ifdef OSC_HOST
-	#include "oscar_types_host.h"
-	#include "oscar_host.h"
-#else
-	#include "oscar_types_target.h"
-	#include "oscar_target.h"
-#endif /* OSC_HOST */
-
-/*! @brief Module-specific error codes.
- * 
+/*! Module-specific error codes.
  * These are enumerated with the offset
  * assigned to each module, so a distinction over
  * all modules can be made */
-enum EnOscSimErrors {
-	ENUM_CALLBACK_EXHAUSTED = OSC_SIM_ERROR_OFFSET
+enum EnOscLogErrors {
+	ELOG_INVALID_EXPOSURE_VALID = OSC_LOG_ERROR_OFFSET
 };
 
-/*======================== API functions ===============================*/
+/*! @brief The different log levels of the logging module */
+enum EnOscLogLevel {
+	EMERG,
+	ALERT,
+	CRITICAL,
+	ERROR,
+	WARN,
+	NOTICE,
+	INFO,
+	DEBUG,
+	NONE,
+	/*! @brief A special loglevel used to report simulation results in the host implementation */
+	SIMULATION = 255
+};
+
+/*=========================== API functions ============================*/
 
 /*********************************************************************//*!
  * @brief Constructor
@@ -52,54 +54,54 @@ enum EnOscSimErrors {
  * @param hFw Pointer to the handle of the framework.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-OSC_ERR OscSimCreate(void *hFw);
+OSC_ERR OscLogCreate(void *hFw);
 
 /*********************************************************************//*!
  * @brief Destructor
  * 
  * @param hFw Pointer to the handle of the framework.
  *//*********************************************************************/
-void OscSimDestroy(void *hFw);
+void OscLogDestroy(void *hFw);
 
 /*********************************************************************//*!
- * @brief Initialize simulation
+ * @brief Sets the highest log level to be output to the console
  * 
- * After creation of all required modules the application has to init
- * the simulation module. Time variable is set to 0. Callbacks to
- * stimuli reader and writer are issued to applie default signal values.
+ * Set the log level to NONE to disable logging.
+ * 
+ * @param level The log level to set.
  *//*********************************************************************/
-void OscSimInitialize(void);
+void OscLogSetConsoleLogLevel(const enum EnOscLogLevel level);
 
 /*********************************************************************//*!
- * @brief Increment the simulation time step.
+ * @brief Sets the highest log level to be output to the log file
  * 
- * The application should call this function after every 'frame' of
- * the simulation. This automatically adjusts the current test image
- * file name fo the next cycle. Callback for stimuli reader and
- * writer is issued after timer increment. This prepares the the input
- * signals for the next cycle and writes current output signals (to
- * next cycle!)
- * Target: Stump since simulation is only done on host.
+ * Set the log level to NONE to disable logging.
+ * 
+ * @param level The log level to set.
  *//*********************************************************************/
-void OscSimStep();
+void OscLogSetFileLogLevel(const enum EnOscLogLevel level);
 
 /*********************************************************************//*!
- * @brief Get the current simulation time step.
+ * @brief Logs a message.
  * 
- * Target: Stump since simulation is only done on host.
+ * The console and the log file have different log levels. This log level
+ * is first checked before writing out a message.
  * 
- * @return The current simulation time step.
+ * @param level The log level of the message.
+ * @param strFormat Format string of the message.
+ * @param ... Format parameters of the message.
  *//*********************************************************************/
-uint32 OscSimGetCurTimeStep();
+void OscLog(const enum EnOscLogLevel level, const char * strFormat, ...);
 
 /*********************************************************************//*!
- * @brief Register a callback function to be called every new timestep.
+ * @brief Logs a fatal error and terminates program.
  * 
- * Target: Stump since simulation is only done on host.
+ * This is only for fatal errors where the program has to be stopped
  * 
- * @param pCallback Pointer to the function to be called.
- * @return SUCCESS or an appropriate error code.
+ * @param strFormat Format string of the message.
+ * @param ... Format parameters of the message.
  *//*********************************************************************/
-OSC_ERR OscSimRegisterCycleCallback( void (*pCallback)(void));
+void OscFatalErr(const char * strFormat, ...);
 
-#endif /*SIM_PUB_H_*/
+
+#endif /*LOG_PUB_H_*/

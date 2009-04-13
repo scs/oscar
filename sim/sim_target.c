@@ -18,14 +18,9 @@
 
 /*! @file sim_target.c
  * @brief Simulation module implementation for host
- * 
  */
 
-#include "oscar_types_target.h"
-
-#include "sim_pub.h"
-#include "sim_priv.h"
-#include "oscar_intern.h"
+#include "sim.h"
 
 /*! @brief The module singelton instance. */
 struct OSC_SIM_OBJ sim;

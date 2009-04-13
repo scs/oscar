@@ -30,8 +30,6 @@
 #ifndef CLB_PUB_H_
 #define CLB_PUB_H_
 
-#include "oscar_error.h"
-
 #define MAX_NR_HOTPIXEL         1000    /*!< @brief Max number of hotpixels */
 
 /*! Module-specific error codes. */

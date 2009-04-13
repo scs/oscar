@@ -20,11 +20,11 @@
  * @brief Debayering using linear interpolation with 1st degree laplace
  * coefficients.
  */
-#include "vis_pub.h"
-#include "vis_priv.h"
-#include "sup/sup_pub.h"
+
 #include <stdio.h>
 #include <stdlib.h>
+
+#include "vis.h"
 
 /*! @brief Rounding division by 2. */
 #define INT_DIVIDE_BY_2_ROUND(x) ((x + 1) / 2)

@@ -20,7 +20,6 @@
  * @brief Oscar framework implementation
  * 
  * Create, destroy and module dependency functionality.
- * 
  */
 
  /*!
@@ -30,14 +29,10 @@
  * 
  * \section Introduction
  * This is the documentation of the Open-Source Camera (OSCAR) software framework.
- *
  */
 
-#include "oscar_priv.h"
-#include "oscar_error.h"
-#include "oscar_version.h"
-
 #include <stdio.h>
+#include "oscar.h"
 
 struct OSC_FRAMEWORK fw;    /*!< @brief Module singelton instance */
 

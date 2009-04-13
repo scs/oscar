@@ -18,21 +18,9 @@
 
 /*! @file srd_host.c
  * @brief Stimuli reader module implementation for host.
- * 
-	************************************************************************/
+ */
 
-#ifdef OSC_HOST
-	#include "oscar_types_host.h"
-#endif
-#ifdef OSC_TARGET
-	#include "oscar_types_target.h"
-#endif
-#include "oscar_intern.h"
-
-#include "srd_pub.h"
-#include "srd_priv.h"
-
-#include <sim/sim_pub.h>
+#include "srd.h"
 
 struct OSC_SRD srd; /*!< Module singelton instance */
 
