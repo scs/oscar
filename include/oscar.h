@@ -25,16 +25,133 @@
 #ifndef OSCAR_MAIN_HEADER_FILE_WHICH_MAY_BE_INCLUDED_FROM_INSIDE_A_MODULE_H_
 #define OSCAR_MAIN_HEADER_FILE_WHICH_MAY_BE_INCLUDED_FROM_INSIDE_A_MODULE_H_
 
-/* Include the correct type header file, depending on the target */
+#include <stdbool.h>
+#include <stdint.h>
+
+// This saves to characters ...
+typedef int8_t int8;
+typedef uint8_t uint8;
+typedef int16_t int16;
+typedef uint16_t uint16;
+typedef int32_t int32;
+typedef uint32_t uint32;
+typedef int64_t int64;
+typedef uint64_t uint64;
+typedef int OSC_ERR;
+typedef bool BOOL;
+
+#define TRUE true
+#define FALSE false
+
 #if defined(OSC_HOST)
-	#include "../oscar_types_host.h"
-	#include "../oscar_host.h"
+/* Defined as stumps because it is needed in code shared by target and
+ * host. */
+/*! @brief Used to mark likely expressions for compiler optimization */
+#define likely(x) (x)
+/*! @brief Used to mark unlikely expressions for compiler optimization */
+#define unlikely(x) (x)
 #elif defined(OSC_TARGET)
-	#include "../oscar_types_target.h"
-	#include "../oscar_target.h"
+/* Bluntly copied from linux/compiler.h from uclinux */
+/*! @brief Used to mark likely expressions for compiler optimization */
+#define likely(x) __builtin_expect(!!(x), 1)
+/*! @brief Used to mark unlikely expressions for compiler optimization */
+#define unlikely(x) __builtin_expect(!!(x), 0)
 #else
-	#error "Neither OSC_HOST nor OSC_TARGET has been defined as a preprocessor macro!"
+#error "Neither OSC_HOST nor OSC_TARGET is defined as a macro."
 #endif
+
+/*! @brief Endianness of this machine. Intel uses LITTLE_ENDIAN */
+#define CPU_LITTLE_ENDIAN
+
+/*! @brief Macro to swap the endianness of a 16 bit number */
+#define ENDIAN_SWAP_16(x) ((x>>8) | (x<<8))
+
+/*! @brief Macro to swap the endianness of a 32 bit number */
+#define ENDIAN_SWAP_32(x) ( \
+	(x>>24) | \
+	((x<<8) & 0x00FF0000) | \
+	((x>>8) & 0x0000FF00) | \
+	(x<<24) \
+)
+
+/*! @brief Macro to swap the endianness of a 64 bit number */
+#define ENDIAN_SWAP_64(x) ( \
+	(x>>56) | \
+	((x<<40) & 0x00FF000000000000) | \
+	((x<<24) & 0x0000FF0000000000) | \
+	((x<<8)  & 0x000000FF00000000) | \
+	((x>>8)  & 0x00000000FF000000) | \
+	((x>>24) & 0x0000000000FF0000) | \
+	((x>>40) & 0x000000000000FF00) | \
+	(x<<56) \
+)
+
+/*! @brief Load a 32 bit value from a non-aligned address. */
+#define LD_INT32(pData) ( \
+	((int32)((pData)[0])) | (((int32)((pData)[1])) << 8) | \
+	(((int32)((pData)[2])) << 16) | (((int32)((pData)[3])) << 24) \
+)
+
+/*! @brief Write a 32 bit value to a non-aligned address. */
+#define ST_INT32(pData, val) { \
+	((pData)[0] = (uint8)(val & 0x000000FF)); \
+	((pData)[1] = (uint8)((val & 0x0000FF00) >> 8)); \
+	((pData)[2] = (uint8)((val & 0x00FF0000) >> 16)); \
+	((pData)[3] = (uint8)((val & 0xFF000000) >> 24)); \
+}
+
+/*! @brief Load a 16 bit value from a non-aligned address. */
+#define LD_INT16(pData) (((int16)((pData)[0])) | (((int16)((pData)[1])) << 8))
+
+/*! @brief Write a 16 bit value to a non-aligned address. */
+#define ST_INT16(pData, val) { \
+	((pData)[0] = (uint8)(val & 0x00FF)); \
+	((pData)[1] = (uint8)((val & 0xFF00) >> 8)); \
+}
+
+/*! @brief Represents the color depth of a picture */
+enum EnOscPictureType {
+	OSC_PICTURE_GREYSCALE,
+	OSC_PICTURE_YUV_444,
+	OSC_PICTURE_YUV_422,
+	OSC_PICTURE_YUV_420,
+	OSC_PICTURE_YUV_400,
+	OSC_PICTURE_CHROM_U,
+	OSC_PICTURE_CHROM_V,
+	OSC_PICTURE_HUE,
+	OSC_PICTURE_BGR_24,
+	OSC_PICTURE_RGB_24
+};
+
+/*! @brief Structure representing an 8-bit picture */
+struct OSC_PICTURE {
+	void * data;                /*!< @brief The actual image data */
+	unsigned short width;       /*!< @brief Width of the picture */
+	unsigned short height;      /*!< @brief Height of the picture */
+	enum EnOscPictureType type; /*!< @brief The type of the picture */
+};
+
+/*! @brief The order in which the colored pixels of a bayer pattern
+ * appear in a row.
+ * 
+ * The colors are abbreviated as follows:
+ * - G: Green
+ * - R: Red
+ * - B: Blue
+ * 
+ * The enum is constructed from two bools; one saying whether the first
+ * pixel in the row is green and the other whether it is a red or blue
+ * row.
+ *          firstGreen      firstOther
+ * red          11              01
+ * blue         10              00
+ * */
+enum EnBayerOrder {
+	ROW_BGBG = 0,
+	ROW_RGRG = 1,
+	ROW_GBGB = 2,
+	ROW_GRGR = 3
+};
 
 #include "../oscar_version.h"
 #include "../oscar_error.h"
