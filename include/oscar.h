@@ -25,10 +25,14 @@
 #ifndef OSCAR_MAIN_HEADER_FILE_WHICH_MAY_BE_INCLUDED_FROM_INSIDE_A_MODULE_H_
 #define OSCAR_MAIN_HEADER_FILE_WHICH_MAY_BE_INCLUDED_FROM_INSIDE_A_MODULE_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdbool.h>
 #include <stdint.h>
 
-// This saves to characters ...
+/* This saves to characters ... */
 typedef int8_t int8;
 typedef uint8_t uint8;
 typedef int16_t int16;
@@ -231,6 +235,10 @@ OSC_ERR OscGetVersionString(char *hVersion);
 #endif
 #ifdef TARGET_TYPE_INDXCAM
 #include "../lgx/lgx_pub.h"
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif /*OSCAR_MAIN_HEADER_FILE_WHICH_MAY_BE_INCLUDED_FROM_INSIDE_A_MODULE_H_*/
