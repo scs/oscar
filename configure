@@ -99,7 +99,7 @@ CONFIG_FILE=".config"
 # Names of the confguration variables as they can be accessed from a Makefile
 CONFIG_NAMES=(CONFIG_BOARD CONFIG_USE_FIRMWARE CONFIG_FIRMWARE_PATH)
 # Prompts displayed when asking for a configuration
-CONFIG_PROMPTS=("Select the board you are using (LEANXCAM/INDXCAM/MESA_SR4K)." "Do you want to use an external cpld firmware (y/n)?" "Enter the path to the cpld firmware.")
+CONFIG_PROMPTS=("Select the board you are using (LEANXCAM/INDXCAM/MESA_SR4K)." "Is the lgx module allready at the path ./lgx (y/n)?" "Enter the path to the lgx module.")
 # Functions to run to find out whether a configuration will be asked for. The empty string is equivalent to "true" (always ask).
 CONFIG_ENABLE=('' 'enable_match CONFIG_BOARD INDXCAM' 'enable_match CONFIG_USE_FIRMWARE y')
 # Regular expressions to match an answer to with grep -xE to find out whether an answer is valid. The empty string is equivalent to ".*" (everything goes).

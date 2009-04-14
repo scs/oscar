@@ -1,0 +1,1 @@
+MODULES := bmp cam cfg clb cpld dma dspl frd gpio hsm ipc jpg lgx log sim srd sup swr vis 

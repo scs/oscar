@@ -149,29 +149,7 @@ OSC_ERR OscGetVersionString(char *hVersion);
  * contain the declarations of the API functions of the respective
  * module.
  */
-#include "log.h"
-#include "dspl.h"
-#include "dma.h"
-#include "ipc.h"
-#include "bmp.h"
-#include "sup.h"
-#ifndef TARGET_TYPE_MESA_SR4K
-#include "cam.h"
-#include "cpld.h"
-#include "sim.h"
-#include "swr.h"
-#include "srd.h"
-#include "frd.h"
-#include "hsm.h"
-#include "cfg.h"
-#include "clb.h"
-#include "vis.h"
-#include "gpio.h"
-#include "jpg.h"
-#endif
-#ifdef TARGET_TYPE_INDXCAM
-#include "../lgx/lgx_pub.h"
-#endif
+#include "board.h"
 
 #ifdef __cplusplus
 }
