@@ -156,6 +156,6 @@ char* OscCfgAppendLabel(
  * @param strSize Array length of str.
  * @return index of first invalid char.
  *//*********************************************************************/
-unsigned int OscCfgFindInvalidChar(const char *str, const unsigned int strSize);
+unsigned int OscCfgFindInvalidChar(const unsigned char *str, const unsigned int strSize);
 
 #endif /*CFG_PRIV_H_*/

@@ -69,6 +69,7 @@ struct OSC_FRAMEWORK
 	struct OSC_MODULE clb;     /*!< @brief camera calibration*/
 	struct OSC_MODULE vis;     /*!< @brief Vision library*/
 	struct OSC_MODULE gpio;    /*!< @brief GPIO */
+	struct OSC_MODULE jpg;     /*!< @brief JPG*/
 };
 
 #endif /* OSCAR_INTER_H_ */

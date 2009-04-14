@@ -148,7 +148,7 @@ OSC_ERR OscCfgRegisterFile(
 	cfg.nrOfContents++;
 	
 	/* append string termination */
-	invalidCharIndex = OscCfgFindInvalidChar(cfg.contents[actIndex].data, fileSize);
+	invalidCharIndex = OscCfgFindInvalidChar((unsigned char *)cfg.contents[actIndex].data, fileSize);
 	cfg.contents[actIndex].data[invalidCharIndex] = '\0';
 	OscLog(DEBUG, "%s: string length set to %d\n",
 			__func__, invalidCharIndex);
@@ -789,12 +789,12 @@ char* OscCfgAppendLabel(
 	return &text[strlen(text)];
 }
 
-unsigned int OscCfgFindInvalidChar(const char *str, const unsigned int strSize)
+unsigned int OscCfgFindInvalidChar(const unsigned char *str, const unsigned int strSize)
 {
 	int i;
 	for (i=0; i<strSize; i++)
 	{
-		if ((str[i] < (char)0x0a) || (str[i] > (char)0x7f))
+		if ((str[i] < (unsigned char)0x0a) || (str[i] > (unsigned char)0x7f))
 		{
 			return i;
 		}

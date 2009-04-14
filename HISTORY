@@ -1,3 +1,7 @@
++ Release v1.2-p4
+Add shift-left functions for fract16 and fract2x16
+
+
 + Release v1.2-p3
 Bugfixes Config-Modul
 Reactivate DMA workaround

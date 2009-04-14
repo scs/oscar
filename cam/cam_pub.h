@@ -254,7 +254,7 @@ OSC_ERR OscCamCreateMultiBuffer(const uint8 multiBufferDepth,
  * 
  * @return SUCCESS or an appropriate error code
  *//*********************************************************************/
-inline OSC_ERR OscCamDeleteMultiBuffer();
+OSC_ERR OscCamDeleteMultiBuffer();
 
 /*********************************************************************//*!
  * @brief Set one of the frame buffers used by the camera driver

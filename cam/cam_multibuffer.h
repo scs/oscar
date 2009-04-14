@@ -81,7 +81,7 @@ OSC_ERR OscCamMultiBufferCreate(struct OSC_CAM_MULTIBUFFER * pMB,
  * @param pMB Pointer to multi buffer to destroy.
  * @return SUCCESS or an appropriate error code
  *//*********************************************************************/
-inline OSC_ERR OscCamMultiBufferDestroy(struct OSC_CAM_MULTIBUFFER * pMB);
+OSC_ERR OscCamMultiBufferDestroy(struct OSC_CAM_MULTIBUFFER * pMB);
 
 /*********************************************************************//*!
  * @brief Return the frame buffer to capture to next.
@@ -95,7 +95,7 @@ inline OSC_ERR OscCamMultiBufferDestroy(struct OSC_CAM_MULTIBUFFER * pMB);
  * @param pMB Pointer to multi buffer this operation is done on.
  * @return Buffer ID for the next capture.
  *//*********************************************************************/
-inline uint8 OscCamMultiBufferGetCapBuf(
+uint8 OscCamMultiBufferGetCapBuf(
 		const struct OSC_CAM_MULTIBUFFER *pMB);
 
 /*********************************************************************//*!
@@ -125,7 +125,7 @@ void OscCamMultiBufferCapture(struct OSC_CAM_MULTIBUFFER * pMB);
  * @param pMB Pointer to multi buffer this operation is done on.
  * @return Buffer ID for the next capture.
  *//*********************************************************************/
-inline uint8 OscCamMultiBufferGetSyncBuf(
+uint8 OscCamMultiBufferGetSyncBuf(
 		const struct OSC_CAM_MULTIBUFFER *pMB);
 
 /*********************************************************************//*!

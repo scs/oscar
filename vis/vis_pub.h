@@ -34,7 +34,6 @@
 #endif /* OSC_HOST */
 
 #include "bayer_pub.h"
-#include "bmp_pub.h"
 
 /*====================== API functions =================================*/
 

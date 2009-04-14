@@ -143,3 +143,31 @@ void OscLog(const enum EnOscLogLevel level, const char * strFormat, ...)
 	}
 }
 
+void OscFatalErr(const char * strFormat, ...)
+{
+	uint16 len;
+	va_list ap; /*< The dynamic argument list */
+
+	osc_log.strTemp[0] = 0; /* Mark the string as empty */
+
+	/* Log to console */
+
+	va_start(ap, strFormat);
+	vprintf(strFormat, ap);
+	va_end(ap);
+
+	/* Log to the log file*/
+
+	/* We can't use sprintf because we only have the additional
+	 * arguments as a list => use vsprintf */
+	va_start(ap, strFormat);
+	len += vsprintf(osc_log.strTemp, strFormat, ap);
+	va_end(ap);
+
+	/* Write the message to the syslog daemon. */
+	syslog(EMERG, osc_log.strTemp);
+
+	exit(1);
+}
+
+
