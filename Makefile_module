@@ -20,7 +20,7 @@ MAKE += -RL --no-print-directory
 SHELL := $(shell which bash)
 
 # This includes the framework configuration.
-include $(dir $(shell readlink $(lastword $(MAKEFILE_LIST)))).config
+include $(dir ./$(shell readlink $(lastword $(MAKEFILE_LIST))))Makefile_config
 
 # Generic flags for the C compiler.
 CFLAGS := -c -std=gnu99 -Wall -pedantic -I. -I..

@@ -15,22 +15,16 @@
 # with this library; if not, write to the Free Software Foundation, Inc., 51
 # Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-# Disable make's built-in rules
+# Disable make's built-in rules.
 MAKE += -RL --no-print-directory
 SHELL := $(shell which bash)
 
-# This includes the framework configuration
--include .config
-
-BOARD_FILE_NAME := $(shell ls boards)
-
-
-# Header files needed by an application using this framework
-HEADERS = oscar_types_host.h oscar_types_target.h oscar_host.h oscar_target.h oscar_error.h oscar_dependencies.h oscar_version.h oscar_target_type.h
+# This includes the framework configuration.
+include Makefile_config
 
 # Executable to create the static library
-AR_host = ar -rcs
-AR_target = bfin-uclinux-ar -rcs
+AR_host := ar -rcs
+AR_target := bfin-uclinux-ar -rcs
 
 # Modes to compile this module in.
 MODES := host target target_sim
@@ -93,10 +87,9 @@ config:
 # Target that gets called by the configure script after the configuration.
 .PHONY: reconfigure
 reconfigure: needs_config
-	{ echo "/* Automatically generated file. Do not edit. */"; echo "#define TARGET_TYPE_$(CONFIG_BOARD)"; } > oscar_target_type.h
+	ln -sf "../boards/$(CONFIG_BOARD).h" "include/board.h"
 ifeq '$(CONFIG_USE_FIRMWARE)' 'y'
-	rm -rf "lgx"
-	cp -r $(CONFIG_FIRMWARE_PATH)/lgx .
+	@ if ! [ -e "lgx" ] || [ -h "lgx" ]; then ln -fs $(CONFIG_FIRMWARE_PATH) "lgx"; else echo "Warning: The symlink to the lgx module could not be created as the file ./lgx already exists and is something other than a symlink. Pleas remove it and run 'make reconfigure' to create the symlink."; fi
 endif
 
 # Builds the doxygen documentation.
