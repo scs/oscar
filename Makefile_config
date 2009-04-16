@@ -1,5 +1,14 @@
 #Inlcude theis makefile to get the configuration variables and the right board makefile.
 
+# .PHONY is broken on static pattern rules.
+.PHONY: .FORCE
+
+# This allows us to call this makefile directly which includes the boards makefile for reconfiguration.
+ifeq '$(words $(MAKEFILE_LIST))' '1'
+  reconfigure: .FORCE
+  RECONFIGURE := reconfigure
+endif
+
 -include $(ROOT_DIR).config
 ifneq '$(CONFIG_BOARD)' ''
   include $(ROOT_DIR)boards/$(CONFIG_BOARD).mk

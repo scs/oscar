@@ -1,4 +1,4 @@
-CONFIGS="BOARD EXTERNAL_FIRMWARE FIRMWARE_PATH"
+CONFIGS="BOARD LOCAL_FIRMWARE FIRMWARE_PATH"
 
 CONFIG_BOARD() {
 	local BOARDS=$(ls boards/ | sed -rn 's/\.(h|mk)$//p' | sort -r | uniq -d)
@@ -11,8 +11,8 @@ CONFIG_BOARD() {
 	[ "$1" ] && "$1"
 }
 
-CONFIG_EXTERNAL_FIRMWARE() {
-	default() { echo 'y'; }
+CONFIG_LOCAL_FIRMWARE() {
+	default() { echo 'n'; }
 	enabled() { [ "$CONFIG_BOARD" == 'indXcam' ]; }
 	prompt() { echo "Is the lgx module allready at the path ./lgx (y/n)?"; }
 	check() { grep -xqE 'y|n'; }
@@ -22,7 +22,7 @@ CONFIG_EXTERNAL_FIRMWARE() {
 
 CONFIG_FIRMWARE_PATH() {
 	default() { echo '../lgx'; }
-	enabled() { [ "$CONFIG_EXTERNAL_FIRMWARE" == 'n' ]; }
+	enabled() { [ "$CONFIG_LOCAL_FIRMWARE" == 'n' ]; }
 	prompt() { echo "Enter the path to the lgx module.?"; }
 	check() { grep -xqE '.+'; }
 	

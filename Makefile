@@ -35,9 +35,6 @@ varnames = $(filter $(.VARIABLES), $(foreach i, $(shell seq 1 $(words $(subst _,
 firstvar = $($(lastword $(call varnames, $(1))))
 allvars = $(foreach i, $(call varnames, $(1)), $($i))
 
-# .PHONY is broken on static pattern rules.
-.PHONY: .FORCE
-
 # Default target which builds all modules for the selected board configuration.
 all: $(MODES) .FORCE;
 
@@ -78,6 +75,7 @@ config: .FORCE
 # Target that gets called by the configure script after the configuration.
 reconfigure: needs_config .FORCE
 	ln -sf "../boards/$(CONFIG_BOARD).h" "include/board.h"
+	$(MAKE) -f Makefile_config reconfigure
 
 # Builds the doxygen documentation.
 doc: .FORCE
