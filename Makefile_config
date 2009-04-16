@@ -1,9 +1,9 @@
-#Inlcude theis makefile to get the configuration variables and the right board makefile.
+# Include this makefile to get the configuration variables and the right board makefile.
 
 # .PHONY is broken on static pattern rules.
 .PHONY: .FORCE
 
-# This allows us to call this makefile directly which includes the boards makefile for reconfiguration.
+# This allows us to call this makefile to use the selected board's makefile's reconfigure target.
 ifeq '$(words $(MAKEFILE_LIST))' '1'
   reconfigure: .FORCE
   RECONFIGURE := reconfigure
