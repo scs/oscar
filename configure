@@ -115,7 +115,7 @@ for i_name in $CONFIGS; do
 			VALUE_NEW=
 		fi > /dev/null
 		
-		[ "$VALUE_NEW" ] && echo "#$i_name = $VALUE_NEW"
+		[ "$VALUE_NEW" ] && echo "#$NAME = $VALUE_NEW"
 	fi
 done > "${CONF_FILE}~"
 
