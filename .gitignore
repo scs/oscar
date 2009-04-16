@@ -9,4 +9,4 @@
 /.metadata
 /.settings
 /.config
-/oscar_target_type.h
+/include/board.h

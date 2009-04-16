@@ -15,31 +15,16 @@
 # with this library; if not, write to the Free Software Foundation, Inc., 51
 # Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-# Disable make's built-in rules
+# Disable make's built-in rules.
 MAKE += -RL --no-print-directory
 SHELL := $(shell which bash)
 
-# This includes the framework configuration
--include .config
-
-# All the supported board configurations.
-BOARDS := LEANXCAM INDXCAM MESA_SR4K
-
-# Module lists for each board configuration.
-MODULES_MESA_SR4K := log bmp ipc sup dspl dma
-MODULES_LEANXCAM := $(MODULES_MESA_SR4K) cam cpld sim swr srd frd hsm cfg clb vis gpio jpg
-MODULES_INDXCAM := $(MODULES_LEANXCAM) lgx
-
-# Generate list modules for the chosen board configuration and a list with all possible moduels (for clean and such).
-MODULES := $(MODULES_$(CONFIG_BOARD))
-MODULES_ALL := $(sort $(wildcard $(foreach i, $(BOARDS), $(MODULES_$(i)))))
-
-# Header files needed by an application using this framework
-HEADERS = oscar_types_host.h oscar_types_target.h oscar_host.h oscar_target.h oscar_error.h oscar_dependencies.h oscar_version.h oscar_target_type.h
+# This includes the framework configuration.
+include Makefile_config
 
 # Executable to create the static library
-AR_host = ar -rcs
-AR_target = bfin-uclinux-ar -rcs
+AR_host := ar -rcs
+AR_target := bfin-uclinux-ar -rcs
 
 # Modes to compile this module in.
 MODES := host target target_sim
@@ -64,7 +49,7 @@ MODULE_TARGETS := $(addprefix modules_, $(MODES))
 .PHONY: $(MODULE_TARGETS)
 $(MODULE_TARGETS): modules_%: $(addsuffix /%, $(MODULES)) needs_config
 
-# Allow a module to be given on the command line build that module.
+# Allow a module to be given on the command line to build that module.
 .PHONY: $(MODULES)
 $(MODULES):
 	$(MAKE) -C $@
@@ -80,7 +65,8 @@ define subdir_target
 $(1)%:
 	$(MAKE) -C $(1) $$*
 endef
-$(foreach i, $(wildcard */Makefile), $(eval $(call subdir_target,$(dir $(i)))))
+SUBDIRS := $(dir $(wildcard */Makefile))
+$(foreach i, $(SUBDIRS), $(eval $(call subdir_target, $(i))))
 
 # Routing individual object file requests directly to the compile Makefile
 .PHONY: %.o
@@ -101,10 +87,9 @@ config:
 # Target that gets called by the configure script after the configuration.
 .PHONY: reconfigure
 reconfigure: needs_config
-	{ echo "/* Automatically generated file. Do not edit. */"; echo "#define TARGET_TYPE_$(CONFIG_BOARD)"; } > oscar_target_type.h
+	ln -sf "../boards/$(CONFIG_BOARD).h" "include/board.h"
 ifeq '$(CONFIG_USE_FIRMWARE)' 'y'
-	rm -rf "lgx"
-	cp -r $(CONFIG_FIRMWARE_PATH)/lgx .
+	@ if ! [ -e "lgx" ] || [ -h "lgx" ]; then ln -fs $(CONFIG_FIRMWARE_PATH) "lgx"; else echo "Warning: The symlink to the lgx module could not be created as the file ./lgx already exists and is something other than a symlink. Pleas remove it and run 'make reconfigure' to create the symlink."; fi
 endif
 
 # Builds the doxygen documentation.
@@ -116,7 +101,7 @@ doc:
 
 # Cleans the framework and all modules
 .PHONY: clean
-clean: %: $(addsuffix /%, $(MODULES_ALL)) oscar_clean
+clean: %: $(addsuffix /%, $(SUBDIRS)) oscar_clean
 	rm -rf library/*.a
 	rm -rf doc/{html,latex,index.html}
 

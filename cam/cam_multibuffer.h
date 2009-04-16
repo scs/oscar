@@ -23,7 +23,7 @@
 #ifndef CAM_MULTIBUFFER_H_
 #define CAM_MULTIBUFFER_H_
 
-#include "include/oscar.h"
+#include "oscar.h"
 #include "mt9v032.h"
 
 /*! @brief The structure representing a multibuffer.
