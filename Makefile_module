@@ -20,10 +20,11 @@ MAKE += -RL --no-print-directory
 SHELL := $(shell which bash)
 
 # This includes the framework configuration.
-include $(dir ./$(shell readlink $(lastword $(MAKEFILE_LIST))))Makefile_config
+ROOT_PATH := $(dir $(shell readlink $(lastword $(MAKEFILE_LIST))))
+include $(ROOT_PATH)Makefile_config
 
 # Generic flags for the C compiler.
-CFLAGS := -c -std=gnu99 -Wall -pedantic -I. -I..
+CFLAGS := -c -std=gnu99 -Wall -pedantic $(if $(ROOT_PATH), -I$(ROOT_PATH))
 
 # Host-Compiler executables and flags.
 CC_host_ := gcc $(CFLAGS) -DOSC_HOST

@@ -1,7 +1,5 @@
 #Inlcude theis makefile to get the configuration variables and the right board makefile.
 
-ROOT_DIR := $(dir ./$(lastword $(MAKEFILE_LIST)))
-
 -include $(ROOT_DIR).config
 ifneq '$(CONFIG_BOARD)' ''
   include $(ROOT_DIR)boards/$(CONFIG_BOARD).mk
