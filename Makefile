@@ -59,7 +59,7 @@ define subdir_target
 $(1)/%: .FORCE
 	$(MAKE) -C $(1) $$*
 endef
-SUBDIRS := $(patsubst %/, %, $(dir $(wildcard */Makefile)))
+SUBDIRS := $(sort $(patsubst %/, %, $(dir $(wildcard */Makefile))) $(MODULES))
 $(foreach i, $(SUBDIRS), $(eval $(call subdir_target, $(i))))
 
 # Routing individual object file requests directly to the compile Makefile
@@ -78,9 +78,6 @@ config: .FORCE
 # Target that gets called by the configure script after the configuration.
 reconfigure: needs_config .FORCE
 	ln -sf "../boards/$(CONFIG_BOARD).h" "include/board.h"
-ifeq '$(CONFIG_USE_FIRMWARE)' 'y'
-	@ if ! [ -e "lgx" ] || [ -h "lgx" ]; then ln -fs $(CONFIG_FIRMWARE_PATH) "lgx"; else echo "Warning: The symlink to the lgx module could not be created as the file ./lgx already exists and is something other than a symlink. Pleas remove it and run 'make reconfigure' to create the symlink."; fi
-endif
 
 # Builds the doxygen documentation.
 doc: .FORCE
