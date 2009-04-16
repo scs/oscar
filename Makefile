@@ -35,78 +35,65 @@ varnames = $(filter $(.VARIABLES), $(foreach i, $(shell seq 1 $(words $(subst _,
 firstvar = $($(lastword $(call varnames, $(1))))
 allvars = $(foreach i, $(call varnames, $(1)), $($i))
 
+# .PHONY is broken on static pattern rules.
+.PHONY: .FORCE
+
 # Default target which builds all modules for the selected board configuration.
-.PHONY: all $(MODES)
-all: $(MODES)
+all: $(MODES) .FORCE;
 
 # Targets to build in a specific build mode and create the library.
-$(MODES): %: library/libosc_%.a
-library/libosc_%.a: modules_% oscar_%
+$(MODES): %: library/libosc_%.a .FORCE;
+library/libosc_%.a: oscar_% $(addsuffix /%, $(MODULES))
 	$(call firstvar, AR_$*) $@ $(addsuffix /build/*_$*.o, $(MODULES) .)
 
-# Targets to compile the modules only in a specific mode.
-MODULE_TARGETS := $(addprefix modules_, $(MODES))
-.PHONY: $(MODULE_TARGETS)
-$(MODULE_TARGETS): modules_%: $(addsuffix /%, $(MODULES)) needs_config
-
 # Allow a module to be given on the command line to build that module.
-.PHONY: $(MODULES)
-$(MODULES):
+$(MODULES): .FORCE
 	$(MAKE) -C $@
 
 # Call this as oscar_$(MODE) to only build them main oscar files.
-.PHONY: oscar_%
-oscar_%:
+oscar_%: .FORCE
 	$(MAKE) -f Makefile_module $*
 
 # Produce a target of the form "foo/%" for every directory foo that contains a Makefile
 define subdir_target
-.PHONY: $(1)%
-$(1)%:
+$(1)/%: .FORCE
 	$(MAKE) -C $(1) $$*
 endef
-SUBDIRS := $(dir $(wildcard */Makefile))
+SUBDIRS := $(patsubst %/, %, $(dir $(wildcard */Makefile)))
 $(foreach i, $(SUBDIRS), $(eval $(call subdir_target, $(i))))
 
 # Routing individual object file requests directly to the compile Makefile
-.PHONY: %.o
-%.o: needs_config
+%.o: needs_config .FORCE
 	$(MAKE) -f Makefile_module $@
 
 # Use this target as a prerequisite in a target that should fail if the framework has not yet been configured.
-.PHONY: needs_config
-needs_config:
+needs_config: .FORCE
 	@ [ -e ".config" ] || { echo "The framework has to be configured using 'make config' first!"; false; }
 $(sort $(MAKEFILE_LIST) .config):;
 
 # Target to explicitly start the configuration process.
-.PHONY: config
-config:
+config: .FORCE
 	@ ./configure
 
 # Target that gets called by the configure script after the configuration.
-.PHONY: reconfigure
-reconfigure: needs_config
+reconfigure: needs_config .FORCE
 	ln -sf "../boards/$(CONFIG_BOARD).h" "include/board.h"
 ifeq '$(CONFIG_USE_FIRMWARE)' 'y'
 	@ if ! [ -e "lgx" ] || [ -h "lgx" ]; then ln -fs $(CONFIG_FIRMWARE_PATH) "lgx"; else echo "Warning: The symlink to the lgx module could not be created as the file ./lgx already exists and is something other than a symlink. Pleas remove it and run 'make reconfigure' to create the symlink."; fi
 endif
 
 # Builds the doxygen documentation.
-.PHONY: doc
-doc:
+doc: .FORCE
 	rm -rf doc/{html,latex}
 	doxygen documentation/oscar.doxygen
 	ln -sf html/index.html documentation/index.html
 
 # Cleans the framework and all modules
-.PHONY: clean
-clean: %: $(addsuffix /%, $(SUBDIRS)) oscar_clean
+clean: %: $(addsuffix /%, $(SUBDIRS)) oscar_clean .FORCE
 	rm -rf library/*.a
 	rm -rf doc/{html,latex,index.html}
 
 # Cleans everything not intended for source distribution
-.PHONY: distclean
-distclean: clean
+distclean: clean .FORCE
 	rm -f .config
 	rm -rf lgx
