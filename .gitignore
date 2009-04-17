@@ -1,12 +1,9 @@
 # Ignore generated files
-*.[oad]
-*.gdb
 *~
+build
 
 # Ignore files used by the build system
-/doc
 /lgx
 /.metadata
 /.settings
 /.config
-/include/board.h
