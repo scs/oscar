@@ -70,7 +70,7 @@ while [ "$1" ]; do
 	NAME=$(echo "$1" | cut -d "=" -f 1)
 	VALUE=$(echo "$1" | cut -d "=" -f 2)
 	
-	echo "$NAME" | grep -xF "$(echo "$CONFIGS" | tr ' ' '\n' | sed -r 's/^/CONFIG_/')" || fail "Unknown variable: $$NAME"
+	echo "$NAME" | grep -xqF "$(echo "$CONFIGS" | tr ' ' '\n' | sed -r 's/^/CONFIG_/')" || fail "Unknown variable: $$NAME"
 	variable_write "$NAME" "$VALUE"
 	
 	shift
@@ -123,4 +123,4 @@ done > "${CONF_FILE}~"
 mv -f "${CONF_FILE}~" "${CONF_FILE}"
 
 # Call the makefile to update according to the new configuration.
-make -C "$SCRIPT_DIR" --no-print-directory reconfigure > /dev/null
+make -C "$SCRIPT_DIR" --no-print-directory reconfigure
