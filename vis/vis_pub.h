@@ -182,6 +182,32 @@ OSC_ERR OscVisFastDebayerRGB(const struct OSC_PICTURE *pRaw, struct OSC_PICTURE 
  *//*********************************************************************/
 OSC_ERR OscVisFastDebayerLumY(const struct OSC_PICTURE *pRaw, struct OSC_PICTURE *pOut);
 
+/*********************************************************************//*!
+ * @brief Convert a raw image captured by a camera sensor with bayer
+ * filter to a greyscale output image.
+ * 
+ * This function performs a very simple debayering and makes one 
+ * greyscale pixel out of 4 bayered pixels. This means that the
+ * resulting image is only width/2 by height/2 pixels. Image size is 
+ * reduced by a factor of 4! 
+ * On the target, this function is assembler-optimized for the Blackfin
+ * processor and makes use of its video-pixel operations. On the host, this
+ * function just calls OscVisFastDebayerGrey()
+ * Because of vector operations, width must be a multiple of 4 and the
+ * input and output memory for the images must be 4-byte aligned!
+ * Height must be a multiple of 2!
+ *
+ * Time: ~3.1 ms for 752x480 raw to 376x240 grey (in SDRAM)
+ *
+ * @see OscVisFastDebayerGrey
+ *
+ * The image is returned in 8 Bit/Pixel greyscale format.
+ * 
+ * @param pRaw Pointer to an OSC_PICTURE structure which contains the raw input picture of size width x height.
+ * @param pOut Pointer to the result OSC_PICTURE structure of size (width/2) x (height/2).
+ * @return SUCCESS or an appropriate error code.
+ *//*********************************************************************/
+OSC_ERR OscVisVectorDebayerGrey(const struct OSC_PICTURE *pRaw, struct OSC_PICTURE *pOut);
 
 /*********************************************************************//*!
  * @brief Convert a raw image captured by a camera sensor with bayer

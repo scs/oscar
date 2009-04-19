@@ -22,10 +22,13 @@ SOURCES_HOST := vis.c bayer_fast.c transform.c bayer_lincorr.c
 SOURCES_TARGET := vis.c bayer_fast.c transform.c bayer_lincorr.c
 
 OBJECTS_HOST := $(patsubst %.c, %_host.o, $(SOURCES_HOST))
-OBJECTS_TARGET := $(patsubst %.c, %_target.o, $(SOURCES_TARGET))
-OBJECTS_TARGET_SIM := $(patsubst %.c, %_target_sim.o, $(SOURCES_TARGET))
+OBJECTS_TARGET := $(patsubst %.c, %_target.o, $(SOURCES_TARGET)) vector_debayer_grey_target.o
+OBJECTS_TARGET_SIM := $(patsubst %.c, %_target_sim.o, $(SOURCES_TARGET)) vector_debayer_grey_target.o
 
 all: target host
+
+vector_debayer_grey_target.o:
+	bfin-uclinux-as vector_debayer_grey_target.asm -o vector_debayer_grey_target.o
 
 host: $(OBJECTS_HOST) $(OBJECTS_TARGET_SIM)
 target: $(OBJECTS_TARGET)
