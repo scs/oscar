@@ -30,11 +30,22 @@
 
 #include "oscar.h"
 
+/*! @brief The saturation value for a fract16 number. */
+#define FR16_MAX ((fract16) 0x7fff)
+/*! @brief The negative saturation value for a fract16 number. */
+#define FR16_MIN ((fract16) -0x8000)
+/*! @brief The scaling factor of a fract16 number. */
+#define FR16_SCALE ((float) 0x8000)
+
+/*! @brief The saturation value for a fract32 number. */
+#define FR32_MAX ((fract16) 0x7fffffff)
+/*! @brief The negative saturation value for a fract32 number. */
+#define FR32_MIN ((fract16) -0x80000000)
+/*! @brief The scaling factor of a fract32 number. */
+#define FR32_SCALE ((float) 0x80000000)
+
 /*! @brief The object struct of the camera module */
-struct OSC_DSPL {
-	/*! @brief Dummy to have at least one member in this struct. */
-	int dummy;
-};
+struct OSC_DSPL { };
 
 /*********************************************************************//*!
  * @brief Rearrange real data array in bit reverse order

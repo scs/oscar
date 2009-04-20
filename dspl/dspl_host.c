@@ -76,9 +76,9 @@ inline float OscDsplFr16ToFloat(fract16 n)
 
 inline fract16 OscDsplFloatToFr16(float n)
 {
-	float ret = (n*FR16_SCALE);
-	if(ret > FR16_SAT)
-		ret = FR16_SAT;
+	float ret = (n * FR16_SCALE);
+	if(ret > FR16_MAX)
+		ret = FR16_MAX;
 	return (fract16)ret;
 }
 
@@ -94,41 +94,21 @@ fract16 OscDsplLow_of_fr2x16(fract2x16 x)
 
 fract16 OscDsplShl_fr1x16(fract16 x, int y)
 {
-	if( y > 0 )
-	{
-		return x << y;
-	}
-	else
-	if (y < 0)
-	{
-		return x >> -y;
-	}
-	else
-	{
-		return x;
-	}
+	/* The C standard does not specify (to my knowledge) the result of a shift operation with a negative amount. */
+	if (y > 0)
+		x <<= y;
+	else if (y < 0)
+		x >>= y;
+	
+	return x;
 }
 
 fract2x16 OscDsplShl_fr2x16(fract2x16 x, int y)
 {
-	fract16 low, high;
-	if( y > 0 )
-	{
-		low  = OscDsplLow_of_fr2x16(x) << y;		
-		high = OscDsplHigh_of_fr2x16(x) << y;		
-		return OscDsplCompose_fr2x16( high, low);
-	}
-	else
-	if (y < 0)
-	{
-		low  = OscDsplLow_of_fr2x16(x) >> -y;		
-		high = OscDsplHigh_of_fr2x16(x) >> -y;		
-		return OscDsplCompose_fr2x16( high, low);
-	}
-	else
-	{
-		return x;
-	}
+	fract16 low = OscDsplShl_fr1x16(OscDsplLow_of_fr2x16(x), y);
+	fract16 high  = OscDsplShl_fr1x16(OscDsplHigh_of_fr2x16(x), y);
+	
+	return OscDsplCompose_fr2x16(high, low);
 }
 
 fract2x16 OscDsplCompose_fr2x16(fract16 h, fract16 l)
@@ -167,10 +147,10 @@ fract16 OscDsplTransRfr32fr16(fract32 multfr32)
 	}
 
 	multfr32 = multfr32 >> 15;
-	if(multfr32 >= 32767)
-		resultfr16 = 0x7fff;
-	else if(multfr32 <= -32768)
-		resultfr16 = 0x8000;
+	if(multfr32 >= FR16_MAX)
+		resultfr16 = FR16_MAX;
+	else if(multfr32 <= FR16_MIN)
+		resultfr16 = FR16_MIN;
 	
 	return resultfr16;
 }
@@ -200,10 +180,10 @@ fract16 OscDsplTransfr32fr16(fract32 multfr32)
 	resultfr16 = multfr32 >> 15;
 
 	multfr32 = multfr32 >> 15;
-	if(multfr32 >= 32767)
-		resultfr16 = 0x7fff;
-	else if(multfr32 <= -32768)
-		resultfr16 = 0x8000;
+	if(multfr32 >= FR16_MAX)
+		resultfr16 = FR16_MAX;
+	else if(multfr32 <= FR16_MIN)
+		resultfr16 = FR16_MIN;
 	
 	return resultfr16;
 }
@@ -237,7 +217,7 @@ fract16 OscDspl_sin_fr16(fract16 x)
 		afr16= OscDsplMultRFr16(afr16,bfr16);
 	}
 	if( (uint32)accufr32  > 0x3fffC000) /* saturating */
-		resultfr16= 0x7fff;
+		resultfr16= FR16_MAX;
 	else
 		resultfr16 =  accufr32 >> 15 ;
 	if(x < 0)
@@ -256,7 +236,7 @@ fract16 OscDspl_cos_fr16(fract16 x)
 	afr16=x;
 	if(x<0)
 		afr16=-x;
-	afr16 = (fract16)0x8000 - afr16;
+	afr16 = FR16_MIN - afr16;
 	bfr16=afr16;
 	int i=0;
 	for(i=0; i<5;i++)
@@ -265,7 +245,7 @@ fract16 OscDspl_cos_fr16(fract16 x)
 		afr16= OscDsplMultRFr16(afr16,bfr16);
 	}
 	if( (uint32)accufr32  > 0x3fffC000) /* saturating */
-		resultfr16= 0x7fff;
+		resultfr16= FR16_MAX;
 	else
 		resultfr16 =  accufr32 >> 15 ;
 	return resultfr16;
@@ -310,17 +290,17 @@ complex_fract16 OscDspl_cadd_fr16(complex_fract16 a, complex_fract16 b)
 	real = a.re + b.re;
 	imag = a.im + b.im;
 
-	if(real >= 32767)
-		result.re = 0x7fff;
-	else if(real <= -32768)
-		result.re = 0x8000;
+	if(real >= FR16_MAX)
+		result.re = FR16_MAX;
+	else if(real <= FR16_MIN)
+		result.re = FR16_MIN;
 	else
 		result.re = real;
 
-	if(imag >= 32767)
-		result.im = 0x7fff;
-	else if(imag <= -32768)
-		result.im = 0x8000;
+	if(imag >= FR16_MAX)
+		result.im = FR16_MAX;
+	else if(imag <= FR16_MIN)
+		result.im = FR16_MIN;
 	else
 		result.im = imag;
 
@@ -348,17 +328,17 @@ complex_fract16 OscDspl_csub_fr16( complex_fract16 a, complex_fract16 b)
 	real = a.re - b.re;
 	imag = a.im - b.im;
 
-	if(real >= 32767)
-		result.re = 0x7fff;
-	else if(real <= -32768)
-		result.re = 0x8000;
+	if(real >= FR16_MAX)
+		result.re = FR16_MAX;
+	else if(real <= FR16_MIN)
+		result.re = FR16_MIN;
 	else
 		result.re = real;
 
-	if(imag >= 32767)
-		result.im = 0x7fff;
-	else if(imag <= -32768)
-		result.im = 0x8000;
+	if(imag >= FR16_MAX)
+		result.im = FR16_MAX;
+	else if(imag <= FR16_MIN)
+		result.im = FR16_MIN;
 	else
 		result.im = imag;
 
@@ -368,10 +348,10 @@ complex_fract16 OscDspl_csub_fr16( complex_fract16 a, complex_fract16 b)
 fract16 OscDsplSatFr16(fract32 satfr32)
 {
 	fract16 resultfr16;
-	if(satfr32 >= 32767)
-		resultfr16 = 0x7fff;
-	else if(satfr32 <= -32768)
-		resultfr16 = 0x8000;
+	if(satfr32 >= FR16_MAX)
+		resultfr16 = FR16_MAX;
+	else if(satfr32 <= FR16_MIN)
+		resultfr16 = FR16_MIN;
 	else
 		resultfr16=satfr32;
 	
@@ -430,17 +410,17 @@ complex_fract16 OscDspl_cmlt_fr16 ( complex_fract16 a, complex_fract16 b )
 	real = (a.re * b.re - a.im * b.im)>> 15;
 	imag = (a.re * b.im  + a.im * b.re)>> 15;
 		
-	if(real >= 32767)
-		result.re = 0x7fff;
-	else if(real <= -32768)
-		result.re = 0x8000;
+	if(real >= FR16_MAX)
+		result.re = FR16_MAX;
+	else if(real <= FR16_MIN)
+		result.re = FR16_MIN;
 	else
 		result.re = real;
 
-	if(imag >= 32767)
-		result.im = 0x7fff;
-	else if(imag <= -32768)
-		result.im = 0x8000;
+	if(imag >= FR16_MAX)
+		result.im = FR16_MAX;
+	else if(imag <= FR16_MIN)
+		result.im = FR16_MIN;
 	else
 		result.im = imag;
 
@@ -482,7 +462,7 @@ void OscDspl_twidfftrad2_fr16(complex_fract16 w[], int n )
 
 	// 1. Quadrant
 	// Compute cosine and -sine values for the range [0..PI/2)
-	w[idx].re = 0x7fff;  //=cos(0)
+	w[idx].re = FR16_MAX;  //=cos(0)
 	w[idx].im = 0x0;     //=sin(0)
 	for(i = 1; i < nquart; i++)
 	{
@@ -504,7 +484,7 @@ void OscDspl_twidfftrad2_fr16(complex_fract16 w[], int n )
 	// no need to compute sine again
 	idx++;
 	w[idx].re = 0x0;      //=cos(PI/2)
-	w[idx].im = 0x8000;   //=-sin(PI/2);
+	w[idx].im = FR16_MIN;   //=-sin(PI/2);
 	for(i = 1; i < nquart; i++)
 	{
 	idx++;
@@ -1039,7 +1019,7 @@ void  OscDspl_ifft_fr16( const complex_fract16   in[],
 
 fract16 OscDspl_vecmax_fr16(const fract16 vec[], int length)
 {
-	fract16 max = 0x8000;
+	fract16 max = FR16_MIN;
 	int i;
 	
 	if(length <= 0)
@@ -1055,7 +1035,7 @@ fract16 OscDspl_vecmax_fr16(const fract16 vec[], int length)
 
 int OscDspl_vecmaxloc_fr16(const fract16 vec[], int length)
 {
-	fract16 max = 0x8000;
+	fract16 max = FR16_MIN;
 	int i;
 	int maxLoc = 0;
 	
@@ -1075,7 +1055,7 @@ int OscDspl_vecmaxloc_fr16(const fract16 vec[], int length)
 
 fract16 OscDspl_vecmin_fr16(const fract16 vec[], int length)
 {
-	fract16 result = 0x7fff;
+	fract16 result = FR16_MAX;
 	int i;
 	
 	if(length <= 0)
@@ -1094,7 +1074,7 @@ fract16 OscDspl_vecminloc_fr16(const fract16 vec[], int length)
 	fract16 result;
 	int i,j;
 	
-	result = 0x7fff;
+	result = FR16_MAX;
 	j=0;
 	
 	if(length <= 0)
@@ -1114,10 +1094,10 @@ fract16 OscDspl_vecminloc_fr16(const fract16 vec[], int length)
 long long int OscDsplSatFr64(long long int in)
 {
 	long long int result;
-	if(in > (fract32)0x7FFFFFFF)
-		result = (fract32)0x7FFFFFFF;
-	else if(in < (fract32)0x80000000)
-		result = (fract32)0x80000000;
+	if(in > FR32_MAX)
+		result = FR32_MAX;
+	else if(in < FR32_MIN)
+		result = FR32_MIN;
 	else
 		result = in;
 	
@@ -1129,7 +1109,7 @@ fract16 OscDspl_var_fr16(const fract16 sample[], int length)
 	int i;
 	long long int sum64=0, sumsq64=0,sumn64=0;
 	fract16 sumn16, result, mone;
-	mone = (fract16) 0x8000;
+	mone = FR16_MIN;
 	
 	if(length < 2)
 		return 0;
@@ -1265,8 +1245,8 @@ fract16 OscDspl_cabs_fr16(complex_fract16 c)
 	
 	if(c.re < 0)
 	{
-		if(c.re == (fract16)0x8000)
-			ccp.re = 0x7fff;
+		if(c.re == FR16_MIN)
+			ccp.re = FR16_MAX;
 		else
 		ccp.re = -c.re;
 	}
@@ -1275,8 +1255,8 @@ fract16 OscDspl_cabs_fr16(complex_fract16 c)
 	
 	if(c.im < 0)
 	{
-		if(c.im == (fract16)0x8000)
-			ccp.im = 0x7fff;
+		if(c.im == FR16_MIN)
+			ccp.im = FR16_MAX;
 		else
 			ccp.im = -c.im;
 	}
@@ -1293,7 +1273,7 @@ fract16 OscDspl_cabs_fr16(complex_fract16 c)
 	if(ccp.re == ccp.im)
 	{
 		if(ccp.re >= 0x5a82)    /* overflow check if real >= 0.707 */
-			return 0x7fff;
+			return FR16_MAX;
 		else
 		{
 			result = OscDsplMultRFr16(0x5a82,ccp.re) << 1; /* Result = (1.414 * real) * 2 */

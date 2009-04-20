@@ -44,11 +44,6 @@ typedef struct complex_fract16 {
 
 #endif /* OSC_HOST */
 
-/*! @brief The saturation value for a fract16 number. */
-#define FR16_SAT 0x7fff
-/*! @brief The scaling factor of a fract16 number. */
-#define FR16_SCALE 0x8000
-
 /*=========================== API functions ============================*/
 
 /*********************************************************************//*!
