@@ -216,7 +216,7 @@ fract16 OscDspl_sin_fr16(fract16 x)
 		accufr32 += (fract32)afr16 * (fract32)coef[i] << 1;
 		afr16= OscDsplMultRFr16(afr16,bfr16);
 	}
-	if( (uint32)accufr32  > 0x3fffC000) /* saturating */
+	if((uint32_t) accufr32 > 0x3fffC000) /* saturating */
 		resultfr16= FR16_MAX;
 	else
 		resultfr16 =  accufr32 >> 15 ;
@@ -244,7 +244,7 @@ fract16 OscDspl_cos_fr16(fract16 x)
 		accufr32 += (fract32)afr16 * (fract32)coef[i] << 1;
 		afr16= OscDsplMultRFr16(afr16,bfr16);
 	}
-	if( (uint32)accufr32  > 0x3fffC000) /* saturating */
+	if((uint32_t) accufr32 > 0x3fffC000) /* saturating */
 		resultfr16= FR16_MAX;
 	else
 		resultfr16 =  accufr32 >> 15 ;
