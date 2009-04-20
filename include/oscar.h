@@ -31,6 +31,7 @@ extern "C" {
 
 /* Support file for the NIH design pattern. */
 #include "nih.h"
+#include "version.h"
 
 #if defined(OSC_HOST)
 /* Defined as stumps because it is needed in code shared by target and
@@ -93,9 +94,97 @@ enum EnBayerOrder {
 	ROW_GRGR = 3
 };
 
-#include "../oscar_version.h"
-#include "../oscar_error.h"
-#include "../oscar_dependencies.h"
+/*! @brief Define general non-module-specific
+ * error codes for the OSC framework */
+enum EnOscErrors {
+	SUCCESS = 0,
+	EOUT_OF_MEMORY,
+	ETIMEOUT,
+	EUNABLE_TO_OPEN_FILE,
+	EINVALID_PARAMETER,
+	EDEVICE,
+	ENOTHING_TO_ABORT,
+	EDEVICE_BUSY,
+	ECANNOT_DELETE,
+	EBUFFER_TOO_SMALL,
+	EFILE_ERROR,
+	ECANNOT_UNLOAD,
+	ENR_OF_INSTANCES_EXHAUSTED,
+	EFILE_PARSING_ERROR,
+	EALREADY_INITIALIZED,
+	ENO_SUCH_DEVICE,
+	EUNABLE_TO_READ,
+	ETRY_AGAIN,
+	EINTERRUPTED,
+	EUNSUPPORTED
+};
+
+/* Define an offset for all modules, which allows it to define module-specific errors that do not overlap. */
+/*! @brief Error identifier offset of the cam module. */
+#define OSC_CAM_ERROR_OFFSET 100
+/*! @brief Error identifier offset of the cpld module. */
+#define OSC_CPLD_ERROR_OFFSET 200
+/*! @brief Error identifier offset of the lgx module. */
+#define OSC_LGX_ERROR_OFFSET 300
+/*! @brief Error identifier offset of the log module. */
+#define OSC_LOG_ERROR_OFFSET 400
+/*! @brief Error identifier offset of the sim module. */
+#define OSC_SIM_ERROR_OFFSET 500
+/*! @brief Error identifier offset of the bmp module. */
+#define OSC_BMP_ERROR_OFFSET 600
+/*! @brief Error identifier offset of the swr module. */
+#define OSC_SWR_ERROR_OFFSET 700
+/*! @brief Error identifier offset of the srd module. */
+#define OSC_SRD_ERROR_OFFSET 800
+/*! @brief Error identifier offset of the ipc module. */
+#define OSC_IPC_ERROR_OFFSET 900
+/*! @brief Error identifier offset of the frd module. */
+#define OSC_FRD_ERROR_OFFSET 1000
+/*! @brief Error identifier offset of the dma module. */
+#define OSC_DMA_ERROR_OFFSET 1100
+/*! @brief Error identifier offset of the hsm module. */
+#define OSC_HSM_ERROR_OFFSET 1200
+/*! @brief Error identifier offset of the cfg module. */
+#define OSC_CFG_ERROR_OFFSET 1300
+/*! @brief Error identifier offset of the clb module. */
+#define OSC_CLB_ERROR_OFFSET 1400
+
+/*! @brief Describes a module dependency of a module and all necessary information to load and unload that module. */
+struct OSC_DEPENDENCY
+{
+	/*! @brief The name of the dependency. */
+	char strName[24];
+	/*! @brief The constructor of the dependency. */
+	OSC_ERR (*create)(void *);
+	/*! @brief The destructor of the dependency. */
+	void (*destroy)(void *);
+};
+
+/*********************************************************************//*!
+ * @brief Loads the module depencies give in a list of modules.
+ * 
+ * Goes through the given dependency array and tries to create all
+ * member modules. If it fails at some point, destroy the dependencies
+ * already created and return with an error code.
+ * 
+ * @param pFw Pointer to the framework
+ * @param aryDeps Array of Dependencies to be loaded.
+ * @param nDeps Length of the dependency array.
+ * @return SUCCESS or an appropriate error code.
+ *//*********************************************************************/
+OSC_ERR OscLoadDependencies(void *pFw, const struct OSC_DEPENDENCY aryDeps[], const uint32 nDeps);
+
+/*********************************************************************//*!
+ * @brief Unloads the module depencies give in a list of modules.
+ * 
+ * Goes through the given dependency array backwards and destroys
+ * all members.
+ * 
+ * @param pFw Pointer to the framework
+ * @param aryDeps Array of Dependencies to be unloaded.
+ * @param nDeps Length of the dependency array.
+ *//*********************************************************************/
+void OscUnloadDependencies(void *pFw, const struct OSC_DEPENDENCY aryDeps[], const uint32 nDeps);
 
 /*********************************************************************//*!
  * @brief Constructor for framework
