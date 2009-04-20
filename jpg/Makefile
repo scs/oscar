@@ -32,7 +32,8 @@ host: *.c *.h ../oscar*.h
 	@echo "Compiling JPG Module for host."
 	@rm -f *_host.o
 	$(HOST_CC) $(HOST_CFLAGS) -c $(SOURCES) 
-	@rename "s/\_.o/_host\.o/" *_.o
+#	@rename "s/\_.o/_host\.o/" *_.o
+	for i in *_.o; do mv $$i $$(echo $$i | sed -r 's|_\.o$$|_host.o|'); done
 #	mv jpg_shared.o jpg_shared_host.o
 	
 ########################### Target object file ####################################
@@ -40,7 +41,8 @@ target1: *.c *.h ../oscar*.h
 	@echo "Compiling JPG Module for target."
 	@rm -f *_target.o
 	$(TARGET_CC) $(TARGET_CFLAGS) -c $(SOURCES)
-	@rename "s/\_.o/_target\.o/" *_.o
+#	@rename "s/\_.o/_target\.o/" *_.o
+	for i in *_.o; do mv $$i $$(echo $$i | sed -r 's|_\.o$$|_target.o|'); done
 #	@mv ipc_shared.o ipc_shared_target.o
 #	@cp ipc_shared_target.o ipc_shared_target_sim.o
 #	@cp ipc_target.o ipc_target_sim.o
@@ -49,7 +51,8 @@ sim1: *.c *.h ../oscar*.h
 	@echo "Compiling JPG Module for target."
 	@rm -f *_target_sim.o
 	$(TARGET_CC) $(TARGET_CFLAGS) -c $(SOURCES)
-	@rename "s/\_.o/_target_sim\.o/" *_.o
+#	@rename "s/\_.o/_target_sim\.o/" *_.o
+	for i in *_.o; do mv $$i $$(echo $$i | sed -r 's|_\.o$$|_target_sim.o|'); done
 #	@mv ipc_shared.o ipc_shared_target.o
 #	@cp ipc_shared_target.o ipc_shared_target_sim.o
 #	@cp ipc_target.o ipc_target_sim.o
