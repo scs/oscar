@@ -82,7 +82,7 @@ inline float OscDsplFr16ToFloat(fract16 n)
 inline fract16 OscDsplFloatToFr16(float n)
 {
 	float ret = (n*FR16_SCALE);
-	if(ret > FR16_SAT)
-		ret = FR16_SAT;
+	if(ret > FR16_MAX)
+		ret = FR16_MAX;
 	return (fract16)ret;
 }
