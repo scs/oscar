@@ -27,7 +27,21 @@
 
 /*! @brief Object struct of the bitmap module */
 struct OSC_VIS {
-	uint32      vis_dummy;  /*!< @brief dummy member */
+	uint32 vis_dummy; /*!< @brief dummy member */
 };
+
+/*======================= Private methods ==============================*/
+/*********************************************************************//*!
+ * @brief Assembler method to debayer a raw image to grey by averaging 
+ * blocks of 4 pixels (R + G + B + G)
+ * 
+ * @param pDst Destination pointer. Must be 4-byte aligned. Has half the
+ * width and half the height of the source image.
+ * @param pSrc Raw source image pointer. Must be 4-byte aligned. 
+ * @param width Width of source image
+ * @param height of source image.
+ * @return SUCCESS or an appropriate error code otherwise
+ *//*********************************************************************/
+extern void debayer_grey(unsigned char *pDst, const unsigned char *pSrc, unsigned int width, unsigned int height);
 
 #endif /*VIS_PRIV_H_*/

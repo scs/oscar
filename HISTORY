@@ -1,3 +1,7 @@
++ Release v1.2-p5
+Multiple bug-fixes (configuring, timeout)
+
+
 + Release v1.2-p4
 Add shift-left functions for fract16 and fract2x16
 

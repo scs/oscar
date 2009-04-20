@@ -29,8 +29,8 @@ OSC_ERR OscVisFastDebayerRGB(const struct OSC_PICTURE *pRaw, struct OSC_PICTURE 
 {
 	uint16 x,y;
 	uint32 outPos = 0;
-	char *in  = (char *)pRaw->data;
-	char *out = (char *)pOut->data;
+	unsigned char *in  = (unsigned char *)pRaw->data;
+	unsigned char *out = (unsigned char *)pOut->data;
 
 	for (y=0; y<pRaw->height; y+=2) {
 		for (x=0; x<pRaw->width; x+=2) {
@@ -49,17 +49,55 @@ OSC_ERR OscVisFastDebayerRGB(const struct OSC_PICTURE *pRaw, struct OSC_PICTURE 
 }
 
 
+OSC_ERR OscVisVectorDebayerGrey(const struct OSC_PICTURE *pRaw, struct OSC_PICTURE *pOut)
+{
+	if(pOut == NULL || pRaw == NULL || pOut->data == NULL || pRaw->data == NULL)
+	{
+		return -EINVALID_PARAMETER;
+	}
+
+	if(pRaw->width%4 != 0 || pRaw->height%2 != 0)
+	{
+		OscLog(ERROR, "%s: Invalid input image dimensions!\n",
+		       __func__);
+		return -EINVALID_PARAMETER;
+	}
+
+	if((uint32)pRaw->data % 4 != 0 || (uint32)pOut->data % 4 != 0)
+	{
+		OscLog(ERROR, "%s: Input and output image memory must be 4-byte aligned!\n",
+		       __func__);
+		return -EINVALID_PARAMETER;
+	}
+
+#ifdef OSC_TARGET
+	/* Call the assembler optimized function that does the actual work for us. */
+	_debayer_grey((uint8*)pOut->data,
+		      (const uint8*)pRaw->data,
+		      pRaw->width,
+		      pRaw->height);
+	return SUCCESS;
+#endif
+#ifdef OSC_HOST
+	return OscVisFastDebayerGrey(pRaw, pOut);
+#endif
+}
+
+
 OSC_ERR OscVisFastDebayerGrey(const struct OSC_PICTURE *pRaw, struct OSC_PICTURE *pOut)
 {
 	uint16 x,y;
 	uint32 outPos=0;
-	char *in  = (char *)pRaw->data;
-	char *out = (char *)pOut->data;
+	uint8 *in  = (uint8 *)pRaw->data;
+	uint8 *out = (uint8 *)pOut->data;
 
 	for (y=0; y<pRaw->height; y+=2) {
 		for (x=0; x<pRaw->width; x+=2) {
 			                /*     blue           +          2x green          +              red           */
-			out[outPos++] = ( in[y*pRaw->width+x] + (in[y*pRaw->width+x+1]<<1) + in[(y+1)*pRaw->width+x+1] )>>2;
+			out[outPos++] = (uint8)(( (uint16)in[y*pRaw->width+x] + 
+						  (uint16)in[y*pRaw->width+x+1] + 
+						  (uint16)in[(y+1)*pRaw->width+x] +
+						  (uint16)in[(y+1)*pRaw->width+x+1] ) >> 2);
 		} /* for x */
 	} /* for y */
 	pOut->width  = pRaw->width/2;

@@ -46,6 +46,7 @@ void OscDmaStart(void *hChainHandle)
 	/* Set the stop flag to zero */
 	pChain->syncFlag = 0;
 	FLUSHINV(&pChain->syncFlag);
+	SSYNC;
 	
 	/* Calculate the config word as a merge of source and destination
 	 * config. */
@@ -69,6 +70,7 @@ OSC_ERR OscDmaSync(void *hChainHandle)
 	while(OscSupCycToMicroSecs(OscSupCycGet() - startCyc) < DMA_TIMEOUT)
 	{
 		FLUSHINV(&pChain->syncFlag);
+		SSYNC;
 		if(pChain->syncFlag != 0)
 			return SUCCESS;
 		waitCyc = OscSupCycGet();
@@ -89,6 +91,7 @@ OSC_ERR OscDmaSync(void *hChainHandle)
 	while(timeout--)
 	{
 		FLUSHINV(&pChain->syncFlag);
+		SSYNC;
 		if(pChain->syncFlag != 0)
 			return SUCCESS;
 		waitCyc = OscSupCycGet();
