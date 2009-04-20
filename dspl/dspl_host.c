@@ -101,33 +101,21 @@ fract16 OscDsplLow_of_fr2x16(fract2x16 x)
 
 fract16 OscDsplShl_fr1x16(fract16 x, int y)
 {
-	if( y > 0 )
-	{
-		return x << y;
-	}
-	else
-	if (y < 0)
-	{
-		return x >> -y;
-	}
+	/* The C standard does not specify (to my knowledge) the result of a shift operation with a negative amount. */
+	if (y > 0)
+		x <<= y;
+	else if (y < 0)
+		x >>= y;
+	
+	return x;
 }
 
 fract2x16 OscDsplShl_fr2x16(fract2x16 x, int y)
 {
-	fract16 low, high;
-	if( y > 0 )
-	{
-		low  = OscDsplLow_of_fr2x16(x) << y;		
-		high = OscDsplHigh_of_fr2x16(x) << y;		
-		return OscDsplCompose_fr2x16( high, low);
-	}
-	else
-	if (y < 0)
-	{
-		low  = OscDsplLow_of_fr2x16(x) >> -y;		
-		high = OscDsplHigh_of_fr2x16(x) >> -y;		
-		return OscDsplCompose_fr2x16( high, low);
-	}
+	fract16 low = OscDsplShl_fr1x16(OscDsplLow_of_fr2x16(x), y);
+	fract16 high  = OscDsplShl_fr1x16(OscDsplHigh_of_fr2x16(x), y);
+	
+	return OscDsplCompose_fr2x16(high, low);
 }
 
 fract2x16 OscDsplCompose_fr2x16(fract16 h, fract16 l)
