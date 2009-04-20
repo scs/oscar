@@ -48,12 +48,12 @@ $(MODULES): .FORCE
 	$(MAKE) -C $@
 
 # Call this as oscar_$(MODE) to only build them main oscar files.
-oscar_%: .FORCE
+oscar_%: .FORCE needs_config
 	$(MAKE) -f Makefile_module $*
 
 # Produce a target of the form "foo/%" for every directory foo that contains a Makefile
 define subdir_target
-$(1)/%: .FORCE
+$(1)/%: .FORCE needs_config
 	$(MAKE) -C $(1) $$*
 endef
 SUBDIRS := $(sort $(patsubst %/, %, $(dir $(wildcard */Makefile))) $(MODULES))
@@ -64,8 +64,10 @@ $(foreach i, $(SUBDIRS), $(eval $(call subdir_target, $(i))))
 	$(MAKE) -f Makefile_module $@
 
 # Use this target as a prerequisite in a target that should fail if the framework has not yet been configured.
-needs_config: .FORCE
+needs_config: .FORCE;
+ifneq '$(filter-out clean config, $(or $(MAKECMDGOALS), needs_config))' ''
 	@ [ -e ".config" ] || { echo "The framework has to be configured using 'make config' first!"; false; }
+endif
 $(sort $(MAKEFILE_LIST) .config):;
 
 # Target to explicitly start the configuration process.
