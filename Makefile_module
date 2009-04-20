@@ -56,7 +56,7 @@ allvars = $(foreach i, $(call varnames, $(1)), $($i))
 all: $(MODES)
 
 # Including depency files and optional local Makefile.
--include Makefile.local *.d
+-include Makefile.local build/*.d
 
 #Defining and expanding the build targets.
 define build_rules
