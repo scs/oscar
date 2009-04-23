@@ -83,12 +83,11 @@ reconfigure: needs_config .FORCE
 doc: .FORCE
 	rm -rf doc/{html,latex}
 	doxygen documentation/oscar.doxygen
-	ln -sf html/index.html documentation/index.html
 
 # Cleans the framework and all modules
 clean: %: $(addsuffix /%, $(SUBDIRS)) oscar_clean .FORCE
 	rm -rf library/*.a
-	rm -rf doc/{html,latex,index.html}
+	rm -rf doc/{html,latex}
 
 # Cleans everything not intended for source distribution
 distclean: clean .FORCE
