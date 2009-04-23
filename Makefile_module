@@ -40,8 +40,8 @@ CC_target_sim_dbg := $(CC_target_) -DOSC_SIM -ggdb3
 
 # Listings of source files for the different modes.
 SOURCES := $(filter-out %_host.c %_target.c, $(wildcard *.c))
-SOURCES_host += $(SOURCES) $(wildcard *_host.c)
-SOURCES_target += $(SOURCES) $(wildcard *_target.c)
+SOURCES_host := $(SOURCES) $(wildcard *_host.c)
+SOURCES_target := $(SOURCES) $(wildcard *_target.c)
 
 # Modes to compile this module in.
 MODES := host target target_sim
