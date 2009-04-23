@@ -234,7 +234,6 @@ set_target: .config
 doc:
 	rm -rf doc/{html,latex}
 	doxygen documentation/oscar.doxygen
-	ln -sf html/index.html documentation/index.html
 
 # Cleanup
 .PHONY: clean
@@ -243,7 +242,7 @@ clean:
 	rm -f $(OUT)$(HOST_SUFFIX) $(OUT)$(TARGET_SUFFIX)
 	rm -rf $(STAGING_DIR)
 	rm -f *.o
-	rm -rf doc/{html,latex,index.html}
+	rm -rf doc/{html,latex}
 	@echo "Directory cleaned"
 
 # Cleans everything not intended for source distribution
