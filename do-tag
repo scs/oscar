@@ -124,7 +124,7 @@ EOF
 # Changes since the last release, $NEWEST_RELEASE:
 #
 EOF
-					git diff --stat | sed -r "s/^/#/" >> "$TEMP_FILE"
+					git diff --stat "$NEWEST_RELEASE" | sed -r "s/^/#/" >> "$TEMP_FILE"
 				fi
 			fi
 			
