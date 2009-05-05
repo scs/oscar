@@ -206,7 +206,7 @@ OSC_ERR OscCamSetAreaOfInterest(const uint16 lowX,
 				__func__, errno);
 		
 		/* An error has occured */
-		if(errno == -EINVAL) /* Invalid parameter */
+		if(errno == EINVAL) /* Invalid parameter */
 		{
 			OscLog(ERROR, "%s(%u, %u, %u, %u): Invalid parameter!\n",
 					__func__, lowX, lowY, width, height);
