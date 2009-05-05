@@ -72,7 +72,7 @@ OSC_ERR OscVisVectorDebayerGrey(const struct OSC_PICTURE *pRaw, struct OSC_PICTU
 
 #ifdef OSC_TARGET
 	/* Call the assembler optimized function that does the actual work for us. */
-	_debayer_grey((uint8*)pOut->data,
+	debayer_grey((uint8*)pOut->data,
 		      (const uint8*)pRaw->data,
 		      pRaw->width,
 		      pRaw->height);

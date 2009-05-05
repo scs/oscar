@@ -1,9 +1,9 @@
 .text
         .align 4 
 
-	.global __debayer_grey
+	.global _debayer_grey
 	
-__debayer_grey:
+_debayer_grey:
 	link 0
 	[ --sp ] = ( P5:3 )
 	[ --sp ] = R4

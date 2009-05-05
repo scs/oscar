@@ -42,6 +42,9 @@ struct OSC_VIS {
  * @param height of source image.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-extern void debayer_grey(unsigned char *pDst, const unsigned char *pSrc, unsigned int width, unsigned int height);
+extern void debayer_grey(unsigned char *pDst,
+                         const unsigned char *pSrc,
+                         unsigned int width,
+                         unsigned int height);
 
 #endif /*VIS_PRIV_H_*/

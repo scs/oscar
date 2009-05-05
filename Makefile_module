@@ -38,6 +38,10 @@ CC_target_dbg := $(CC_target_) -ggdb3
 CC_target_sim := $(CC_target_) -DOSC_SIM -O2
 CC_target_sim_dbg := $(CC_target_) -DOSC_SIM -ggdb3
 
+# Assembler for the host and the target.
+AS_host := as
+AS_target := bfin-uclinux-as
+
 # Listings of source files for the different modes.
 SOURCES := $(filter-out %_host.c %_target.c, $(wildcard *.c))
 SOURCES_host := $(SOURCES) $(wildcard *_host.c)
@@ -60,11 +64,14 @@ all: $(MODES)
 
 #Defining and expanding the build targets.
 define build_rules
-$(1): $(patsubst %.c, build/%_$(1).o, $(call firstvar, SOURCES_$(1)))
+$(1): $(patsubst %.c, build/%_$(1).o, $(patsubst %.asm, build/%_$(1).o, $(call firstvar, SOURCES_$(1))))
 build/%_$(1).o: %.c $(filter-out %.d, $(MAKEFILE_LIST))
 	@ mkdir -p $$(dir $$@)
 	$$(call firstvar, CC_$(1)) -MD $$< -o $$@
 	@ grep -oE '[^ \\]+' < $$(@:.o=.d) | sed -r '/:$$$$/d; s/^.*$$$$/$$(subst /, \/, $$@): \0\n\0:/' > $$(@:.o=.d~) && mv -f $$(@:.o=.d){~,}
+build/%_$(1).o: %.asm $(filter-out %.d, $(MAKEFILE_LIST))
+	@ mkdir -p $$(dir $$@)
+	$$(call firstvar, AS_$(1)) $$< -o $$@
 endef
 $(foreach i, $(MODES), $(eval $(call build_rules,$(i))))
 

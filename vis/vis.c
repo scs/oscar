@@ -89,4 +89,3 @@ void OscVisDestroy(void *hFw)
 	
 	memset(&vis, 0, sizeof(struct OSC_VIS));
 }
-

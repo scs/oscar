@@ -1,0 +1,1 @@
+SOURCES_target += $(wildcard *.asm)
