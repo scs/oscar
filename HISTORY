@@ -1,3 +1,13 @@
++ Release v1.3
+
+* Cleaned up the Makefile infrastructure which allows us to only have one generic module Makefile.
+* The framework now generates libraries with and without debugging symbols and with and without IO simulation.
+* Added a 'MESA_SR4K' target, used for the SwissRanger 4000 by Mesa Imaging.
+* Added the 'jpg' module which can be used to encode JPEG images.
+* Added the function 'OscSupCycGet64' to read the 64-bit hight-resolution-timer on the blackfin DSP.
+* Added a very fast grayscale debayering function 'OscVisVectorDebayerGrey' using DSP vector operations.
+
+
 + Release v1.2-p5
 Multiple bug-fixes (configuring, timeout)
 
