@@ -81,7 +81,7 @@ reconfigure: needs_config .FORCE
 
 # Builds the doxygen documentation.
 doc: .FORCE
-	rm -rf doc/{html,latex}
+	rm -rf documentation/{html,latex}
 	doxygen documentation/oscar.doxygen
 
 # Cleans the framework and all modules
