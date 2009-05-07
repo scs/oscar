@@ -16,7 +16,7 @@
 	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-/*! @file dma_target.c
+/*! @file
  * @brief Memory DMA module implementation for target
  */
 

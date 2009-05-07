@@ -18,7 +18,7 @@
 	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-/*! @file jpg_pub.h
+/*! @file
  * @brief API definition for jpeg module
  * 
  */

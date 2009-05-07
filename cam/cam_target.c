@@ -16,7 +16,7 @@
 	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-/*! @file cam_target.c
+/*! @file
  * @brief Camera module implementation for target
 	
  * On the OSC-specific hardware featuring

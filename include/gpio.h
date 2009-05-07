@@ -16,7 +16,7 @@
 	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-/*! @file gpio_pub.h
+/*! @file
  * @brief Public GPIO module definition
  *
  * Contains the public definitions of the GPIO module.

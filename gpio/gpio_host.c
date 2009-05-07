@@ -16,7 +16,7 @@
 	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-/*! @file gpio_host.c
+/*! @file
  * @brief GPIO module implementation for host
  */
 

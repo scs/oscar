@@ -16,7 +16,7 @@
 	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-/*! @file frd_pub.h
+/*! @file
  * @brief API definition for filename reader module
  * 
  * Frd allows reads a configuration file containing the syntax rules

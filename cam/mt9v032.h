@@ -16,7 +16,7 @@
 	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-/*! @file mt9v032.h
+/*! @file
  * @brief API for mt9v032h camera driver
  */
 

@@ -16,7 +16,7 @@
 	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-/*! @file log_host.c
+/*! @file
  * @brief Logging module implementation for host
  */
 

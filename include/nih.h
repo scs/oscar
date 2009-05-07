@@ -16,7 +16,7 @@
 	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-/*! @file nih.h
+/*! @file
  * @brief NIH - "Not invented here."
  * 
  * Header file to support applications using the NIH design pattern.

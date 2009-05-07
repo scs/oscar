@@ -16,7 +16,7 @@
 	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-/*! @file sup_pub.h
+/*! @file
  * @brief API definition for support module.
  * 
  * Contains stuff that is too small to be put in a separate module.

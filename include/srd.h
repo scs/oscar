@@ -16,7 +16,7 @@
 	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-/*! @file srd_pub.h
+/*! @file
  * @brief API definition for stimuli reader module
  * 
  * Srd allows to read signal values from a stimuli file.

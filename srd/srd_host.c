@@ -16,7 +16,7 @@
 	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-/*! @file srd_host.c
+/*! @file
  * @brief Stimuli reader module implementation for host.
  */
 

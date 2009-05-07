@@ -16,7 +16,7 @@
 	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-/*! @file cpld_pub.h
+/*! @file
  * @brief API definition for Cpld module.
  * 
  * Cpld provides the basic functionality to access

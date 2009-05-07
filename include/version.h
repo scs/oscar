@@ -1,4 +1,4 @@
-/*! @file oscar_version.h
+/*! @file
  * @brief Framework versioning.
  * 
  * For usage of the number fields @see OscGetRevisionNumber() 

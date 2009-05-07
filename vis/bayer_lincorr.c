@@ -16,7 +16,7 @@
 	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-/*! @file bayer_lincorr.c
+/*! @file
  * @brief Debayering using linear interpolation with 1st degree laplace
  * coefficients.
  */

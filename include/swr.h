@@ -16,7 +16,7 @@
 	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-/*! @file swr_pub.h
+/*! @file
  * @brief API definition for stimuli writer module
  * 
  * Swr allows to log signal values to a stimuli report file

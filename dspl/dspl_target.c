@@ -16,7 +16,7 @@
 	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-/*! @file dspl_target.c
+/*! @file
  * @brief Blackfin DSP runtime library implementation for host.
  * 
  * All functions of the DSP runtime library used on the target must

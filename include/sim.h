@@ -16,7 +16,7 @@
 	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-/*! @file sim_pub.h
+/*! @file
  * @brief API definition for simulation module
  * 
  * Simulation is only used for host. Target implementation provides

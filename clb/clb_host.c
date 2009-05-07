@@ -16,7 +16,7 @@
 	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-/*! @file clb_host.c
+/*! @file
  * @brief Calibration module implementation
  * 
  * No calibration is applied to host pictures.

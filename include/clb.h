@@ -16,7 +16,7 @@
 	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-/*! @file clb_pub.h
+/*! @file
  * @brief API definition for calibration module
  * 
  * Provides support for camera calibration including correction methods as:

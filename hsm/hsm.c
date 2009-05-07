@@ -16,7 +16,7 @@
 	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-/*! @file hsm.c
+/*! @file
  * @brief HSM implementation for host and target.
  * 
 	************************************************************************/

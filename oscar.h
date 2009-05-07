@@ -16,7 +16,7 @@
 	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-/*! @file oscar.h
+/*! @file
  * @brief Private framework definitions
  */
 #ifndef OSCAR_PRIV_H_

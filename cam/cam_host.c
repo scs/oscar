@@ -16,7 +16,7 @@
 	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-/*! @file cam_host.c
+/*! @file
  * @brief Camera module implementation for host
  * 
  * Simulation of the OSC-specific hardware featuring

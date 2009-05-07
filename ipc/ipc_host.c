@@ -16,7 +16,7 @@
 	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-/*! @file ipc_host.c
+/*! @file
  * @brief Interprocess communication module implementation for host
  */
 

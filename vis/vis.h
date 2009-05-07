@@ -16,7 +16,7 @@
 	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-/*! @file vis.h
+/*! @file
  * @brief Private vision support module definitions with object structure
  */
 
