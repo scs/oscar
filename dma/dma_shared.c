@@ -94,7 +94,7 @@ inline void OscDmaResetChain(void *hChainHandle)
 {
 	struct DMA_CHAIN *pChain = (struct DMA_CHAIN*)hChainHandle;
 
-	if(unlikely(pChainHandle == NULL))
+	if(unlikely(hChainHandle == NULL))
 	{
 	    OscLog(ERROR, "%s: Invalid parameter!\n");
 	    return;
