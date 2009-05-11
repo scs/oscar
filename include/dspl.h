@@ -33,9 +33,9 @@
 
 #ifdef OSC_HOST
 /* For the host, we need to manually make the type definitions */
-typedef uint16_t fract16;
-typedef uint32_t fract32;
-typedef uint32_t fract2x16;
+typedef int16_t fract16;
+typedef int32_t fract32;
+typedef int32_t fract2x16;
 
 typedef struct complex_fract16 {
 	fract16 re;

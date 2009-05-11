@@ -83,6 +83,15 @@ void OscDmaResetChain(void *hChainHandle);
  * a limited number of moves supported in a chain. The transfer will not
  * start until OscDmaStart() has been called.
  * All moves in a chain must have the same word size!
+ * 
+ * Conditions:
+ * - Same number of words read as written:
+ *   dstXCount * dstYCount = srcXCount * srcYCount
+ * - All memory accesses are aligned to the word size:
+ *   pDstAddr % word_size = pSrcAddr % word_size = 0
+ *   dstXModify % word_size = dstYModify % word_size = 
+ *   srcXModify % word_size = srcYModify % word_size = 0
+ *
  * @see OscDmaStart
  * 
  * @param hChainHandle Handle to the DMA chain to add this move to.
@@ -92,22 +101,22 @@ void OscDmaResetChain(void *hChainHandle);
  * @param dstXCount The number of words in the X direction of the
  * destination memory block.
  * @param dstXModify The offset the write address is modified with
- * after each line.
+ * after each word in the X direction.
  * @param dstYCount The number of words in the Y direction of the
  * destination memory block.
  * @param dstYModify The offset the write address is modified with
- * after each word.
+ * after each line in the Y direction.
  * @param pSrcAddr The starting address at which reading will begin.
  * @param enSrcWdSize The word size transferred per DMA cycle on the
  * writing end.
  * @param srcXCount The number of words in the X direction of the
  * source memory block.
  * @param srcXModify The offset the read address is modified with
- * after each word.
+ * after each word in the X direction.
  * @param srcYCount The number of words in the Y direction of the
  * source memory block.
  * @param srcYModify The offset the read address is modified with
- * after each line.
+ * after each line in the Y direction.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
 OSC_ERR OscDmaAdd2DMove(void *hChainHandle,
@@ -130,6 +139,14 @@ OSC_ERR OscDmaAdd2DMove(void *hChainHandle,
  * All moves in a chain must have the same word size!
  * @see OscDmaStart
  * 
+ *
+ * Conditions:
+ * - Same number of words read as written:
+ *   dstCount = srcCount
+ * - All memory accesses are aligned to the word size:
+ *   pDstAddr % word_size = pSrcAddr % word_size = 0
+ *   dstModify % word_size = srcModify % word_size = 0
+ *
  * @param hChainHandle Handle to the DMA chain to add this move to.
  * @param pDstAddr The starting address at which writing will begin.
  * @param enDstWdSize The word size transferred per DMA cycle on the

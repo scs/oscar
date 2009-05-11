@@ -356,7 +356,7 @@ OSC_ERR OscCfgGetStrRange(
     {
     	err = ECFG_INVALID_RANGE;
 	}  
-	if( err != SUCCESS)
+	if( err != SUCCESS && pDefault != NULL)
 	{
     	strcpy( pVal->str, pDefault);
     	err = ECFG_USED_DEFAULT;

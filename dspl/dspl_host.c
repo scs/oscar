@@ -96,9 +96,11 @@ fract16 OscDsplShl_fr1x16(fract16 x, int y)
 {
 	/* The C standard does not specify (to my knowledge) the result of a shift operation with a negative amount. */
 	if (y > 0)
-		x <<= y;
-	else if (y < 0)
-		x >>= y;
+	{
+	    x <<= y;
+	} else if (y < 0) {
+	    x >>= (-y);
+	}
 	
 	return x;
 }
