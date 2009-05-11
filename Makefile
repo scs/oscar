@@ -76,8 +76,8 @@ config: .FORCE
 
 # Target that gets called by the configure script after the configuration.
 reconfigure: needs_config .FORCE
-	ln -sf "../boards/$(CONFIG_BOARD).h" "include/board.h"
-	$(MAKE) -f Makefile_config reconfigure
+	@ ln -sf "../boards/$(CONFIG_BOARD).h" "include/board.h"
+	@ $(MAKE) --always-make -f Makefile_config reconfigure
 
 # Builds the doxygen documentation.
 doc: .FORCE
