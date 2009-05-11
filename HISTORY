@@ -1,3 +1,8 @@
++ Release v1.3-p1
+
+* This fixed some major bugs in the dspl modules which made the host implementation virtually useless.
+
+
 + Release v1.3
 
 * Cleaned up the Makefile infrastructure which allows us to only have one generic module Makefile.
