@@ -94,3 +94,9 @@ clean: %: $(addsuffix /%, $(SUBDIRS)) oscar_clean .FORCE
 distclean: clean .FORCE
 	rm -f .config
 	rm -rf lgx
+
+# This captures all warnings generated while compiling the framework and sorts them by file.
+warnings: .FORCE
+	@ echo "Gathering all warnings, this takes a minute ..." >&2
+	@ $(MAKE) clean &> /dev/null
+	@ $(MAKE) all 2>&1 | sed -rn 's,^([^:]+:[0-9]+): (warning|error): (.*)$$,\1 \3,p' | sort | uniq
