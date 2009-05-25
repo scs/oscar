@@ -27,7 +27,8 @@
 #include "oscar.h"
 
 /*!@brief object struct */
-struct { } hsm; /*!< Module singelton instance */
+struct OSC_HSM { void * dummy; };
+struct OSC_HSM hsm; /*!< Module singelton instance */
 
 /*! The dependencies of this module. */
 struct OSC_DEPENDENCY hsm_deps[] = {
@@ -60,8 +61,7 @@ OSC_ERR OscHsmCreate(void *hFw)
 		return err;
 	}
 	
-	memset(&hsm, 0, sizeof hsm);
-	
+	hsm = (struct OSC_HSM) { 0 };
 	
 	/* Increment the use count */
 	pFw->hsm.hHandle = (void*)&hsm;
@@ -88,7 +88,7 @@ void OscHsmDestroy(void *hFw)
 			sizeof(hsm_deps)/sizeof(struct OSC_DEPENDENCY));
 	
 	
-	memset(&hsm, 0, sizeof hsm);
+	hsm = (struct OSC_HSM) { 0 };
 }
 
 

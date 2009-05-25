@@ -43,8 +43,8 @@ OSC_ERR OscDsplCreate(void *hFw)
 		/* The module is already allocated */
 		return SUCCESS;
 	}
-		
-	memset(&osc_dspl, 0, sizeof(struct OSC_DSPL));
+	
+	osc_dspl = (struct OSC_DSPL) { 0 };
 		
 	/* Increment the use count */
 	pFw->dspl.hHandle = (void*)&osc_dspl;
@@ -66,7 +66,7 @@ void OscDsplDestroy(void *hFw)
 		return;
 	}
 	
-	memset(&osc_dspl, 0, sizeof(struct OSC_DSPL));
+	osc_dspl = (struct OSC_DSPL) { 0 };
 }
 
 inline float OscDsplFr16ToFloat(fract16 n)
