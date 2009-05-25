@@ -127,7 +127,7 @@ void OscLog(const enum EnOscLogLevel level, const char * strFormat, ...)
 
 void OscFatalErr(const char * strFormat, ...)
 {
-	uint16 len;
+	uint16 len = 0;
 	va_list ap; /*< The dynamic argument list */
 
 	osc_log.strTemp[0] = 0; /* Mark the string as empty */
@@ -140,8 +140,7 @@ void OscFatalErr(const char * strFormat, ...)
 
 	/* Log to the log file*/
 
-	/* We can't use sprintf because we only have the additional
-	 * arguments as a list => use vsprintf */
+	/* We can't use sprintf because we only have the additional arguments as a list => use vsprintf */
 	va_start(ap, strFormat);
 	len += vsprintf(osc_log.strTemp, strFormat, ap);
 	va_end(ap);
