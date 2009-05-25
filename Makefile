@@ -17,7 +17,7 @@
 
 # Disable make's built-in rules.
 MAKE += -RL --no-print-directory
-SHELL := $(shell which bash)
+SHELL := $(shell which bash) -e -o pipefail
 
 # Include the configuration file only if a target given on the command line requires it.
 ifneq '$(filter-out clean distclean config doc, $(or $(MAKECMDGOALS), all))' ''
@@ -52,7 +52,7 @@ library/libosc_%.a: oscar_% $(addsuffix /%, $(MODULES))
 $(MODULES): .FORCE
 	$(MAKE) -C $@
 
-# Call this as oscar_$(MODE) to only build them main oscar files.
+# Call this as oscar_$(MODE) to only build the main oscar files.
 oscar_%: .FORCE
 	$(MAKE) -f Makefile_module $*
 
@@ -97,6 +97,6 @@ distclean: clean .FORCE
 
 # This captures all warnings generated while compiling the framework and sorts them by file.
 warnings: .FORCE
-	@ echo "Gathering all warnings, this takes a minute ..." >&2
+	@ echo "Gathering all warnings, this may take a minute ..." >&2
 	@ $(MAKE) clean &> /dev/null
-	@ $(MAKE) all 2>&1 | sed -rn 's,^([^:]+:[0-9]+): (warning|error): (.*)$$,\1 \3,p' | sort | uniq
+	@ { $(MAKE) all; $(MAKE) doc; } 2>&1 | sed -rn 's,^([^:]+:[0-9]+): (warning|error): (.*)$$,\1 \3,pi' | sort | uniq

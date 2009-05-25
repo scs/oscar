@@ -17,7 +17,7 @@
 
 # Disable make's built-in rules.
 MAKE += -RL --no-print-directory
-SHELL := $(shell which bash)
+SHELL := $(shell which bash) -e -o pipefail
 
 # This includes the framework configuration.
 ROOT_PATH := $(dir $(shell readlink $(lastword $(MAKEFILE_LIST))))
