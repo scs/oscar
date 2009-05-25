@@ -99,4 +99,4 @@ distclean: clean .FORCE
 warnings: .FORCE
 	@ echo "Gathering all warnings, this may take a minute ..." >&2
 	@ $(MAKE) clean &> /dev/null
-	@ { $(MAKE) all; $(MAKE) doc; } 2>&1 > /dev/null | sed -rn 's,^([^:]+:[0-9]+): (warning|error): (.*)$$,\1 \3,pi' | sort | uniq
+	@ { $(MAKE) all; $(MAKE) doc; } 2>&1 > /dev/null | sed -rn 's,^([^:]+:[0-9]+): (warning|error): (.*)$$,\1 \3,pi' | sort | uniq | tee >(wc -l | sed -rn 's|[\t ]*||g; s|$$| warnings.|p')
