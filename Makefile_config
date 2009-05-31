@@ -1,15 +1,16 @@
 # Include this makefile to get the configuration variables and the right board makefile.
 
-# .PHONY is broken on static pattern rules.
-.PHONY: .FORCE
-
 # This allows us to call this makefile to use the selected board's makefile's reconfigure target.
 ifeq '$(words $(MAKEFILE_LIST))' '1'
-  reconfigure: .FORCE
+  .PHONY: reconfigure
   RECONFIGURE := reconfigure
 endif
 
--include $(ROOT_DIR).config
-ifneq '$(CONFIG_BOARD)' ''
-  include $(ROOT_DIR)boards/$(CONFIG_BOARD).mk
+# Try to include the configuration file.
+-include $(ROOT_PATH).config
+ifneq '$(lastword $(MAKEFILE_LIST))' '$(ROOT_PATH).config'
+  $(error "The framework has to be configured using 'make config' first!")
 endif
+
+# Include the board-specific makefile.
+include $(ROOT_PATH)boards/$(CONFIG_BOARD).mk
