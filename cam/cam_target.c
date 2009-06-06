@@ -25,6 +25,14 @@
 
 #include "cam.h"
 
+#ifdef OSC_SIM
+
+ /* Replace this file with the host version for simulation (as there, we do not access
+  * the camera. */
+ #include "cam_host.c"
+
+#else /* OSC_SIM */
+
 #include <sys/ioctl.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -658,4 +666,4 @@ OSC_ERR OscCamConfigSensorLedOut(bool bSensorLedOut, bool bInvert)
 
 #endif /* TARGET_TYPE_LEANXCAM */
 
-
+#endif /* OSC_SIM */

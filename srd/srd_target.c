@@ -20,6 +20,10 @@
  * @brief Stimuli reader module implementation for target.
  */
 
+#ifdef OSC_SIM
+ #include "srd_host.c"
+#else /* OSC_SIM */
+
 #include "srd.h"
 
 struct OSC_SRD srd;     /*!< Module singelton instance */
@@ -84,3 +88,4 @@ void OscSrdDestroy(void *hFw)
 	memset(&srd, 0, sizeof(struct OSC_SRD));
 }
 
+#endif /* OSC_SIM */
