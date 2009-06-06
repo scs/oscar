@@ -340,4 +340,29 @@ OSC_ERR OscVisFastDebayerHSL_L(const struct OSC_PICTURE *pRaw, struct OSC_PICTUR
  *//*********************************************************************/
 OSC_ERR OscVisSobel(const uint8 *pIn, uint8 *pOut, const uint16 width, const uint16 height, const uint8 exp);
 
+/*********************************************************************//*!
+ * @brief Debayer an image to BGR color format using bilinear debayering.
+ * 
+ * Function is assembler-optimized on target. (~14 ms for 752x480)
+ * Currently only the bayer orders BGBG and GRGR are supported (which are
+ * the ones normally encountered when reading an image from the CMOS
+ * sensor).
+ * The result is an image with the format OSC_PICTURE_BGR_24.
+ *
+ * @param pDst The destination image (size: width x height x 3)
+ * @param pSrc The source image (size: width x height)
+ * @param width Width of the source image. Must be multiple of 4 and greater
+ * zero.
+ * @param height Height of the source image
+ * @param pTmp Temporary memory for intermediate calculations
+ * (size: width x 4)
+ * @param enBayerOrder The order of the bayer pattern in the source image.
+ * @return SUCCESS or an appropriate error code.
+ *//*********************************************************************/
+OSC_ERR OscVisDebayerBilinearBGR(uint8 *pDst, 
+				 uint8 *pSrc, 
+				 uint32 width, 
+				 uint32 height, 
+				 uint8 *pTmp, 
+				 enum EnBayerOrder enBayerOrder);
 #endif /*VIS_PUB_H_*/
