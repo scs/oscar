@@ -17,12 +17,8 @@
 */
 
 /*! @file
- * @brief GPIO module implementation for target
+ * @brief GPIO module implementation for host
  */
-
-#ifdef OSC_SIM
- #include "gpio_host.c"
-#else /* OSC_SIM */
 
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -450,5 +446,3 @@ OSC_ERR OscGpioConfigImageTrigger(enum EnTriggerConfig enConfig)
 }
 
 #endif /* TARGET_TYPE_LEANXCAM */
-
-#endif /* OSC_SIM */

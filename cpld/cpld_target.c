@@ -20,10 +20,6 @@
  * @brief Cpld module implementation for target.
  */
 
-#ifdef OSC_SIM
- #include "cpld_host.c"
-#else /* OSC_SIM */
-
 #include <sys/ioctl.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -215,4 +211,3 @@ OSC_ERR OscCpldFget(
 	return -ENO_SUCH_DEVICE;
 }
 #endif /* TARGET_TYPE_INDXCAM */
-#endif /* OSC_SIM */

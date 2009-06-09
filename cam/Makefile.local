@@ -1,0 +1,3 @@
+SOURCES_host := cam_shared.c cam_multibuffer.c cam_host.c
+SOURCES_target := cam_shared.c cam_multibuffer.c cam_target.c
+SOURCES_target_sim := cam_shared.c cam_multibuffer.c cam_host.c

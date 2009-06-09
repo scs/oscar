@@ -1,0 +1,3 @@
+SOURCES_host := srd_host.c
+SOURCES_target := srd_target.c
+SOURCES_target_sim := srd_host.c

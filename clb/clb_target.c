@@ -20,10 +20,6 @@
  * @brief Calibration module implementation for target
  */
 
-#ifdef OSC_SIM
- #include "clb_host.c"
-#else /* OSC_SIM */
-
 #include <sys/ioctl.h>
 #include <fcntl.h>
 #include <errno.h>
@@ -553,5 +549,5 @@ OSC_ERR OscClbCorrectHotpixel(uint8* pImg)
 	return SUCCESS;
 }
 
-#endif /* OSC_SIM */
+
 

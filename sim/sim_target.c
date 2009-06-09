@@ -25,11 +25,6 @@
 /*! @brief The module singelton instance. */
 struct OSC_SIM_OBJ sim;
 
-#ifdef OSC_SIM
-
- #include "sim_host.c"
-
-#else /* OSC_SIM */
 OSC_ERR OscSimCreate(void *hFw)
 {
 	struct OSC_FRAMEWORK *pFw;
@@ -91,6 +86,3 @@ OSC_ERR OscSimRegisterCycleCallback( void (*pCallback)(void))
 {
 	return SUCCESS;
 }
-
-#endif /* OSC_SIM */
-
