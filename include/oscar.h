@@ -57,6 +57,36 @@ extern "C" {
 /*! @brief Gives the length of a field (Does not work on pointers!). */
 #define length(a) ((sizeof (a)) / sizeof *(a))
 
+#define OscFunctionBegin \
+	OSC_ERR _OscInternal_err_ = SUCCESS;
+
+#define OscFunctionCatch \
+	return SUCCESS; \
+fail: __attribute__ ((unused))
+
+#define OscFunctionEnd \
+	return _OscInternal_err_;
+
+#define OscMark_format(fmt, args ...) OscLog(ERROR, "%s: %s(): Line %d" fmt "\n", __FILE__, __FUNCTION__, __LINE__, ## args)
+
+#define OscMark() OscMark_format("")
+#define OscMark_m(m, args ...) OscMark_format(": " m, ## args)
+
+#define OscFail_es(e) { _OscInternal_err_ = e; goto fail; }
+#define OscFail_em(e, m, args ...) { OscMark_m(m, ## args); OscFail_es(e); }
+#define OscFail_s() OscFail_es(EGENERAL)
+#define OscFail_m(m, args ...) OscFail_em(EGENERAL, m, ## args)
+
+#define OscAssert_es(expr, e) { if (!(expr)) OscFail_es(e) }
+#define OscAssert_e(expr, e) { if (!(expr)) OscFail_e(e) }
+#define OscAssert_em(expr, e, m, args ...) { if (!(expr)) OscFail_em(e, m, ## args) }
+#define OscAssert_s(expr) OscAssert_es(expr, EASSERT)
+#define OscAssert(expr) OscAssert_es(expr, EASSERT)
+#define OscAssert_m(expr, m, args ...) OscAssert_es(expr, EASSERT, m, ## args)
+
+#define OscCall_s(f, args ...) { OSC_ERR err_ = f(args); if (err_ != SUCCESS) OscFail_es(err_); }
+#define OscCall(f, args ...) { OSC_ERR err_ = f(args); if (err_ != SUCCESS) OscFail_m("%s(): Error %d", #f, (int) err_); }
+
 /*! @brief Define general non-module-specific
  * error codes for the OSC framework */
 enum EnOscErrors {
