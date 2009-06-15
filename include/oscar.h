@@ -50,50 +50,6 @@ extern "C" {
 #error "Neither OSC_HOST nor OSC_TARGET is defined as a macro."
 #endif
 
-/*! @brief Represents the color depth of a picture */
-enum EnOscPictureType {
-	OSC_PICTURE_GREYSCALE,
-	OSC_PICTURE_YUV_444,
-	OSC_PICTURE_YUV_422,
-	OSC_PICTURE_YUV_420,
-	OSC_PICTURE_YUV_400,
-	OSC_PICTURE_CHROM_U,
-	OSC_PICTURE_CHROM_V,
-	OSC_PICTURE_HUE,
-	OSC_PICTURE_BGR_24,
-	OSC_PICTURE_RGB_24
-};
-
-/*! @brief Structure representing an 8-bit picture */
-struct OSC_PICTURE {
-	void * data;                /*!< @brief The actual image data */
-	unsigned short width;       /*!< @brief Width of the picture */
-	unsigned short height;      /*!< @brief Height of the picture */
-	enum EnOscPictureType type; /*!< @brief The type of the picture */
-};
-
-/*! @brief The order in which the colored pixels of a bayer pattern
- * appear in a row.
- * 
- * The colors are abbreviated as follows:
- * - G: Green
- * - R: Red
- * - B: Blue
- * 
- * The enum is constructed from two bools; one saying whether the first
- * pixel in the row is green and the other whether it is a red or blue
- * row.
- *          firstGreen      firstOther
- * red          11              01
- * blue         10              00
- * */
-enum EnBayerOrder {
-	ROW_BGBG = 0,
-	ROW_RGRG = 1,
-	ROW_GBGB = 2,
-	ROW_GRGR = 3
-};
-
 /*! @brief Define general non-module-specific
  * error codes for the OSC framework */
 enum EnOscErrors {
