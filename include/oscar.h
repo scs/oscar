@@ -57,13 +57,15 @@ extern "C" {
 /*! @brief Gives the length of a field (Does not work on pointers!). */
 #define length(a) ((sizeof (a)) / sizeof *(a))
 
+/* OscFunction(Begin|Catch|End): These macros are needed to used the Osc(Fail|Assert|Call)* macros. */
+/*! @brief This macro is needed at the beginning of function that uses the error handling macros. */
 #define OscFunctionBegin \
 	OSC_ERR _OscInternal_err_ = SUCCESS;
-
+/*! @brief This macro is needed between the function body and error handling code in a function that uses the error handling macros. */
 #define OscFunctionCatch \
 	return SUCCESS; \
 fail: __attribute__ ((unused))
-
+/*! @brief This macro is needed at the end of function that uses the error handling macros. */
 #define OscFunctionEnd \
 	return _OscInternal_err_;
 
