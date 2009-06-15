@@ -50,6 +50,13 @@ extern "C" {
 #error "Neither OSC_HOST nor OSC_TARGET is defined as a macro."
 #endif
 
+/*! @brief The opposite of while (condition) { block }; */
+#define until(a) while (!(a))
+/*! @brief An endless loop, equivalent to while (true) { block }; */
+#define loop while (true)
+/*! @brief Gives the length of a field (Does not work on pointers!). */
+#define length(a) ((sizeof (a)) / sizeof *(a))
+
 /*! @brief Define general non-module-specific
  * error codes for the OSC framework */
 enum EnOscErrors {
