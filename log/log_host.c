@@ -30,8 +30,10 @@
  * This is called osc_log
  * instead of log because log is a internal function of the C
  * library */
-struct OSC_LOG osc_log;
-
+struct OSC_LOG osc_log = {
+	.consoleLogLevel = NONE,
+	.fileLogLevel = NONE
+};
 
 OSC_ERR OscLogCreate(void *hFw)
 {
