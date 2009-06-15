@@ -24,7 +24,7 @@ ROOT_PATH := $(dir $(shell readlink $(lastword $(MAKEFILE_LIST))))
 include $(ROOT_PATH)Makefile_config
 
 # Generic flags for the C compiler.
-CFLAGS := -c -std=gnu99 -Wall -pedantic $(if $(ROOT_PATH), -I$(ROOT_PATH))
+CFLAGS := -c -std=gnu99 -Wall $(if $(ROOT_PATH), -I$(ROOT_PATH))
 
 # Host-Compiler executables and flags.
 CC_host_ := gcc $(CFLAGS) -DOSC_HOST
