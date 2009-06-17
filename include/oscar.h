@@ -139,6 +139,45 @@ enum EnOscErrors {
 	EUNSUPPORTED
 };
 
+struct {
+	OSC_ERR(*create)();
+	void(*destroy)();
+} OscModuleFunctions = {
+	[OscModule_log] = { .create = OscLogCreate, .destroy = OscLogDestroy },
+	[OscModule_cpld] = { .create = OscLogCreate, .destroy = OscLogDestroy },
+	[OscModule_lgx] = { .create = OscLogCreate, .destroy = OscLogDestroy },
+	[OscModule_sim] = { .create = OscLogCreate, .destroy = OscLogDestroy },
+	[OscModule_bmp] = { .create = OscLogCreate, .destroy = OscLogDestroy },
+	[OscModule_log] = { .create = OscLogCreate, .destroy = OscLogDestroy },
+	[OscModule_log] = { .create = OscLogCreate, .destroy = OscLogDestroy },
+	[OscModule_log] = { .create = OscLogCreate, .destroy = OscLogDestroy },
+	[OscModule_log] = { .create = OscLogCreate, .destroy = OscLogDestroy },
+	[OscModule_log] = { .create = OscLogCreate, .destroy = OscLogDestroy },
+	[OscModule_log] = { .create = OscLogCreate, .destroy = OscLogDestroy },
+	[OscModule_log] = { .create = OscLogCreate, .destroy = OscLogDestroy },
+	[OscModule_log] = { .create = OscLogCreate, .destroy = OscLogDestroy },
+	[OscModule_log] = { .create = OscLogCreate, .destroy = OscLogDestroy },
+	
+	
+	OscModule_log,
+	OscModule_cam,
+	OscModule_cpld,
+	OscModule_lgx,
+	OscModule_sim,
+	OscModule_bmp,
+	OscModule_swr,
+	OscModule_srd,
+	OscModule_ipc,
+	OscModule_sup,
+	OscModule_frd,
+	OscModule_dspl,
+	OscModule_dma,
+	OscModule_hsm,
+	OscModule_cfg,
+	OscModule_clb,
+	OscModule_vis,
+	OscModule_gp
+
 /* Define an offset for all modules, which allows it to define module-specific errors that do not overlap. */
 /*! @brief Error identifier offset of the cam module. */
 #define OSC_CAM_ERROR_OFFSET 100

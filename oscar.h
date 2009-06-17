@@ -62,4 +62,28 @@ struct OSC_FRAMEWORK
 	struct OSC_MODULE jpg;     /*!< @brief JPG*/
 };
 
+enum OscModule
+{
+	OscModule_log,
+	OscModule_cam,
+	OscModule_cpld,
+	OscModule_lgx,
+	OscModule_sim,
+	OscModule_bmp,
+	OscModule_swr,
+	OscModule_srd,
+	OscModule_ipc,
+	OscModule_sup,
+	OscModule_frd,
+	OscModule_dspl,
+	OscModule_dma,
+	OscModule_hsm,
+	OscModule_cfg,
+	OscModule_clb,
+	OscModule_vis,
+	OscModule_gpio,
+	OscModule_jpg
+};
+	
+	
 #endif /*OSCAR_PRIV_H_*/

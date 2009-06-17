@@ -36,20 +36,54 @@
 
 struct OSC_FRAMEWORK fw;    /*!< @brief Module singelton instance */
 
-OSC_ERR OscCreate(void **phFw)
-{
+OSC_ERR OscCreate(void **phFw) {
+OscFunctionBegin
 	memset(&fw, 0, sizeof(struct OSC_FRAMEWORK));
+	
+/*	OscAssert_e( NULL == &fw, EOUT_OF_MEMORY);
+	OscAssert_em( NULL != &fw, EOUT_OF_MEMORY);*/
+	
+	OscMark();
+	{
+		if (!(((void *)0) == &fw)) {
+	OscMark();
+			OscLog(ERROR, "%s: %s(): Line %d" ": " "mem" "\n", "oscar.c", __FUNCTION__, 43);
+			{
+				_OscInternal_err_ = EOUT_OF_MEMORY; goto fail;
+			};
+		}
+	};
+	OscMark();
+	{
+		if (!(((void *)0) != &fw)) {
+	OscMark();
+			OscLog(ERROR, "%s: %s(): Line %d" ": " "mem" "\n", "oscar.c", __FUNCTION__, 44);
+			{
+				_OscInternal_err_ = EOUT_OF_MEMORY; goto fail;
+			};
+		}
+	};
+	OscMark();
 	
 	/* OSC Create does not instantiate any modules */
 	
 	/* Return the handle */
 	*phFw = &fw;
-	return SUCCESS;
+		
+OscFunctionCatch
+	OscMark_m( "Faild to reserve memory!");
+	
+OscFunctionEnd
 }
 
 OSC_ERR OscDestroy(void *hFw)
 {
 	struct OSC_FRAMEWORK *pFw;
+	
+	if(NULL == hFw)
+	{
+		return SUCCESS;
+	}
 	
 	pFw = (struct OSC_FRAMEWORK*)hFw;
 	
@@ -193,6 +227,11 @@ void OscUnloadDependencies(void *hFw,
 {
 	int i;
 	struct OSC_FRAMEWORK *pFw = (struct OSC_FRAMEWORK*)hFw;
+
+	if(NULL == hFw)
+	{
+		return SUCCESS;
+	}
 	
 	for(i = 0; i < nDeps; i++)
 	{
