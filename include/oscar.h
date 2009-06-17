@@ -104,8 +104,8 @@ fail: __attribute__ ((unused))
 #define OscAssert_s(expr) OscAssert_es(expr, EASSERT)
 /*! @brief Check a condition and abort the current function with a custom error code while printing a default message. */
 #define OscAssert(expr) OscAssert_es(expr, EASSERT)
-/*! @brief Check a condition and abort the current function with a custom error code while printing a custom message. */
-#define OscAssert_m(expr, m, args ...) OscAssert_es(expr, EASSERT, m, ## args)
+/*! @brief Check a condition and abort the current function while printing a custom message. */
+#define OscAssert_m(expr, m, args ...) OscAssert_em(expr, EASSERT, m, ## args)
 
 /* OscCall[_s](): Macros call a function and and abort the current function and execute the exception handler on failure. e is to pass a custom error code. */
 /*! @brief Call a function and check it's return code, aborting the current function on an error. */
