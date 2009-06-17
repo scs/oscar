@@ -57,28 +57,34 @@ extern "C" {
 /*! @brief Gives the length of a field (Does not work on pointers!). */
 #define length(a) ((sizeof (a)) / sizeof *(a))
 
-#define OscFunction(name, args ...) \
+/* OscFunction[Finally|Catch|End]: Declare a function using these macros to use the Osc(Fail|Assert|Call)* error handling macros. */
+/*! @brief Use this macro to declare a function. */
+#define OscFunctionStart(name, args ...) \
 	OSC_ERR name(args) { \
 		OSC_ERR _OscInternal_err_ = SUCCESS; \
 		bool _OscInternal_in_catch_ = false;
 
+/*! @brief This macro starts a function definition. */
 #define OscFunctionFinally() \
 		return SUCCESS; \
 	fail: __attribute__ ((unused)) \
 		if (!_OscInternal_in_catch_) { \
 			_OscInternal_in_catch_ = true;
 
+/*! @brief Use this macro starts the function catch block. */
 #define OscFunctionCatch() \
 	fail: __attribute__ ((unused)) \
 		if (_OscInternal_err_ != SUCCESS && !_OscInternal_in_catch_) { \
 			_OscInternal_in_catch_ = true;
 
+/*! @brief Use this macro starts the function catch block and saves the error code in the variable @name. */
 #define OscFunctionCatch_e(name) \
 	fail: __attribute__ ((unused)) \
 		if (_OscInternal_err_ != SUCCESS && !_OscInternal_in_catch_) { \
 			OSC_ERR name = _OscInternal_err_; \
 			_OscInternal_in_catch_ = true;
 
+/*! @brief This macro ends a function definition. */
 #define OscFunctionEnd() \
 		} \
 		return _OscInternal_err_; \
@@ -98,6 +104,8 @@ extern "C" {
 /*! @brief Abort the current function while printing a custom error mesage and jump to the exception handler after 'fail:'. */
 #define OscFail_em(e, m, args ...) { OscMark_m(m, ## args); OscFail_es(e); }
 /*! @brief Abort the current function with a custom error code and jump to the exception handler after 'fail:'. */
+#define OscFail_e(e) OscFail_es(e)
+/*! @brief Abort the current function and jump to the exception handler after 'fail:'. */
 #define OscFail_s() OscFail_es(EGENERAL)
 /*! @brief Abort the current function with a custom error code while printing a custom error mesage and jump to the exception handler after 'fail:'. */
 #define OscFail_m(m, args ...) OscFail_em(EGENERAL, m, ## args)
@@ -117,17 +125,16 @@ extern "C" {
 #define OscAssert_s(expr) OscAssert_es(expr, EASSERT)
 /*! @brief Check a condition and abort the current function with a custom error code while printing a default message. */
 #define OscAssert(expr) OscAssert_es(expr, EASSERT)
-/*! @brief Check a condition and abort the current function with a custom error code while printing a custom message. */
-#define OscAssert_m(expr, m, args ...) OscAssert_es(expr, EASSERT, m, ## args)
+/*! @brief Check a condition and abort the current function while printing a custom message. */
+#define OscAssert_m(expr, m, args ...) OscAssert_em(expr, EASSERT, m, ## args)
 
-/* OscAssert[_s](): Macros call a function and and abort the current function and execute the exception handler on failure. e is to pass a custom error code. */
+/* OscCall[_s](): Macros call a function and and abort the current function and execute the exception handler on failure. e is to pass a custom error code. */
 /*! @brief Call a function and check it's return code, aborting the current function on an error. */
 #define OscCall_s(f, args ...) { OSC_ERR err_ = f(args); if (err_ != SUCCESS) OscFail_es(err_); }
 /*! @brief Call a function and check it's return code, aborting the current function with a default message on an error. */
 #define OscCall(f, args ...) { OSC_ERR err_ = f(args); if (err_ != SUCCESS) OscFail_m("%s(): Error %d", #f, (int) err_); }
 
-/*! @brief Define general non-module-specific
- * error codes for the OSC framework */
+/*! @brief Define general non-module-specific error codes for the OSC framework */
 enum EnOscErrors {
 	SUCCESS = 0,
 	EGENERAL,

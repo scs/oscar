@@ -36,7 +36,7 @@
 
 struct OSC_FRAMEWORK fw;    /*!< @brief Module singelton instance */
 
-OSC_ERR OscCreate(void **phFw)
+OSC_ERR OscCreate(struct OSC_FRAMEWORK ** phFw)
 {
 	memset(&fw, 0, sizeof(struct OSC_FRAMEWORK));
 	
@@ -47,7 +47,7 @@ OSC_ERR OscCreate(void **phFw)
 	return SUCCESS;
 }
 
-OSC_ERR OscDestroy(void *hFw)
+OSC_ERR OscDestroy(struct OSC_FRAMEWORK * hFw)
 {
 	struct OSC_FRAMEWORK *pFw;
 	
@@ -155,9 +155,7 @@ OSC_ERR OscDestroy(void *hFw)
 }
 
 
-OSC_ERR OscLoadDependencies(void *hFw,
-		const struct OSC_DEPENDENCY aryDeps[],
-		const uint32 nDeps)
+OSC_ERR OscLoadDependencies(struct OSC_FRAMEWORK * hFw, const struct OSC_DEPENDENCY aryDeps[], const uint32 nDeps)
 {
 	int         i;
 	OSC_ERR     err = SUCCESS;
@@ -187,7 +185,7 @@ OSC_ERR OscLoadDependencies(void *hFw,
 	return err;
 }
 
-void OscUnloadDependencies(void *hFw,
+void OscUnloadDependencies(struct OSC_FRAMEWORK * hFw,
 		const struct OSC_DEPENDENCY aryDeps[],
 		const uint32 nDeps)
 {
