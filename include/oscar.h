@@ -229,17 +229,14 @@ OSC_ERR OscLoadDependencies(void *pFw, const struct OSC_DEPENDENCY aryDeps[], co
  *//*********************************************************************/
 void OscUnloadDependencies(void *pFw, const struct OSC_DEPENDENCY aryDeps[], const uint32 nDeps);
 
-/*********************************************************************//*!
- * @brief Constructor for framework
- * 
- * @param phFw Pointer to the handle location for the framework
- * @return SUCCESS or appropriate error code otherwise
- *//*********************************************************************/
-
+/*! @brief Constructor for framework
+	@param modules A list of modules to load as defined in enum OscModule.
+	@return SUCCESS or appropriate error code otherwise.
+*/
 #define OscCreate(modules ...) \
 	({ \
 		enum OscModule _modules[] = { modules }; \
-		_OscCreate(length(_modules), modules); \
+		_OscCreate(length(_modules), _modules); \
 	})
 
 OSC_ERR _OscCreate(int count, enum OscModule * modules);

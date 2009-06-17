@@ -48,9 +48,7 @@ OSC_ERR OscVisCreate(void *hFw)
 	}
 	
 	/* Load the module dependencies of this module. */
-	err = OscLoadDependencies(pFw,
-			vis_deps,
-			sizeof(vis_deps)/sizeof(struct OSC_DEPENDENCY));
+	err = OscCreate(OscModule_log, OscModule_dam);
 	
 	if(err != SUCCESS)
 	{

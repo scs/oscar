@@ -61,31 +61,5 @@ struct OSC_FRAMEWORK
 	struct OSC_MODULE gpio;    /*!< @brief GPIO */
 	struct OSC_MODULE jpg;     /*!< @brief JPG*/
 };
-
-struct {
-	OSC_ERR (*create)(void *);
-	void (*destroy)(void *);
-} OscModuleFunctions[] = {
-	[OscModule_log] = { .create = OscLogCreate, .destroy = OscLogDestroy },
-	[OscModule_cam] = { .create = OscCamCreate, .destroy = OscCamDestroy },
-	[OscModule_cpld] = { .create = OscCpldCreate, .destroy = OscCpldDestroy },
-#ifdef TARGET_TYPE_INDXCAM
-	[OscModule_lgx] = { .create = OscLgxCreate, .destroy = OscLgxDestroy },
-#endif
-	[OscModule_sim] = { .create = OscSimCreate, .destroy = OscSimDestroy },
-	[OscModule_bmp] = { .create = OscBmpCreate, .destroy = OscBmpDestroy },
-	[OscModule_swr] = { .create = OscSwrCreate, .destroy = OscSwrDestroy },
-	[OscModule_srd] = { .create = OscSrdCreate, .destroy = OscSrdDestroy },
-	[OscModule_ipc] = { .create = OscIpcCreate, .destroy = OscIpcDestroy },
-	[OscModule_sup] = { .create = OscSupCreate, .destroy = OscSupDestroy },
-	[OscModule_frd] = { .create = OscFrdCreate, .destroy = OscFrdDestroy },
-	[OscModule_dspl] = { .create = OscDsplCreate, .destroy = OscDsplDestroy },
-	[OscModule_dma] = { .create = OscDmaCreate, .destroy = OscDmaDestroy },
-	[OscModule_hsm] = { .create = OscHsmCreate, .destroy = OscHsmDestroy },
-	[OscModule_cfg] = { .create = OscCfgCreate, .destroy = OscCfgDestroy },
-	[OscModule_clb] = { .create = OscClbCreate, .destroy = OscClbDestroy },
-	[OscModule_vis] = { .create = OscVisCreate, .destroy = OscVisDestroy },
-	[OscModule_jpg] = { .create = OscJpgCreate, .destroy = OscJpgDestroy }
-};
 		
 #endif /*OSCAR_PRIV_H_*/
