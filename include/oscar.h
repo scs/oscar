@@ -252,7 +252,7 @@ OSC_ERR _OscCreate(int count, enum OscModule * modules);
  * @param hFw Pointer to the handle of the framework to be destroyed.
  * @return SUCCESS or an appropriate error code.
  *//*********************************************************************/
-OSC_ERR OscDestroy(void *hFw);
+OSC_ERR OscDestroy();
 
 /*********************************************************************//*!
  * @brief Get framework version numbers

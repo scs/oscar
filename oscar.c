@@ -52,11 +52,11 @@ OscFunctionEnd
 OSC_ERR OscDestroy()
 {
 OscFunctionBegin
-	for (int i = length(OscModuleFunctions)) {
+	for (int i = 0; i < length(OscModuleFunctions); i+= 1) {
 		void (*destroy)(void *) = OscModuleFunctions[i].destroy;
 		
 		if (destroy != NULL)
-			destroy();
+			destroy(&fw);
 	}
 OscFunctionCatch
 OscFunctionEnd
