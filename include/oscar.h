@@ -139,26 +139,8 @@ enum EnOscErrors {
 	EUNSUPPORTED
 };
 
-struct {
-	OSC_ERR(*create)();
-	void(*destroy)();
-} OscModuleFunctions = {
-	[OscModule_log] = { .create = OscLogCreate, .destroy = OscLogDestroy },
-	[OscModule_cpld] = { .create = OscLogCreate, .destroy = OscLogDestroy },
-	[OscModule_lgx] = { .create = OscLogCreate, .destroy = OscLogDestroy },
-	[OscModule_sim] = { .create = OscLogCreate, .destroy = OscLogDestroy },
-	[OscModule_bmp] = { .create = OscLogCreate, .destroy = OscLogDestroy },
-	[OscModule_log] = { .create = OscLogCreate, .destroy = OscLogDestroy },
-	[OscModule_log] = { .create = OscLogCreate, .destroy = OscLogDestroy },
-	[OscModule_log] = { .create = OscLogCreate, .destroy = OscLogDestroy },
-	[OscModule_log] = { .create = OscLogCreate, .destroy = OscLogDestroy },
-	[OscModule_log] = { .create = OscLogCreate, .destroy = OscLogDestroy },
-	[OscModule_log] = { .create = OscLogCreate, .destroy = OscLogDestroy },
-	[OscModule_log] = { .create = OscLogCreate, .destroy = OscLogDestroy },
-	[OscModule_log] = { .create = OscLogCreate, .destroy = OscLogDestroy },
-	[OscModule_log] = { .create = OscLogCreate, .destroy = OscLogDestroy },
-	
-	
+enum OscModule
+{
 	OscModule_log,
 	OscModule_cam,
 	OscModule_cpld,
@@ -176,11 +158,13 @@ struct {
 	OscModule_cfg,
 	OscModule_clb,
 	OscModule_vis,
-	OscModule_gp
+	OscModule_gpio,
+	OscModule_jpg
+};
 
 /* Define an offset for all modules, which allows it to define module-specific errors that do not overlap. */
 /*! @brief Error identifier offset of the cam module. */
-#define OSC_CAM_ERROR_OFFSET 100
+#define OSC_CAM_ERROR_OFFSET OscModule_log * 100
 /*! @brief Error identifier offset of the cpld module. */
 #define OSC_CPLD_ERROR_OFFSET 200
 /*! @brief Error identifier offset of the lgx module. */
@@ -251,7 +235,14 @@ void OscUnloadDependencies(void *pFw, const struct OSC_DEPENDENCY aryDeps[], con
  * @param phFw Pointer to the handle location for the framework
  * @return SUCCESS or appropriate error code otherwise
  *//*********************************************************************/
-OSC_ERR OscCreate(void ** phFw);
+
+#define OscCreate(modules ...) \
+	({ \
+		enum OscModule _modules[] = { modules }; \
+		_OscCreate(length(_modules), modules); \
+	})
+
+OSC_ERR _OscCreate(int count, enum OscModule * modules);
 
 /*********************************************************************//*!
  * @brief Destructor for framework
