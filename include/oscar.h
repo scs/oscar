@@ -57,17 +57,32 @@ extern "C" {
 /*! @brief Gives the length of a field (Does not work on pointers!). */
 #define length(a) ((sizeof (a)) / sizeof *(a))
 
-/* OscFunction(Begin|Catch|End): These macros are needed to used the Osc(Fail|Assert|Call)* macros. */
-/*! @brief This macro is needed at the beginning of function that uses the error handling macros. */
-#define OscFunctionBegin \
-	OSC_ERR _OscInternal_err_ = SUCCESS;
-/*! @brief This macro is needed between the function body and error handling code in a function that uses the error handling macros. */
-#define OscFunctionCatch \
-	return SUCCESS; \
-fail: __attribute__ ((unused))
-/*! @brief This macro is needed at the end of function that uses the error handling macros. */
-#define OscFunctionEnd \
-	return _OscInternal_err_;
+#define OscFunction(name, args ...) \
+	OSC_ERR name(args) { \
+		OSC_ERR _OscInternal_err_ = SUCCESS; \
+		bool _OscInternal_in_catch_ = false;
+
+#define OscFunctionFinally() \
+		return SUCCESS; \
+	fail: __attribute__ ((unused)) \
+		if (!_OscInternal_in_catch_) { \
+			_OscInternal_in_catch_ = true;
+
+#define OscFunctionCatch() \
+	fail: __attribute__ ((unused)) \
+		if (_OscInternal_err_ != SUCCESS && !_OscInternal_in_catch_) { \
+			_OscInternal_in_catch_ = true;
+
+#define OscFunctionCatch_e(name) \
+	fail: __attribute__ ((unused)) \
+		if (_OscInternal_err_ != SUCCESS && !_OscInternal_in_catch_) { \
+			OSC_ERR name = _OscInternal_err_; \
+			_OscInternal_in_catch_ = true;
+
+#define OscFunctionEnd() \
+		} \
+		return _OscInternal_err_; \
+	}
 
 #define OscMark_format(fmt, args ...) OscLog(ERROR, "%s: %s(): Line %d" fmt "\n", __FILE__, __FUNCTION__, __LINE__, ## args)
 
@@ -87,7 +102,11 @@ fail: __attribute__ ((unused))
 /*! @brief Abort the current function with a custom error code while printing a custom error mesage and jump to the exception handler after 'fail:'. */
 #define OscFail_m(m, args ...) OscFail_em(EGENERAL, m, ## args)
 
-/* OscAssert_[e][s|m](): Macros check an assertion and abort the current function and execute the exception handler on failure. e is to pass a custom error code. s is not print a message. m is to print a custom message. By defualt a general message is printed. */
+/*! @brief Used inside the catch part of a function to recover an error and return with a success code. */
+#define OscRecover() \
+	OscFail_es(SUCCESS)
+
+/* OscAssert_[e][s|m](): Macros to check an assertion and abort the current function and execute the exception handler on failure. e is to pass a custom error code. s is not print a message. m is to print a custom message. By defualt a general message is printed. */
 /*! @brief Check a condition and abort the current function. */
 #define OscAssert_es(expr, e) { if (!(expr)) OscFail_es(e) }
 /*! @brief Check a condition and abort the current function while printing a default message. */
@@ -175,6 +194,9 @@ struct OSC_DEPENDENCY
 	void (*destroy)(void *);
 };
 
+/*! @brief The Oscar framework object with handle to modules*/
+struct OSC_FRAMEWORK;
+
 /*********************************************************************//*!
  * @brief Loads the module depencies give in a list of modules.
  * 
@@ -187,7 +209,7 @@ struct OSC_DEPENDENCY
  * @param nDeps Length of the dependency array.
  * @return SUCCESS or an appropriate error code.
  *//*********************************************************************/
-OSC_ERR OscLoadDependencies(void *pFw, const struct OSC_DEPENDENCY aryDeps[], const uint32 nDeps);
+OSC_ERR OscLoadDependencies(struct OSC_FRAMEWORK * pFw, const struct OSC_DEPENDENCY aryDeps[], const uint32 nDeps);
 
 /*********************************************************************//*!
  * @brief Unloads the module depencies give in a list of modules.
@@ -199,7 +221,7 @@ OSC_ERR OscLoadDependencies(void *pFw, const struct OSC_DEPENDENCY aryDeps[], co
  * @param aryDeps Array of Dependencies to be unloaded.
  * @param nDeps Length of the dependency array.
  *//*********************************************************************/
-void OscUnloadDependencies(void *pFw, const struct OSC_DEPENDENCY aryDeps[], const uint32 nDeps);
+void OscUnloadDependencies(struct OSC_FRAMEWORK * pFw, const struct OSC_DEPENDENCY aryDeps[], const uint32 nDeps);
 
 /*********************************************************************//*!
  * @brief Constructor for framework
@@ -207,7 +229,7 @@ void OscUnloadDependencies(void *pFw, const struct OSC_DEPENDENCY aryDeps[], con
  * @param phFw Pointer to the handle location for the framework
  * @return SUCCESS or appropriate error code otherwise
  *//*********************************************************************/
-OSC_ERR OscCreate(void ** phFw);
+OSC_ERR OscCreate(struct OSC_FRAMEWORK ** phFw);
 
 /*********************************************************************//*!
  * @brief Destructor for framework
@@ -217,7 +239,7 @@ OSC_ERR OscCreate(void ** phFw);
  * @param hFw Pointer to the handle of the framework to be destroyed.
  * @return SUCCESS or an appropriate error code.
  *//*********************************************************************/
-OSC_ERR OscDestroy(void *hFw);
+OSC_ERR OscDestroy(struct OSC_FRAMEWORK * hFw);
 
 /*********************************************************************//*!
  * @brief Get framework version numbers
