@@ -37,16 +37,17 @@
 #define MAX_LOADED_MODUELS 50
 
 static struct OscModule * loadedModuels[MAX_LOADED_MODUELS] = { };
-static struct OscModule * loadedModuelsCount = 0;
+int loadedModuelsCount = 0;
 
 static OSC_ERR loadDepencies(struct OscModule ** deps) {
 OscFunctionBegin
 	for (struct OscModule ** dep = deps; *dep != NULL; dep += 1) {
-		if (!dep->isLoaded) {
-			dep->isLoaded = true;
-			OscCall(loadDepencies, dep->dependencies);
-			OscCall(dep->create);
-			loadedModuels[loadedModuelsCount] = dep;
+		if (!(*dep)->isLoaded) {
+			(*dep)->isLoaded = true;
+			OscCall(loadDepencies, (*dep)->dependencies);
+			if ((*dep)->create != NULL)
+				OscCall((*dep)->create);
+			loadedModuels[loadedModuelsCount] = *dep;
 			loadedModuelsCount += 1;
 		}
 	}
@@ -69,7 +70,8 @@ OSC_ERR OscDestroy()
 OscFunctionBegin
 	for (; loadedModuelsCount > 0; loadedModuelsCount -= 1) {
 		struct OscModule * module = loadedModuels[loadedModuelsCount - 1];
-		OscCall(module->destroy);
+		if (module->destroy != NULL)
+			OscCall(module->destroy);
 		module->isLoaded = false;
 	}
 OscFunctionCatch

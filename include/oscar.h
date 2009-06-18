@@ -139,32 +139,9 @@ enum EnOscErrors {
 	EUNSUPPORTED
 };
 
-enum OscModule
-{
-	OscModule_log,
-	OscModule_cam,
-	OscModule_cpld,
-	OscModule_lgx,
-	OscModule_sim,
-	OscModule_bmp,
-	OscModule_swr,
-	OscModule_srd,
-	OscModule_ipc,
-	OscModule_sup,
-	OscModule_frd,
-	OscModule_dspl,
-	OscModule_dma,
-	OscModule_hsm,
-	OscModule_cfg,
-	OscModule_clb,
-	OscModule_vis,
-	OscModule_gpio,
-	OscModule_jpg
-};
-
 /* Define an offset for all modules, which allows it to define module-specific errors that do not overlap. */
 /*! @brief Error identifier offset of the cam module. */
-#define OSC_CAM_ERROR_OFFSET OscModule_log * 100
+#define OSC_CAM_ERROR_OFFSET 100
 /*! @brief Error identifier offset of the cpld module. */
 #define OSC_CPLD_ERROR_OFFSET 200
 /*! @brief Error identifier offset of the lgx module. */
@@ -195,9 +172,10 @@ enum OscModule
 /*! @brief Describes an OSC module and keeps track of how many users
  * hold references to it. */
 struct OscModule {
-	OSC_ERR (* create, * destroy) (void *);
+	OSC_ERR (* create) ();
+	OSC_ERR (* destroy) ();
 	bool isLoaded;
-	OscModule * dependencies[];
+	struct OscModule * dependencies[];
 };
 
 /*! @brief Constructor for framework
@@ -210,7 +188,7 @@ struct OscModule {
 		_OscCreate(&_modules); \
 	})
 
-OSC_ERR OscCreateFunction(int count, enum OscModule * modules);
+OSC_ERR OscCreateFunction(struct OscModule ** modules);
 
 /*********************************************************************//*!
  * @brief Destructor for framework

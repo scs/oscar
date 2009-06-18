@@ -27,12 +27,5 @@
 
 #define RND_MOD_Unbiased
 /*#define RND_MOD_Biased*/
-
-/*! @brief Describes an OSC module and keeps track of how many users
- * hold references to it. */
-struct OscModule {
-	OSC_ERR (* create, * destroy) (void *);
-	OscModule * dependencies[];
-};
 		
 #endif /*OSCAR_PRIV_H_*/

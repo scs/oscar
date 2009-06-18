@@ -20,21 +20,20 @@
  * @brief Configuration file module implementation for target and host
  * 
  */
-struct OscModule OscModule_cfg = {
-	.create = OscCfgCreate,
-	.destroy = OscCfgDestroy,
-	.dependencies = {
-		&OscModule_log,
-		NULL // To end the flexible array.
-	}
-};
-
-#include "oscar.h"
 
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "oscar.h"
+
+struct OscModule OscModule_cfg = {
+	.dependencies = {
+		&OscModule_log,
+		NULL // To end the flexible array.
+	}
+};
 
 /*! @brief Macro defining the maximal number of open configuration files */
 #define CONFIG_FILE_MAX_NUM 3
@@ -156,69 +155,6 @@ unsigned int OscCfgFindInvalidChar(const unsigned char *str, const unsigned int 
 
 /*! @brief The module singelton instance. */
 struct OSC_CFG cfg;
-
-OSC_ERR OscCfgCreate(void *hFw)
-{
-	struct OSC_FRAMEWORK *pFw;
-	OSC_ERR err;
-	
-	pFw = (struct OSC_FRAMEWORK *)hFw;
-	if(pFw->cfg.useCnt != 0)
-	{
-		pFw->cfg.useCnt++;
-		/* The module is already allocated */
-		return SUCCESS;
-	}
-	
-	/* Load the module dependencies of this module. */
-	err = OscLoadDependencies(pFw,
-			cfg_deps,
-			sizeof(cfg_deps)/sizeof(struct OSC_DEPENDENCY));
-	
-	if(err != SUCCESS)
-	{
-		printf("%s: ERROR: Unable to load dependencies! (%d)\n",
-				__func__,
-				err);
-		return err;
-	}
-	
-	memset(&cfg, 0, sizeof(struct OSC_CFG));
-	
-	/* Increment the use count */
-	pFw->cfg.hHandle = (void*)&cfg;
-	pFw->cfg.useCnt++;
-	
-	return SUCCESS;
-}
-
-void OscCfgDestroy(void *hFw)
-{
-	struct OSC_FRAMEWORK *pFw;
-	int i;
-	
-	pFw = (struct OSC_FRAMEWORK *)hFw;
-	
-	/* Check if we really need to release or whether we still
-	 * have users. */
-	pFw->cfg.useCnt--;
-	if(pFw->cfg.useCnt > 0)
-	{
-		return;
-	}
-	
-	/* free memory of file content buffers */
-	for(i=0; i < cfg.nrOfContents; i++)
-	{
-		free(cfg.contents[i].data);
-	}
-
-	OscUnloadDependencies(pFw,
-			cfg_deps,
-			sizeof(cfg_deps)/sizeof(struct OSC_DEPENDENCY));
-	
-	memset(&cfg, 0, sizeof(struct OSC_CFG));
-}
 
 OSC_ERR OscCfgRegisterFile(
 		CFG_FILE_CONTENT_HANDLE *pFileContentHandle,
