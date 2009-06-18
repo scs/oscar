@@ -17,62 +17,8 @@
 */
 
 struct OscModule OscModule_Jpg = {
-	.create = OscJpgCreate,
-	.destroy = OscJpgDestroy,
 	.dependencies = {
 		&OscModule_log,
 		NULL // To end the flexible array.
 	}
 };
-
-OSC_ERR OscJpgCreate(void *hFw)
-{
-	struct OSC_FRAMEWORK *pFw;
-	OSC_ERR err;
-	
-	pFw = (struct OSC_FRAMEWORK *)hFw;
-	if(pFw->jpg.useCnt != 0)
-	{
-		pFw->jpg.useCnt++;
-		/* The module is already allocated */
-		return SUCCESS;
-	}
-	
-	/* Load the module dependencies of this module. */
-	err = OscLoadDependencies(pFw,
-			jpg_deps,
-			sizeof(jpg_deps)/sizeof(struct OSC_DEPENDENCY));
-	
-	if(err != SUCCESS)
-	{
-		printf("%s: ERROR: Unable to load dependencies! (%d)\n",
-				__func__,
-				err);
-		return err;
-	}
-	
-	/* Increment the use count */
-	pFw->bmp.hHandle = NULL;
-	pFw->bmp.useCnt++;
-	
-	return SUCCESS;
-}
-
-void OscJpgDestroy(void *hFw)
-{
-	struct OSC_FRAMEWORK *pFw;
-		
-	pFw = (struct OSC_FRAMEWORK *)hFw;
-	
-	/* Check if we really need to release or whether we still
-	 * have users. */
-	pFw->jpg.useCnt--;
-	if(pFw->jpg.useCnt > 0)
-	{
-		return;
-	}
-	
-	OscUnloadDependencies(pFw,
-			jpg_deps,
-			sizeof(jpg_deps)/sizeof(struct OSC_DEPENDENCY));
-}

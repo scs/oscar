@@ -25,70 +25,10 @@
 
 #include "vis.h"
 
-/*! @brief The module singelton instance. */
-struct OSC_VIS vis;
-
 struct OscModule OscModule_vis = {
-	.create = OscVisCreate,
-	.destroy = OscVisDestroy,
 	.dependencies = {
 		&OscModule_log,
 		&OscModule_dma,
 		NULL // To end the flexible array.
 	}
 };
-
-
-OSC_ERR OscVisCreate(void *hFw)
-{
-	struct OSC_FRAMEWORK *pFw;
-	OSC_ERR err;
-	
-	pFw = (struct OSC_FRAMEWORK *)hFw;
-	if(pFw->vis.useCnt != 0)
-	{
-		pFw->vis.useCnt++;
-		/* The module is already allocated */
-		return SUCCESS;
-	}
-	
-	/* Load the module dependencies of this module. */
-	err = OscCreate(OscModule_log, OscModule_dam);
-	
-	if(err != SUCCESS)
-	{
-		printf("%s: ERROR: Unable to load dependencies! (%d)\n",
-				__func__,
-				err);
-		return err;
-	}
-	
-	memset(&vis, 0, sizeof(struct OSC_VIS));
-	
-	/* Increment the use count */
-	pFw->vis.hHandle = (void*)&vis;
-	pFw->vis.useCnt++;
-	
-	return SUCCESS;
-}
-
-void OscVisDestroy(void *hFw)
-{
-	struct OSC_FRAMEWORK *pFw;
-		
-	pFw = (struct OSC_FRAMEWORK *)hFw;
-	
-	/* Check if we really need to release or whether we still
-	 * have users. */
-	pFw->vis.useCnt--;
-	if(pFw->vis.useCnt > 0)
-	{
-		return;
-	}
-	
-	OscUnloadDependencies(pFw,
-			vis_deps,
-			sizeof(vis_deps)/sizeof(struct OSC_DEPENDENCY));
-	
-	memset(&vis, 0, sizeof(struct OSC_VIS));
-}

@@ -40,17 +40,8 @@ struct OscModule OscModule_log = {
 
 OSC_ERR OscLogCreate(void *hFw)
 {
-	struct OSC_FRAMEWORK *pFw;
-
-	pFw = (struct OSC_FRAMEWORK *)hFw;
-	if(pFw->log.useCnt != 0)
-	{
-		pFw->log.useCnt++;
-		/* The module is already allocated */
-		return SUCCESS;
-	}
+	osc_log = (struct OSC_LOG) { };
 	
-	memset(&osc_log, 0, sizeof(struct OSC_LOG));
 	/* Enable all logging by default */
 	osc_log.consoleLogLevel = DEFAULT_CONSOLE_LOGLEVEL;
 	osc_log.fileLogLevel = DEFAULT_FILE_LOGLEVEL;
@@ -60,31 +51,14 @@ OSC_ERR OscLogCreate(void *hFw)
 	sprintf(osc_log.logName, LOG_NAME);
 	/* Initialize the connection to syslog */
 	openlog(osc_log.logName, 0, LOG_USER);
-	
-	/* Increment the use count */
-	pFw->log.hHandle = (void*)&osc_log;
-	pFw->log.useCnt++;
 
 	return SUCCESS;
 }
 
 void OscLogDestroy(void *hFw)
 {
-	struct OSC_FRAMEWORK *pFw;
-
-	pFw = (struct OSC_FRAMEWORK *)hFw;
-	/* Check if we really need to release or whether we still
-	 * have users. */
-	pFw->log.useCnt--;
-	if(pFw->log.useCnt > 0)
-	{
-		return;
-	}
-		
 	/* Close the connection to syslog */
 	closelog();
-	
-	memset(&osc_log, 0, sizeof(struct OSC_LOG));
 }
 
 inline void OscLogSetConsoleLogLevel(const enum EnOscLogLevel level)

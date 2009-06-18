@@ -25,6 +25,8 @@
 
 #include "oscar.h"
 
+// FIXME: Why does this module exist for the non-simulating target?
+
 #if defined(OSC_HOST) || defined(OSC_SIM)
 /*! @brief Limited number of writer instances */
 #define MAX_NR_WRITER               10
@@ -82,8 +84,10 @@ struct OSC_SWR
 struct OSC_SWR swr; /*!< Module singelton instance */
 
 struct OscModule OscModule_swr = {
+#if defined(OSC_HOST) || defined(OSC_SIM)
 	.create = OscSwrCreate,
 	.destroy = OscSwrDestroy,
+#endif /* defined(OSC_HOST) || defined(OSC_SIM) */
 	.dependencies = {
 		&OscModule_log,
 		NULL // To end the flexible array.
@@ -92,64 +96,17 @@ struct OscModule OscModule_swr = {
 
 OSC_ERR OscSwrCreate(void *hFw)
 {
-	struct OSC_FRAMEWORK *pFw;
 	OSC_ERR err;
 	
-	pFw = (struct OSC_FRAMEWORK *)hFw;
-	if(pFw->swr.useCnt != 0)
-	{
-		pFw->swr.useCnt++;
-		/* The module is already allocated */
-		return SUCCESS;
-	}
-	
-	/* Load the module swr_deps of this module. */
-	err = OscLoadDependencies(pFw,
-			swr_deps,
-			sizeof(swr_deps)/sizeof(struct OSC_DEPENDENCY));
-	
-	if(err != SUCCESS)
-	{
-		printf("%s: ERROR: Unable to load swr_deps! (%d)\n",
-				__func__,
-				err);
-		return err;
-	}
-	
-	memset(&swr, 0, sizeof(struct OSC_SWR));
-	
-#if defined(OSC_HOST) || defined(OSC_SIM)
 	OscSimRegisterCycleCallback( &OscSwrCycleCallback);
-#endif /* defined(OSC_HOST) || defined(OSC_SIM) */
-	
-	/* Increment the use count */
-	pFw->swr.hHandle = (void*)&swr;
-	pFw->swr.useCnt++;
 	
 	return SUCCESS;
 }
 
 void OscSwrDestroy(void *hFw)
 {
-	struct OSC_FRAMEWORK *pFw;
-#if defined(OSC_HOST) || defined(OSC_SIM)
 	uint16 wrId;
-#endif /* defined(OSC_HOST) || defined(OSC_SIM) */
-	
-	pFw = (struct OSC_FRAMEWORK *)hFw;
-	/* Check if we really need to release or whether we still
-	 * have users. */
-	pFw->swr.useCnt--;
-	if(pFw->swr.useCnt > 0)
-	{
-		return;
-	}
-	
-	OscUnloadDependencies(pFw,
-			swr_deps,
-			sizeof(swr_deps)/sizeof(struct OSC_DEPENDENCY));
-	
-#if defined(OSC_HOST) || defined(OSC_SIM)
+
 	/* close all files */
 	for( wrId = 0; wrId<swr.nrOfWriters; wrId++)
 	{
@@ -157,9 +114,6 @@ void OscSwrDestroy(void *hFw)
 		fclose( swr.wr[ wrId].pFile);
 		OscLog(INFO, "Close %s\n", &swr.wr[ wrId].strFile);
 	}
-#endif /* defined(OSC_HOST) || defined(OSC_SIM) */
-	
-	memset(&swr, 0, sizeof(struct OSC_SWR));
 }
 
 #if defined(OSC_HOST) || defined(OSC_SIM)

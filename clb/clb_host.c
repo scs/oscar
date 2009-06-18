@@ -27,64 +27,11 @@
 #include <stdlib.h>
 
 struct OscModule OscModule_clb = {
-	.create = OscClbCreate,
-	.destroy = OscClbDestroy,
 	.dependencies = {
 		&OscModule_log,
 		NULL // To end the flexible array.
 	}
 };
-
-OSC_ERR OscClbCreate(void *hFw)
-{
-	struct OSC_FRAMEWORK    *pFw;
-	OSC_ERR                 err;
-	
-	pFw = (struct OSC_FRAMEWORK *)hFw;
-	if(pFw->clb.useCnt != 0)
-	{
-		pFw->clb.useCnt++;
-		/* The module is already allocated */
-		return SUCCESS;
-	}
-
-	/* Load the module clb_deps of this module. */
-	err = OscLoadDependencies(pFw,
-			clb_deps,
-			sizeof(clb_deps)/sizeof(struct OSC_DEPENDENCY));
-	if(err != SUCCESS)
-	{
-		printf("%s: ERROR: Unable to load clb_deps! (%d)\n",
-				__func__,
-				err);
-		return err;
-	}
-	
-	/* Increment the use count */
-	pFw->clb.hHandle = NULL;
-	pFw->clb.useCnt++;
-	
-	return SUCCESS;
-}
-
-void OscClbDestroy(void *hFw)
-{
-	struct OSC_FRAMEWORK *pFw;
-			
-	pFw = (struct OSC_FRAMEWORK *)hFw;
-	
-	/* Check if we really need to release or whether we still
-	 * have users. */
-	pFw->clb.useCnt--;
-	if(pFw->clb.useCnt > 0)
-	{
-		return;
-	}
-		
-	OscUnloadDependencies(pFw,
-			clb_deps,
-			sizeof(clb_deps)/sizeof(struct OSC_DEPENDENCY));
-}
 
 OSC_ERR OscClbSetupCalibrate(
 		enum EnOscClbCalibrateSlope calibSlope,

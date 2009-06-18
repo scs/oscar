@@ -1,4 +1,4 @@
-/*	Oscar, a hardware abstraction framework for the LeanXcam and IndXcam.
+2/*	Oscar, a hardware abstraction framework for the LeanXcam and IndXcam.
 	Copyright (C) 2008 Supercomputing Systems AG
 	
 	This library is free software; you can redistribute it and/or modify it
@@ -36,76 +36,17 @@ struct OSC_SUP sup;
 
 struct OscModule OscModule_sup = {
 	.create = OscSupCreate,
-	.destroy = OscSupDestroy,
 	.dependencies = {
 		&OscModule_log,
 		NULL // To end the flexible array.
 	}
 };
 
-/*! @brief The length of the dependency array of this module. */
-#define DEP_LEN (sizeof(sup_deps)/sizeof(struct OSC_DEPENDENCY))
-
 OSC_ERR OscSupCreate(void *hFw)
 {
-	struct OSC_FRAMEWORK *pFw;
-	OSC_ERR err;
-
-	pFw = (struct OSC_FRAMEWORK *)hFw;
-	if(pFw->sup.useCnt != 0)
-	{
-		pFw->sup.useCnt++;
-		/* The module is already allocated */
-		return SUCCESS;
-	}
-	
-	/* Load the module dependencies of this module. */
-	err = OscLoadDependencies(pFw,
-			sup_deps,
-			DEP_LEN);
-	
-	if(err != SUCCESS)
-	{
-		printf("%s: ERROR: Unable to load dependencies! (%d)\n",
-				__func__,
-				err);
-		return err;
-	}
-	
-	memset(&sup, 0, sizeof(struct OSC_SUP));
-	
-	/* Increment the use count */
-	pFw->sup.hHandle = (void*)&sup;
-	pFw->sup.useCnt++;
-	
+	sup = (struct OSC_SUP) { };
+		
 	return SUCCESS;
-}
-
-void OscSupDestroy(void *hFw)
-{
-	struct OSC_FRAMEWORK *pFw;
-			
-	pFw = (struct OSC_FRAMEWORK *)hFw;
-	/* Check if we really need to release or whether we still
-	 * have users. */
-	pFw->sup.useCnt--;
-	if(pFw->sup.useCnt > 0)
-	{
-		return;
-	}
-	
-	/* Make sure the watchdog is closed, otherwise the board may
-	 * be reset by it after the application has closed. */
-	if(sup.fdWatchdog > 0)
-	{
-		OscSupWdtClose();
-	}
-	
-	OscUnloadDependencies(pFw,
-			sup_deps,
-			DEP_LEN);
-	
-	memset(&sup, 0, sizeof(struct OSC_SUP));
 }
 
 /*=========================== Watchdog =================================*/
