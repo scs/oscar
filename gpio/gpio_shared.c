@@ -22,12 +22,13 @@
 
 #include "gpio.h"
 
+OSC_ERR OscGpioCreate();
+
 /*! @brief The module singelton instance. */
 struct OSC_GPIO gpio;
 
 struct OscModule OscModule_gpio = {
 	.create = OscGpioCreate,
-	.destroy = OscGpioDestroy,
 	.dependencies = {
 		&OscModule_log,
 #if defined(OSC_HOST) || defined(OSC_SIM)
@@ -70,69 +71,11 @@ struct GPIO_PIN_CONFIG aryPinConfig[] = {
 
 const uint16 nrOfPins = sizeof(aryPinConfig)/sizeof(aryPinConfig[0]);
 
-OSC_ERR OscGpioCreate(void *hFw)
+OSC_ERR OscGpioCreate()
 {
-	struct OSC_FRAMEWORK *pFw;
-	OSC_ERR err;
-
-	pFw = (struct OSC_FRAMEWORK *)hFw;
-	if(pFw->gpio.useCnt != 0)
-	{
-		pFw->gpio.useCnt++;
-		/* The module is already allocated */
-		return SUCCESS;
-	}
-	
-	/* Load the module dependencies of this module. */
-	err = OscLoadDependencies(pFw,
-			gpio_deps,
-			DEP_LEN);
-	
-	if(err != SUCCESS)
-	{
-		printf("%s: ERROR: Unable to load dependencies! (%d)\n",
-				__func__,
-				err);
-		return err;
-	}
-	
-	memset(&gpio, 0, sizeof(struct OSC_GPIO));
-	
-	/* Setup our pins. */
-	err = OscGpioInitPins();
-	if(err != SUCCESS)
-	{
-		OscLog(ERROR, "%s: Unable to intialize GPIO pins (%d)!\n",
-					__func__, err);
-		return -EDEVICE;
-	}
-	
-	/* Increment the use count */
-	pFw->gpio.hHandle = (void*)&gpio;
-	pFw->gpio.useCnt++;
+	gpio = (struct OSC_GPIO) { };
 	
 	return SUCCESS;
-}
-
-void OscGpioDestroy(void *hFw)
-{
-	struct OSC_FRAMEWORK *pFw;
-			
-	pFw = (struct OSC_FRAMEWORK *)hFw;
-	/* Check if we really need to release or whether we still
-	 * have users. */
-	pFw->gpio.useCnt--;
-	if(pFw->gpio.useCnt > 0)
-	{
-		return;
-	}
-	
-	
-	OscUnloadDependencies(pFw,
-			gpio_deps,
-			DEP_LEN);
-	
-	memset(&gpio, 0, sizeof(struct OSC_GPIO));
 }
 
 #ifdef TARGET_TYPE_LEANXCAM

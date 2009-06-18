@@ -38,7 +38,7 @@ struct OscModule OscModule_dspl = {
 	}
 };
 
-OSC_ERR OscDsplCreate(void *hFw)
+OSC_ERR OscDsplCreate()
 {
 	struct OSC_FRAMEWORK *pFw;
 

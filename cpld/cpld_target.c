@@ -39,7 +39,7 @@ struct OscModule OscModule_cpld = {
 	}
 };
 
-OSC_ERR OscCpldCreate(void *hFw)
+OSC_ERR OscCpldCreate()
 {
 #ifdef TARGET_TYPE_INDXCAM
 	struct OSC_FRAMEWORK *pFw;

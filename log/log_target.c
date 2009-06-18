@@ -38,7 +38,7 @@ struct OscModule OscModule_log = {
 	}
 };
 
-OSC_ERR OscLogCreate(void *hFw)
+OSC_ERR OscLogCreate()
 {
 	osc_log = (struct OSC_LOG) { };
 	

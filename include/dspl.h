@@ -49,21 +49,6 @@ typedef struct complex_fract16 {
 /*=========================== API functions ============================*/
 
 /*********************************************************************//*!
- * @brief Constructor
- * 
- * @param hFw Pointer to the handle of the framework.
- * @return SUCCESS or an appropriate error code otherwise
- *//*********************************************************************/
-OSC_ERR OscDsplCreate(void *hFw);
-
-/*********************************************************************//*!
- * @brief Destructor
- * 
- * @param hFw Pointer to the handle of the framework.
- *//*********************************************************************/
-void OscDsplDestroy(void *hFw);
-
-/*********************************************************************//*!
  * @brief Convert fract16 to float.
  * 
  * @param n Fract16 number

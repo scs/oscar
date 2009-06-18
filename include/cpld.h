@@ -40,25 +40,6 @@ enum EnOscCpldErrors
 /*======================= API functions ================================*/
 
 /*********************************************************************//*!
- * @brief Constructor
- * 
- * Available on Industrial OSC platform only.
- * 
- * @param hFw Pointer to the handle of the framework.
- * @return SUCCESS or an appropriate error code otherwise
- *//*********************************************************************/
-OSC_ERR OscCpldCreate(void *hFw);
-
-/*********************************************************************//*!
- * @brief Destructor
- * 
- * Available on Industrial OSC platform only.
- * 
- * @param hFw Pointer to the handle of the framework.
- *//*********************************************************************/
-void OscCpldDestroy(void *hFw);
-
-/*********************************************************************//*!
  * @brief Write register
  * 
  * Available on Industrial OSC platform only.

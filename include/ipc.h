@@ -76,21 +76,6 @@ struct OSC_IPC_REQUEST
 /*=========================== API functions ============================*/
 
 /*********************************************************************//*!
- * @brief Constructor
- * 
- * @param hFw Pointer to the handle of the framework.
- * @return SUCCESS or an appropriate error code otherwise
- *//*********************************************************************/
-OSC_ERR OscIpcCreate(void *hFw);
-
-/*********************************************************************//*!
- * @brief Destructor
- * 
- * @param hFw Pointer to the handle of the framework.
- *//*********************************************************************/
-void OscIpcDestroy(void *hFw);
-
-/*********************************************************************//*!
  * @brief Register an IPC channel for future message communication
  * 
  * Checks if a free IPC channel is available and reserves it. Every IPC

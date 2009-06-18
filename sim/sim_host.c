@@ -23,6 +23,8 @@
 
 #include "sim.h"
 
+OSC_ERR OscSimCreate();
+
 /*! @brief The module singelton instance. */
 struct OSC_SIM_OBJ sim;
 
@@ -33,7 +35,7 @@ struct OscModule OscModule_sim = {
 	}
 };
 
-OSC_ERR OscSimCreate(void *hFw)
+OSC_ERR OscSimCreate()
 {
 	sim = (struct OSC_SIM_OBJ) { };
 		

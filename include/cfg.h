@@ -101,21 +101,6 @@ struct CFG_VAL_STR {
 /*====================== API functions =================================*/
 
 /*********************************************************************//*!
- * @brief Constructor
- * 
- * @param hFw Pointer to the handle of the framework.
- * @return SUCCESS or an appropriate error code otherwise
- *//*********************************************************************/
-OSC_ERR OscCfgCreate(void *hFw);
-
-/*********************************************************************//*!
- * @brief Destructor
- * 
- * @param hFw Pointer to the handle of the framework.
- *//*********************************************************************/
-void OscCfgDestroy(void *hFw);
-
-/*********************************************************************//*!
  * @brief Opens a new file and reads its content to the file content structure
  * 
  * @param pFileContentHandle Ptr to handle to the File content. Is set by this function.

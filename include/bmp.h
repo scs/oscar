@@ -61,21 +61,6 @@ struct OSC_PICTURE {
 /*====================== API functions =================================*/
 
 /*********************************************************************//*!
- * @brief Constructor
- * 
- * @param hFw Pointer to the handle of the framework.
- * @return SUCCESS or an appropriate error code otherwise
- *//*********************************************************************/
-OSC_ERR OscBmpCreate(void *hFw);
-
-/*********************************************************************//*!
- * @brief Destructor
- * 
- * @param hFw Pointer to the handle of the framework.
- *//*********************************************************************/
-void OscBmpDestroy(void *hFw);
-
-/*********************************************************************//*!
  * @brief Read the contents of a BMP image
  * 
  * Open the specified .bmp file and check the header for validity. Only

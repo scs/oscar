@@ -25,6 +25,9 @@
 
 #include "oscar.h"
 
+OSC_ERR OscSwrCreate();
+OSC_ERR OscSwrDestroy();
+
 // FIXME: Why does this module exist for the non-simulating target?
 
 #if defined(OSC_HOST) || defined(OSC_SIM)
@@ -94,7 +97,7 @@ struct OscModule OscModule_swr = {
 	}
 };
 
-OSC_ERR OscSwrCreate(void *hFw)
+OSC_ERR OscSwrCreate()
 {
 	OSC_ERR err;
 	
@@ -103,7 +106,7 @@ OSC_ERR OscSwrCreate(void *hFw)
 	return SUCCESS;
 }
 
-void OscSwrDestroy(void *hFw)
+OSC_ERR OscSwrDestroy()
 {
 	uint16 wrId;
 

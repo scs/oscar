@@ -57,21 +57,6 @@ enum EnOscSrdErrors
 /*====================== API functions =================================*/
 
 /*********************************************************************//*!
- * @brief Constructor
- * 
- * @param hFw Pointer to the handle of the framework.
- * @return SUCCESS or an appropriate error code otherwise
- *//*********************************************************************/
-OSC_ERR OscSrdCreate(void *hFw);
-
-/*********************************************************************//*!
- * @brief Destructor
- * 
- * @param hFw Pointer to the handle of the framework.
- *//*********************************************************************/
-void OscSrdDestroy(void *hFw);
-
-/*********************************************************************//*!
  * @brief Create Stimuli Reader (host only)
  * 
  * @param strFile           I: output file name

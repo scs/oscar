@@ -25,6 +25,9 @@
 
 #include "log.h"
 
+OSC_ERR OscLogCreate();
+OSC_ERR OscLogDestroy();
+
 /*! @brief The module singelton instance.
  * 
  * This is called osc_log
@@ -43,7 +46,7 @@ struct OscModule OscModule_log = {
 	}
 };
 
-OSC_ERR OscLogCreate(void *hFw)
+OSC_ERR OscLogCreate()
 {
 	osc_log = (struct OSC_LOG) { };
 	
@@ -69,7 +72,7 @@ OSC_ERR OscLogCreate(void *hFw)
 	return SUCCESS;
 }
 
-void OscLogDestroy(void *hFw)
+OSC_ERR OscLogDestroy()
 {
 	fclose(osc_log.pLogF);
 	fclose(osc_log.pSimLogF);

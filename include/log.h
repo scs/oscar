@@ -51,21 +51,6 @@ enum EnOscLogLevel {
 /*=========================== API functions ============================*/
 
 /*********************************************************************//*!
- * @brief Constructor
- * 
- * @param hFw Pointer to the handle of the framework.
- * @return SUCCESS or an appropriate error code otherwise
- *//*********************************************************************/
-OSC_ERR OscLogCreate(void *hFw);
-
-/*********************************************************************//*!
- * @brief Destructor
- * 
- * @param hFw Pointer to the handle of the framework.
- *//*********************************************************************/
-void OscLogDestroy(void *hFw);
-
-/*********************************************************************//*!
  * @brief Sets the highest log level to be output to the console
  * 
  * Set the log level to NONE to disable logging.
