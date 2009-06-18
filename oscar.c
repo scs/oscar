@@ -34,41 +34,30 @@
 #include <stdio.h>
 #include "oscar.h"
 
-struct {
-	OSC_ERR (* create, destroy) (void *);
-	bool isLoaded;
-} OscModuleFunctions[] = {
-	[OscModule_log] = { .create = OscLogCreate, .destroy = OscLogDestroy },
-	[OscModule_cam] = { .create = OscCamCreate, .destroy = OscCamDestroy },
-	[OscModule_cpld] = { .create = OscCpldCreate, .destroy = OscCpldDestroy },
-#ifdef TARGET_TYPE_INDXCAM
-	[OscModule_lgx] = { .create = OscLgxCreate, .destroy = OscLgxDestroy },
-#endif
-	[OscModule_sim] = { .create = OscSimCreate, .destroy = OscSimDestroy },
-	[OscModule_bmp] = { .create = OscBmpCreate, .destroy = OscBmpDestroy },
-	[OscModule_swr] = { .create = OscSwrCreate, .destroy = OscSwrDestroy },
-	[OscModule_srd] = { .create = OscSrdCreate, .destroy = OscSrdDestroy },
-	[OscModule_ipc] = { .create = OscIpcCreate, .destroy = OscIpcDestroy },
-	[OscModule_sup] = { .create = OscSupCreate, .destroy = OscSupDestroy },
-	[OscModule_frd] = { .create = OscFrdCreate, .destroy = OscFrdDestroy },
-	[OscModule_dspl] = { .create = OscDsplCreate, .destroy = OscDsplDestroy },
-	[OscModule_dma] = { .create = OscDmaCreate, .destroy = OscDmaDestroy },
-	[OscModule_hsm] = { .create = OscHsmCreate, .destroy = OscHsmDestroy },
-	[OscModule_cfg] = { .create = OscCfgCreate, .destroy = OscCfgDestroy },
-	[OscModule_clb] = { .create = OscClbCreate, .destroy = OscClbDestroy },
-	[OscModule_vis] = { .create = OscVisCreate, .destroy = OscVisDestroy },
-	[OscModule_jpg] = { .create = OscJpgCreate, .destroy = OscJpgDestroy }
-};
+#define MAX_LOADED_MODUELS 50
 
-struct OSC_FRAMEWORK fw = { };    /*!< @brief Module singelton instance */
+static struct OscModule * loadedModuels[MAX_LOADED_MODUELS] = { };
+static struct OscModule * loadedModuelsCount = 0;
 
-OSC_ERR _OscCreate(int count, enum OscModule * modules) {
+static OSC_ERR loadDepencies(struct OscModule ** deps) {
 OscFunctionBegin
-
-	for (int i = 0; i < count; i += 1)
-	{
-		OscCall(OscModuleFunctions[modules[i]].create, &fw);
+	for (struct OscModule ** dep = deps; *dep != NULL; dep += 1) {
+		if (!dep->isLoaded) {
+			dep->isLoaded = true;
+			OscCall(loadDepencies, dep->dependencies);
+			OscCall(dep->create);
+			loadedModuels[loadedModuelsCount] = dep;
+			loadedModuelsCount += 1;
+		}
 	}
+OscFunctionCatch
+OscFunctionEnd
+}
+
+OSC_ERR OscCreateFunction(struct OscModule ** modules) {
+OscFunctionBegin
+	OscCall(loadDepencies, modules);
+
 OscFunctionCatch
 	OscMark_m("Failed to load the Framework.");
 	OscCall(OscDestroy);
@@ -78,11 +67,10 @@ OscFunctionEnd
 OSC_ERR OscDestroy()
 {
 OscFunctionBegin
-	for (int i = 0; i < length(OscModuleFunctions); i+= 1) {
-		void (*destroy)(void *) = OscModuleFunctions[i].destroy;
-		
-		if (destroy != NULL)
-			destroy(&fw);
+	for (; loadedModuelsCount > 0; loadedModuelsCount -= 1) {
+		struct OscModule * module = loadedModuels[loadedModuelsCount - 1];
+		OscCall(module->destroy);
+		module->isLoaded = false;
 	}
 OscFunctionCatch
 OscFunctionEnd
