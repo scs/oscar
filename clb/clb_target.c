@@ -29,10 +29,14 @@
 /*! @brief Return the result of x/y round up to the next full integer. */
 #define ROUND_UP_DIVISION(x, y) ((x + (y - 1))/y)
 
-/*! @brief The dependencies of this module. */
-struct OSC_DEPENDENCY clb_deps[] = {
-		{"log", OscLogCreate, OscLogDestroy},
-		{"cam", OscCamCreate, OscCamDestroy}
+struct OscModule OscModule_clb = {
+	.create = OscClbCreate,
+	.destroy = OscClbDestroy,
+	.dependencies = {
+		&OscModule_log,
+		&OscModule_cam,
+		NULL // To end the flexible array.
+	}
 };
 
 /*! @brief Object struct of the clb module. This

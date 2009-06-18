@@ -24,9 +24,13 @@
 
 struct OSC_CPLD cpld; /*!< The cpld module singelton instance */
 
-/*! The dependencies of this module. */
-struct OSC_DEPENDENCY cpld_deps[] = {
-		{"log", OscLogCreate, OscLogDestroy}
+struct OscModule OscModule_cpld = {
+	.create = OscCpldCreate,
+	.destroy = OscCpldDestroy,
+	.dependencies = {
+		&OscModule_log,
+		NULL // To end the flexible array.
+	}
 };
 
 OSC_ERR OscCpldCreate(void *hFw)

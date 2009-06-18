@@ -25,11 +25,6 @@
 
 #include "oscar.h"
 
-/*! @brief Object struct of the bitmap module */
-struct OSC_VIS {
-	uint32 vis_dummy; /*!< @brief dummy member */
-};
-
 /*======================= Private methods ==============================*/
 /*********************************************************************//*!
  * @brief Assembler method to debayer a raw image to grey by averaging 

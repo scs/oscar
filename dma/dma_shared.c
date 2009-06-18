@@ -28,12 +28,15 @@ struct OSC_DMA dma;
 /*! @brief Data field filled with only ones. */
 static uint32 allOnes = 0xffffffff;
 
-/*! @brief The dependencies of this module. */
-struct OSC_DEPENDENCY dma_deps[] = {
-		{"log", OscLogCreate, OscLogDestroy},
-		{"sup", OscSupCreate, OscSupDestroy}
+struct OscModule OscModule_dma = {
+	.create = OscDmaCreate,
+	.destroy = OscDmaDestroy,
+	.dependencies = {
+		&OscModule_log,
+		&OscModule_sub,
+		NULL // To end the flexible array.
+	}
 };
-
 
 OSC_ERR OscDmaCreate(void *hFw)
 {

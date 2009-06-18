@@ -22,6 +22,8 @@
  */
 #ifndef BMP_PUB_H_
 #define BMP_PUB_H_
+
+extern struct OscModule OscModule_bmp;
 		
 /*! @brief Module-specific error codes.
  * 

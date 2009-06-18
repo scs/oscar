@@ -35,8 +35,8 @@
 #include "oscar.h"
 
 struct {
-	OSC_ERR (*create)(void *);
-	void (*destroy)(void *);
+	OSC_ERR (* create, destroy) (void *);
+	bool isLoaded;
 } OscModuleFunctions[] = {
 	[OscModule_log] = { .create = OscLogCreate, .destroy = OscLogDestroy },
 	[OscModule_cam] = { .create = OscCamCreate, .destroy = OscCamDestroy },

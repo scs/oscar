@@ -26,9 +26,13 @@
 
 #include <stdlib.h>
 
-/*! @brief The dependencies of this module. */
-struct OSC_DEPENDENCY clb_deps[] = {
-		{"log", OscLogCreate, OscLogDestroy}
+struct OscModule OscModule_clb = {
+	.create = OscClbCreate,
+	.destroy = OscClbDestroy,
+	.dependencies = {
+		&OscModule_log,
+		NULL // To end the flexible array.
+	}
 };
 
 OSC_ERR OscClbCreate(void *hFw)

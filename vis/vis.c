@@ -28,11 +28,16 @@
 /*! @brief The module singelton instance. */
 struct OSC_VIS vis;
 
-/*! @brief The dependencies of this module. */
-struct OSC_DEPENDENCY vis_deps[] = {
-		{"log", OscLogCreate, OscLogDestroy},
-		{"dma", OscDmaCreate, OscDmaDestroy}
+struct OscModule OscModule_vis = {
+	.create = OscVisCreate,
+	.destroy = OscVisDestroy,
+	.dependencies = {
+		&OscModule_log,
+		&OscModule_dma,
+		NULL // To end the flexible array.
+	}
 };
+
 
 OSC_ERR OscVisCreate(void *hFw)
 {

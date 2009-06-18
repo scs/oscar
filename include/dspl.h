@@ -23,6 +23,8 @@
 #ifndef DSPL_PUB_H_
 #define DSPL_PUB_H_
 
+extern struct OscModule OscModule_dspl;
+
 #ifdef OSC_TARGET
 /* Include the header files of the DSP runtime library
  * (part of the toolchain)*/

@@ -30,6 +30,14 @@
  * library */
 struct OSC_LOG osc_log;
 
+struct OscModule OscModule_log = {
+	.create = OscLogCreate,
+	.destroy = OscLogDestroy,
+	.dependencies = {
+		NULL // To end the flexible array.
+	}
+};
+
 OSC_ERR OscLogCreate(void *hFw)
 {
 	struct OSC_FRAMEWORK *pFw;

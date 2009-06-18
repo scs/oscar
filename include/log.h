@@ -23,6 +23,8 @@
 #ifndef LOG_PUB_H_
 #define LOG_PUB_H_
 
+extern struct OscModule OscModule_log;
+
 /*! Module-specific error codes.
  * These are enumerated with the offset
  * assigned to each module, so a distinction over

@@ -28,6 +28,8 @@
 #ifndef IPC_PUB_H_
 #define IPC_PUB_H_
 
+extern struct OscModule OscModule_ipc;
+
 /*! @brief Module-specific error codes.
  * These are enumerated with the offset
  * assigned to each module, so a distinction over

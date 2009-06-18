@@ -30,12 +30,10 @@
 
 /*! @brief Describes an OSC module and keeps track of how many users
  * hold references to it. */
-struct OSC_MODULE
-{
-	/*! @brief Handle to the module. */
-	void *      hHandle;
-	/*! @brief Used to prevent premature unloading. */
-	int         useCnt;
+struct OscModule {
+	OSC_ERR (* create, * destroy) (void *);
+	bool isLoaded;
+	OscModule * dependencies[];
 };
 
 /*! @brief The Oscar framework object with handle to modules*/

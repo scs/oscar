@@ -25,6 +25,8 @@
 #ifndef JPG_PUB_H_
 #define JPG_PUB_H_
 
+extern struct OscModule OscModule_jpg;
+
 /*====================== API functions =================================*/
 
 /*********************************************************************//*!

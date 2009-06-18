@@ -34,9 +34,13 @@
 /*! @brief The module singelton instance. */
 struct OSC_SUP sup;
 
-/*! @brief The dependencies of this module. */
-struct OSC_DEPENDENCY sup_deps[] = {
-		{"log", OscLogCreate, OscLogDestroy}
+struct OscModule OscModule_sup = {
+	.create = OscSupCreate,
+	.destroy = OscSupDestroy,
+	.dependencies = {
+		&OscModule_log,
+		NULL // To end the flexible array.
+	}
 };
 
 /*! @brief The length of the dependency array of this module. */

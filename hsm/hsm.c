@@ -30,9 +30,13 @@
 struct OSC_HSM { void * dummy; };
 struct OSC_HSM hsm; /*!< Module singelton instance */
 
-/*! The dependencies of this module. */
-struct OSC_DEPENDENCY hsm_deps[] = {
-		{"log", OscLogCreate, OscLogDestroy}
+struct OscModule OscModule_hsm = {
+	.create = OscHsmCreate,
+	.destroy = OscHsmDestroy,
+	.dependencies = {
+		&OscModule_log,
+		NULL // To end the flexible array.
+	}
 };
 
 OSC_ERR OscHsmCreate(void *hFw)

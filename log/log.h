@@ -45,7 +45,7 @@
 /*! @brief The object struct of the camera module */
 struct OSC_LOG {
 	/*! @brief The log identity prepended to syslog messages. */
-	char logName[64];
+	char logName[64]; // FIXME: why isn't this a (char *)?
 	/*! @brief The highest log level that is output to the console */
 	enum EnOscLogLevel consoleLogLevel;
 	/*! @brief The highest log level that is output to the log file */

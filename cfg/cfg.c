@@ -20,6 +20,14 @@
  * @brief Configuration file module implementation for target and host
  * 
  */
+struct OscModule OscModule_cfg = {
+	.create = OscCfgCreate,
+	.destroy = OscCfgDestroy,
+	.dependencies = {
+		&OscModule_log,
+		NULL // To end the flexible array.
+	}
+};
 
 #include "oscar.h"
 
@@ -148,11 +156,6 @@ unsigned int OscCfgFindInvalidChar(const unsigned char *str, const unsigned int 
 
 /*! @brief The module singelton instance. */
 struct OSC_CFG cfg;
-
-/*! @brief The dependencies of this module. */
-struct OSC_DEPENDENCY cfg_deps[] = {
-		{"log", OscLogCreate, OscLogDestroy}
-};
 
 OSC_ERR OscCfgCreate(void *hFw)
 {

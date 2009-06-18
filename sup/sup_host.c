@@ -26,6 +26,15 @@
 /*! @brief The module singelton instance. */
 struct OSC_SUP sup;
 
+struct OscModule OscModule_sup = {
+	.create = OscSupCreate,
+	.destroy = OscSupDestroy,
+	.dependencies = {
+		&OscModule_log,
+		NULL // To end the flexible array.
+	}
+};
+
 OSC_ERR OscSupCreate(void *hFw)
 {
 	struct OSC_FRAMEWORK *pFw;

@@ -25,6 +25,8 @@
 #ifndef GPIO_PUB_H_
 #define GPIO_PUB_H_
 
+extern struct OscModule OscModule_gpio;
+
 /*! @brief The GPIO pins that can be accessed from the application.
  * 
  * This is a list of all the GPIO names on all the supported hardware

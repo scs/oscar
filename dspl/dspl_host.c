@@ -31,6 +31,13 @@
 /*! @brief The module singelton instance.  */
 struct OSC_DSPL osc_dspl;
 
+struct OscModule OscModule_dspl = {
+	.create = OscDsplCreate,
+	.destroy = OscDsplDestroy,
+	.dependencies = {
+		NULL // To end the flexible array.
+	}
+};
 
 OSC_ERR OscDsplCreate(void *hFw)
 {

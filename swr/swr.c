@@ -81,9 +81,13 @@ struct OSC_SWR
 
 struct OSC_SWR swr; /*!< Module singelton instance */
 
-/*! The dependencies of this module. */
-struct OSC_DEPENDENCY swr_deps[] = {
-	{"log", OscLogCreate, OscLogDestroy}
+struct OscModule OscModule_swr = {
+	.create = OscSwrCreate,
+	.destroy = OscSwrDestroy,
+	.dependencies = {
+		&OscModule_log,
+		NULL // To end the flexible array.
+	}
 };
 
 OSC_ERR OscSwrCreate(void *hFw)

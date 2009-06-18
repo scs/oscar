@@ -24,9 +24,13 @@
 
 struct OSC_SRD srd; /*!< Module singelton instance */
 
-/*! The dependencies of this module. */
-struct OSC_DEPENDENCY srd_deps[] = {
-		{"log", OscLogCreate, OscLogDestroy}
+struct OscModule OscModule_srd = {
+	.create = OscSrdCreate,
+	.destroy = OscSrdDestroy,
+	.dependencies = {
+		&OscModule_log,
+		NULL // To end the flexible array.
+	}
 };
 
 OSC_ERR OscSrdCreate(void *hFw)

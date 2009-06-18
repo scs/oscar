@@ -22,8 +22,15 @@
 
 #include "bmp.h"
 
-/*! @brief The module singelton instance. */
-struct OSC_BMP bmp;
+/*! @brief The module definition. */
+struct OscModule OscModule_bmp = {
+	.create = OscBmpCreate,
+	.destroy = OscBmpDestroy,
+	.dependencies = {
+		&OscModule_log,
+		NULL // To end the flexible array.
+	}
+};
 
 /*! @brief The dependencies of this module. */
 struct OSC_DEPENDENCY bmp_deps[] = {

@@ -25,13 +25,17 @@
 /*! @brief The module singelton instance. */
 struct OSC_GPIO gpio;
 
-/*! @brief The dependencies of this module. */
-struct OSC_DEPENDENCY gpio_deps[] = {
-		{"log", OscLogCreate, OscLogDestroy}
+struct OscModule OscModule_gpio = {
+	.create = OscGpioCreate,
+	.destroy = OscGpioDestroy,
+	.dependencies = {
+		&OscModule_log,
 #if defined(OSC_HOST) || defined(OSC_SIM)
-		,{"srd", OscSrdCreate, OscSrdDestroy}
-		,{"swr", OscSwrCreate, OscSwrDestroy}
+		&OscModule_srd,
+		&OscModule_swr,
 #endif /* OSC_HOST or OSC_SIM */
+		NULL // To end the flexible array.
+	}
 };
 		
 /*! @brief The length of the dependency array of this module. */

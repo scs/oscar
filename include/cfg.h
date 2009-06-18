@@ -60,6 +60,8 @@
 #ifndef CFG_PUB_H_
 #define CFG_PUB_H_
 
+extern struct OscModule OscModule_cfg;
+
 /*! @brief Module-specific error codes.
  * 
  * These are enumerated with the offset

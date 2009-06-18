@@ -26,6 +26,8 @@
 #ifndef SIM_PUB_H_
 #define SIM_PUB_H_
 
+extern struct OscModule OscModule_sim;
+
 /*! @brief Module-specific error codes.
  * 
  * These are enumerated with the offset

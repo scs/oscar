@@ -30,9 +30,14 @@
 #include <fcntl.h>
 #include <errno.h>
 
-/*! @brief The dependencies of this module. */
-struct OSC_DEPENDENCY cam_deps[] = {
-		{"log", OscLogCreate, OscLogDestroy}
+/*! @brief The module definition. */
+struct OscModule OscModule_cam = {
+	.create = OscCamCreate,
+	.destroy = OscCamDestroy,
+	.dependencies = {
+		&OscModule_log,
+		NULL // To end the flexible array.
+	}
 };
 
 struct OSC_CAM cam; /*!< @brief The camera module singelton instance */

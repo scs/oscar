@@ -102,10 +102,14 @@ struct OSC_FRD
 
 struct OSC_FRD frd; /*!< Module singelton instance */
 
-/*! The dependencies of this module. */
-struct OSC_DEPENDENCY frd_deps[] = {
-		{"log", OscLogCreate, OscLogDestroy},
-		{"sim", OscSimCreate, OscSimDestroy}
+struct OscModule OscModule_frd = {
+	.create = OscFrdCreate,
+	.destroy = OscFrdDestroy,
+	.dependencies = {
+		&OscModule_log,
+		&OscModule_sim,
+		NULL // To end the flexible array.
+	}
 };
 
 static void OscFrdSimCycleCallback();

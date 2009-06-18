@@ -35,6 +35,14 @@ struct OSC_LOG osc_log = {
 	.fileLogLevel = NONE
 };
 
+struct OscModule OscModule_log = {
+	.create = OscLogCreate,
+	.destroy = OscLogDestroy,
+	.dependencies = {
+		NULL // To end the flexible array.
+	}
+};
+
 OSC_ERR OscLogCreate(void *hFw)
 {
 	struct OSC_FRAMEWORK *pFw;

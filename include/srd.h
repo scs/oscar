@@ -41,7 +41,9 @@
  */
 
 #ifndef SRD_PUB_H_
-#define SRD_PUB_H_
+#define SRD_PUB_H
+
+extern struct OscModule OscModule_srd;
 
 /*! Module-specific error codes.
  * These are enumerated with the offset

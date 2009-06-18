@@ -34,11 +34,14 @@
 /*! The camera module singelton instance. */
 struct OSC_IPC ipc;
 
-/*! The dependencies of this module. */
-struct OSC_DEPENDENCY ipc_deps[] = {
-		{"log", OscLogCreate, OscLogDestroy}
+struct OscModule OscModule_ipc = {
+	.create = OscIpcCreate,
+	.destroy = OscIpcDestroy,
+	.dependencies = {
+		&OscModule_log,
+		NULL // To end the flexible array.
+	}
 };
-
 
 OSC_ERR OscIpcCreate(void *hFw)
 {

@@ -26,6 +26,13 @@
 /*! @brief The module singelton instance. */
 struct OSC_SIM_OBJ sim;
 
+struct OscModule OscModule_sim = {
+	.create = OscSimCreate,
+	.destroy = OscSimDestroy,
+	.dependencies = {
+		NULL // To end the flexible array.
+	}
+};
 
 OSC_ERR OscSimCreate(void *hFw)
 {

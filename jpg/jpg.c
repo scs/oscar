@@ -16,75 +16,63 @@
 	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-/*! @file
- * @brief Blackfin DSP runtime library implementation for host.
- * 
- * All functions of the DSP runtime library used on the target must
- * be implemented for the host. The implementation for the target on the
- * other hand must not be done in the framework, since it already exists
- * in optimized form in the library.
- */
-
-#include "dspl.h"
-
-/*! @brief The module singelton instance. */
-struct OSC_DSPL osc_dspl;
-
-struct OscModule OscModule_dspl = {
-	.create = OscDsplCreate,
-	.destroy = OscDsplDestroy,
+struct OscModule OscModule_Jpg = {
+	.create = OscJpgCreate,
+	.destroy = OscJpgDestroy,
 	.dependencies = {
+		&OscModule_log,
 		NULL // To end the flexible array.
 	}
 };
 
-OSC_ERR OscDsplCreate(void *hFw)
+OSC_ERR OscJpgCreate(void *hFw)
 {
 	struct OSC_FRAMEWORK *pFw;
-
+	OSC_ERR err;
+	
 	pFw = (struct OSC_FRAMEWORK *)hFw;
-	if(pFw->dspl.useCnt != 0)
+	if(pFw->jpg.useCnt != 0)
 	{
-		pFw->dspl.useCnt++;
+		pFw->jpg.useCnt++;
 		/* The module is already allocated */
 		return SUCCESS;
 	}
-		
-	memset(&osc_dspl, 0, sizeof(struct OSC_DSPL));
-		
+	
+	/* Load the module dependencies of this module. */
+	err = OscLoadDependencies(pFw,
+			jpg_deps,
+			sizeof(jpg_deps)/sizeof(struct OSC_DEPENDENCY));
+	
+	if(err != SUCCESS)
+	{
+		printf("%s: ERROR: Unable to load dependencies! (%d)\n",
+				__func__,
+				err);
+		return err;
+	}
+	
 	/* Increment the use count */
-	pFw->dspl.hHandle = (void*)&osc_dspl;
-	pFw->dspl.useCnt++;
-
+	pFw->bmp.hHandle = NULL;
+	pFw->bmp.useCnt++;
+	
 	return SUCCESS;
 }
 
-void OscDsplDestroy(void *hFw)
+void OscJpgDestroy(void *hFw)
 {
 	struct OSC_FRAMEWORK *pFw;
 		
 	pFw = (struct OSC_FRAMEWORK *)hFw;
+	
 	/* Check if we really need to release or whether we still
 	 * have users. */
-	pFw->dspl.useCnt--;
-	if(pFw->dspl.useCnt > 0)
+	pFw->jpg.useCnt--;
+	if(pFw->jpg.useCnt > 0)
 	{
 		return;
 	}
 	
-	memset(&osc_dspl, 0, sizeof(struct OSC_DSPL));
-}
-
-
-inline float OscDsplFr16ToFloat(fract16 n)
-{
-	return (((float)n)/FR16_SCALE);
-}
-
-inline fract16 OscDsplFloatToFr16(float n)
-{
-	float ret = (n*FR16_SCALE);
-	if(ret > FR16_MAX)
-		ret = FR16_MAX;
-	return (fract16)ret;
+	OscUnloadDependencies(pFw,
+			jpg_deps,
+			sizeof(jpg_deps)/sizeof(struct OSC_DEPENDENCY));
 }

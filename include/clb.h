@@ -30,6 +30,8 @@
 #ifndef CLB_PUB_H_
 #define CLB_PUB_H_
 
+extern struct OscModule OscModule_clb;
+
 #define MAX_NR_HOTPIXEL         1000    /*!< @brief Max number of hotpixels */
 
 /*! Module-specific error codes. */

@@ -23,6 +23,8 @@
 #ifndef CAM_PUB_H_
 #define CAM_PUB_H_
 
+extern struct OscModule OscModule_cam;
+
 /*! Module-specific error codes.
  * These are enumerated with the offset
  * assigned to each module, so a distinction over
