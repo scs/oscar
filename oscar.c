@@ -38,8 +38,7 @@
 
 static struct OscModule ** loadedModuels = NULL;
 
-static OSC_ERR loadModules(struct OscModule ** deps) {
-OscFunctionBegin
+OscFunctionStart(static loadModules, struct OscModule ** deps)
 	for (struct OscModule ** dep = deps; *dep != NULL; dep += 1) {
 		OscAssert((*dep)->useCount >= 0);
 		
@@ -52,12 +51,10 @@ OscFunctionBegin
 		
 		(*dep)->useCount += 1;
 	}
-OscFunctionCatch
-OscFunctionEnd
-}
+OscFunctionCatch()
+OscFunctionEnd()
 
-static OSC_ERR unloadModules(struct OscModule ** deps) {
-OscFunctionBegin
+OscFunctionStart(static unloadModules, struct OscModule ** deps)
 	for (struct OscModule ** dep = deps; *dep != NULL; dep += 1) {
 		(*dep)->useCount -= 1;
 		
@@ -70,34 +67,28 @@ OscFunctionBegin
 		
 		OscAssert((*dep)->useCount >= 0);
 	}
-OscFunctionCatch
-OscFunctionEnd
-}
+OscFunctionCatch()
+OscFunctionEnd()
 
-OSC_ERR OscCreateFunction(struct OscModule ** modules) {
-OscFunctionBegin
+OscFunctionStart(OscCreateFunction, struct OscModule ** modules)
 	OscAssert_m(loadedModuels == NULL, "The Framework is already loaded!");
 	
 	// This requires modules point to static data which is done so by the OscCreate Macro. But it may not be a good idea ...
 	loadedModuels = modules;
 	OscCall(loadModules, loadedModuels);
 
-OscFunctionCatch
+OscFunctionCatch()
 	OscMark_m("Failed to load the Framework.");
 	OscCall(OscDestroy);
-OscFunctionEnd
-}
+OscFunctionEnd()
 
-OSC_ERR OscDestroy()
-{
-OscFunctionBegin
+OscFunctionStart(OscDestroy)
 	OscAssert_m(loadedModuels != NULL, "The Framework is not loaded!");
 	
 	OscCall(unloadModules, loadedModuels);
 	loadedModuels = NULL;
-OscFunctionCatch
-OscFunctionEnd
-}
+OscFunctionCatch()
+OscFunctionEnd()
 
 OSC_ERR OscGetVersionNumber(
 	char *hMajor, 
