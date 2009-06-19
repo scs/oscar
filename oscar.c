@@ -65,7 +65,7 @@ OscFunctionBegin
 			if ((*dep)->destroy != NULL)
 				OscCall((*dep)->destroy);
 			
-			OscCall(unloadDepencies, (*dep)->dependencies);
+			OscCall(unloadModules, (*dep)->dependencies);
 		}
 		
 		OscAssert((*dep)->useCount >= 0);
@@ -93,7 +93,7 @@ OSC_ERR OscDestroy()
 OscFunctionBegin
 	OscAssert_m(loadedModuels != NULL, "The Framework is not loaded!");
 	
-	OscCall(loadModules, loadedModuels);
+	OscCall(unloadModules, loadedModuels);
 	loadedModuels = NULL;
 OscFunctionCatch
 OscFunctionEnd

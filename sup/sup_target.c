@@ -1,4 +1,4 @@
-2/*	Oscar, a hardware abstraction framework for the LeanXcam and IndXcam.
+/*	Oscar, a hardware abstraction framework for the LeanXcam and IndXcam.
 	Copyright (C) 2008 Supercomputing Systems AG
 	
 	This library is free software; you can redistribute it and/or modify it
@@ -30,6 +30,8 @@
 #include <bfin_sram.h>
 
 #include "sup.h"
+
+OSC_ERR OscSupCreate();
 
 /*! @brief The module singelton instance. */
 struct OSC_SUP sup;

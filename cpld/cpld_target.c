@@ -28,6 +28,9 @@
 
 #include "cpld.h"
 
+OSC_ERR OscCpldCreate();
+OSC_ERR OscCpldDestroy();
+
 struct OSC_CPLD cpld;       /*!< The cpld module singelton instance */
 
 struct OscModule OscModule_cpld = {
@@ -42,31 +45,8 @@ struct OscModule OscModule_cpld = {
 OSC_ERR OscCpldCreate()
 {
 #ifdef TARGET_TYPE_INDXCAM
-	struct OSC_FRAMEWORK *pFw;
-	OSC_ERR err;
+	cpld = (struct OSC_CPLD) { };
 	
-	pFw = (struct OSC_FRAMEWORK *)hFw;
-	if(pFw->cpld.useCnt != 0)
-	{
-		pFw->cpld.useCnt++;
-		/* The module is already allocated */
-		return SUCCESS;
-	}
-	
-	/* Load the module cpld_deps of this module. */
-	err = OscLoadDependencies(pFw,
-			cpld_deps,
-			sizeof(cpld_deps)/sizeof(struct OSC_DEPENDENCY));
-	if(err != SUCCESS)
-	{
-		OscLog(ERROR, "%s: Unable to load cpld_deps! (%d)\n",
-				__func__,
-				err);
-		return err;
-	}
-		
-	memset(&cpld, 0, sizeof(struct OSC_CPLD));
-
 	/* Open cpld device driver */
 	cpld.file = fopen( OSC_CPLD_DRIVER_FILE, "rw+");
 	if( unlikely( cpld.file == 0))
@@ -87,10 +67,6 @@ OSC_ERR OscCpldCreate()
 				strerror(errno));
 		return -ENO_CPLD_DEVICE_FOUND;
 	}
-				
-	/* Increment the use count */
-	pFw->cpld.hHandle = (void*)&cpld;
-	pFw->cpld.useCnt++;
 	
 	return SUCCESS;
 #else
@@ -100,28 +76,10 @@ OSC_ERR OscCpldCreate()
 #endif /* TARGET_TYPE_INDXCAM */
 }
 
-void OscCpldDestroy(void *hFw)
+OSC_ERR OscCpldDestroy()
 {
-	struct OSC_FRAMEWORK *pFw;
-
-	pFw = (struct OSC_FRAMEWORK *)hFw;
-	/* Check if we really need to release or whether we still
-	 * have users. */
-	pFw->cpld.useCnt--;
-	if(pFw->cpld.useCnt > 0)
-	{
-		return;
-	}
-		
-	OscUnloadDependencies(pFw,
-			cpld_deps,
-			sizeof(cpld_deps)/sizeof(struct OSC_DEPENDENCY));
-	
 	if(cpld.file != NULL)
-	{
 		fclose(cpld.file);
-	}
-	memset(&cpld, 0, sizeof(struct OSC_CPLD));
 }
 
 #ifdef TARGET_TYPE_INDXCAM

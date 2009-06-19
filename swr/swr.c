@@ -97,6 +97,7 @@ struct OscModule OscModule_swr = {
 	}
 };
 
+#if defined(OSC_HOST) || defined(OSC_SIM)
 OSC_ERR OscSwrCreate()
 {
 	OSC_ERR err;
@@ -118,6 +119,7 @@ OSC_ERR OscSwrDestroy()
 		OscLog(INFO, "Close %s\n", &swr.wr[ wrId].strFile);
 	}
 }
+#endif
 
 #if defined(OSC_HOST) || defined(OSC_SIM)
 OSC_ERR OscSwrCreateWriter(

@@ -22,6 +22,8 @@
 
 #include "sim.h"
 
+OSC_ERR OscSimCreate();
+
 /*! @brief The module singelton instance. */
 // FIXME: Why do we have this instance on the host, or even the whole module?
 struct OSC_SIM_OBJ sim;

@@ -23,6 +23,9 @@
 #include <syslog.h>
 #include "log.h"
 
+OSC_ERR OscLogCreate();
+OSC_ERR OscLogDestroy();
+
 /*! @brief The module singelton instance.
  * 
  * This is called osc_log
@@ -58,7 +61,7 @@ OSC_ERR OscLogCreate()
 	return SUCCESS;
 }
 
-void OscLogDestroy(void *hFw)
+OSC_ERR OscLogDestroy()
 {
 	/* Close the connection to syslog */
 	closelog();

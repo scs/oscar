@@ -22,6 +22,8 @@
 
 #include "srd.h"
 
+OSC_ERR OscSrdCreate();
+
 struct OSC_SRD srd;     /*!< Module singelton instance */
 
 struct OscModule OscModule_srd = {
@@ -34,7 +36,7 @@ struct OscModule OscModule_srd = {
 
 OSC_ERR OscSrdCreate()
 {
-	sup = (struct OSC_SRD) { };
+	srd = (struct OSC_SRD) { };
 		
 	return SUCCESS;
 }
