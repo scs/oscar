@@ -106,6 +106,7 @@ struct OSC_FRD
 struct OSC_FRD frd; /*!< Module singelton instance */
 
 struct OscModule OscModule_frd = {
+	.name = "frd",
 	.create = OscFrdCreate,
 	.destroy = OscFrdDestroy,
 	.dependencies = {

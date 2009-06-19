@@ -27,6 +27,7 @@
 #include "oscar.h"
 
 struct OscModule OscModule_hsm = {
+	.name = "hsm",
 	.dependencies = {
 		&OscModule_log,
 		NULL // To end the flexible array.

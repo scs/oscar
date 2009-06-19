@@ -32,6 +32,7 @@ OSC_ERR OscCamCreate();
 
 /*! @brief The module definition. */
 struct OscModule OscModule_cam = {
+	.name = "cam",
 	.create = OscCamCreate,
 	.dependencies = {
 		&OscModule_log,

@@ -27,6 +27,7 @@ OSC_ERR OscCpldCreate();
 struct OSC_CPLD cpld; /*!< The cpld module singelton instance */
 
 struct OscModule OscModule_cpld = {
+	.name = "cpld",
 	.create = OscCpldCreate,
 	.dependencies = {
 		&OscModule_log,

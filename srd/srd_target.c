@@ -27,6 +27,7 @@ OSC_ERR OscSrdCreate();
 struct OSC_SRD srd;     /*!< Module singelton instance */
 
 struct OscModule OscModule_srd = {
+	.name = "srd",
 	.create = OscSrdCreate,
 	.dependencies = {
 		&OscModule_log,

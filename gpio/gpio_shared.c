@@ -28,6 +28,7 @@ OSC_ERR OscGpioCreate();
 struct OSC_GPIO gpio;
 
 struct OscModule OscModule_gpio = {
+	.name = "gpio",
 	.create = OscGpioCreate,
 	.dependencies = {
 		&OscModule_log,

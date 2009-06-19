@@ -31,6 +31,7 @@ struct OSC_DMA dma;
 static uint32 allOnes = 0xffffffff;
 
 struct OscModule OscModule_dma = {
+	.name = "dma",
 	.create = OscDmaCreate,
 	.dependencies = {
 		&OscModule_log,

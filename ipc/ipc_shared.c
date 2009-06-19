@@ -38,6 +38,7 @@ OSC_ERR OscIpcCreate();
 OSC_ERR OscIpcDestroy();
 
 struct OscModule OscModule_ipc = {
+	.name = "ipc",
 	.create = OscIpcCreate,
 	.destroy = OscIpcDestroy,
 	.dependencies = {

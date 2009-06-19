@@ -29,6 +29,7 @@
 #include "dspl.h"
 
 struct OscModule OscModule_dspl = {
+	.name = "dspl",
 	.dependencies = {
 		NULL // To end the flexible array.
 	}

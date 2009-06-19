@@ -34,8 +34,6 @@
 #include <stdio.h>
 #include "oscar.h"
 
-#define MAX_LOADED_MODUELS 50
-
 static struct OscModule ** loadedModuels = NULL;
 
 static OSC_ERR loadModules(struct OscModule ** deps) {
@@ -44,10 +42,19 @@ OscFunctionBegin
 		OscAssert((*dep)->useCount >= 0);
 		
 		if ((*dep)->useCount == 0) {
-			OscCall(loadModules, (*dep)->dependencies);
+			char * name = (*dep)->name;
+			int canary = 123456789;
 			
-			if ((*dep)->create != NULL)
+			if (name == NULL)
+				name = "<noname>";
+			
+			OscMark_m("Loading depencies of %s ...", name);
+			OscCall(loadModules, (*dep)->dependencies);
+			OscMark_m("Loading module %s ...", name);
+			
+			if ((*dep)->create != NULL) {
 				OscCall((*dep)->create);
+			}
 		}
 		
 		(*dep)->useCount += 1;

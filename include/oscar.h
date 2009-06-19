@@ -172,6 +172,7 @@ enum EnOscErrors {
 struct OscModule {
 	OSC_ERR (* create) ();
 	OSC_ERR (* destroy) ();
+	char * name;
 	int useCount;
 	struct OscModule * dependencies[];
 };
