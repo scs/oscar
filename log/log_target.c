@@ -65,6 +65,8 @@ OSC_ERR OscLogDestroy()
 {
 	/* Close the connection to syslog */
 	closelog();
+
+	return SUCCESS;
 }
 
 inline void OscLogSetConsoleLogLevel(const enum EnOscLogLevel level)

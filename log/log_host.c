@@ -76,6 +76,8 @@ OSC_ERR OscLogDestroy()
 {
 	fclose(osc_log.pLogF);
 	fclose(osc_log.pSimLogF);
+
+	return SUCCESS;
 }
 
 inline void OscLogSetConsoleLogLevel(const enum EnOscLogLevel level)

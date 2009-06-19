@@ -118,6 +118,8 @@ OSC_ERR OscSwrDestroy()
 		fclose( swr.wr[ wrId].pFile);
 		OscLog(INFO, "Close %s\n", &swr.wr[ wrId].strFile);
 	}
+	
+	return SUCCESS;
 }
 #endif
 

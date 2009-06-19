@@ -94,6 +94,8 @@ OSC_ERR OscCamCreate()
 OSC_ERR OscCamDestroy()
 {
 	close(cam.vidDev);
+
+	return SUCCESS;
 }
 
 OSC_ERR OscCamSetFileNameReader(void* hReaderHandle)

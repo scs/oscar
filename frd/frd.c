@@ -160,6 +160,8 @@ OSC_ERR OscFrdDestroy()
 					__func__, pReader->enType);
 		}
 	}
+
+	return SUCCESS;
 }
 
 /*********************************************************************//*!

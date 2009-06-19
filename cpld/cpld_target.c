@@ -80,6 +80,8 @@ OSC_ERR OscCpldDestroy()
 {
 	if(cpld.file != NULL)
 		fclose(cpld.file);
+
+	return SUCCESS;
 }
 
 #ifdef TARGET_TYPE_INDXCAM
