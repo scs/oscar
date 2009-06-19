@@ -73,8 +73,19 @@ const uint16 nrOfPins = sizeof(aryPinConfig)/sizeof(aryPinConfig[0]);
 
 OSC_ERR OscGpioCreate()
 {
+	OSC_ERR err = SUCCESS;
+	
 	gpio = (struct OSC_GPIO) { };
 	
+	/* Setup our pins. */
+	err = OscGpioInitPins();
+	if(err != SUCCESS)
+	{
+		OscLog(ERROR, "%s: Unable to intialize GPIO pins (%d)!\n",
+					__func__, err);
+		return -EDEVICE;
+	}
+
 	return SUCCESS;
 }
 
