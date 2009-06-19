@@ -172,7 +172,7 @@ enum EnOscErrors {
 struct OscModule {
 	OSC_ERR (* create) ();
 	OSC_ERR (* destroy) ();
-	bool isLoaded;
+	int useCount;
 	struct OscModule * dependencies[];
 };
 
@@ -182,7 +182,7 @@ struct OscModule {
 */
 #define OscCreate(modules ...) \
 	({ \
-		enum OscModule _modules[] = { modules, NULL }; \
+		static enum OscModule _modules[] = { modules, NULL }; \
 		_OscCreate(&_modules); \
 	})
 

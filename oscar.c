@@ -36,21 +36,39 @@
 
 #define MAX_LOADED_MODUELS 50
 
-static struct OscModule * loadedModuels[MAX_LOADED_MODUELS] = { };
-int loadedModuelsCount = 0;
+static struct OscModule ** loadedModuels = NULL;
 
-<<<<<<< HEAD:oscar.c
-static OSC_ERR loadDepencies(struct OscModule ** deps) {
+static OSC_ERR loadModules(struct OscModule ** deps) {
 OscFunctionBegin
 	for (struct OscModule ** dep = deps; *dep != NULL; dep += 1) {
-		if (!(*dep)->isLoaded) {
-			(*dep)->isLoaded = true;
-			OscCall(loadDepencies, (*dep)->dependencies);
+		OscAssert((*dep)->useCount >= 0);
+		
+		if ((*dep)->useCount == 0) {
+			OscCall(loadModules, (*dep)->dependencies);
+			
 			if ((*dep)->create != NULL)
 				OscCall((*dep)->create);
-			loadedModuels[loadedModuelsCount] = *dep;
-			loadedModuelsCount += 1;
 		}
+		
+		(*dep)->useCount += 1;
+	}
+OscFunctionCatch
+OscFunctionEnd
+}
+
+static OSC_ERR unloadModules(struct OscModule ** deps) {
+OscFunctionBegin
+	for (struct OscModule ** dep = deps; *dep != NULL; dep += 1) {
+		(*dep)->useCount -= 1;
+		
+		if ((*dep)->useCount == 0) {
+			if ((*dep)->destroy != NULL)
+				OscCall((*dep)->destroy);
+			
+			OscCall(unloadDepencies, (*dep)->dependencies);
+		}
+		
+		OscAssert((*dep)->useCount >= 0);
 	}
 OscFunctionCatch
 OscFunctionEnd
@@ -58,7 +76,11 @@ OscFunctionEnd
 
 OSC_ERR OscCreateFunction(struct OscModule ** modules) {
 OscFunctionBegin
-	OscCall(loadDepencies, modules);
+	OscAssert_m(loadedModuels == NULL, "The Framework is already loaded!");
+	
+	// This requires modules point to static data which is done so by the OscCreate Macro. But it may not be a good idea ...
+	loadedModuels = modules;
+	OscCall(loadModules, loadedModuels);
 
 OscFunctionCatch
 	OscMark_m("Failed to load the Framework.");
@@ -69,12 +91,10 @@ OscFunctionEnd
 OSC_ERR OscDestroy()
 {
 OscFunctionBegin
-	for (; loadedModuelsCount > 0; loadedModuelsCount -= 1) {
-		struct OscModule * module = loadedModuels[loadedModuelsCount - 1];
-		if (module->destroy != NULL)
-			OscCall(module->destroy);
-		module->isLoaded = false;
-	}
+	OscAssert_m(loadedModuels != NULL, "The Framework is not loaded!");
+	
+	OscCall(loadModules, loadedModuels);
+	loadedModuels = NULL;
 OscFunctionCatch
 OscFunctionEnd
 }
