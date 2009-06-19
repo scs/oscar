@@ -166,8 +166,6 @@ enum EnOscErrors {
 #define OSC_HSM_ERROR_OFFSET 1200
 /*! @brief Error identifier offset of the cfg module. */
 #define OSC_CFG_ERROR_OFFSET 1300
-/*! @brief Error identifier offset of the clb module. */
-#define OSC_CLB_ERROR_OFFSET 1400
 
 /*! @brief Describes a module dependency of a module and all necessary information to load and unload that module. */
 struct OSC_DEPENDENCY

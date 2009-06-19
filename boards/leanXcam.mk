@@ -1,1 +1,1 @@
-MODULES := bmp cam cfg clb cpld dma dspl frd gpio hsm ipc jpg log sim srd sup swr vis 
+MODULES := bmp cam cfg cpld dma dspl frd gpio hsm ipc jpg log sim srd sup swr vis 

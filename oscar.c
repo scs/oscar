@@ -144,12 +144,6 @@ OSC_ERR OscDestroy(void *hFw)
 				__func__);
 		return -ECANNOT_UNLOAD;
 	}
-	if(pFw->clb.useCnt)
-	{
-		fprintf(stderr, "%s: ERROR: Clb module still loaded!\n",
-				__func__);
-		return -ECANNOT_UNLOAD;
-	}
 	memset(hFw, 0, sizeof(struct OSC_FRAMEWORK));
 	return SUCCESS;
 }
