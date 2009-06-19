@@ -22,6 +22,8 @@
 
 #include "srd.h"
 
+OSC_ERR OscSrdCreate();
+
 struct OSC_SRD srd; /*!< Module singelton instance */
 
 struct OscModule OscModule_srd = {
@@ -36,7 +38,7 @@ OSC_ERR OscSrdCreate()
 {
 	OSC_ERR err;
 	
-	sup = (struct OSC_SRD) { };
+	srd = (struct OSC_SRD) { };
 
 	OscSimRegisterCycleCallback( &OscSrdCycleCallback);
 	

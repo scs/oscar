@@ -58,24 +58,6 @@ enum EnOscClbCalibrateSlope
 /*========================== API functions =============================*/
 
 /*********************************************************************//*!
- * @brief Constructor
- * 
- * Initialize the member variables and set everything up for later.
- * 
- * @param hFw Pointer to the handle of the framework.
- * @return SUCCESS or an appropriate error code otherwise
- *//*********************************************************************/
-OSC_ERR OscClbCreate(void *hFw);
-
-/*********************************************************************//*!
- * @brief Destructor
- * 
- * @param hFw Pointer to the handle of the framework.
- *//*********************************************************************/
-void OscClbDestroy(void *hFw);
-
-
-/*********************************************************************//*!
  * @brief Setup the sensor calibration method.
  * 
  * To compensate for CMOS sensor non-linearity different calibration

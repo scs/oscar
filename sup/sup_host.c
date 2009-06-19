@@ -23,6 +23,8 @@
 #include <time.h>
 #include "sup.h"
 
+OSC_ERR OscSupCreate();
+
 // FIXME: Why do we have this instance on the host?
 /*! @brief The module singelton instance. */
 struct OSC_SUP sup;
@@ -35,7 +37,7 @@ struct OscModule OscModule_sup = {
 	}
 };
 
-OSC_ERR OscSupCreate(void *hFw)
+OSC_ERR OscSupCreate()
 {
 	sup = (struct OSC_SUP) { };
 		

@@ -139,24 +139,4 @@ void HsmOnStart(Hsm *me);
 void HsmOnEvent(Hsm *me, Msg const *msg);
 
 
-
-/*====================== API functions =================================*/
-
-/*********************************************************************//*!
- * @brief Constructor
- * 
- * @param hFw Pointer to the handle of the framework.
- * @return SUCCESS or an appropriate error code otherwise
- *//*********************************************************************/
-OSC_ERR OscHsmCreate(void *hFw);
-
-/*********************************************************************//*!
- * @brief Destructor
- * 
- * @param hFw Pointer to the handle of the framework.
- *//*********************************************************************/
-void OscHsmDestroy(void *hFw);
-
-
-
 #endif /*HSM_PUB_H_*/

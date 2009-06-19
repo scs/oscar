@@ -71,7 +71,7 @@ static void AlignMemory()
 	pClb = (typeof (pClb)) (temp * CACHE_LINE_LEN);
 }
 
-OSC_ERR OscClbCreate(void *hFw)
+OSC_ERR OscClbCreate()
 {
 	struct OSC_FRAMEWORK    *pFw;
 	OSC_ERR                 err;

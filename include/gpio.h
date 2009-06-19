@@ -57,21 +57,6 @@ enum EnTriggerConfig
 /*======================== API functions ===============================*/
 
 /*********************************************************************//*!
- * @brief Constructor
- * 
- * @param hFw Pointer to the handle of the framework.
- * @return SUCCESS or an appropriate error code otherwise
- *//*********************************************************************/
-OSC_ERR OscGpioCreate(void *hFw);
-
-/*********************************************************************//*!
- * @brief Destructor
- * 
- * @param hFw Pointer to the handle of the framework.
- *//*********************************************************************/
-void OscGpioDestroy(void *hFw);
-
-/*********************************************************************//*!
  * @brief Set the state of an output
  * 
  * @param enGpio Identifier of the GPIO to be set.

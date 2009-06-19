@@ -28,6 +28,8 @@
 
 #include "cam.h"
 
+OSC_ERR OscCamCreate();
+
 /*! @brief The module definition. */
 struct OscModule OscModule_cam = {
 	.create = OscCamCreate,
@@ -282,7 +284,7 @@ static OSC_ERR OscCamCropPicture(uint8* pDstBuffer,
 	return SUCCESS;
 }
 
-OSC_ERR OscCamCreate(void *hFw)
+OSC_ERR OscCamCreate()
 {
 	OSC_ERR                 err;
 	uint16                  dummy;

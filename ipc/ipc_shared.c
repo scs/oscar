@@ -34,6 +34,9 @@
 /*! The camera module singelton instance. */
 struct OSC_IPC ipc;
 
+OSC_ERR OscIpcCreate();
+OSC_ERR OscIpcDestroy();
+
 struct OscModule OscModule_ipc = {
 	.create = OscIpcCreate,
 	.destroy = OscIpcDestroy,

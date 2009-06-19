@@ -52,22 +52,6 @@ enum EnOscFrdErrors
 /*====================== API functions =================================*/
 
 /*********************************************************************//*!
- * @brief Constructor
- * 
- * @param hFw Pointer to the handle of the framework.
- * @return SUCCESS or an appropriate error code otherwise
- *//*********************************************************************/
-OSC_ERR OscFrdCreate(void *hFw);
-
-/*********************************************************************//*!
- * @brief Destructor
- * 
- * @param hFw Pointer to the handle of the framework.
- *//*********************************************************************/
-void OscFrdDestroy(void *hFw);
-
-
-/*********************************************************************//*!
  * @brief Create a filename reader.
  * 
  * This will parse the supplied config file for the parameters to

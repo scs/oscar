@@ -22,6 +22,8 @@
 
 #include "dma.h"
 
+OSC_ERR OscDmaCreate();
+
 /*! @brief The module singelton instance. */
 struct OSC_DMA dma;
 
@@ -30,67 +32,18 @@ static uint32 allOnes = 0xffffffff;
 
 struct OscModule OscModule_dma = {
 	.create = OscDmaCreate,
-	.destroy = OscDmaDestroy,
 	.dependencies = {
 		&OscModule_log,
-		&OscModule_sub,
+		&OscModule_sup,
 		NULL // To end the flexible array.
 	}
 };
 
-OSC_ERR OscDmaCreate(void *hFw)
+OSC_ERR OscDmaCreate()
 {
-	struct OSC_FRAMEWORK *pFw;
-	OSC_ERR err = SUCCESS;
-
-	pFw = (struct OSC_FRAMEWORK *)hFw;
-	if(pFw->dma.useCnt != 0)
-	{
-		pFw->dma.useCnt++;
-		/* The module is already allocated */
-		return SUCCESS;
-	}
+	dma = (struct OSC_DMA) { };
 	
-	/* Load the module dependencies of this module. */
-	err = OscLoadDependencies(pFw,
-			dma_deps,
-			sizeof(dma_deps)/sizeof(struct OSC_DEPENDENCY));
-	
-	if(err != SUCCESS)
-	{
-		printf("%s: ERROR: Unable to load dependencies! (%d)\n",
-				__func__,
-				err);
-		return err;
-	}
-	
-	memset(&dma, 0, sizeof(struct OSC_DMA));
-	
-	/* Increment the use count */
-	pFw->dma.hHandle = (void*)&dma;
-	pFw->dma.useCnt++;
-
-	return err;
-}
-
-void OscDmaDestroy(void *hFw)
-{
-	struct OSC_FRAMEWORK *pFw;
-
-	pFw = (struct OSC_FRAMEWORK *)hFw;
-	/* Check if we really need to release or whether we still
-	 * have users. */
-	pFw->dma.useCnt--;
-	if(pFw->dma.useCnt > 0)
-	{
-		return;
-	}
-		
-	OscUnloadDependencies(pFw,
-			dma_deps,
-			sizeof(dma_deps)/sizeof(struct OSC_DEPENDENCY));
-	
-	memset(&dma, 0, sizeof(struct OSC_DMA));
+	return SUCCESS;
 }
 
 inline void OscDmaResetChain(void *hChainHandle)

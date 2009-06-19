@@ -42,7 +42,7 @@ struct OscModule OscModule_sup = {
 	}
 };
 
-OSC_ERR OscSupCreate(void *hFw)
+OSC_ERR OscSupCreate()
 {
 	sup = (struct OSC_SUP) { };
 		

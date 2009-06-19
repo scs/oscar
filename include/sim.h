@@ -40,21 +40,6 @@ enum EnOscSimErrors {
 /*======================== API functions ===============================*/
 
 /*********************************************************************//*!
- * @brief Constructor
- * 
- * @param hFw Pointer to the handle of the framework.
- * @return SUCCESS or an appropriate error code otherwise
- *//*********************************************************************/
-OSC_ERR OscSimCreate(void *hFw);
-
-/*********************************************************************//*!
- * @brief Destructor
- * 
- * @param hFw Pointer to the handle of the framework.
- *//*********************************************************************/
-void OscSimDestroy(void *hFw);
-
-/*********************************************************************//*!
  * @brief Initialize simulation
  * 
  * After creation of all required modules the application has to init
