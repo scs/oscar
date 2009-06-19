@@ -25,6 +25,7 @@
 #include <string.h>
 #include "include/oscar.h"
 
+// FIXME: What does this do?
 #define RND_MOD_Unbiased
 /*#define RND_MOD_Biased*/
 		

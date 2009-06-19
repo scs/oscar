@@ -39,6 +39,7 @@
 static struct OscModule * loadedModuels[MAX_LOADED_MODUELS] = { };
 int loadedModuelsCount = 0;
 
+<<<<<<< HEAD:oscar.c
 static OSC_ERR loadDepencies(struct OscModule ** deps) {
 OscFunctionBegin
 	for (struct OscModule ** dep = deps; *dep != NULL; dep += 1) {
