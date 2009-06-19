@@ -182,8 +182,8 @@ struct OscModule {
 */
 #define OscCreate(modules ...) \
 	({ \
-		static enum OscModule _modules[] = { modules, NULL }; \
-		_OscCreate(&_modules); \
+		static struct OscModule * _modules[] = { modules, NULL }; \
+		OscCreateFunction(&_modules); \
 	})
 
 OSC_ERR OscCreateFunction(struct OscModule ** modules);
