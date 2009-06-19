@@ -22,44 +22,24 @@
 
 #include "sim.h"
 
+OSC_ERR OscSimCreate();
+
 /*! @brief The module singelton instance. */
+// FIXME: Why do we have this instance on the host, or even the whole module?
 struct OSC_SIM_OBJ sim;
 
-OSC_ERR OscSimCreate(void *hFw)
-{
-	struct OSC_FRAMEWORK *pFw;
-
-	pFw = (struct OSC_FRAMEWORK *)hFw;
-	if(pFw->sim.useCnt != 0)
-	{
-		pFw->sim.useCnt++;
-		/* The module is already allocated */
-		return SUCCESS;
+struct OscModule OscModule_sim = {
+	.create = OscSimCreate,
+	.dependencies = {
+		NULL // To end the flexible array.
 	}
+};
+
+OSC_ERR OscSimCreate()
+{
+	sim = (struct OSC_SIM_OBJ) { };
 		
-	memset(&sim, 0, sizeof(struct OSC_SIM_OBJ));
-		
-	/* Increment the use count */
-	pFw->sim.hHandle = (void*)&sim;
-	pFw->sim.useCnt++;
-	
 	return SUCCESS;
-}
-
-void OscSimDestroy(void *hFw)
-{
-	struct OSC_FRAMEWORK *pFw;
-			
-	pFw = (struct OSC_FRAMEWORK *)hFw;
-	/* Check if we really need to release or whether we still
-	 * have users. */
-	pFw->sim.useCnt--;
-	if(pFw->sim.useCnt > 0)
-	{
-		return;
-	}
-	
-	memset(&sim, 0, sizeof(struct OSC_SIM_OBJ));
 }
 
 /*********************************************************************//*!

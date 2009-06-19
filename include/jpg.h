@@ -25,22 +25,9 @@
 #ifndef JPG_PUB_H_
 #define JPG_PUB_H_
 
+extern struct OscModule OscModule_jpg;
+
 /*====================== API functions =================================*/
-
-/*********************************************************************//*!
- * @brief Constructor
- * 
- * @param hFw Pointer to the handle of the framework.
- * @return SUCCESS or an appropriate error code otherwise
- *//*********************************************************************/
-OSC_ERR OscJpgCreate(void *hFw);
-
-/*********************************************************************//*!
- * @brief Destructor
- * 
- * @param hFw Pointer to the handle of the framework.
- *//*********************************************************************/
-void OscJpgDestroy(void *hFw);
 
 /*********************************************************************//*!
  * @brief Encode a bitmap image to a JPEG file

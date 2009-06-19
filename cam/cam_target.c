@@ -30,40 +30,28 @@
 #include <fcntl.h>
 #include <errno.h>
 
-/*! @brief The dependencies of this module. */
-struct OSC_DEPENDENCY cam_deps[] = {
-		{"log", OscLogCreate, OscLogDestroy}
+OSC_ERR OscCamCreate();
+OSC_ERR OscCamDestroy();
+
+/*! @brief The module definition. */
+struct OscModule OscModule_cam = {
+	.create = OscCamCreate,
+	.destroy = OscCamDestroy,
+	.dependencies = {
+		&OscModule_log,
+		NULL // To end the flexible array.
+	}
 };
 
 struct OSC_CAM cam; /*!< @brief The camera module singelton instance */
 
-OSC_ERR OscCamCreate(void *hFw)
+OSC_ERR OscCamCreate()
 {
-	struct OSC_FRAMEWORK    *pFw;
-	OSC_ERR                 err;
-	uint16                  dummy;
+	OSC_ERR err;
+	uint16 dummy;
 	
-	pFw = (struct OSC_FRAMEWORK *)hFw;
-	if(pFw->cam.useCnt != 0)
-	{
-		pFw->cam.useCnt++;
-		/* The module is already allocated */
-		return SUCCESS;
-	}
+	cam = (struct OSC_CAM) { };
 	
-	/* Load the module cam_deps of this module. */
-	err = OscLoadDependencies(pFw,
-			cam_deps,
-			sizeof(cam_deps)/sizeof(struct OSC_DEPENDENCY));
-	if(err != SUCCESS)
-	{
-		printf("%s: ERROR: Unable to load cam_deps! (%d)\n",
-				__func__,
-				err);
-		return err;
-	}
-		
-	memset(&cam, 0, sizeof(struct OSC_CAM));
 	/* Open the video device file.
 	 * We will be communicating with the camera driver by issuing
 	 * IOCTLs over this file descriptor. */
@@ -92,10 +80,7 @@ OSC_ERR OscCamCreate(void *hFw)
 			&cam.curHorizBlank);
 	/* Read back the area of interest to implicitely update
 	 * cam.curCamRowClks. */
-	err |= OscCamGetAreaOfInterest(&dummy,
-			&dummy,
-			&dummy,
-			&dummy);
+	err |= OscCamGetAreaOfInterest(&dummy, &dummy, &dummy, &dummy);
 	if(err != SUCCESS)
 	{
 		printf("%s: ERROR: Unable to read current settings from "
@@ -103,33 +88,14 @@ OSC_ERR OscCamCreate(void *hFw)
 				__func__);
 	}
 	
-	/* Increment the use count */
-	pFw->cam.hHandle = (void*)&cam;
-	pFw->cam.useCnt++;
-		
 	return SUCCESS;
 }
 
-void OscCamDestroy(void *hFw)
+OSC_ERR OscCamDestroy()
 {
-	struct OSC_FRAMEWORK *pFw;
-				
-	pFw = (struct OSC_FRAMEWORK *)hFw;
-
-	/* Check if we really need to release or whether we still
-	 * have users. */
-	pFw->cam.useCnt--;
-	if(pFw->cam.useCnt > 0)
-	{
-		return;
-	}
-	
-	OscUnloadDependencies(pFw,
-			cam_deps,
-			sizeof(cam_deps)/sizeof(struct OSC_DEPENDENCY));
-	
 	close(cam.vidDev);
-	memset(&cam, 0, sizeof(struct OSC_CAM));
+
+	return SUCCESS;
 }
 
 OSC_ERR OscCamSetFileNameReader(void* hReaderHandle)

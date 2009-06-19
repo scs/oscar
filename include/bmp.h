@@ -22,6 +22,8 @@
  */
 #ifndef BMP_PUB_H_
 #define BMP_PUB_H_
+
+extern struct OscModule OscModule_bmp;
 		
 /*! @brief Module-specific error codes.
  * 
@@ -57,21 +59,6 @@ struct OSC_PICTURE {
 };
 
 /*====================== API functions =================================*/
-
-/*********************************************************************//*!
- * @brief Constructor
- * 
- * @param hFw Pointer to the handle of the framework.
- * @return SUCCESS or an appropriate error code otherwise
- *//*********************************************************************/
-OSC_ERR OscBmpCreate(void *hFw);
-
-/*********************************************************************//*!
- * @brief Destructor
- * 
- * @param hFw Pointer to the handle of the framework.
- *//*********************************************************************/
-void OscBmpDestroy(void *hFw);
 
 /*********************************************************************//*!
  * @brief Read the contents of a BMP image

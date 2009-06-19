@@ -40,6 +40,8 @@
 #ifndef SWR_PUB_H_
 #define SWR_PUB_H_
 
+extern struct OscModule OscModule_swr;
+
 /*! Module-specific error codes.
  * These are enumerated with the offset
  * assigned to each module, so a distinction over
@@ -58,22 +60,6 @@ enum EnOscSwrSignalType
 };
 
 /*====================== API functions =================================*/
-
-/*********************************************************************//*!
- * @brief Constructor
- * 
- * @param hFw Pointer to the handle of the framework.
- * @return SUCCESS or an appropriate error code otherwise
- *//*********************************************************************/
-OSC_ERR OscSwrCreate(void *hFw);
-
-/*********************************************************************//*!
- * @brief Destructor
- * 
- * @param hFw Pointer to the handle of the framework.
- *//*********************************************************************/
-void OscSwrDestroy(void *hFw);
-
 /*********************************************************************//*!
  * @brief Create Stimuli Writer (host only)
  * 

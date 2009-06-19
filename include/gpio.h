@@ -25,6 +25,8 @@
 #ifndef GPIO_PUB_H_
 #define GPIO_PUB_H_
 
+extern struct OscModule OscModule_gpio;
+
 /*! @brief The GPIO pins that can be accessed from the application.
  * 
  * This is a list of all the GPIO names on all the supported hardware
@@ -53,21 +55,6 @@ enum EnTriggerConfig
 
 
 /*======================== API functions ===============================*/
-
-/*********************************************************************//*!
- * @brief Constructor
- * 
- * @param hFw Pointer to the handle of the framework.
- * @return SUCCESS or an appropriate error code otherwise
- *//*********************************************************************/
-OSC_ERR OscGpioCreate(void *hFw);
-
-/*********************************************************************//*!
- * @brief Destructor
- * 
- * @param hFw Pointer to the handle of the framework.
- *//*********************************************************************/
-void OscGpioDestroy(void *hFw);
 
 /*********************************************************************//*!
  * @brief Set the state of an output

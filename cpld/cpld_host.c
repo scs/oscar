@@ -22,71 +22,28 @@
 
 #include "cpld.h"
 
+OSC_ERR OscCpldCreate();
+
 struct OSC_CPLD cpld; /*!< The cpld module singelton instance */
 
-/*! The dependencies of this module. */
-struct OSC_DEPENDENCY cpld_deps[] = {
-		{"log", OscLogCreate, OscLogDestroy}
+struct OscModule OscModule_cpld = {
+	.create = OscCpldCreate,
+	.dependencies = {
+		&OscModule_log,
+		NULL // To end the flexible array.
+	}
 };
 
-OSC_ERR OscCpldCreate(void *hFw)
+// FIXME: Why do we have this module on targets other than the indXcam?
+OSC_ERR OscCpldCreate()
 {
 #ifdef TARGET_TYPE_INDXCAM
-	struct OSC_FRAMEWORK *pFw;
-	OSC_ERR err;
-	
-	pFw = (struct OSC_FRAMEWORK *)hFw;
-	if(pFw->cpld.useCnt != 0)
-	{
-		pFw->cpld.useCnt++;
-		/* The module is already allocated */
-		return SUCCESS;
-	}
-	
-	/* Load the module cpld_deps of this module. */
-	err = OscLoadDependencies(pFw,
-			cpld_deps,
-			sizeof(cpld_deps)/sizeof(struct OSC_DEPENDENCY));
-	if(err != SUCCESS)
-	{
-		printf("%s: ERROR: Unable to load cpld_deps! (%d)\n",
-				__func__,
-				err);
-		return err;
-	}
-	
-	memset(&cpld, 0, sizeof(struct OSC_CPLD));
-
-	/* Increment the use count */
-	pFw->cpld.hHandle = (void*)&cpld;
-	pFw->cpld.useCnt++;
-	
-	return SUCCESS;
+	cpld = (struct OSC_CPLD) { };
 #else
 	OscLog(ERROR, "%s: No CPLD available on this hardware platform!\n",
 				__func__);
 	return -ENO_SUCH_DEVICE;
 #endif /* TARGET_TYPE_INDXCAM */
-}
-
-void OscCpldDestroy(void *hFw)
-{
-	struct OSC_FRAMEWORK *pFw;
-
-	pFw = (struct OSC_FRAMEWORK *)hFw;
-	/* Check if we really need to release or whether we still
-	 * have users. */
-	pFw->cpld.useCnt--;
-	if(pFw->cpld.useCnt > 0)
-	{
-		return;
-	}
-	
-	OscUnloadDependencies(pFw,
-			cpld_deps,
-			sizeof(cpld_deps)/sizeof(struct OSC_DEPENDENCY));
-	
-	memset(&cpld, 0, sizeof(struct OSC_CPLD));
 }
 
 OSC_ERR OscCpldRset(

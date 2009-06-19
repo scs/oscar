@@ -30,6 +30,8 @@
 #ifndef CLB_PUB_H_
 #define CLB_PUB_H_
 
+extern struct OscModule OscModule_clb;
+
 #define MAX_NR_HOTPIXEL         1000    /*!< @brief Max number of hotpixels */
 
 /*! Module-specific error codes. */
@@ -54,24 +56,6 @@ enum EnOscClbCalibrateSlope
 
 
 /*========================== API functions =============================*/
-
-/*********************************************************************//*!
- * @brief Constructor
- * 
- * Initialize the member variables and set everything up for later.
- * 
- * @param hFw Pointer to the handle of the framework.
- * @return SUCCESS or an appropriate error code otherwise
- *//*********************************************************************/
-OSC_ERR OscClbCreate(void *hFw);
-
-/*********************************************************************//*!
- * @brief Destructor
- * 
- * @param hFw Pointer to the handle of the framework.
- *//*********************************************************************/
-void OscClbDestroy(void *hFw);
-
 
 /*********************************************************************//*!
  * @brief Setup the sensor calibration method.

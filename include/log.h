@@ -23,6 +23,8 @@
 #ifndef LOG_PUB_H_
 #define LOG_PUB_H_
 
+extern struct OscModule OscModule_log;
+
 /*! Module-specific error codes.
  * These are enumerated with the offset
  * assigned to each module, so a distinction over
@@ -47,21 +49,6 @@ enum EnOscLogLevel {
 };
 
 /*=========================== API functions ============================*/
-
-/*********************************************************************//*!
- * @brief Constructor
- * 
- * @param hFw Pointer to the handle of the framework.
- * @return SUCCESS or an appropriate error code otherwise
- *//*********************************************************************/
-OSC_ERR OscLogCreate(void *hFw);
-
-/*********************************************************************//*!
- * @brief Destructor
- * 
- * @param hFw Pointer to the handle of the framework.
- *//*********************************************************************/
-void OscLogDestroy(void *hFw);
 
 /*********************************************************************//*!
  * @brief Sets the highest log level to be output to the console

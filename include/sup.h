@@ -25,22 +25,9 @@
 #ifndef SUP_PUB_H_
 #define SUP_PUB_H_
 
+extern struct OscModule OscModule_sup;
+
 /*======================== API functions ===============================*/
-
-/*********************************************************************//*!
- * @brief Constructor
- * 
- * @param hFw Pointer to the handle of the framework.
- * @return SUCCESS or an appropriate error code otherwise
- *//*********************************************************************/
-OSC_ERR OscSupCreate(void *hFw);
-
-/*********************************************************************//*!
- * @brief Destructor
- * 
- * @param hFw Pointer to the handle of the framework.
- *//*********************************************************************/
-void OscSupDestroy(void *hFw);
 
 /*--------------------------- Watchdog ---------------------------------*/
 

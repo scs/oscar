@@ -22,69 +22,13 @@
 
 #include "bmp.h"
 
-/*! @brief The module singelton instance. */
-struct OSC_BMP bmp;
-
-/*! @brief The dependencies of this module. */
-struct OSC_DEPENDENCY bmp_deps[] = {
-		{"log", OscLogCreate, OscLogDestroy}
+/*! @brief The module definition. */
+struct OscModule OscModule_bmp = {
+	.dependencies = {
+		&OscModule_log,
+		NULL // To end the flexible array.
+	}
 };
-
-OSC_ERR OscBmpCreate(void *hFw)
-{
-	struct OSC_FRAMEWORK *pFw;
-	OSC_ERR err;
-	
-	pFw = (struct OSC_FRAMEWORK *)hFw;
-	if(pFw->bmp.useCnt != 0)
-	{
-		pFw->bmp.useCnt++;
-		/* The module is already allocated */
-		return SUCCESS;
-	}
-	
-	/* Load the module dependencies of this module. */
-	err = OscLoadDependencies(pFw,
-			bmp_deps,
-			sizeof(bmp_deps)/sizeof(struct OSC_DEPENDENCY));
-	
-	if(err != SUCCESS)
-	{
-		printf("%s: ERROR: Unable to load dependencies! (%d)\n",
-				__func__,
-				err);
-		return err;
-	}
-	
-	memset(&bmp, 0, sizeof(struct OSC_BMP));
-	
-	/* Increment the use count */
-	pFw->bmp.hHandle = (void*)&bmp;
-	pFw->bmp.useCnt++;
-	
-	return SUCCESS;
-}
-
-void OscBmpDestroy(void *hFw)
-{
-	struct OSC_FRAMEWORK *pFw;
-		
-	pFw = (struct OSC_FRAMEWORK *)hFw;
-	
-	/* Check if we really need to release or whether we still
-	 * have users. */
-	pFw->bmp.useCnt--;
-	if(pFw->bmp.useCnt > 0)
-	{
-		return;
-	}
-	
-	OscUnloadDependencies(pFw,
-			bmp_deps,
-			sizeof(bmp_deps)/sizeof(struct OSC_DEPENDENCY));
-	
-	memset(&bmp, 0, sizeof(struct OSC_BMP));
-}
 
 /*********************************************************************//*!
  * @brief Extract all necessary information from a RGB BMP Header

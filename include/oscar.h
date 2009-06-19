@@ -187,56 +187,27 @@ enum EnOscErrors {
 #define OSC_HSM_ERROR_OFFSET 1200
 /*! @brief Error identifier offset of the cfg module. */
 #define OSC_CFG_ERROR_OFFSET 1300
-/*! @brief Error identifier offset of the clb module. */
-#define OSC_CLB_ERROR_OFFSET 1400
 
-/*! @brief Describes a module dependency of a module and all necessary information to load and unload that module. */
-struct OSC_DEPENDENCY
-{
-	/*! @brief The name of the dependency. */
-	char strName[24];
-	/*! @brief The constructor of the dependency. */
-	OSC_ERR (*create)(void *);
-	/*! @brief The destructor of the dependency. */
-	void (*destroy)(void *);
+/*! @brief Describes an OSC module and keeps track of how many users
+ * hold references to it. */
+struct OscModule {
+	OSC_ERR (* create) ();
+	OSC_ERR (* destroy) ();
+	int useCount;
+	struct OscModule * dependencies[];
 };
 
-/*! @brief The Oscar framework object with handle to modules*/
-struct OSC_FRAMEWORK;
+/*! @brief Constructor for framework
+	@param modules A list of modules to load as defined in enum OscModule.
+	@return SUCCESS or appropriate error code otherwise.
+*/
+#define OscCreate(modules ...) \
+	({ \
+		static struct OscModule * _modules[] = { modules, NULL }; \
+		OscCreateFunction(&_modules); \
+	})
 
-/*********************************************************************//*!
- * @brief Loads the module depencies give in a list of modules.
- * 
- * Goes through the given dependency array and tries to create all
- * member modules. If it fails at some point, destroy the dependencies
- * already created and return with an error code.
- * 
- * @param pFw Pointer to the framework
- * @param aryDeps Array of Dependencies to be loaded.
- * @param nDeps Length of the dependency array.
- * @return SUCCESS or an appropriate error code.
- *//*********************************************************************/
-OSC_ERR OscLoadDependencies(struct OSC_FRAMEWORK * pFw, const struct OSC_DEPENDENCY aryDeps[], const uint32 nDeps);
-
-/*********************************************************************//*!
- * @brief Unloads the module depencies give in a list of modules.
- * 
- * Goes through the given dependency array backwards and destroys
- * all members.
- * 
- * @param pFw Pointer to the framework
- * @param aryDeps Array of Dependencies to be unloaded.
- * @param nDeps Length of the dependency array.
- *//*********************************************************************/
-void OscUnloadDependencies(struct OSC_FRAMEWORK * pFw, const struct OSC_DEPENDENCY aryDeps[], const uint32 nDeps);
-
-/*********************************************************************//*!
- * @brief Constructor for framework
- * 
- * @param phFw Pointer to the handle location for the framework
- * @return SUCCESS or appropriate error code otherwise
- *//*********************************************************************/
-OSC_ERR OscCreate(struct OSC_FRAMEWORK ** phFw);
+OSC_ERR OscCreateFunction(struct OscModule ** modules);
 
 /*********************************************************************//*!
  * @brief Destructor for framework
@@ -246,7 +217,7 @@ OSC_ERR OscCreate(struct OSC_FRAMEWORK ** phFw);
  * @param hFw Pointer to the handle of the framework to be destroyed.
  * @return SUCCESS or an appropriate error code.
  *//*********************************************************************/
-OSC_ERR OscDestroy(struct OSC_FRAMEWORK * hFw);
+OSC_ERR OscDestroy();
 
 /*********************************************************************//*!
  * @brief Get framework version numbers

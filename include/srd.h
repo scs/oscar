@@ -41,7 +41,9 @@
  */
 
 #ifndef SRD_PUB_H_
-#define SRD_PUB_H_
+#define SRD_PUB_H
+
+extern struct OscModule OscModule_srd;
 
 /*! Module-specific error codes.
  * These are enumerated with the offset
@@ -53,21 +55,6 @@ enum EnOscSrdErrors
 };
 
 /*====================== API functions =================================*/
-
-/*********************************************************************//*!
- * @brief Constructor
- * 
- * @param hFw Pointer to the handle of the framework.
- * @return SUCCESS or an appropriate error code otherwise
- *//*********************************************************************/
-OSC_ERR OscSrdCreate(void *hFw);
-
-/*********************************************************************//*!
- * @brief Destructor
- * 
- * @param hFw Pointer to the handle of the framework.
- *//*********************************************************************/
-void OscSrdDestroy(void *hFw);
 
 /*********************************************************************//*!
  * @brief Create Stimuli Reader (host only)

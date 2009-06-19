@@ -23,22 +23,7 @@
 #ifndef VIS_PUB_H_
 #define VIS_PUB_H_
 
-/*====================== API functions =================================*/
-
-/*********************************************************************//*!
- * @brief Constructor
- * 
- * @param hFw Pointer to the handle of the framework.
- * @return SUCCESS or an appropriate error code otherwise
- *//*********************************************************************/
-OSC_ERR OscVisCreate(void *hFw);
-
-/*********************************************************************//*!
- * @brief Destructor
- * 
- * @param hFw Pointer to the handle of the framework.
- *//*********************************************************************/
-void OscVisDestroy(void *hFw);
+extern struct OscModule OscModule_vis;
 
 /*********************************************************************//*!
  * @brief Convert a raw image captured by a camera sensor with bayer

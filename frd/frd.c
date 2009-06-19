@@ -26,6 +26,9 @@
 
 #include "oscar.h"
 
+OSC_ERR OscFrdCreate();
+OSC_ERR OscFrdDestroy();
+
 /*! @brief The maximum number of readers that can be registered. */
 #define MAX_NR_READERS 8
 
@@ -102,42 +105,24 @@ struct OSC_FRD
 
 struct OSC_FRD frd; /*!< Module singelton instance */
 
-/*! The dependencies of this module. */
-struct OSC_DEPENDENCY frd_deps[] = {
-		{"log", OscLogCreate, OscLogDestroy},
-		{"sim", OscSimCreate, OscSimDestroy}
+struct OscModule OscModule_frd = {
+	.create = OscFrdCreate,
+	.destroy = OscFrdDestroy,
+	.dependencies = {
+		&OscModule_log,
+		&OscModule_sim,
+		NULL // To end the flexible array.
+	}
 };
 
 static void OscFrdSimCycleCallback();
 
-OSC_ERR OscFrdCreate(void *hFw)
+OSC_ERR OscFrdCreate()
 {
-	struct OSC_FRAMEWORK *pFw;
-	OSC_ERR err;
-
-	pFw = (struct OSC_FRAMEWORK *)hFw;
-	if(pFw->frd.useCnt != 0)
-	{
-		pFw->frd.useCnt++;
-		/* The module is already allocated */
-		return SUCCESS;
-	}
-
-	/* Load the module frd_deps of this module. */
-	err = OscLoadDependencies(pFw,
-			frd_deps,
-			sizeof(frd_deps)/sizeof(struct OSC_DEPENDENCY));
+	OSC_ERR err = SUCCESS;
 	
-	if(err != SUCCESS)
-	{
-		printf("%s: ERROR: Unable to load frd_deps! (%d)\n",
-				__func__,
-				err);
-		return err;
-	}
+	frd = (struct OSC_FRD) { };
 	
-	memset(&frd, 0, sizeof(struct OSC_FRD));
-
 	/* Register a callback to be invoked every simulation cycle
 	 * to be able to fetch the next file name from the list. */
 	err = OscSimRegisterCycleCallback(OscFrdSimCycleCallback);
@@ -148,28 +133,14 @@ OSC_ERR OscFrdCreate(void *hFw)
 		return err;
 	}
 	
-	/* Increment the use count */
-	pFw->frd.hHandle = (void*)&frd;
-	pFw->frd.useCnt++;
-	
 	return SUCCESS;
 }
 
-void OscFrdDestroy(void *hFw)
+OSC_ERR OscFrdDestroy()
 {
-	struct OSC_FRAMEWORK *pFw;
 	struct OSC_FRD_READER *pReader;
 	uint32 rd;
 		
-	pFw = (struct OSC_FRAMEWORK *)hFw;
-	/* Check if we really need to release or whether we still
-	 * have users. */
-	pFw->frd.useCnt--;
-	if(pFw->frd.useCnt > 0)
-	{
-		return;
-	}
-	
 	for(rd = 0; rd < frd.nrOfReaders; rd++)
 	{
 		pReader = &frd.rd[rd];
@@ -189,12 +160,8 @@ void OscFrdDestroy(void *hFw)
 					__func__, pReader->enType);
 		}
 	}
-	OscUnloadDependencies(pFw,
-			frd_deps,
-			sizeof(frd_deps)/sizeof(struct OSC_DEPENDENCY));
-	
-	
-	memset(&frd, 0, sizeof(struct OSC_FRD));
+
+	return SUCCESS;
 }
 
 /*********************************************************************//*!

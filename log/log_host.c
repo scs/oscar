@@ -25,6 +25,9 @@
 
 #include "log.h"
 
+OSC_ERR OscLogCreate();
+OSC_ERR OscLogDestroy();
+
 /*! @brief The module singelton instance.
  * 
  * This is called osc_log
@@ -35,19 +38,18 @@ struct OSC_LOG osc_log = {
 	.fileLogLevel = NONE
 };
 
-OSC_ERR OscLogCreate(void *hFw)
-{
-	struct OSC_FRAMEWORK *pFw;
-
-	pFw = (struct OSC_FRAMEWORK *)hFw;
-	if(pFw->log.useCnt != 0)
-	{
-		pFw->log.useCnt++;
-		/* The module is already allocated */
-		return SUCCESS;
+struct OscModule OscModule_log = {
+	.create = OscLogCreate,
+	.destroy = OscLogDestroy,
+	.dependencies = {
+		NULL // To end the flexible array.
 	}
-		
-	memset(&osc_log, 0, sizeof(struct OSC_LOG));
+};
+
+OSC_ERR OscLogCreate()
+{
+	osc_log = (struct OSC_LOG) { };
+	
 	/* Set log levels to defaults. */
 	osc_log.consoleLogLevel = DEFAULT_CONSOLE_LOGLEVEL;
 	osc_log.fileLogLevel = DEFAULT_FILE_LOGLEVEL;
@@ -66,31 +68,16 @@ OSC_ERR OscLogCreate(void *hFw)
 		fclose(osc_log.pLogF);
 		return -EUNABLE_TO_OPEN_FILE;
 	}
-		
-	/* Increment the use count */
-	pFw->log.hHandle = (void*)&osc_log;
-	pFw->log.useCnt++;
-
+	
 	return SUCCESS;
 }
 
-void OscLogDestroy(void *hFw)
+OSC_ERR OscLogDestroy()
 {
-	struct OSC_FRAMEWORK *pFw;
-		
-	pFw = (struct OSC_FRAMEWORK *)hFw;
-	/* Check if we really need to release or whether we still
-	 * have users. */
-	pFw->log.useCnt--;
-	if(pFw->log.useCnt > 0)
-	{
-		return;
-	}
-	
 	fclose(osc_log.pLogF);
 	fclose(osc_log.pSimLogF);
-	
-	memset(&osc_log, 0, sizeof(struct OSC_LOG));
+
+	return SUCCESS;
 }
 
 inline void OscLogSetConsoleLogLevel(const enum EnOscLogLevel level)

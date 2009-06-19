@@ -34,168 +34,69 @@
 #include <stdio.h>
 #include "oscar.h"
 
-struct OSC_FRAMEWORK fw;    /*!< @brief Module singelton instance */
+#define MAX_LOADED_MODUELS 50
 
-OSC_ERR OscCreate(struct OSC_FRAMEWORK ** phFw)
-{
-	memset(&fw, 0, sizeof(struct OSC_FRAMEWORK));
-	
-	/* OSC Create does not instantiate any modules */
-	
-	/* Return the handle */
-	*phFw = &fw;
-	return SUCCESS;
-}
+static struct OscModule ** loadedModuels = NULL;
 
-OSC_ERR OscDestroy(struct OSC_FRAMEWORK * hFw)
-{
-	struct OSC_FRAMEWORK *pFw;
-	
-	pFw = (struct OSC_FRAMEWORK*)hFw;
-	
-	/* Check if there are still any modules loaded. */
-	if(pFw->bmp.useCnt)
-	{
-		fprintf(stderr, "%s: ERROR: Bmp module still loaded!\n",
-				__func__);
-		return -ECANNOT_UNLOAD;
-	}
-	if(pFw->cam.useCnt)
-	{
-		fprintf(stderr, "%s: ERROR: Cam module still loaded!\n",
-				__func__);
-		return -ECANNOT_UNLOAD;
-	}
-	if(pFw->cpld.useCnt)
-	{
-		fprintf(stderr, "%s: ERROR: CPLD module still loaded!\n",
-				__func__);
-		return -ECANNOT_UNLOAD;
-	}
-	if(pFw->ipc.useCnt)
-	{
-		fprintf(stderr, "%s: ERROR: IPC module still loaded!\n",
-				__func__);
-		return -ECANNOT_UNLOAD;
-	}
-	if(pFw->lgx.useCnt)
-	{
-		fprintf(stderr, "%s: ERROR: Lgx module still loaded!\n",
-				__func__);
-		return -ECANNOT_UNLOAD;
-	}
-	if(pFw->log.useCnt)
-	{
-		fprintf(stderr, "%s: ERROR: Log module still loaded!\n",
-				__func__);
-		return -ECANNOT_UNLOAD;
-	}
-	if(pFw->sim.useCnt)
-	{
-		fprintf(stderr, "%s: ERROR: Sim module still loaded!\n",
-				__func__);
-		return -ECANNOT_UNLOAD;
-	}
-	if(pFw->srd.useCnt)
-	{
-		fprintf(stderr, "%s: ERROR: Srd module still loaded!\n",
-				__func__);
-		return -ECANNOT_UNLOAD;
-	}
-	if(pFw->swr.useCnt)
-	{
-		fprintf(stderr, "%s: ERROR: Swr module still loaded!\n",
-				__func__);
-		return -ECANNOT_UNLOAD;
-	}
-	if(pFw->sup.useCnt)
-	{
-		fprintf(stderr, "%s: ERROR: Sup module still loaded!\n",
-				__func__);
-		return -ECANNOT_UNLOAD;
-	}
-	if(pFw->frd.useCnt)
-	{
-		fprintf(stderr, "%s: ERROR: Frd module still loaded!\n",
-				__func__);
-		return -ECANNOT_UNLOAD;
-	}
-	if(pFw->dspl.useCnt)
-	{
-		fprintf(stderr, "%s: ERROR: Dspl module still loaded!\n",
-				__func__);
-		return -ECANNOT_UNLOAD;
-	}
-	if(pFw->dma.useCnt)
-	{
-		fprintf(stderr, "%s: ERROR: Dma module still loaded!\n",
-				__func__);
-		return -ECANNOT_UNLOAD;
-	}
-	if(pFw->hsm.useCnt)
-	{
-		fprintf(stderr, "%s: ERROR: Hsm module still loaded!\n",
-				__func__);
-		return -ECANNOT_UNLOAD;
-	}
-	if(pFw->cfg.useCnt)
-	{
-		fprintf(stderr, "%s: ERROR: Cfg module still loaded!\n",
-				__func__);
-		return -ECANNOT_UNLOAD;
-	}
-	if(pFw->clb.useCnt)
-	{
-		fprintf(stderr, "%s: ERROR: Clb module still loaded!\n",
-				__func__);
-		return -ECANNOT_UNLOAD;
-	}
-	memset(hFw, 0, sizeof(struct OSC_FRAMEWORK));
-	return SUCCESS;
-}
-
-
-OSC_ERR OscLoadDependencies(struct OSC_FRAMEWORK * hFw, const struct OSC_DEPENDENCY aryDeps[], const uint32 nDeps)
-{
-	int         i;
-	OSC_ERR     err = SUCCESS;
-	struct OSC_FRAMEWORK *pFw = (struct OSC_FRAMEWORK*)hFw;
-	
-	for(i = 0; i < nDeps; i++)
-	{
-		err = aryDeps[i].create(pFw);
-		if(err < 0)
-		{
-			fprintf(stderr, "%s: ERROR: "\
-					"Unable to load dependency module %s! (%d)\n",
-					__func__,
-					aryDeps[i].strName,
-					err);
-			break;
+static OSC_ERR loadModules(struct OscModule ** deps) {
+OscFunctionBegin
+	for (struct OscModule ** dep = deps; *dep != NULL; dep += 1) {
+		OscAssert((*dep)->useCount >= 0);
+		
+		if ((*dep)->useCount == 0) {
+			OscCall(loadModules, (*dep)->dependencies);
+			
+			if ((*dep)->create != NULL)
+				OscCall((*dep)->create);
 		}
+		
+		(*dep)->useCount += 1;
 	}
-	
-	if(err != 0)
-	{
-		for(i--; i >= 0; i--)
-		{
-			aryDeps[i].destroy(pFw);
-		}
-	}
-	return err;
+OscFunctionCatch
+OscFunctionEnd
 }
 
-void OscUnloadDependencies(struct OSC_FRAMEWORK * hFw,
-		const struct OSC_DEPENDENCY aryDeps[],
-		const uint32 nDeps)
-{
-	int i;
-	struct OSC_FRAMEWORK *pFw = (struct OSC_FRAMEWORK*)hFw;
-	
-	for(i = 0; i < nDeps; i++)
-	{
-		aryDeps[nDeps - i - 1].destroy(pFw);
+static OSC_ERR unloadModules(struct OscModule ** deps) {
+OscFunctionBegin
+	for (struct OscModule ** dep = deps; *dep != NULL; dep += 1) {
+		(*dep)->useCount -= 1;
+		
+		if ((*dep)->useCount == 0) {
+			if ((*dep)->destroy != NULL)
+				OscCall((*dep)->destroy);
+			
+			OscCall(unloadModules, (*dep)->dependencies);
+		}
+		
+		OscAssert((*dep)->useCount >= 0);
 	}
+OscFunctionCatch
+OscFunctionEnd
+}
+
+OSC_ERR OscCreateFunction(struct OscModule ** modules) {
+OscFunctionBegin
+	OscAssert_m(loadedModuels == NULL, "The Framework is already loaded!");
+	
+	// This requires modules point to static data which is done so by the OscCreate Macro. But it may not be a good idea ...
+	loadedModuels = modules;
+	OscCall(loadModules, loadedModuels);
+
+OscFunctionCatch
+	OscMark_m("Failed to load the Framework.");
+	OscCall(OscDestroy);
+OscFunctionEnd
+}
+
+OSC_ERR OscDestroy()
+{
+OscFunctionBegin
+	OscAssert_m(loadedModuels != NULL, "The Framework is not loaded!");
+	
+	OscCall(unloadModules, loadedModuels);
+	loadedModuels = NULL;
+OscFunctionCatch
+OscFunctionEnd
 }
 
 OSC_ERR OscGetVersionNumber(

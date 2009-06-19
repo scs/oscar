@@ -34,80 +34,39 @@
 /*! The camera module singelton instance. */
 struct OSC_IPC ipc;
 
-/*! The dependencies of this module. */
-struct OSC_DEPENDENCY ipc_deps[] = {
-		{"log", OscLogCreate, OscLogDestroy}
+OSC_ERR OscIpcCreate();
+OSC_ERR OscIpcDestroy();
+
+struct OscModule OscModule_ipc = {
+	.create = OscIpcCreate,
+	.destroy = OscIpcDestroy,
+	.dependencies = {
+		&OscModule_log,
+		NULL // To end the flexible array.
+	}
 };
 
-
-OSC_ERR OscIpcCreate(void *hFw)
+OSC_ERR OscIpcCreate()
 {
-	struct OSC_FRAMEWORK *pFw;
-	OSC_ERR err;
-
-	pFw = (struct OSC_FRAMEWORK *)hFw;
-	if(pFw->ipc.useCnt != 0)
-	{
-		pFw->ipc.useCnt++;
-		/* The module is already allocated */
-		return SUCCESS;
-	}
-
-	/* Load the module ipc_deps of this module. */
-	err = OscLoadDependencies(pFw,
-			ipc_deps,
-			sizeof(ipc_deps)/sizeof(struct OSC_DEPENDENCY));
+	ipc = (struct OSC_IPC) { };
 	
-	if(err != SUCCESS)
-	{
-		printf("%s: ERROR: Unable to load ipc_deps! (%d)\n",
-				__func__,
-				err);
-		return err;
-	}
-
-	memset(&ipc, 0, sizeof(struct OSC_IPC));
-
-	/* Increment the use count */
-	pFw->ipc.hHandle = (void*)&ipc;
-	pFw->ipc.useCnt++;
-
 	return SUCCESS;
 }
 
-void OscIpcDestroy(void *hFw)
+OSC_ERR OscIpcDestroy()
 {
-	OSC_IPC_CHAN_ID         i;
-	struct OSC_FRAMEWORK    *pFw;
-
-	pFw = (struct OSC_FRAMEWORK *)hFw;
-	/* Check if we really need to release or whether we still
-	 * have users. */
-	pFw->ipc.useCnt--;
-	if(pFw->ipc.useCnt > 0)
-	{
-		return;
-	}
+	OSC_IPC_CHAN_ID i;
 
 	/* Close all sockets associated with open channels */
 	for(i = 0; i < MAX_NR_IPC_CHANNELS; i++)
-	{
 		if(ipc.arybIpcChansBusy[i] == TRUE)
-		{
 			if(ipc.aryIpcChans[i].sock > 0)
-			{
 				OscIpcUnregisterChannel(ipc.aryIpcChans[i].sock);
-			}
-		}
-	}
-
-	OscUnloadDependencies(pFw,
-			ipc_deps,
-			sizeof(ipc_deps)/sizeof(struct OSC_DEPENDENCY));
-
-	memset(&ipc, 0, sizeof(struct OSC_IPC));
+	
+	return SUCCESS;
 }
 
+// FUXME: WTF for is this function?
 static inline void UniqueClientSocketName(char *strSocketPath)
 {
 	sprintf(strSocketPath,

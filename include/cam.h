@@ -23,6 +23,8 @@
 #ifndef CAM_PUB_H_
 #define CAM_PUB_H_
 
+extern struct OscModule OscModule_cam;
+
 /*! Module-specific error codes.
  * These are enumerated with the offset
  * assigned to each module, so a distinction over
@@ -93,23 +95,6 @@ enum EnBayerOrder {
 };
 
 /*========================== API functions =============================*/
-
-/*********************************************************************//*!
- * @brief Constructor
- * 
- * Initialize the member variables and set everything up for later.
- * 
- * @param hFw Pointer to the handle of the framework.
- * @return SUCCESS or an appropriate error code otherwise
- *//*********************************************************************/
-OSC_ERR OscCamCreate(void *hFw);
-
-/*********************************************************************//*!
- * @brief Destructor
- * 
- * @param hFw Pointer to the handle of the framework.
- *//*********************************************************************/
-void OscCamDestroy(void *hFw);
 
 /*********************************************************************//*!
  * @brief Host only: Set the file name reader the host implementation

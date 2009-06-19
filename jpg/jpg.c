@@ -16,17 +16,11 @@
 	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-/*! @file
- * @brief Private framework definitions
- */
-#ifndef OSCAR_PRIV_H_
-#define OSCAR_PRIV_H_
+#include "jpg.h"
 
-#include <string.h>
-#include "include/oscar.h"
-
-// FIXME: What does this do?
-#define RND_MOD_Unbiased
-/*#define RND_MOD_Biased*/
-		
-#endif /*OSCAR_PRIV_H_*/
+struct OscModule OscModule_Jpg = {
+	.dependencies = {
+		&OscModule_log,
+		NULL // To end the flexible array.
+	}
+};
