@@ -40,8 +40,8 @@
 					res = _osc_internal_err_ == errs[i]; \
 			} \
 			res; \
-		})) { \
-			in_catch = true;
+			in_catch = true; \
+		})) {
 
 #define OscFunctionFail(e) \
 		} else if (({ \
@@ -52,13 +52,17 @@
 				for (int i = 0; !res && i < length(errs); i += 1) \
 					res = _osc_internal_err_ == errs[i]; \
 			} \
+			in_catch = true; \
+			in_fail = true; \
 			res; \
-		})) { \
-			in_fail = true;
+		})) {
 
 #define OscFunctionFinally() \
 		} \
-		if (!in_finally) {
+		if (!in_finally) { \
+			in_catch = true; \
+			in_fail = true; \
+			in_finally = true;
 
 #define OscFunctionEnd() \
 		} \
