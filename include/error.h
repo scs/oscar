@@ -21,52 +21,58 @@
 
 /* OscFunction[Finally|Catch|End]: Declare a function using these macros to use the Osc(Fail|Assert|Call)* error handling macros. */
 /*! @brief Use this macro to declare a function. */
-
 #define OscFunction(name, args ...) \
 	OSC_ERR name(args) { \
 		OSC_ERR _osc_internal_err_ = SUCCESS; \
-		bool in_body = false, in_catch __attribute__ ((unused)) = false, in_fail __attribute__ ((unused)) = false, in_finally __attribute__ ((unused)) = false; \
+		int _osc_internal_stage_ = 0; \
 	_osc_internal_top_: __attribute__ ((unused)) \
-		if (!in_body) { \
-			in_body = true;
+		if (({ \
+			bool res = _osc_internal_stage_ < 1; \
+			if (res) \
+				_osc_internal_stage_ += 1; \
+			res; \
+		})) {
 
 #define OscFunctionCatch(e) \
 		} else if (({ \
 			bool res = false; \
-			if (!in_catch) { \
+			if (_osc_internal_stage_ < 2) { \
 				OSC_ERR const errs[] = { e }; \
 				res = length(errs) == 0; \
 				for (int i = 0; !res && i < length(errs); i += 1) \
-					res = _osc_internal_err_ == errs[i]; \
+					res = errs[i] == _osc_internal_err_; \
 			} \
+			if (res) \
+				_osc_internal_stage_ += 2; \
 			res; \
-			in_catch = true; \
 		})) {
 
 #define OscFunctionFail(e) \
 		} else if (({ \
 			bool res = false; \
-			if (!in_fail) { \
+			if (_osc_internal_stage_ < 4) { \
 				OSC_ERR const errs[] = { e }; \
 				res = length(errs) == 0; \
 				for (int i = 0; !res && i < length(errs); i += 1) \
-					res = _osc_internal_err_ == errs[i]; \
+					res = errs[i] == _osc_internal_err_; \
 			} \
-			in_catch = true; \
-			in_fail = true; \
+			if (res) \
+				_osc_internal_stage_ += 4; \
 			res; \
 		})) {
 
 #define OscFunctionFinally() \
 		} \
-		if (!in_finally) { \
-			in_catch = true; \
-			in_fail = true; \
-			in_finally = true;
+		if (({ \
+			bool res = _osc_internal_stage_ < 8; \
+			if (res) \
+				_osc_internal_stage_ += 8; \
+			res; \
+		})) {
 
 #define OscFunctionEnd() \
 		} \
-		if (in_catch && !in_fail) \
+		if ((_osc_internal_stage_ & (2 + 4)) == 2) \
 			return SUCCESS; \
 		return _osc_internal_err_; \
 	}
