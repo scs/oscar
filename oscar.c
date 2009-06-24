@@ -43,18 +43,15 @@ OscFunctionBegin
 		
 		if ((*dep)->useCount == 0) {
 			char * name = (*dep)->name;
-			int canary = 123456789;
 			
 			if (name == NULL)
 				name = "<noname>";
 			
-			OscMark_m("Loading depencies of %s ...", name);
 			OscCall(loadModules, (*dep)->dependencies);
-			OscMark_m("Loading module %s ...", name);
 			
-			if ((*dep)->create != NULL) {
+			OscMark_m("Loading module %s ...", name);
+			if ((*dep)->create != NULL)
 				OscCall((*dep)->create);
-			}
 		}
 		
 		(*dep)->useCount += 1;
