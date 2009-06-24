@@ -1,16 +1,16 @@
 /*	Oscar, a hardware abstraction framework for the LeanXcam and IndXcam.
 	Copyright (C) 2008 Supercomputing Systems AG
-
+	
 	This library is free software; you can redistribute it and/or modify it
 	under the terms of the GNU Lesser General Public License as published by
 	the Free Software Foundation; either version 2.1 of the License, or (at
 	your option) any later version.
-
+	
 	This library is distributed in the hope that it will be useful, but
 	WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
 	General Public License for more details.
-
+	
 	You should have received a copy of the GNU Lesser General Public License
 	along with this library; if not, write to the Free Software Foundation,
 	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -18,7 +18,7 @@
 
 /*! @file
  * @brief Camera module implementation for host
- *
+ * 
  * Simulation of the OSC-specific hardware featuring
  * a Micron MT9V032 CMOS image sensor.
  */
@@ -186,7 +186,7 @@ static void OscCamResetRegs()
 
 /*********************************************************************//*!
  * @brief Host only: Find the register by the specified register address
- *
+ * 
  * @param addr Address of the desired register
  * @return Pointer to the structure describing the register or NULL
  *//*********************************************************************/
@@ -205,12 +205,12 @@ static struct reg_info * OscCamFindReg(const uint32 addr)
 
 /*********************************************************************//*!
  * @brief Host only: Crop a picture to the specified window.
- *
+ * 
  * The contents of the supplied OSC_PICTURE structure are cropped and
  * written to pDstBuffer. pPic is not changed.
- *
+ * 
  * Host only.
- *
+ * 
  * @param pDstBuffer The destination buffer where the cropped image
  * is written to.
  * @param dstBufferSize Size of above destination buffer.
@@ -223,13 +223,13 @@ static OSC_ERR OscCamCropPicture(uint8* pDstBuffer,
 		const struct OSC_PICTURE *pPic,
 		const struct capture_window *pCropWin)
 {
-OscFunctionBegin
+OscFunctionBegin	
 	uint8       *pTSrc, *pTDst;
 	uint32      croppedSize;
 	uint16      colorDepth, bytesPerPixel;
 	uint32      y;
 	uint32      lowY, highY;
-
+	
 	/* Input validation */
 	if((pPic == NULL) || (pPic->data == NULL) || (pCropWin == NULL) ||
 			(pDstBuffer == NULL) || (dstBufferSize == 0))
@@ -240,26 +240,26 @@ OscFunctionBegin
 	if((pPic->width < (pCropWin->col_off + pCropWin->width)) ||
 			pPic->height < (pCropWin->row_off + pCropWin->height))
 	{
-		OscFail_em( -EPICTURE_TOO_SMALL,
+		OscFail_em( -EPICTURE_TOO_SMALL, 
 				"Unable to crop image (%dx%d) to (%dx%d @ %d/%d).",
 				pPic->width, pPic->height,
 				pCropWin->width, pCropWin->height,
 				pCropWin->col_off, pCropWin->row_off);
 	}
-
+	
 	/* Allocate a temporary buffer for the cropped image */
 	colorDepth = OSC_PICTURE_TYPE_COLOR_DEPTH(pPic->type);
 	bytesPerPixel = colorDepth / 8;
 	croppedSize = pCropWin->width *  pCropWin->height * bytesPerPixel;
-
-	OscAssert_em( croppedSize <= dstBufferSize, -EBUFFER_TOO_SMALL,
-			"Specified destination Buffer too small. (%d < %d)",
+	
+	OscAssert_em( croppedSize <= dstBufferSize, -EBUFFER_TOO_SMALL, 
+			"Specified destination Buffer too small. (%d < %d)", 
 			dstBufferSize, croppedSize);
-
+	
 	/* The crop rectangle */
 	lowY = pCropWin->row_off;
 	highY = pCropWin->row_off + pCropWin->height;
-
+	
 	/* Copy loop to transfer the pixels from the supplied picture
 	 * to the cropped buffer */
 	pTDst = pDstBuffer;
@@ -273,25 +273,25 @@ OscFunctionBegin
 		memcpy(pTDst,
 				pTSrc,
 				bytesPerPixel * pCropWin->width);
-
+		
 		pTDst += pCropWin->width * bytesPerPixel;
 		pTSrc += pPic->width * bytesPerPixel;
 	}
-
+	
 OscFunctionCatch
 OscFunctionEnd
 }
 
 OSC_ERR OscCamCreate(){
-OscFunctionBegin
+OscFunctionBegin	
 	OSC_ERR                 err;
 	uint16                  dummy;
-
+	
 	cam = (struct OSC_CAM) { };
-
+	
 	/* Initialize camera registers */
 	OscCamResetRegs();
-
+	
 	/* Create the file name reader if the config file exists. Otherwise
 	 * the application will have to set the file name reader later over
 	 * OscFrdSetFileNameReader(). */
@@ -299,9 +299,9 @@ OscFunctionBegin
 	{
 		OscFrdCreateReader(&cam.hFNReader, FILENAME_READER_CONFIG_FILE);
 	}
-
+	
 	cam.lastValidID = OSC_CAM_INVALID_BUFFER_ID;
-
+	
 	err = SUCCESS;
 #ifdef TARGET_TYPE_LEANXCAM
 	/* Disable LED_OUT on leanXcam so the GPIOs can function correctly.
@@ -317,28 +317,28 @@ OscFunctionBegin
 	/* Read back the area of interest to implicitely update
 	 * cam.curCamRowClks. */
 	err |= OscCamGetAreaOfInterest(&dummy, &dummy, &dummy, &dummy);
-
-	OscAssert_em( err == SUCCESS, err,
+	
+	OscAssert_em( err == SUCCESS, err, 
 		"Unable to read current settings from camera!");
-
+	
 OscFunctionCatch
 OscFunctionEnd
 }
 
 OSC_ERR OscCamSetFileNameReader(void* hReaderHandle){
-OscFunctionBegin
+OscFunctionBegin	
 	/* Input validation. */
 	OscAssert_e( hReaderHandle != NULL, -EINVALID_PARAMETER);
-
-
+	
+	
 	if(cam.hFNReader != NULL)
 	{
 		OscLog(WARN, "%s WARNING: Replacing file name reader already "
 				"associated with camera module!\n", __func__);
 	}
-
+	
 	cam.hFNReader = hReaderHandle;
-
+	
 OscFunctionCatch
 OscFunctionEnd
 }
@@ -374,7 +374,7 @@ OscFunctionBegin
 		cam.capWin.width = width;
 		cam.capWin.height = height;
 	}
-
+	
 	/* The row time of the camera consists of the pixel readout time
 	 * for the width of the row plus the horizontal blanking. The time
 	 * has a lower bound. */
@@ -383,11 +383,11 @@ OscFunctionBegin
 	{
 		cam.curCamRowClks = CAM_MIN_ROW_CLKS;
 	}
-
+		
 	/* Recalculate and set the shutter width, since it changes when
 	 * changing the area of interest. */
 	OscCamSetShutterWidth(cam.curExpTime);
-
+		
 	OscLog(DEBUG, "Area of interest set to %dx%d at %d/%d.\n",
 			cam.capWin.width,
 			cam.capWin.height,
@@ -403,7 +403,7 @@ OscFunctionBegin
 
 	pReg = OscCamFindReg(reg);
 	OscAssert_e( pReg != NULL, -EINVALID_PARAMETER);
-
+	
 	pReg->value = value;
 
 OscFunctionCatch
@@ -417,8 +417,8 @@ OscFunctionBegin
 	OscAssert_e( pResult != NULL, -EINVALID_PARAMETER);
 
 	pReg = OscCamFindReg(reg);
-	OscAssert_e( pReg != NULL, -EINVALID_PARAMETER);
-
+	OscAssert_e( pReg != NULL, -EINVALID_PARAMETER);	
+	
 	*pResult = pReg->value;
 
 OscFunctionCatch
@@ -446,8 +446,8 @@ OscFunctionBegin
 		 * buffer. */
 		for(i = 0; i < cam.multiBuffer.multiBufferDepth; i++)
 		{
-			OscAssert_em( cam.multiBuffer.fbIDs[i] != fbID,
-				-ECANNOT_DELETE,
+			OscAssert_em( cam.multiBuffer.fbIDs[i] != fbID, 
+				-ECANNOT_DELETE, 
 				"Deleting frame buffer %d being part of a multi buffer!",
 				fbID);
 		}
@@ -491,7 +491,7 @@ OSC_ERR OscCamSetupCapture(uint8 fbID){
 OscFunctionBegin
 	uint8           fb;
 	int             i;
-
+	
 	/* If the caller is using automatic multibuffer management,
 	 * get the correct frame buffer. */
 	fb = fbID;
@@ -500,14 +500,14 @@ OscFunctionBegin
 		/* Get the buffer ID to write to next */
 		fb = OscCamMultiBufferGetCapBuf(&cam.multiBuffer);
 	}
-
+	
 	OscAssert_e(fb <= MAX_NR_FRAME_BUFFERS, -EINVALID_PARAMETER)
 
 	if(unlikely(cam.capWin.width == 0 || cam.capWin.height == 0))
 	{
 		OscFail_em( -ENO_AREA_OF_INTEREST_SET, "No area of interest set!");
 	}
-
+	
 	for(i = 0; i < MAX_NR_FRAME_BUFFERS; i++)
 	{
 		if(cam.fbStat[i] == STATUS_CAPTURING_SINGLE)
@@ -521,29 +521,29 @@ OscFunctionBegin
 					__func__, fb, i);
 		}
 	}
-
+	
 	cam.fbStat[fb] = STATUS_CAPTURING_SINGLE;
-
+		
 	OscLog(DEBUG,
 			"%s: Setting up capture of %ux%d picture " \
 			"on frame buffer %d.\n",
 			__func__, cam.capWin.width, cam.capWin.height, fb);
-
+	
 	/* This is a void-operation in the host implementation, since we
 	 * can read a picture from file at any time. */
-
+	
 	if(fbID == OSC_CAM_MULTI_BUFFER)
 	{
 		/* Allow the multi buffer to update is status according to this
 		 * successful capture. */
 		OscCamMultiBufferCapture(&cam.multiBuffer);
 	}
-
+	
 	/* Save the capture window currently configured since that will
 	 * be the one used later when really reading the image */
 	memcpy(&cam.lastCapWin, &cam.capWin, sizeof(struct capture_window));
 
-
+	
 OscFunctionCatch
 OscFunctionEnd
 }
@@ -560,7 +560,7 @@ OSC_ERR OscCamCancelCapture()
 			return SUCCESS;
 		}
 	}
-
+	
 	OscLog(WARN, "%s: Cancel request when no picture \
 			transfer to cancel.\n",
 			__func__);
@@ -576,7 +576,7 @@ OSC_ERR OscCamReadPicture(const uint8 fbID,
 	uint8               fb;
 	struct OSC_PICTURE  pic;
 	char                strPicFileName[256];
-
+	
 
 	if(unlikely(cam.hFNReader == NULL))
 	{
@@ -596,7 +596,7 @@ OSC_ERR OscCamReadPicture(const uint8 fbID,
 			return -ENO_CAPTURE_STARTED;
 		}
 	}
-
+	
 	/* Input validation */
 	if((ppPic == NULL) || (fb > MAX_NR_FRAME_BUFFERS) ||
 			(cam.fbufs[fb].data == NULL))
@@ -605,7 +605,7 @@ OSC_ERR OscCamReadPicture(const uint8 fbID,
 				__func__, fbID, ppPic, maxAge, timeout);
 		return -EINVALID_PARAMETER;
 	}
-
+	
 	*ppPic = NULL; /* Precaution */
 
 	if(cam.fbStat[fb] != STATUS_CAPTURING_SINGLE)
@@ -615,20 +615,20 @@ OSC_ERR OscCamReadPicture(const uint8 fbID,
 				__func__, fb);
 		return -ENO_CAPTURE_STARTED;
 	}
-
+	
 	OscLog(DEBUG,
 			"%s(%u, 0x%x, %u, %u): Syncing capture on frame buffer %d.\n",
 			__func__, fbID, ppPic, maxAge, timeout, fb);
-
+	
 	/* Get the current test image file name from the file name reader
 	 * module */
 	OscFrdGetCurrentFileName(cam.hFNReader,
 			strPicFileName);
-
+	
 	/* We have no assumptions about the picture format but let
 	 * everything be filled and allocated by the loader routine */
 	memset(&pic, 0, sizeof(struct OSC_PICTURE));
-
+	
 	/* Read the file */
 	err = OscBmpRead(&pic, strPicFileName);
 	if(err != 0)
@@ -637,7 +637,7 @@ OSC_ERR OscCamReadPicture(const uint8 fbID,
 				__func__, strPicFileName, err);
 		return -EDEVICE;
 	}
-
+	
 	/* Crop the picture to the window set by the application.
 	 * We use the window at the time of the call to OscCamSetupCapture()
 	 * to emulate the behavior of the target implementation. */
@@ -651,16 +651,16 @@ OSC_ERR OscCamReadPicture(const uint8 fbID,
 				__func__, strPicFileName, err);
 		return -EDEVICE;
 	}
-
+	
 	/* Free the picture structure data again; it was allocated in the
 	 * OscBmpRead routine. */
 	free(pic.data);
 
 	*ppPic = cam.fbufs[fb].data;
 	cam.fbStat[fb] = STATUS_VALID;
-
+	
 	/* The operation was successful */
-
+	
 	if(fbID == OSC_CAM_MULTI_BUFFER)
 	{
 		/* Allow the multi buffer to update is status according to this
@@ -678,28 +678,28 @@ OSC_ERR OscCamReadPicture(const uint8 fbID,
 		 * latest picture. */
 		cam.lastValidID = fb;
 	}
-
+	
 	return err;
 }
 
 OSC_ERR OscCamReadLatestPicture(uint8 ** ppPic){
-OscFunctionBegin
+OscFunctionStart
 	/* Input Validation */
 	OscAssert_e( ppPic != NULL, -EINVALID_PARAMETER);
-
+	
 	*ppPic = NULL;  /* Precaution */
-
+	
 	OscAssert_e( cam.lastValidID != OSC_CAM_INVALID_BUFFER_ID,
 		-ENO_MATCHING_PICTURE);
-
+	
 	OscAssert_e( cam.fbufs[cam.lastValidID].data != NULL,
 		-ENO_MATCHING_PICTURE);
-
+	
 	OscLog(DEBUG,
 			"%s(0x%x): Getting latest picture from frame" \
 			"buffer %d.\n",
 			__func__, ppPic,cam.lastValidID);
-
+	
 	*ppPic = cam.fbufs[cam.lastValidID].data;
 OscFunctionCatch
 	cam.lastValidID = OSC_CAM_INVALID_BUFFER_ID;
