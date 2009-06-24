@@ -683,7 +683,7 @@ OSC_ERR OscCamReadPicture(const uint8 fbID,
 }
 
 OSC_ERR OscCamReadLatestPicture(uint8 ** ppPic){
-OscFunctionStart
+OscFunctionBegin
 	/* Input Validation */
 	OscAssert_e( ppPic != NULL, -EINVALID_PARAMETER);
 	
