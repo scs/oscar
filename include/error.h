@@ -26,27 +26,37 @@
 
 #define OscFunction(name, args ...) \
 	OSC_ERR name(args) { \
-		OSC_ERR _osc_internal_error_ __attribute__ ((unused)) = SUCCESS; \
-		OSC_ERR _osc_internal_status_ __attribute__ ((unused)) = SUCCESS; \
-		int _osc_internal_stage_ = 0; \
+		struct { \
+			OSC_ERR error, status; \
+			bool caught: 1; \
+			uint32_t stage: 31; \
+		} _osc_internal_state_ = { \
+			.error = SUCCESS, \
+			.status = SUCCESS, \
+			.caught = false, \
+			.stage = 0 \
+		}; \
 	_osc_internal_top_: __attribute__ ((unused)) \
 		if (({ \
-			bool res = _osc_internal_stage_ < 1; \
+			bool res = _osc_internal_state_.stage < 1; \
 			if (res) \
-				_osc_internal_stage_ += 1; \
+				_osc_internal_state_.stage += 1; \
 			res; \
 		})) {
 
+// FIXME: Too much redundancy between this and the next macro.
 #define OscFunctionCatch(e) \
 		} else if (({ \
 			bool res = false; \
-			if (_osc_internal_stage_ < 2) { \
+			if (_osc_internal_state_.stage < 2) { \
 				OSC_ERR const errs[] = { e }; \
 				res = length(errs) == 0; \
 				for (int i = 0; !res && i < length(errs); i += 1) \
-					res = errs[i] == _osc_internal_error_; \
-				if (res) \
-					_osc_internal_stage_ += 2; \
+					res = errs[i] == _osc_internal_state_.error; \
+				if (res) { \
+					_osc_internal_state_.stage += 2; \
+					_osc_internal_state_.caught = true; \
+				} \
 			} \
 			res; \
 		})) {
@@ -54,13 +64,13 @@
 #define OscFunctionFail(e) \
 		} else if (({ \
 			bool res = false; \
-			if (_osc_internal_stage_ < 4) { \
+			if (_osc_internal_state_.stage < 3) { \
 				OSC_ERR const errs[] = { e }; \
 				res = length(errs) == 0; \
 				for (int i = 0; !res && i < length(errs); i += 1) \
-					res = errs[i] == _osc_internal_error_; \
+					res = errs[i] == _osc_internal_state_.error; \
 				if (res) \
-					_osc_internal_stage_ += 4; \
+					_osc_internal_state_.stage += 3; \
 			} \
 			res; \
 		})) {
@@ -68,19 +78,17 @@
 #define OscFunctionFinally() \
 		} \
 		if (({ \
-			bool res = _osc_internal_stage_ < 8; \
+			bool res = _osc_internal_state_.stage < 4; \
 			if (res) \
-				_osc_internal_stage_ += 8; \
+				_osc_internal_state_.stage += 4; \
 			res; \
 		})) {
 
 #define OscFunctionEnd() \
 		} \
-	/*	if (strcmp(__FUNCTION__, "tested") == 0) \
-			printf("stage: %d, error: %d\n", _osc_internal_stage_, _osc_internal_error_); \
-	*/	if ((_osc_internal_stage_ & (2 + 4)) == 2) \
+		if (_osc_internal_state_.caught) \
 			return SUCCESS; \
-		return _osc_internal_error_; \
+		return _osc_internal_state_.error; \
 	}
 
 #define OscMark_format(fmt, args ...) OscLog(ERROR, "%s: %s(): Line %d" fmt "\n", __FILE__, __FUNCTION__, __LINE__, ## args)
@@ -96,7 +104,8 @@
 /*! @brief Abort the current function and jump to the exception handler after 'fail:'. */
 #define OscFail_es(e) \
 	{ \
-		_osc_internal_error_ = e; \
+		_osc_internal_state_.error = e; \
+		_osc_internal_state_.caught = false; \
 		goto _osc_internal_top_; \
 	}
 
@@ -151,36 +160,37 @@
 
 /* OscCall[_s](): Macros call a function and and abort the current function and execute the exception handler on failure. e is to pass a custom error code. */
 /*! @brief Call a function and check it's return code, aborting the current function on an error. */
+// FIXME: Too much redundancy between the next four macros.
 #define OscCall_s(f, args ...) \
 	{ \
-		_osc_internal_status_ = f(args); \
-		if (_osc_internal_status_ < SUCCESS) \
-			OscFail_es(_osc_internal_status_); \
+		_osc_internal_state_.status = f(args); \
+		if (_osc_internal_state_.status < SUCCESS) \
+			OscFail_es(_osc_internal_state_.status); \
 	}
 
 /*! @brief Call a function and check it's return code, aborting the current function with a default message on an error. */
 #define OscCall(f, args ...) \
 	{ \
-		_osc_internal_status_ = f(args); \
-		if (_osc_internal_status_ < SUCCESS) \
-			OscFail_em(_osc_internal_status_, "%s(): Error %d", #f, (int) _osc_internal_status_); \
+		_osc_internal_state_.status = f(args); \
+		if (_osc_internal_state_.status < SUCCESS) \
+			OscFail_em(_osc_internal_state_.status, "%s(): Error %d", #f, (int) _osc_internal_state_.status); \
 	}
 
 #define OscCall_is(f, args ...) \
 	{ \
-		_osc_internal_status_ = f(args); \
+		_osc_internal_state_.status = f(args); \
 	}
 
 #define OscCall_i(f, args ...) \
 	{ \
-		_osc_internal_status_ = f(args); \
-		if (_osc_internal_status_ < SUCCESS) \
-			OscMark_m("%s(): Error %d", #f, (int) _osc_internal_status_); \
+		_osc_internal_state_.status = f(args); \
+		if (_osc_internal_state_.status < SUCCESS) \
+			OscMark_m("%s(): Error %d", #f, (int) _osc_internal_state_.status); \
 	}
 
-#define OscLastError() _osc_internal_error_
+#define OscLastError() _osc_internal_state_.error
 
-#define OscLastStatus() _osc_internal_status_
+#define OscLastStatus() _osc_internal_state_.status
 
 /*! @brief Define general non-module-specific error codes for the OSC framework */
 enum EnOscErrors {
