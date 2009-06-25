@@ -34,8 +34,6 @@
 #include <stdio.h>
 #include "oscar.h"
 
-#define MAX_LOADED_MODUELS 50
-
 static struct OscModule ** loadedModuels = NULL;
 
 OscFunction(static loadModules, struct OscModule ** deps)
