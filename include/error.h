@@ -120,12 +120,12 @@
 #define OscFail_e(e) OscFail_es(e)
 
 /*! @brief Abort the current function and jump to the exception handler after 'fail:'. */
-#define OscFail_s() OscFail_es(EGENERAL)
+#define OscFail_s() OscFail_es(-EGENERAL)
 
-#define OscFail() OscFail_e(EGENERAL)
+#define OscFail() OscFail_e(-EGENERAL)
 
 /*! @brief Abort the current function with a custom error code while printing a custom error mesage and jump to the exception handler after 'fail:'. */
-#define OscFail_m(m, args ...) OscFail_em(EGENERAL, m, ## args)
+#define OscFail_m(m, args ...) OscFail_em(-EGENERAL, m, ## args)
 
 /* OscAssert_[e][s|m](): Macros to check an assertion and abort the current function and execute the exception handler on failure. e is to pass a custom error code. s is not print a message. m is to print a custom message. By defualt a general message is printed. */
 /*! @brief Check a condition and abort the current function. */
@@ -150,13 +150,13 @@
 	}
 
 /*! @brief Check a condition and abort the current function with a custom error code. */
-#define OscAssert_s(expr) OscAssert_es(expr, EASSERT)
+#define OscAssert_s(expr) OscAssert_es(expr, -EASSERT)
 
 /*! @brief Check a condition and abort the current function with a custom error code while printing a default message. */
-#define OscAssert(expr) OscAssert_es(expr, EASSERT)
+#define OscAssert(expr) OscAssert_es(expr, -EASSERT)
 
 /*! @brief Check a condition and abort the current function while printing a custom message. */
-#define OscAssert_m(expr, m, args ...) OscAssert_em(expr, EASSERT, m, ## args)
+#define OscAssert_m(expr, m, args ...) OscAssert_em(expr, -EASSERT, m, ## args)
 
 /* OscCall[_s](): Macros call a function and and abort the current function and execute the exception handler on failure. e is to pass a custom error code. */
 /*! @brief Call a function and check it's return code, aborting the current function on an error. */
