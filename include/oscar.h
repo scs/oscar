@@ -33,30 +33,9 @@ extern "C" {
 #include "nih.h"
 #include "version.h"
 #include "error.h"
-
-#if defined(OSC_HOST)
-/* Defined as stumps because it is needed in code shared by target and
- * host. */
-/*! @brief Used to mark likely expressions for compiler optimization */
-#define likely(x) (x)
-/*! @brief Used to mark unlikely expressions for compiler optimization */
-#define unlikely(x) (x)
-#elif defined(OSC_TARGET)
-/* Bluntly copied from linux/compiler.h from uclinux */
-/*! @brief Used to mark likely expressions for compiler optimization */
-#define likely(x) __builtin_expect(!!(x), 1)
-/*! @brief Used to mark unlikely expressions for compiler optimization */
-#define unlikely(x) __builtin_expect(!!(x), 0)
-#else
-#error "Neither OSC_HOST nor OSC_TARGET is defined as a macro."
-#endif
-
-/*! @brief The opposite of while (condition) { block }; */
-#define until(a) while (!(a))
-/*! @brief An endless loop, equivalent to while (true) { block }; */
-#define loop while (true)
-/*! @brief Gives the length of a field (Does not work on pointers!). */
-#define length(a) ((sizeof (a)) / sizeof *(a))
+#include "pool.h"
+#include "list.h"
+#include "support.h"
 
 /*! @brief Describes an OSC module and keeps track of how many users
  * hold references to it. */
