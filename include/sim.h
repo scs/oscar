@@ -15,6 +15,8 @@
 	along with this library; if not, write to the Free Software Foundation,
 	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
+#ifndef OSCAR_INCLUDE_SIM_H_
+#define OSCAR_INCLUDE_SIM_H_
 
 /*! @file
  * @brief API definition for simulation module
@@ -22,9 +24,6 @@
  * Simulation is only used for host. Target implementation provides
  * stump function definition.
  */
-
-#ifndef SIM_PUB_H_
-#define SIM_PUB_H_
 
 /*! @brief Module-specific error codes.
  * 
@@ -93,4 +92,4 @@ uint32 OscSimGetCurTimeStep();
  *//*********************************************************************/
 OSC_ERR OscSimRegisterCycleCallback( void (*pCallback)(void));
 
-#endif /*SIM_PUB_H_*/
+#endif // #ifndef OSCAR_INCLUDE_SIM_H_

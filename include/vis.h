@@ -15,13 +15,13 @@
 	along with this library; if not, write to the Free Software Foundation,
 	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
+#ifndef OSCAR_VIS_INCLUDE_H_
+#define OSCAR_VIS_INCLUDE_H_
 
 /*! @file
  * @brief API definition for vision library module
  * 
  */
-#ifndef VIS_PUB_H_
-#define VIS_PUB_H_
 
 /*====================== API functions =================================*/
 
@@ -365,4 +365,5 @@ OSC_ERR OscVisDebayerBilinearBGR(uint8 *pDst,
 				 uint32 height, 
 				 uint8 *pTmp, 
 				 enum EnBayerOrder enBayerOrder);
-#endif /*VIS_PUB_H_*/
+
+#endif // #ifndef OSCAR_VIS_INCLUDE_H_
