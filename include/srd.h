@@ -15,6 +15,8 @@
 	along with this library; if not, write to the Free Software Foundation,
 	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
+#ifndef OSCAR_INCLUDE_SRD_H_
+#define OSCAR_INCLUDE_SRD_H_
 
 /*! @file
  * @brief API definition for stimuli reader module
@@ -39,9 +41,6 @@
  * The order of signal names has to match with the order of signal
  * registration to the reader.
  */
-
-#ifndef SRD_PUB_H_
-#define SRD_PUB_H
 
 extern struct OscModule OscModule_srd;
 
@@ -87,6 +86,4 @@ OSC_ERR OscSrdRegisterSignal( void* pReader, char* strSignal, void** ppSignal);
  *//*********************************************************************/
 OSC_ERR OscSrdGetUpdateSignal( void* pSignal, bool* pbValue);
 
-
-
-#endif /*SRD_PUB_H_*/
+#endif // #ifndef OSCAR_INCLUDE_SRD_H_

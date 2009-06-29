@@ -15,6 +15,8 @@
 	along with this library; if not, write to the Free Software Foundation,
 	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
+#ifndef OSCAR_INCLUDE_SUP_H_
+#define OSCAR_INCLUDE_SUP_H_
 
 /*! @file
  * @brief API definition for support module.
@@ -22,8 +24,6 @@
  * Contains stuff that is too small to be put in a separate module.
  * 
  */
-#ifndef SUP_PUB_H_
-#define SUP_PUB_H_
 
 extern struct OscModule OscModule_sup;
 
@@ -425,12 +425,12 @@ int OscSupSramFree(void *pAddr);
  * Host: This does nothing
  */
 #define CSYNC asm("csync;\n")
-#endif /* OSC_TARGET */
+#endif // #ifdef OSC_TARGET
 
 #ifdef OSC_HOST
 #define SSYNC {}
 #define CSYNC {}
-#endif /* OSC_HOST */
+#endif // #ifdef OSC_HOST
 
 /*------------------------ Memory copy ----------------------------*/
 #ifdef OSC_TARGET
@@ -456,7 +456,7 @@ int OscSupSramFree(void *pAddr);
 		:                                   \
 		:"a" (pDst), "a" (pSrc), "a" (count-1) \
 		: "LC1","LT1","LB1", "I0","P0", "R0")
-#endif /* OSC_TARGET */
+#endif // #ifdef OSC_TARGET
 
 #ifdef OSC_HOST
 #define memcpy_inline(pDst,pSrc,count)      \
@@ -469,8 +469,6 @@ int OscSupSramFree(void *pAddr);
 		*pD++ = *pS++;                      \
 	}                                       \
 }
-#endif /* OSC_HOST */
+#endif // #ifdef OSC_HOST
 
-
-#endif /* SUP_PUB_H_ */
-
+#endif // #ifndef OSCAR_INCLUDE_SUP_H_
