@@ -223,7 +223,6 @@ static OSC_ERR OscCamCropPicture(uint8* pDstBuffer,
 		const struct OSC_PICTURE *pPic,
 		const struct capture_window *pCropWin)
 {
-OscFunctionBegin	
 	uint8       *pTSrc, *pTDst;
 	uint32      croppedSize;
 	uint16      colorDepth, bytesPerPixel;
@@ -234,17 +233,19 @@ OscFunctionBegin
 	if((pPic == NULL) || (pPic->data == NULL) || (pCropWin == NULL) ||
 			(pDstBuffer == NULL) || (dstBufferSize == 0))
 	{
-		OscFail_em( -EINVALID_PARAMETER, "Invalid parameter (0x%x, %u, 0x%x, 0x%x)",
-				pDstBuffer, dstBufferSize, pPic, pCropWin);
+		OscLog(ERROR, "%s(0x%x, %u, 0x%x, 0x%x): Invalid parameter!\n",
+				__func__, pDstBuffer, dstBufferSize, pPic, pCropWin);
+		return -EINVALID_PARAMETER;
 	}
 	if((pPic->width < (pCropWin->col_off + pCropWin->width)) ||
 			pPic->height < (pCropWin->row_off + pCropWin->height))
 	{
-		OscFail_em( -EPICTURE_TOO_SMALL, 
-				"Unable to crop image (%dx%d) to (%dx%d @ %d/%d).",
-				pPic->width, pPic->height,
+		OscLog(ERROR,
+				"%s: Unable to crop image (%dx%d) to (%dx%d @ %d/%d).\n",
+				__func__, pPic->width, pPic->height,
 				pCropWin->width, pCropWin->height,
 				pCropWin->col_off, pCropWin->row_off);
+		return -EPICTURE_TOO_SMALL;
 	}
 	
 	/* Allocate a temporary buffer for the cropped image */
@@ -252,9 +253,12 @@ OscFunctionBegin
 	bytesPerPixel = colorDepth / 8;
 	croppedSize = pCropWin->width *  pCropWin->height * bytesPerPixel;
 	
-	OscAssert_em( croppedSize <= dstBufferSize, -EBUFFER_TOO_SMALL, 
-			"Specified destination Buffer too small. (%d < %d)", 
-			dstBufferSize, croppedSize);
+	if(croppedSize > dstBufferSize)
+	{
+		OscLog(ERROR, "%s: Specified destination Buffer too small. \
+				(%d < %d)\n", __func__, dstBufferSize, croppedSize);
+		return -EBUFFER_TOO_SMALL;
+	}
 	
 	/* The crop rectangle */
 	lowY = pCropWin->row_off;
@@ -278,12 +282,11 @@ OscFunctionBegin
 		pTSrc += pPic->width * bytesPerPixel;
 	}
 	
-OscFunctionCatch
-OscFunctionEnd
+	return SUCCESS;
 }
 
-OSC_ERR OscCamCreate(){
-OscFunctionBegin	
+OSC_ERR OscCamCreate()
+{
 	OSC_ERR                 err;
 	uint16                  dummy;
 	
@@ -318,18 +321,23 @@ OscFunctionBegin
 	 * cam.curCamRowClks. */
 	err |= OscCamGetAreaOfInterest(&dummy, &dummy, &dummy, &dummy);
 	
-	OscAssert_em( err == SUCCESS, err, 
-		"Unable to read current settings from camera!");
+	if(err != SUCCESS)
+	{
+		printf("%s: ERROR: Unable to read current settings from "
+				"camera!\n",
+				__func__);
+	}
 	
-OscFunctionCatch
-OscFunctionEnd
+	return SUCCESS;
 }
 
-OSC_ERR OscCamSetFileNameReader(void* hReaderHandle){
-OscFunctionBegin	
+OSC_ERR OscCamSetFileNameReader(void* hReaderHandle)
+{
 	/* Input validation. */
-	OscAssert_e( hReaderHandle != NULL, -EINVALID_PARAMETER);
-	
+	if(hReaderHandle == NULL)
+	{
+		return -EINVALID_PARAMETER;
+	}
 	
 	if(cam.hFNReader != NULL)
 	{
@@ -339,8 +347,7 @@ OscFunctionBegin
 	
 	cam.hFNReader = hReaderHandle;
 	
-OscFunctionCatch
-OscFunctionEnd
+	return SUCCESS;
 }
 
 OSC_ERR OscCamSetAreaOfInterest(const uint16 lowX,
@@ -348,17 +355,18 @@ OSC_ERR OscCamSetAreaOfInterest(const uint16 lowX,
 		const uint16 width,
 		const uint16 height)
 {
-OscFunctionBegin
 	/* Input validation */
 	if(width%2 != 0 ||
 			lowX + width > MAX_IMAGE_WIDTH ||
 			lowY + height > MAX_IMAGE_HEIGHT)
 	{
-		OscFail_em( -EINVALID_PARAMETER,
-				"Invalid parameter (%dx%d at %d/%d). "
+		OscLog(ERROR,
+				"%s: Invalid parameter (%dx%d at %d/%d). "
 				"Must fit %dx%d and width must be even\n",
+				__func__,
 				width, height, lowX,lowY,
 				MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT);
+		return -EINVALID_PARAMETER;
 	}
 
 	if((width == 0) || (height == 0))
@@ -393,36 +401,40 @@ OscFunctionBegin
 			cam.capWin.height,
 			cam.capWin.col_off,
 			cam.capWin.row_off);
-OscFunctionCatch
-OscFunctionEnd
+	return SUCCESS;
 }
 
-OSC_ERR OscCamSetRegisterValue(const uint32 reg, const uint16 value){
-OscFunctionBegin
+OSC_ERR OscCamSetRegisterValue(const uint32 reg, const uint16 value)
+{
 	struct reg_info * pReg;
 
 	pReg = OscCamFindReg(reg);
-	OscAssert_e( pReg != NULL, -EINVALID_PARAMETER);
-	
+	if(pReg == NULL)
+	{
+		return -EINVALID_PARAMETER;
+	}
 	pReg->value = value;
 
-OscFunctionCatch
-OscFunctionEnd
+	return 0;
 }
 
-OSC_ERR OscCamGetRegisterValue(const uint32 reg, uint16 *pResult){
-OscFunctionBegin
+OSC_ERR OscCamGetRegisterValue(const uint32 reg, uint16 *pResult)
+{
 	struct reg_info * pReg;
 
-	OscAssert_e( pResult != NULL, -EINVALID_PARAMETER);
+	if(pResult == NULL)
+	{
+		return -EINVALID_PARAMETER;
+	}
 
 	pReg = OscCamFindReg(reg);
-	OscAssert_e( pReg != NULL, -EINVALID_PARAMETER);	
-	
+	if(pReg == NULL)
+	{
+		return -EINVALID_PARAMETER;
+	}
 	*pResult = pReg->value;
 
-OscFunctionCatch
-OscFunctionEnd
+	return SUCCESS;
 }
 
 OSC_ERR OscCamSetFrameBuffer(const uint8 fbID,
@@ -430,13 +442,19 @@ OSC_ERR OscCamSetFrameBuffer(const uint8 fbID,
 		const void * pData,
 		const int bCached)
 {
-OscFunctionBegin
 	struct frame_buffer fb;
 	int i;
 
 	/* Input validation */
-	OscAssert_e( fbID <= MAX_NR_FRAME_BUFFERS, -EINVALID_PARAMETER);
-	OscAssert_e( pData != NULL && uSize != 0, -EINVALID_PARAMETER);
+	if(fbID > MAX_NR_FRAME_BUFFERS ||
+			(pData == NULL && uSize != 0))
+	{
+		OscLog(ERROR,
+				"%s(%d, %d, 0x%x, %d): \
+				Invalid parameter.\n",
+				__func__, fbID, uSize, pData, bCached);
+		return -EINVALID_PARAMETER;
+	}
 
 	if(pData == NULL)
 	{
@@ -446,10 +464,14 @@ OscFunctionBegin
 		 * buffer. */
 		for(i = 0; i < cam.multiBuffer.multiBufferDepth; i++)
 		{
-			OscAssert_em( cam.multiBuffer.fbIDs[i] != fbID, 
-				-ECANNOT_DELETE, 
-				"Deleting frame buffer %d being part of a multi buffer!",
-				fbID);
+			if(cam.multiBuffer.fbIDs[i] == fbID)
+			{
+				OscLog(ERROR,
+						"%s: Deleting frame buffer %d being part of \
+						a multi buffer!.\n",
+						__func__, fbID);
+				return -ECANNOT_DELETE;
+			}
 		}
 		if(cam.fbStat[fbID] == STATUS_UNITIALIZED)
 		{
@@ -459,7 +481,7 @@ OscFunctionBegin
 		}
 		cam.fbStat[fbID] = STATUS_UNITIALIZED;
 		memset(&cam.fbufs[fbID], 0, sizeof(struct frame_buffer));
-		return SUCCESS;
+		return 0;
 	}
 
 	fb.id = fbID;
@@ -475,20 +497,20 @@ OscFunctionBegin
 	if((cam.fbufs[fbID].data != NULL) ||
 			cam.fbStat[fbID] != STATUS_UNITIALIZED)
 	{
-		OscFail_em( -EFRAME_BUFFER_BUSY,
-			"Unable to set frame buffer %d -> busy.", fbID);
+		OscLog(ERROR, "%s: Unable to set frame buffer %d -> busy.\n",
+				__func__, fbID);
+		return -EFRAME_BUFFER_BUSY;
 	}
 
 	/* Store the info for later */
 	memcpy(&cam.fbufs[fb.id], &fb, sizeof(struct frame_buffer));
 	cam.fbStat[fb.id] = STATUS_READY;
 
-OscFunctionCatch
-OscFunctionEnd
+	return SUCCESS;
 }
 
-OSC_ERR OscCamSetupCapture(uint8 fbID){
-OscFunctionBegin
+OSC_ERR OscCamSetupCapture(uint8 fbID)
+{
 	uint8           fb;
 	int             i;
 	
@@ -501,11 +523,18 @@ OscFunctionBegin
 		fb = OscCamMultiBufferGetCapBuf(&cam.multiBuffer);
 	}
 	
-	OscAssert_e(fb <= MAX_NR_FRAME_BUFFERS, -EINVALID_PARAMETER)
+	if(fb > MAX_NR_FRAME_BUFFERS)
+	{
+		OscLog(ERROR, "%s(%u): Invalid parameter!\n",
+				__func__, fbID);
+		return -EINVALID_PARAMETER;
+	}
 
 	if(unlikely(cam.capWin.width == 0 || cam.capWin.height == 0))
 	{
-		OscFail_em( -ENO_AREA_OF_INTEREST_SET, "No area of interest set!");
+		OscLog(ERROR, "%s: No area of interest set!\n",
+				__func__);
+		return -ENO_AREA_OF_INTEREST_SET;
 	}
 	
 	for(i = 0; i < MAX_NR_FRAME_BUFFERS; i++)
@@ -544,8 +573,7 @@ OscFunctionBegin
 	memcpy(&cam.lastCapWin, &cam.capWin, sizeof(struct capture_window));
 
 	
-OscFunctionCatch
-OscFunctionEnd
+	return SUCCESS;
 }
 
 OSC_ERR OscCamCancelCapture()
@@ -564,7 +592,7 @@ OSC_ERR OscCamCancelCapture()
 	OscLog(WARN, "%s: Cancel request when no picture \
 			transfer to cancel.\n",
 			__func__);
-	return ENOTHING_TO_ABORT;
+	return -ENOTHING_TO_ABORT;
 }
 
 OSC_ERR OscCamReadPicture(const uint8 fbID,
@@ -682,18 +710,25 @@ OSC_ERR OscCamReadPicture(const uint8 fbID,
 	return err;
 }
 
-OSC_ERR OscCamReadLatestPicture(uint8 ** ppPic){
-OscFunctionBegin
+OSC_ERR OscCamReadLatestPicture(uint8 ** ppPic) {
 	/* Input Validation */
-	OscAssert_e( ppPic != NULL, -EINVALID_PARAMETER);
+	if(ppPic == NULL)
+	{
+		return -EINVALID_PARAMETER;
+	}
 	
 	*ppPic = NULL;  /* Precaution */
 	
-	OscAssert_e( cam.lastValidID != OSC_CAM_INVALID_BUFFER_ID,
-		-ENO_MATCHING_PICTURE);
+	if(cam.lastValidID == OSC_CAM_INVALID_BUFFER_ID)
+	{
+		return -ENO_MATCHING_PICTURE;
+	}
 	
-	OscAssert_e( cam.fbufs[cam.lastValidID].data != NULL,
-		-ENO_MATCHING_PICTURE);
+	if(cam.fbufs[cam.lastValidID].data == NULL)
+	{
+		cam.lastValidID = OSC_CAM_INVALID_BUFFER_ID;
+		return -ENO_MATCHING_PICTURE;
+	}
 	
 	OscLog(DEBUG,
 			"%s(0x%x): Getting latest picture from frame" \
@@ -701,9 +736,7 @@ OscFunctionBegin
 			__func__, ppPic,cam.lastValidID);
 	
 	*ppPic = cam.fbufs[cam.lastValidID].data;
-OscFunctionCatch
-	cam.lastValidID = OSC_CAM_INVALID_BUFFER_ID;
-OscFunctionEnd
+	return SUCCESS;
 }
 
 OSC_ERR OscCamRegisterCorrectionCallback(
