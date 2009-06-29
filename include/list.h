@@ -26,20 +26,51 @@
 #include <stddef.h>
 #include "support.h"
 
-#deinfe ListDeclareType(n, t)
-	struct n ## _list_ {
-		n
-	}
+#if 0
+#define OscListType(head_t, elem_t, type) \
+	typedef struct _osc_internal_list_head_ ## head_t head_t; \
+	typedef struct _osc_internal_list_elem_ ## elem_t elem_t; \
+	struct _osc_internal_list_head_ ## typedef_head { \
+		elem_t * first, * last; \
+	}; \
+	struct _osc_internal_list_elem_ ## elem_t { \
+		head_t * head; \
+		elem_t * prev, * next; \
+		type data; \
+	};
 
-#define ListDeclare(n, t)
+#define OscListInit(head) \
+	head = (typeof (head)) { }
 
-#define ListInsert(n, e)
+#define OscListRemove(head, elem) \
+	({
+		OSC_ERR err = SUCCESS;
+		if (elem->head != elem)
+			err = -EPOOL;
+		if (err == SUCCESS) {
+			elem
+		}
+		err;
+	})
 
-#define ListRemove(n, e)
+#define ListPrepend(head, elem) \
+	({
+		OSC_ERR err = SUCCESS;
+		if (elem->head != NULL)
+			err = ListRemove(elem->head, elem)
+		if (err == SUCCESS) {
+			elem->head = head;
+			elem->next = head->first
+			head->first elem;
+			if (head->last == NULL)
+				head->last = elem
+		}
+		err;
+	})
 
-#define ListFirst(n, e)
+#define OscListFirst(n, e)
 
-#define ListIterate(n, i)
-
+#define OscListIterate(n, i)
+#endif
 
 #endif // #ifndef OSCAR_INCLUDE_LIST_H_
