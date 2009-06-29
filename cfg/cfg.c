@@ -29,6 +29,7 @@
 #include "oscar.h"
 
 struct OscModule OscModule_cfg = {
+	.name = "cfg",
 	.dependencies = {
 		&OscModule_log,
 		NULL // To end the flexible array.

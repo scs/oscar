@@ -30,6 +30,7 @@ OSC_ERR OscSupCreate();
 struct OSC_SUP sup;
 
 struct OscModule OscModule_sup = {
+	.name = "sup",
 	.create = OscSupCreate,
 	.dependencies = {
 		&OscModule_log,

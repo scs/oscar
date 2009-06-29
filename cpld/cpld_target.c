@@ -34,6 +34,7 @@ OSC_ERR OscCpldDestroy();
 struct OSC_CPLD cpld;       /*!< The cpld module singelton instance */
 
 struct OscModule OscModule_cpld = {
+	.name = "cpld",
 	.create = OscCpldCreate,
 	.destroy = OscCpldDestroy,
 	.dependencies = {

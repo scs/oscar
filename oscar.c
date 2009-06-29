@@ -41,8 +41,14 @@ OscFunction(static loadModules, struct OscModule ** deps)
 		OscAssert((*dep)->useCount >= 0);
 		
 		if ((*dep)->useCount == 0) {
+			char * name = (*dep)->name;
+			
+			if (name == NULL)
+				name = "<noname>";
+			
 			OscCall(loadModules, (*dep)->dependencies);
 			
+			OscMark_m("Loading module %s ...", name);
 			if ((*dep)->create != NULL)
 				OscCall((*dep)->create);
 		}

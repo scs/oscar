@@ -35,6 +35,7 @@ OSC_ERR OscCamDestroy();
 
 /*! @brief The module definition. */
 struct OscModule OscModule_cam = {
+	.name = "cam",
 	.create = OscCamCreate,
 	.destroy = OscCamDestroy,
 	.dependencies = {

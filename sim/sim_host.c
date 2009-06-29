@@ -29,6 +29,7 @@ OSC_ERR OscSimCreate();
 struct OSC_SIM_OBJ sim;
 
 struct OscModule OscModule_sim = {
+	.name = "sim",
 	.create = OscSimCreate,
 	.dependencies = {
 		NULL // To end the flexible array.

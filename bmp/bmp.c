@@ -24,6 +24,7 @@
 
 /*! @brief The module definition. */
 struct OscModule OscModule_bmp = {
+	.name = "bmp",
 	.dependencies = {
 		&OscModule_log,
 		NULL // To end the flexible array.

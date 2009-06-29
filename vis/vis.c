@@ -26,6 +26,7 @@
 #include "vis.h"
 
 struct OscModule OscModule_vis = {
+	.name = "vis",
 	.dependencies = {
 		&OscModule_log,
 		&OscModule_dma,

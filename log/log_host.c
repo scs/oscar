@@ -39,6 +39,7 @@ struct OSC_LOG osc_log = {
 };
 
 struct OscModule OscModule_log = {
+	.name = "log",
 	.create = OscLogCreate,
 	.destroy = OscLogDestroy,
 	.dependencies = {

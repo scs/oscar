@@ -87,6 +87,7 @@ struct OSC_SWR
 struct OSC_SWR swr; /*!< Module singelton instance */
 
 struct OscModule OscModule_swr = {
+	.name = "swr",
 #if defined(OSC_HOST) || defined(OSC_SIM)
 	.create = OscSwrCreate,
 	.destroy = OscSwrDestroy,
