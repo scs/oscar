@@ -46,17 +46,14 @@ OSC_ERR OscSimCreate()
 /*********************************************************************//*!
  * Target: Stump since simulation is only done on host.
  *//*********************************************************************/
-void OscSimInitialize(void)
-{
+OSC_ERR OscSimInitialize(void) {
 }
 
-void OscSimStep()
-{
+OSC_ERR OscSimStep() {
 }
 
-uint32 OscSimGetCurTimeStep()
-{
-	return SUCCESS;
+uint32 OscSimGetCurTimeStep() {
+	return SUCCESS; // FIXME: Doesn't SUCCESS kind of have the wrong type!?
 }
 
 

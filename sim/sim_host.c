@@ -43,8 +43,7 @@ OSC_ERR OscSimCreate()
 	return SUCCESS;
 }
 
-void OscSimInitialize(void)
-{
+OSC_ERR OscSimInitialize() {
 	uint16 i;
 	
 	for( i=0; i< sim.numCycleCallback; i++)
@@ -53,8 +52,7 @@ void OscSimInitialize(void)
 	}
 }
 
-void OscSimStep()
-{
+OSC_ERR OscSimStep() {
 	uint16 i;
 	
 	/* pre advance simulation time */

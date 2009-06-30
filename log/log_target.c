@@ -70,19 +70,20 @@ OSC_ERR OscLogDestroy()
 	return SUCCESS;
 }
 
-inline void OscLogSetConsoleLogLevel(const enum EnOscLogLevel level)
-{
+OSC_ERR OscLogSetConsoleLogLevel(const enum EnOscLogLevel level) {
 	osc_log.consoleLogLevel = level;
+	
+	return SUCCESS;
 }
 
-inline void OscLogSetFileLogLevel(const enum EnOscLogLevel level)
-{
+OSC_ERR OscLogSetFileLogLevel(const enum EnOscLogLevel level) {
 	osc_log.fileLogLevel = level;
+	
+	return SUCCESS;
 }
 
 
-void OscLog(const enum EnOscLogLevel level, const char * strFormat, ...)
-{
+OSC_ERR OscLog(const enum EnOscLogLevel level, const char * strFormat, ...) {
 	va_list ap; /*< The dynamic argument list */
 
 	if (level <= osc_log.consoleLogLevel)
@@ -114,9 +115,11 @@ void OscLog(const enum EnOscLogLevel level, const char * strFormat, ...)
 		if (len >= sizeof osc_log.strTemp)
 			syslog(LOG_WARNING, "The last error message has been truncated because it was too big.");
 	}
+	
+	return SUCCESS;
 }
 
-void OscFatalErr(const char * strFormat, ...)
+OSC_ERR OscFatalErr(const char * strFormat, ...)
 {
 	uint16 len = 0;
 	va_list ap; /*< The dynamic argument list */
@@ -138,7 +141,8 @@ void OscFatalErr(const char * strFormat, ...)
 
 	/* Write the message to the syslog daemon. */
 	syslog(EMERG, osc_log.strTemp);
-
+	
+	// FIXME: WTF is it the business of the logging module to terminate the application!?
 	exit(1);
 }
 

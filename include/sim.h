@@ -45,7 +45,7 @@ enum EnOscSimErrors {
  * the simulation module. Time variable is set to 0. Callbacks to
  * stimuli reader and writer are issued to applie default signal values.
  *//*********************************************************************/
-void OscSimInitialize(void);
+OSC_ERR OscSimInitialize();
 
 /*********************************************************************//*!
  * @brief Increment the simulation time step.
@@ -58,7 +58,7 @@ void OscSimInitialize(void);
  * next cycle!)
  * Target: Stump since simulation is only done on host.
  *//*********************************************************************/
-void OscSimStep();
+OSC_ERR OscSimStep();
 
 /*********************************************************************//*!
  * @brief Get the current simulation time step.

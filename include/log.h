@@ -57,7 +57,7 @@ enum EnOscLogLevel {
  * 
  * @param level The log level to set.
  *//*********************************************************************/
-void OscLogSetConsoleLogLevel(const enum EnOscLogLevel level);
+OSC_ERR OscLogSetConsoleLogLevel(const enum EnOscLogLevel level);
 
 /*********************************************************************//*!
  * @brief Sets the highest log level to be output to the log file
@@ -66,7 +66,7 @@ void OscLogSetConsoleLogLevel(const enum EnOscLogLevel level);
  * 
  * @param level The log level to set.
  *//*********************************************************************/
-void OscLogSetFileLogLevel(const enum EnOscLogLevel level);
+OSC_ERR OscLogSetFileLogLevel(const enum EnOscLogLevel level);
 
 /*********************************************************************//*!
  * @brief Logs a message.
@@ -78,7 +78,7 @@ void OscLogSetFileLogLevel(const enum EnOscLogLevel level);
  * @param strFormat Format string of the message.
  * @param ... Format parameters of the message.
  *//*********************************************************************/
-void OscLog(const enum EnOscLogLevel level, const char * strFormat, ...);
+OSC_ERR OscLog(const enum EnOscLogLevel level, const char * strFormat, ...);
 
 /*********************************************************************//*!
  * @brief Logs a fatal error and terminates program.
@@ -88,7 +88,7 @@ void OscLog(const enum EnOscLogLevel level, const char * strFormat, ...);
  * @param strFormat Format string of the message.
  * @param ... Format parameters of the message.
  *//*********************************************************************/
-void OscFatalErr(const char * strFormat, ...);
+OSC_ERR OscFatalErr(const char * strFormat, ...);
 
 
 #endif /*LOG_PUB_H_*/
