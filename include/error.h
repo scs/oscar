@@ -40,7 +40,7 @@
 		if (({ \
 			bool res = _osc_internal_state_.stage < 1; \
 			if (res) \
-				_osc_internal_state_.stage += 1; \
+				_osc_internal_state_.stage = 1; \
 			res; \
 		})) {
 
@@ -54,7 +54,7 @@
 				for (int i = 0; !res && i < length(errs); i += 1) \
 					res = errs[i] == _osc_internal_state_.error; \
 				if (res) { \
-					_osc_internal_state_.stage += 2; \
+					_osc_internal_state_.stage = 2; \
 					_osc_internal_state_.caught = true; \
 				} \
 			} \
@@ -70,7 +70,7 @@
 				for (int i = 0; !res && i < length(errs); i += 1) \
 					res = errs[i] == _osc_internal_state_.error; \
 				if (res) \
-					_osc_internal_state_.stage += 3; \
+					_osc_internal_state_.stage = 3; \
 			} \
 			res; \
 		})) {
@@ -80,7 +80,7 @@
 		if (({ \
 			bool res = _osc_internal_state_.stage < 4; \
 			if (res) \
-				_osc_internal_state_.stage += 4; \
+				_osc_internal_state_.stage = 4; \
 			res; \
 		})) {
 
