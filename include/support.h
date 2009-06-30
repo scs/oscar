@@ -36,11 +36,18 @@
 #error "Neither OSC_HOST nor OSC_TARGET is defined as a macro."
 #endif
 
+#define containerOf(ptr, type, member) \
+	({ \
+		const typeof (((type *) 0)->member) * __mptr = (ptr); \
+		(type *) ((char *)__mptr - offsetof(type, member)); \
+	})
+
 /*! @brief The opposite of while (condition) { block }; */
 #define until(a) while (!(a))
 /*! @brief An endless loop, equivalent to while (true) { block }; */
 #define loop while (true)
 /*! @brief Gives the length of a field (Does not work on pointers!). */
 #define length(a) ((sizeof (a)) / sizeof *(a))
+
 
 #endif // #ifndef OSCAR_INCLUDE_POOL_H_
