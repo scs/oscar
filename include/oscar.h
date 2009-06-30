@@ -54,7 +54,7 @@ struct OscModule {
 #define OscCreate(modules ...) \
 	({ \
 		static struct OscModule * _modules[] = { modules, NULL }; \
-		OscCreateFunction(&_modules); \
+		OscCreateFunction(_modules); \
 	})
 
 OSC_ERR OscCreateFunction(struct OscModule ** modules);
