@@ -1,0 +1,3 @@
+SOURCES_host := clb_host.c
+SOURCES_target := clb_target.c
+SOURCES_target_sim := clb_host.c
