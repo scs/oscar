@@ -89,15 +89,15 @@ OSC_ERR OscGetVersionNumber(char *hMajor, char *hMinor, char *hPatch);
 /*********************************************************************//*!
  * @brief Get framework version string
  * 
- * Version string format: v<major>.<minor>[-p<patch>]  eg: v1.3  or v1.3-p1
+ * Version string format: v<major>.<minor>[-p<patch>][-RC<patch>]  eg: v1.3  or v1.3-p1
  * The patch number is not printed if no bug-fixes are available (patch=0).
  *  
  * See @see OscGetVersionNumber for number interpretation.
  * 
- * @param hMajor Pointer to formated version string.
+ * @param pVersion Pointer to formated version string.
  * @return SUCCESS or an appropriate error code.
  *//*********************************************************************/
-OSC_ERR OscGetVersionString(char *hVersion);
+OscFunctionDeclare(OscGetVersionString, char ** pVersion)
 
 /* Include the public header files of the different modules, which
  * contain the declarations of the API functions of the respective

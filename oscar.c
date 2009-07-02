@@ -99,12 +99,21 @@ OSC_ERR OscGetVersionNumber(char *hMajor, char *hMinor, char *hPatch)
 	return SUCCESS;
 }
 
-OSC_ERR OscGetVersionString( char *hVersion)
-{
-	sprintf(hVersion, "v%d.%d", OSC_VERSION_MAJOR, OSC_VERSION_MINOR);
-	if(OSC_VERSION_PATCH)
-	{
-		sprintf(hVersion, "%s-p%d", hVersion, OSC_VERSION_PATCH);
-	}
-	return SUCCESS;
-}
+OscFunction(OscGetVersionString, char ** pVersion)
+	static char buffer[80];
+	int num;
+	
+	if (OSC_VERSION_PATCH == 0)
+		if (OSC_VERSION_RC == 0)
+			num = snprintf(buffer, sizeof buffer, "v%d.%d", OSC_VERSION_MAJOR, OSC_VERSION_MINOR);
+		else
+			num = snprintf(buffer, sizeof buffer, "v%d.%d-RC%d", OSC_VERSION_MAJOR, OSC_VERSION_MINOR, OSC_VERSION_RC);
+	else
+		if (OSC_VERSION_RC == 0)
+			num = snprintf(buffer, sizeof buffer, "v%d.%d-p%d", OSC_VERSION_MAJOR, OSC_VERSION_MINOR, OSC_VERSION_PATCH);
+		else
+			num = snprintf(buffer, sizeof buffer, "v%d.%d-p%d-RC%d", OSC_VERSION_MAJOR, OSC_VERSION_MINOR, OSC_VERSION_PATCH, OSC_VERSION_RC);
+	
+	OscAssert_m(num < sizeof buffer, "No buffer space left.");
+	*pVersion = buffer;
+OscFunctionEnd()

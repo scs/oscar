@@ -25,6 +25,7 @@
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 
 #include "oscar.h"
 
@@ -153,6 +154,21 @@ char* OscCfgAppendLabel(
  * @return index of first invalid char.
  *//*********************************************************************/
 unsigned int OscCfgFindInvalidChar(const unsigned char *str, const unsigned int strSize);
+
+/*!
+	@brief Get the value of a U-Boot environment variable.
+	@param key The name of the variable.
+	@param value Is set to point to the value in a static buffer.
+*/
+OscFunctionDeclare(static getUBootEnv, char * key, char ** value)
+
+/*!
+	@brief Parse an integer from a string.
+	@param str String containing the integer.
+	@param res Is set to the number parsed from the string.
+*/
+OscFunctionDeclare(static parseInteger, char * str, int * res)
+
 
 /*! @brief The module singelton instance. */
 struct OSC_CFG cfg;
@@ -605,9 +621,123 @@ OSC_ERR OscCfgGetBool(
 	return err;		
 }
 
+#ifdef TARGET_TYPE_MESA_SR4K
+#error OscCfgGetSystemInformation needs to be updated to work on the Mesa SwissRanger.
+#endif
+
+OscFunction(OscCfgGetSystemInformation, struct OscSystemInfo ** ppInfo)
+	OscFunction(staticStore, char * str, char ** staticStr)
+		static char buffer[1024];
+		static char * pNext = buffer;
+		static int remaining = sizeof buffer;
+		int len = strlen(str) + 1;
+		
+		OscAssert_m(len < remaining, "No buffer space left.");
+		
+		strncpy(pNext, str, remaining);
+		
+		*staticStr = pNext;
+		pNext += len;
+		remaining -= len;
+	OscFunctionEnd()
+	
+	OscFunction(hasBayernPattern, struct OscSystemInfo * pInfo, bool * res)
+		if (pInfo->hardware.board.boardType == OscSystemInfo_boardType_leanXcam) {
+			if (strcmp(pInfo->hardware.board.assembly, "A") == 0 || strcmp(pInfo->hardware.board.assembly, "B") == 0) {
+				*res = true;
+			} else if (strcmp(pInfo->hardware.board.assembly, "C") == 0) {
+				*res = false;
+			} else {
+				OscFail();
+			}
+		} else if (pInfo->hardware.board.boardType == OscSystemInfo_boardType_indXcam) {
+			*res = false;
+		} else {
+			OscFail();
+		}
+	OscFunctionEnd()
+	
+	static struct OscSystemInfo info;
+	static bool inited = false;
+	
+	if (!inited) {
+		char * envVar;
+		char envVar2[80];
+		
+		OscCall(getUBootEnv, "hwrev", &envVar)
+		if (OscLastStatus() == ECFG_UBOOT_ENV_NOT_FOUND) {
+			OscCall(getUBootEnv, "HWREV", &envVar); // Fallback to the ALL_CAPS_VARIANT.
+			if (OscLastStatus() == ECFG_UBOOT_ENV_NOT_FOUND) {
+#ifdef TARGET_TYPE_LEANXCAM
+				envVar = "LX_1.1_B";
+#endif
+#ifdef TARGET_TYPE_INDXCAM
+				envVar = "IX_1.1_A";
+#endif
+			}
+		}
+		
+		// FIXME: why do I have to copy the string out of getUBootEnv's static buffer?
+		strcpy(envVar2, envVar);
+		envVar = envVar2;
+		
+		OscCall(staticStore, envVar, &info.hardware.board.revision);
+		
+		{
+			char * part2, * part3, * part4;
+			
+			part2 = strchr(envVar, '_');
+			OscAssert_m(part2 != NULL, "Invalid format for hwrev: %s", info.hardware.board.revision);
+			*part2 = '\0';
+			part2 += 1;
+			
+			part3 = strchr(part2, '.');
+			OscAssert_m(part3 != NULL, "Invalid format for hwrev: %s", info.hardware.board.revision);
+			*part3 = 0;
+			part3 += 1;
+			
+			part4 = strchr(part3, '_');
+			OscAssert_m(part4 != NULL, "Invalid format for hwrev: %s", info.hardware.board.revision);
+			*part4 = 0;
+			part4 += 1;
+			
+			if (strcmp(envVar, "LX") == 0)
+				info.hardware.board.boardType = OscSystemInfo_boardType_leanXcam;
+			else if (strcmp(envVar, "IX") == 0)
+				info.hardware.board.boardType = OscSystemInfo_boardType_indXcam;
+			else
+				OscAssert_m(part2 != NULL, "Invalid format for hwrev: %s", info.hardware.board.revision);
+			
+			OscCall(parseInteger, part2, &info.hardware.board.major);
+			OscCall(parseInteger, part3, &info.hardware.board.minor);
+			
+			OscCall(staticStore, part4, &info.hardware.board.assembly);
+		}
+		
+		info.hardware.imageSensor.imageWidth = OSC_CAM_MAX_IMAGE_WIDTH;
+		info.hardware.imageSensor.imageWidth = OSC_CAM_MAX_IMAGE_HEIGHT;
+		OscCall(hasBayernPattern, &info, &info.hardware.imageSensor.hasBayernPattern);
+		
+		{
+			char * version;
+			
+			info.software.Oscar.major = OSC_VERSION_MAJOR;
+			info.software.Oscar.minor = OSC_VERSION_MINOR;
+			info.software.Oscar.patch = OSC_VERSION_PATCH;
+			info.software.Oscar.rc = OSC_VERSION_RC;
+			
+			OscCall(OscGetVersionString, &version);
+			OscCall(staticStore, version, &info.software.Oscar.version);
+		}
+		
+		inited = true;
+	}
+	
+	*ppInfo = &info;
+OscFunctionEnd()
 
 /*======================= Private methods ==============================*/
-
+// FIXME: Private? Why aren't these static then?
 OSC_ERR OscCfgFlushContentHelper(const CFG_FILE_CONTENT_HANDLE hFileContent, bool all)
 {
 	FILE        *pCfgFile;
@@ -862,3 +992,67 @@ unsigned int OscCfgFindInvalidChar(const unsigned char *str, const unsigned int 
 	}
 	return strSize;
 }
+
+OscFunction(static getUBootEnv, char * key, char ** value)
+#ifdef OSC_HOST
+	*value = NULL;
+	OscFail_es(ECFG_UBOOT_ENV_NOT_FOUND);
+#endif
+#ifdef OSC_TARGET
+	static char buffer[80];
+	
+	{
+		FILE * file;
+		char * ferr;
+		int err;
+		
+		// FIXME: key should be escaped or checked for invalid characters.
+		err = snprintf(buffer, sizeof buffer, "fw_printenv '%s' 2> /dev/null", key);
+		OscAssert_em(err < sizeof buffer, -ECFG_UBOOT_ENV_READ_ERROR, "No buffer space left.");
+		
+		file = popen(buffer, "r");
+		OscAssert_em(file != NULL, -ECFG_UBOOT_ENV_READ_ERROR, "Error starting command: %s", strerror(errno));
+		
+		ferr = fgets(buffer, sizeof buffer, file);
+		
+		if (feof(file) != 0)
+			OscFail_es(ECFG_UBOOT_ENV_NOT_FOUND);
+			
+		err = pclose(file);
+		
+		OscAssert_em(ferr != NULL || feof(file) != 0, -ECFG_UBOOT_ENV_READ_ERROR, "Error reading from command: %s", strerror(errno));
+		OscAssert_em(err != -1, -ECFG_UBOOT_ENV_READ_ERROR, "Error closing command: %s", strerror(errno));
+		
+		if (err == 1) {
+			*value = NULL;
+			OscFail_es(ECFG_UBOOT_ENV_NOT_FOUND);
+		} else if (err != 0) {
+			OscFail_em(-ECFG_UBOOT_ENV_READ_ERROR, "Error in command: %d", err);
+		}
+	}
+	
+	{
+		char * equals, * newline;
+		
+		newline = strchr(buffer, '\n');
+		OscAssert_em(newline != NULL, -ECFG_UBOOT_ENV_READ_ERROR, "No newline found.");
+		*newline = 0;
+		
+		equals = strchr(buffer, '=');
+		OscAssert_em(equals != NULL, -ECFG_UBOOT_ENV_READ_ERROR, "No equals sign found.");
+		*value = equals + 1;
+	}
+#endif
+OscFunctionEnd()
+
+OscFunction(static parseInteger, char * str, int * res)
+	char * pEnd;
+	int num = strtol(str, &pEnd, 10);
+	
+	OscAssert_m(str != pEnd, "Not a valid integer: %s", str);
+	OscAssert_m(*pEnd == 0, "Garbage at end of integer: %s", str);
+	
+	*res = num;
+OscFunctionEnd()
+
+// FIXME: This file is too long! (Written on line 1018)
