@@ -121,14 +121,15 @@ struct OscSystemInfo {
 			bool hasBayernPattern;
 			int imageWidth, imageHeight;
 		} imageSensor;
+/* Not jet implemented:
 #ifdef TARGET_TYPE_INDXCAM
 		struct {
 			bool flashable;
 		} CPLD;
-#endif
+#endif */
 	} hardware;
 	struct {
-		struct OscCfgVersion uClinux, UBoot, Oscar;
+		struct OscCfgVersion /* Not jet implemented: uClinux, UBoot, */ Oscar;
 	} software;
 };
 
