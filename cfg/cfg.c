@@ -657,7 +657,7 @@ OscFunction(OscCfgGetSystemInformation, struct OscSystemInfo ** ppInfo)
 		}
 	OscFunctionEnd()
 	
-	static struct OscSystemInfo info;
+	static struct OscSystemInfo info = { };
 	static bool inited = false;
 	
 	if (!inited) {
