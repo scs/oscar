@@ -65,12 +65,12 @@ CONF_FILE=$(readlink -f "$SCRIPT_DIR/.config")
 
 # Read the configurations set on the command line.
 while [ "$1" ]; do
-	echo "$1" | grep -qF "=" || "Unknown option: $$1"
+	echo "$1" | grep -qF "=" || fail "Unknown option: $1"
 	
 	NAME=$(echo "$1" | cut -d "=" -f 1)
 	VALUE=$(echo "$1" | cut -d "=" -f 2)
 	
-	echo "$NAME" | grep -xqF "$(echo "$CONFIGS" | tr ' ' '\n' | sed -r 's/^/CONFIG_/')" || fail "Unknown variable: $$NAME"
+	echo "$NAME" | grep -xqF "$(echo "$CONFIGS" | tr ' ' '\n' | sed -r 's/^/CONFIG_/')" || fail "Unknown variable: $NAME"
 	variable_write "$NAME" "$VALUE"
 	
 	shift
