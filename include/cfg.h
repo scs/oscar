@@ -129,7 +129,7 @@ struct OscSystemInfo {
 #endif */
 	} hardware;
 	struct {
-		struct OscCfgVersion /* Not jet implemented: uClinux, UBoot, */ Oscar;
+		struct OscCfgVersion uClinux, /* Not jet implemented: UBoot, */ Oscar;
 	} software;
 };
 

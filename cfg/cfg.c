@@ -169,6 +169,11 @@ OscFunctionDeclare(static getUBootEnv, char * key, char ** value)
 */
 OscFunctionDeclare(static parseInteger, char * str, int * res)
 
+/*!
+	@brief Get the version of the running uClinux version.
+	@param res Is set to point to the value in a static buffer.
+*/
+OscFunctionDeclare(static getUClinuxVersion, char ** res)
 
 /*! @brief The module singelton instance. */
 struct OSC_CFG cfg;
@@ -728,6 +733,10 @@ OscFunction(OscCfgGetSystemInfo, struct OscSystemInfo ** ppInfo)
 			
 			OscCall(OscGetVersionString, &version);
 			OscCall(staticStore, version, &info.software.Oscar.version);
+			OscMark();
+			OscCall(getUClinuxVersion, &version);
+			OscCall(staticStore, version, &info.software.uClinux.version);
+			OscMark();
 		}
 		
 		inited = true;
@@ -1053,6 +1062,32 @@ OscFunction(static parseInteger, char * str, int * res)
 	OscAssert_m(*pEnd == 0, "Garbage at end of integer: %s", str);
 	
 	*res = num;
+OscFunctionEnd()
+
+OscFunction(static getUClinuxVersion, char ** res)
+	static char buffer[80];
+	FILE * file = NULL;
+	
+	char * ferr, * newline;
+	int err;
+	
+	file = popen("cat /proc/version | sed -rn 's,.*Git_(.*)-svn.*,\\1,p'", "r");
+	OscAssert(file != NULL);
+	
+	ferr = fgets(buffer, sizeof buffer, file);
+	OscAssert(ferr != NULL || feof(file) != 0);
+	
+	err = pclose(file);
+	OscAssert(err == 0);
+	
+	newline = strchr(buffer, '\n');
+	OscAssert(newline != NULL);
+	*newline = 0;
+	*res = buffer;
+	
+OscFunctionCatch()
+//	pclose(file); FIXME: Shit! file's not in scope anymore!
+	*res = "v1.2-p1"; // FIXME: Do we need something more sopisticated as fallback? Maybe telling the user that we don't know, e.g. on the host?
 OscFunctionEnd()
 
 // FIXME: This file is too long! (Written on line 1018)
