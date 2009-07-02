@@ -396,6 +396,6 @@ OSC_ERR OscCfgGetBool(
 	@brief Get a pointer to static instance of struct OscSystemInfo.
 	@param ppInfo Will be set to point to the struct OscSystemInfo.
 */
-OscFunctionDeclare(OscCfgGetSystemInformation, struct OscSystemInfo ** ppInfo)		
+OscFunctionDeclare(OscCfgGetSystemInfo, struct OscSystemInfo ** ppInfo)		
 
 #endif /*CFG_PUB_H_*/

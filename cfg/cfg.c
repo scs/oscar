@@ -622,10 +622,10 @@ OSC_ERR OscCfgGetBool(
 }
 
 #ifdef TARGET_TYPE_MESA_SR4K
-#error OscCfgGetSystemInformation needs to be updated to work on the Mesa SwissRanger.
+#error OscCfgGetSystemInfo needs to be updated to work on the Mesa SwissRanger.
 #endif
 
-OscFunction(OscCfgGetSystemInformation, struct OscSystemInfo ** ppInfo)
+OscFunction(OscCfgGetSystemInfo, struct OscSystemInfo ** ppInfo)
 	OscFunction(staticStore, char * str, char ** staticStr)
 		static char buffer[1024];
 		static char * pNext = buffer;
