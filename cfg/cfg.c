@@ -733,10 +733,9 @@ OscFunction(OscCfgGetSystemInfo, struct OscSystemInfo ** ppInfo)
 			
 			OscCall(OscGetVersionString, &version);
 			OscCall(staticStore, version, &info.software.Oscar.version);
-			OscMark();
+			
 			OscCall(getUClinuxVersion, &version);
 			OscCall(staticStore, version, &info.software.uClinux.version);
-			OscMark();
 		}
 		
 		inited = true;
