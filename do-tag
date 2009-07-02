@@ -72,6 +72,7 @@ update_files() {
 	sed -ri -e "s/(OSC_VERSION_MAJOR[\t ]+)[0-9]+/\1$VERSION_MAJOR/" "$VERSION_FILE"
 	sed -ri -e "s/(OSC_VERSION_MINOR[\t ]+)[0-9]+/\1$VERSION_MINOR/" "$VERSION_FILE"
 	sed -ri -e "s/(OSC_VERSION_PATCH[\t ]+)[0-9]+/\1$VERSION_PATCH/" "$VERSION_FILE"
+	sed -ri -e "s/(OSC_VERSION_RC[\t ]+)[0-9]+/\1$VERSION_RC/" "$VERSION_FILE"
 	
 	echo "$VERSION_FILE"
 }
