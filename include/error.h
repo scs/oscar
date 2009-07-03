@@ -36,7 +36,8 @@
 			.caught = false, \
 			.stage = 0 \
 		}; \
-	_osc_internal_top_: __attribute__ ((unused)) \
+	goto _osc_internal_top_; \
+	_osc_internal_top_: \
 		if (({ \
 			bool res = _osc_internal_state_.stage < 1; \
 			if (res) \

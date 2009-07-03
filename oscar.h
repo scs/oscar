@@ -25,7 +25,7 @@
 #include <string.h>
 #include "include/oscar.h"
 
-// FIXME: What does this do?
+/*! Rounding behaviour of host emulation of dspl module. */
 #define RND_MOD_Unbiased
 /*#define RND_MOD_Biased*/
 		
