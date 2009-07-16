@@ -18,7 +18,7 @@
 
 #include "jpg.h"
 
-struct OscModule OscModule_Jpg = {
+struct OscModule OscModule_jpg = {
 	.dependencies = {
 		&OscModule_log,
 		NULL // To end the flexible array.
