@@ -25,6 +25,30 @@
 
 #include "vis.h"
 
+
+OSC_ERR OscVisFastDebayerBGR(const struct OSC_PICTURE *pRaw, struct OSC_PICTURE *pOut) 
+{
+	uint16 x,y;
+	uint32 outPos = 0;
+	char *in  = (char *)pRaw->data;
+	char *out = (char *)pOut->data;
+
+	for (y=0; y<pRaw->height; y+=2) {
+		for (x=0; x<pRaw->width; x+=2) {
+			/* Blue */
+			out[outPos++]=in[y*pRaw->width+x];			
+			/* Green */
+			out[outPos++]=in[y*pRaw->width+x+1];
+			/* Red */
+			out[outPos++]=in[(y+1)*pRaw->width+x+1];
+		} /* for x */
+	} /* for y */
+	pOut->width  = pRaw->width/2;
+	pOut->height = pRaw->height/2; 
+	pOut->type  = OSC_PICTURE_BGR_24;
+	return 0;
+}
+
 OSC_ERR OscVisFastDebayerRGB(const struct OSC_PICTURE *pRaw, struct OSC_PICTURE *pOut) 
 {
 	uint16 x,y;

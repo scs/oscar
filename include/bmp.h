@@ -47,7 +47,8 @@ enum EnOscPictureType {
 	OSC_PICTURE_CHROM_V,
 	OSC_PICTURE_HUE,
 	OSC_PICTURE_BGR_24,
-	OSC_PICTURE_RGB_24
+	OSC_PICTURE_RGB_24,
+	OSC_PICTURE_BINARY
 };
 
 /*! @brief Structure representing an 8-bit picture */
