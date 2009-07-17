@@ -219,6 +219,21 @@ OSC_ERR OscVisDebayerSpot(uint8 const * const pRaw, uint16 const width, uint16 c
  * @return SUCCESS or an appropriate error code.
  *//*********************************************************************/
 OSC_ERR OscVisFastDebayerRGB(const struct OSC_PICTURE *pRaw, struct OSC_PICTURE *pOut);
+
+/*********************************************************************//*!
+ * @brief Convert a raw image captured by a camera sensor with bayer
+ * filter to an BGR output image.
+ * 
+ * Very simple debayering. Makes one colour pixel out of 4 bayered pixels
+ * This means that the resulting image is only width/2 by height/2 pixels
+ * Image size is reduced by a factor of 4!
+ * This needs about 6ms for a full 752x480 frame on leanXcam
+ * The image is returned in BGR24 Format
+ * 
+ * @param pRaw Pointer to an OSC_PICTURE structure which contains the raw input picture of size width x height.
+ * @param pOut Pointer to the result OSC_PICTURE structure of size (width/2) x (height/2).
+ * @return SUCCESS or an appropriate error code.
+ *//*********************************************************************/
 OSC_ERR OscVisFastDebayerBGR(const struct OSC_PICTURE *pRaw, struct OSC_PICTURE *pOut);
 
 /*********************************************************************//*!
@@ -493,21 +508,21 @@ OSC_ERR OscVisDrawCentroidMarkers(struct OSC_PICTURE *picIn, struct OSC_VIS_REGI
 OSC_ERR OscVisDrawBoundingBox(struct OSC_PICTURE *picIn, struct OSC_VIS_REGIONS *regions);
 
 /*********************************************************************//*!
- * @brief RGB to Grayscale Conversion * 
+ * @brief BGR to Grayscale Conversion * 
  * 
- * This function converts a RGB color image to a grayscale image using the same R,G,B pixel scalars
+ * This function converts a BGR color image to a grayscale image using the same R,G,B pixel scalars
  * used in MATLAB.
  * 
  * @param picIn Pointer to the input color picture struct (type must be OSC_PICTURE_BGR).
  * @param picOut Pointer to the output picture struct. (type will be OSC_PICTURE_GREYSCALE).
  * @return SUCCESS or an appropriate error code.
  *//*********************************************************************/
-OSC_ERR OscVisRGB2Gray(struct OSC_PICTURE *picIn, struct OSC_PICTURE *picOut);
+OSC_ERR OscVisBGR2Grey(struct OSC_PICTURE *picIn, struct OSC_PICTURE *picOut);
 
 /*********************************************************************//*!
- * @brief Grayscale to Binary Conversion * 
+ * @brief Greyscale to Binary Conversion * 
  * 
- * This function converts a grayscale image to a 'binary' image. In fact, the pixel values still are of type uint8,
+ * This function converts a greyscale image to a 'binary' image. In fact, the pixel values still are of type uint8,
  * but only values of 0 (background) resp. 1 (foreground) are generated.
  * 
  * @param picIn Pointer to the input color picture struct (type must be OSC_PICTURE_GREYSCALE).
@@ -516,12 +531,12 @@ OSC_ERR OscVisRGB2Gray(struct OSC_PICTURE *picIn, struct OSC_PICTURE *picOut);
  * @param bDarkIsForeground Flag to enable detection of dark foreground objects on a bright background.
  * @return SUCCESS or an appropriate error code.
  *//*********************************************************************/
-OSC_ERR OscVisGray2BW(struct OSC_PICTURE *picIn, struct OSC_PICTURE *picOut, uint8 threshold, bool bDarkIsForeground);
+OSC_ERR OscVisGrey2BW(struct OSC_PICTURE *picIn, struct OSC_PICTURE *picOut, uint8 threshold, bool bDarkIsForeground);
 
 /*********************************************************************//*!
- * @brief Grayscale to Binary Conversion * 
+ * @brief BGR to Binary Conversion * 
  * 
- * This function converts  a RGB color image directly to a 'binary' image using a MATLAB style RGB-to-grayscale conversion first
+ * This function converts  a BGR color image directly to a 'binary' image using a MATLAB style RGB-to-grayscale conversion first
  * before the brightness thresholding.
  * 
  * @param picIn Pointer to the input color picture struct (type must be OSC_PICTURE_BGR).
@@ -530,7 +545,7 @@ OSC_ERR OscVisGray2BW(struct OSC_PICTURE *picIn, struct OSC_PICTURE *picOut, uin
  * @param bDarkIsForeground Flag to enable detection of dark foreground objects on a bright background.
  * @return SUCCESS or an appropriate error code.
  *//*********************************************************************/
-OSC_ERR OscVisRGB2BW(struct OSC_PICTURE *picIn, struct OSC_PICTURE *picOut, uint8 threshold, bool bDarkIsForeground);
+OSC_ERR OscVisBGR2BW(struct OSC_PICTURE *picIn, struct OSC_PICTURE *picOut, uint8 threshold, bool bDarkIsForeground);
 
 
 

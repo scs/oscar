@@ -29,7 +29,7 @@
 
 
 
-OSC_ERR OscVisRGB2Gray(struct OSC_PICTURE *picIn, struct OSC_PICTURE *picOut)
+OSC_ERR OscVisBGR2Grey(struct OSC_PICTURE *picIn, struct OSC_PICTURE *picOut)
 {
 
 	uint32 outPos = 0;
@@ -76,7 +76,7 @@ OSC_ERR OscVisRGB2Gray(struct OSC_PICTURE *picIn, struct OSC_PICTURE *picOut)
 
 
 
-OSC_ERR OscVisGray2BW(struct OSC_PICTURE *picIn, struct OSC_PICTURE *picOut, uint8 threshold, bool bDarkIsForeground)
+OSC_ERR OscVisGrey2BW(struct OSC_PICTURE *picIn, struct OSC_PICTURE *picOut, uint8 threshold, bool bDarkIsForeground)
 {	
 	uint8 foregroundValue, backgroundValue;
 	
@@ -130,7 +130,7 @@ OSC_ERR OscVisGray2BW(struct OSC_PICTURE *picIn, struct OSC_PICTURE *picOut, uin
 	return SUCCESS;
 }
 
-OSC_ERR OscVisRGB2BW(struct OSC_PICTURE *picIn, struct OSC_PICTURE *picOut, uint8 threshold, bool bDarkIsForeground)
+OSC_ERR OscVisBGR2BW(struct OSC_PICTURE *picIn, struct OSC_PICTURE *picOut, uint8 threshold, bool bDarkIsForeground)
 {
 	uint8 *pImgIn = (uint8*)picIn->data;
 	uint8 *pBWImgOut = (uint8*)picOut->data;
