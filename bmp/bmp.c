@@ -349,7 +349,7 @@ OSC_ERR OscBmpRead(struct OSC_PICTURE *pPic, const char *strFileName)
 	pData = (uint8*)pPic->data;
 	for(row = 0; row < pPic->height; row++)
 	{
-		fread(&pData[row*pPic->width*colorDepth/8], colorDepth/8,
+		fread(&pData[row*pPic->width*colorDepth/8], 1,
 			rowLen, pPicFile);
 	}
 	
