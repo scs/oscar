@@ -23,7 +23,9 @@
 #ifndef __MT9V032_H__
 #define __MT9V032_H__
 
-#include <linux/ioctl.h>
+#ifdef OSC_TARGET
+#  include <linux/ioctl.h>
+#endif
 
 /*! @brief Maximum number of frame buffers in the driver. */
 #define MAX_NR_FRAME_BUFFERS 8

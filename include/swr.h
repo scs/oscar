@@ -15,6 +15,8 @@
 	along with this library; if not, write to the Free Software Foundation,
 	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
+#ifndef OSCAR_INCLUDE_SWR_H_
+#define OSCAR_INCLUDE_SWR_H_
 
 /*! @file
  * @brief API definition for stimuli writer module
@@ -37,8 +39,7 @@
  *   @ tab {time} tab  {val}          tab  {val}         (instruction line)
  */
 
-#ifndef SWR_PUB_H_
-#define SWR_PUB_H_
+extern struct OscModule OscModule_swr;
 
 /*! Module-specific error codes.
  * These are enumerated with the offset
@@ -58,22 +59,6 @@ enum EnOscSwrSignalType
 };
 
 /*====================== API functions =================================*/
-
-/*********************************************************************//*!
- * @brief Constructor
- * 
- * @param hFw Pointer to the handle of the framework.
- * @return SUCCESS or an appropriate error code otherwise
- *//*********************************************************************/
-OSC_ERR OscSwrCreate(void *hFw);
-
-/*********************************************************************//*!
- * @brief Destructor
- * 
- * @param hFw Pointer to the handle of the framework.
- *//*********************************************************************/
-void OscSwrDestroy(void *hFw);
-
 /*********************************************************************//*!
  * @brief Create Stimuli Writer (host only)
  * 
@@ -130,5 +115,4 @@ OSC_ERR OscSwrUpdateSignal(
  *//*********************************************************************/
 OSC_ERR OscSwrManualReport( const void* pWriter);
 
-
-#endif /*SWR_PUB_H_*/
+#endif // #ifndef OSCAR_INCLUDE_SWR_H_

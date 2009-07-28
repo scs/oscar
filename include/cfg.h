@@ -60,6 +60,8 @@
 #ifndef CFG_PUB_H_
 #define CFG_PUB_H_
 
+extern struct OscModule OscModule_cfg;
+
 /*! @brief Module-specific error codes.
  * 
  * These are enumerated with the offset
@@ -77,7 +79,9 @@ enum EnOscCfgErrors {
 	ECFG_UNABLE_TO_WRITE_FILE,
 	ECFG_UNABLE_TO_READ_FILE,
 	ECFG_USED_DEFAULT,
-	ECFG_ERROR
+	ECFG_ERROR,
+	ECFG_UBOOT_ENV_READ_ERROR,
+	ECFG_UBOOT_ENV_NOT_FOUND
 };
 /*! @brief Macro defining the maximal value string size*/
 #define CONFIG_VAL_MAX_SIZE 1024
@@ -96,22 +100,40 @@ struct CFG_VAL_STR {
 	char str[CONFIG_VAL_MAX_SIZE];
 };
 
+/*! @brief Structure for generic package version informations. */
+struct OscCfgVersion {
+	int major, minor, patch, rc;
+	char * version;
+};
+
+struct OscSystemInfo {
+	struct {
+		struct {
+			enum {
+				OscSystemInfo_boardType_leanXcam,
+				OscSystemInfo_boardType_indXcam,
+				OscSystemInfo_boardType_mesaSR4K,
+			} boardType;
+			int major, minor;
+			char * assembly, * revision;
+		} board;
+		struct {
+			bool hasBayernPattern;
+			int imageWidth, imageHeight;
+		} imageSensor;
+/* Not jet implemented:
+#ifdef TARGET_TYPE_INDXCAM
+		struct {
+			bool flashable;
+		} CPLD;
+#endif */
+	} hardware;
+	struct {
+		struct OscCfgVersion uClinux, /* Not jet implemented: UBoot, */ Oscar;
+	} software;
+};
+
 /*====================== API functions =================================*/
-
-/*********************************************************************//*!
- * @brief Constructor
- * 
- * @param hFw Pointer to the handle of the framework.
- * @return SUCCESS or an appropriate error code otherwise
- *//*********************************************************************/
-OSC_ERR OscCfgCreate(void *hFw);
-
-/*********************************************************************//*!
- * @brief Destructor
- * 
- * @param hFw Pointer to the handle of the framework.
- *//*********************************************************************/
-void OscCfgDestroy(void *hFw);
 
 /*********************************************************************//*!
  * @brief Opens a new file and reads its content to the file content structure
@@ -368,6 +390,12 @@ OSC_ERR OscCfgGetBool(
 		const CFG_FILE_CONTENT_HANDLE hFileContent,
 		const struct CFG_KEY *pKey,
 		bool *iVal,
-		const bool def);		
+		const bool def);
+
+/*!
+	@brief Get a pointer to static instance of struct OscSystemInfo.
+	@param ppInfo Will be set to point to the struct OscSystemInfo.
+*/
+OscFunctionDeclare(OscCfgGetSystemInfo, struct OscSystemInfo ** ppInfo)		
 
 #endif /*CFG_PUB_H_*/

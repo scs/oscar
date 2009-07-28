@@ -23,6 +23,8 @@
 #ifndef DSPL_PUB_H_
 #define DSPL_PUB_H_
 
+extern struct OscModule OscModule_dspl;
+
 #ifdef OSC_TARGET
 /* Include the header files of the DSP runtime library
  * (part of the toolchain)*/
@@ -45,21 +47,6 @@ typedef struct complex_fract16 {
 #endif /* OSC_HOST */
 
 /*=========================== API functions ============================*/
-
-/*********************************************************************//*!
- * @brief Constructor
- * 
- * @param hFw Pointer to the handle of the framework.
- * @return SUCCESS or an appropriate error code otherwise
- *//*********************************************************************/
-OSC_ERR OscDsplCreate(void *hFw);
-
-/*********************************************************************//*!
- * @brief Destructor
- * 
- * @param hFw Pointer to the handle of the framework.
- *//*********************************************************************/
-void OscDsplDestroy(void *hFw);
 
 /*********************************************************************//*!
  * @brief Convert fract16 to float.

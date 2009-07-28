@@ -23,6 +23,8 @@
 #ifndef HSM_PUB_H_
 #define HSM_PUB_H_
 
+extern struct OscModule OscModule_hsm;
+
 /*! Module-specific error codes.
  * These are enumerated with the offset
  * assigned to each module, so a distinction over
@@ -135,26 +137,6 @@ void HsmOnStart(Hsm *me);
  * @param msg       Pointer to message
  *//*********************************************************************/
 void HsmOnEvent(Hsm *me, Msg const *msg);
-
-
-
-/*====================== API functions =================================*/
-
-/*********************************************************************//*!
- * @brief Constructor
- * 
- * @param hFw Pointer to the handle of the framework.
- * @return SUCCESS or an appropriate error code otherwise
- *//*********************************************************************/
-OSC_ERR OscHsmCreate(void *hFw);
-
-/*********************************************************************//*!
- * @brief Destructor
- * 
- * @param hFw Pointer to the handle of the framework.
- *//*********************************************************************/
-void OscHsmDestroy(void *hFw);
-
 
 
 #endif /*HSM_PUB_H_*/

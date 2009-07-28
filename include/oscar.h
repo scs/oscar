@@ -32,167 +32,32 @@ extern "C" {
 /* Support file for the NIH design pattern. */
 #include "nih.h"
 #include "version.h"
+#include "error.h"
+#include "pool.h"
+#include "list.h"
+#include "support.h"
 
-#if defined(OSC_HOST)
-/* Defined as stumps because it is needed in code shared by target and
- * host. */
-/*! @brief Used to mark likely expressions for compiler optimization */
-#define likely(x) (x)
-/*! @brief Used to mark unlikely expressions for compiler optimization */
-#define unlikely(x) (x)
-#elif defined(OSC_TARGET)
-/* Bluntly copied from linux/compiler.h from uclinux */
-/*! @brief Used to mark likely expressions for compiler optimization */
-#define likely(x) __builtin_expect(!!(x), 1)
-/*! @brief Used to mark unlikely expressions for compiler optimization */
-#define unlikely(x) __builtin_expect(!!(x), 0)
-#else
-#error "Neither OSC_HOST nor OSC_TARGET is defined as a macro."
-#endif
-
-/*! @brief Represents the color depth of a picture */
-enum EnOscPictureType {
-	OSC_PICTURE_GREYSCALE,
-	OSC_PICTURE_YUV_444,
-	OSC_PICTURE_YUV_422,
-	OSC_PICTURE_YUV_420,
-	OSC_PICTURE_YUV_400,
-	OSC_PICTURE_CHROM_U,
-	OSC_PICTURE_CHROM_V,
-	OSC_PICTURE_HUE,
-	OSC_PICTURE_BGR_24,
-	OSC_PICTURE_RGB_24
+/*! @brief Describes an OSC module and keeps track of how many users
+ * hold references to it. */
+struct OscModule {
+	OSC_ERR (* create) ();
+	OSC_ERR (* destroy) ();
+	char * name;
+	int useCount;
+	struct OscModule * dependencies[];
 };
 
-/*! @brief Structure representing an 8-bit picture */
-struct OSC_PICTURE {
-	void * data;                /*!< @brief The actual image data */
-	unsigned short width;       /*!< @brief Width of the picture */
-	unsigned short height;      /*!< @brief Height of the picture */
-	enum EnOscPictureType type; /*!< @brief The type of the picture */
-};
+/*! @brief Constructor for framework
+	@param modules A list of modules to load as defined in enum OscModule.
+	@return SUCCESS or appropriate error code otherwise.
+*/
+#define OscCreate(modules ...) \
+	({ \
+		static struct OscModule * _modules[] = { modules, NULL }; \
+		OscCreateFunction(_modules); \
+	})
 
-/*! @brief The order in which the colored pixels of a bayer pattern
- * appear in a row.
- * 
- * The colors are abbreviated as follows:
- * - G: Green
- * - R: Red
- * - B: Blue
- * 
- * The enum is constructed from two bools; one saying whether the first
- * pixel in the row is green and the other whether it is a red or blue
- * row.
- *          firstGreen      firstOther
- * red          11              01
- * blue         10              00
- * */
-enum EnBayerOrder {
-	ROW_BGBG = 0,
-	ROW_RGRG = 1,
-	ROW_GBGB = 2,
-	ROW_GRGR = 3
-};
-
-/*! @brief Define general non-module-specific
- * error codes for the OSC framework */
-enum EnOscErrors {
-	SUCCESS = 0,
-	EOUT_OF_MEMORY,
-	ETIMEOUT,
-	EUNABLE_TO_OPEN_FILE,
-	EINVALID_PARAMETER,
-	EDEVICE,
-	ENOTHING_TO_ABORT,
-	EDEVICE_BUSY,
-	ECANNOT_DELETE,
-	EBUFFER_TOO_SMALL,
-	EFILE_ERROR,
-	ECANNOT_UNLOAD,
-	ENR_OF_INSTANCES_EXHAUSTED,
-	EFILE_PARSING_ERROR,
-	EALREADY_INITIALIZED,
-	ENO_SUCH_DEVICE,
-	EUNABLE_TO_READ,
-	ETRY_AGAIN,
-	EINTERRUPTED,
-	EUNSUPPORTED
-};
-
-/* Define an offset for all modules, which allows it to define module-specific errors that do not overlap. */
-/*! @brief Error identifier offset of the cam module. */
-#define OSC_CAM_ERROR_OFFSET 100
-/*! @brief Error identifier offset of the cpld module. */
-#define OSC_CPLD_ERROR_OFFSET 200
-/*! @brief Error identifier offset of the lgx module. */
-#define OSC_LGX_ERROR_OFFSET 300
-/*! @brief Error identifier offset of the log module. */
-#define OSC_LOG_ERROR_OFFSET 400
-/*! @brief Error identifier offset of the sim module. */
-#define OSC_SIM_ERROR_OFFSET 500
-/*! @brief Error identifier offset of the bmp module. */
-#define OSC_BMP_ERROR_OFFSET 600
-/*! @brief Error identifier offset of the swr module. */
-#define OSC_SWR_ERROR_OFFSET 700
-/*! @brief Error identifier offset of the srd module. */
-#define OSC_SRD_ERROR_OFFSET 800
-/*! @brief Error identifier offset of the ipc module. */
-#define OSC_IPC_ERROR_OFFSET 900
-/*! @brief Error identifier offset of the frd module. */
-#define OSC_FRD_ERROR_OFFSET 1000
-/*! @brief Error identifier offset of the dma module. */
-#define OSC_DMA_ERROR_OFFSET 1100
-/*! @brief Error identifier offset of the hsm module. */
-#define OSC_HSM_ERROR_OFFSET 1200
-/*! @brief Error identifier offset of the cfg module. */
-#define OSC_CFG_ERROR_OFFSET 1300
-/*! @brief Error identifier offset of the clb module. */
-#define OSC_CLB_ERROR_OFFSET 1400
-
-/*! @brief Describes a module dependency of a module and all necessary information to load and unload that module. */
-struct OSC_DEPENDENCY
-{
-	/*! @brief The name of the dependency. */
-	char strName[24];
-	/*! @brief The constructor of the dependency. */
-	OSC_ERR (*create)(void *);
-	/*! @brief The destructor of the dependency. */
-	void (*destroy)(void *);
-};
-
-/*********************************************************************//*!
- * @brief Loads the module depencies give in a list of modules.
- * 
- * Goes through the given dependency array and tries to create all
- * member modules. If it fails at some point, destroy the dependencies
- * already created and return with an error code.
- * 
- * @param pFw Pointer to the framework
- * @param aryDeps Array of Dependencies to be loaded.
- * @param nDeps Length of the dependency array.
- * @return SUCCESS or an appropriate error code.
- *//*********************************************************************/
-OSC_ERR OscLoadDependencies(void *pFw, const struct OSC_DEPENDENCY aryDeps[], const uint32 nDeps);
-
-/*********************************************************************//*!
- * @brief Unloads the module depencies give in a list of modules.
- * 
- * Goes through the given dependency array backwards and destroys
- * all members.
- * 
- * @param pFw Pointer to the framework
- * @param aryDeps Array of Dependencies to be unloaded.
- * @param nDeps Length of the dependency array.
- *//*********************************************************************/
-void OscUnloadDependencies(void *pFw, const struct OSC_DEPENDENCY aryDeps[], const uint32 nDeps);
-
-/*********************************************************************//*!
- * @brief Constructor for framework
- * 
- * @param phFw Pointer to the handle location for the framework
- * @return SUCCESS or appropriate error code otherwise
- *//*********************************************************************/
-OSC_ERR OscCreate(void ** phFw);
+OSC_ERR OscCreateFunction(struct OscModule ** modules);
 
 /*********************************************************************//*!
  * @brief Destructor for framework
@@ -202,7 +67,7 @@ OSC_ERR OscCreate(void ** phFw);
  * @param hFw Pointer to the handle of the framework to be destroyed.
  * @return SUCCESS or an appropriate error code.
  *//*********************************************************************/
-OSC_ERR OscDestroy(void *hFw);
+OSC_ERR OscDestroy();
 
 /*********************************************************************//*!
  * @brief Get framework version numbers
@@ -224,15 +89,15 @@ OSC_ERR OscGetVersionNumber(char *hMajor, char *hMinor, char *hPatch);
 /*********************************************************************//*!
  * @brief Get framework version string
  * 
- * Version string format: v<major>.<minor>[-p<patch>]  eg: v1.3  or v1.3-p1
+ * Version string format: v<major>.<minor>[-p<patch>][-RC<patch>]  eg: v1.3  or v1.3-p1
  * The patch number is not printed if no bug-fixes are available (patch=0).
  *  
  * See @see OscGetVersionNumber for number interpretation.
  * 
- * @param hMajor Pointer to formated version string.
+ * @param pVersion Pointer to formated version string.
  * @return SUCCESS or an appropriate error code.
  *//*********************************************************************/
-OSC_ERR OscGetVersionString(char *hVersion);
+OscFunctionDeclare(OscGetVersionString, char ** pVersion)
 
 /* Include the public header files of the different modules, which
  * contain the declarations of the API functions of the respective

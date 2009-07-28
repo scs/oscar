@@ -45,7 +45,7 @@
 #define FR32_SCALE ((float) 0x80000000)
 
 /*! @brief The object struct of the camera module */
-struct OSC_DSPL { };
+struct OSC_DSPL { void * dummy; };
 
 /*********************************************************************//*!
  * @brief Rearrange real data array in bit reverse order

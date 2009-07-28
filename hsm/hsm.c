@@ -26,71 +26,13 @@
 
 #include "oscar.h"
 
-/*!@brief object struct */
-struct { } hsm; /*!< Module singelton instance */
-
-/*! The dependencies of this module. */
-struct OSC_DEPENDENCY hsm_deps[] = {
-		{"log", OscLogCreate, OscLogDestroy}
+struct OscModule OscModule_hsm = {
+	.name = "hsm",
+	.dependencies = {
+		&OscModule_log,
+		NULL // To end the flexible array.
+	}
 };
-
-OSC_ERR OscHsmCreate(void *hFw)
-{
-	struct OSC_FRAMEWORK *pFw;
-	OSC_ERR err;
-
-	pFw = (struct OSC_FRAMEWORK *)hFw;
-	if(pFw->hsm.useCnt != 0)
-	{
-		pFw->hsm.useCnt++;
-		/* The module is already allocated */
-		return SUCCESS;
-	}
-
-	/* Load the module hsm_deps of this module. */
-	err = OscLoadDependencies(pFw,
-			hsm_deps,
-			sizeof(hsm_deps)/sizeof(struct OSC_DEPENDENCY));
-	
-	if(err != SUCCESS)
-	{
-		printf("%s: ERROR: Unable to load hsm_deps! (%d)\n",
-				__func__,
-				err);
-		return err;
-	}
-	
-	memset(&hsm, 0, sizeof hsm);
-	
-	
-	/* Increment the use count */
-	pFw->hsm.hHandle = (void*)&hsm;
-	pFw->hsm.useCnt++;
-	
-	return SUCCESS;
-}
-
-void OscHsmDestroy(void *hFw)
-{
-	struct OSC_FRAMEWORK *pFw;
-		
-	pFw = (struct OSC_FRAMEWORK *)hFw;
-	/* Check if we really need to release or whether we still
-	 * have users. */
-	pFw->hsm.useCnt--;
-	if(pFw->hsm.useCnt > 0)
-	{
-		return;
-	}
-	
-	OscUnloadDependencies(pFw,
-			hsm_deps,
-			sizeof(hsm_deps)/sizeof(struct OSC_DEPENDENCY));
-	
-	
-	memset(&hsm, 0, sizeof hsm);
-}
-
 
 static Msg const startMsg = { START_EVT };
 static Msg const entryMsg = { ENTRY_EVT };

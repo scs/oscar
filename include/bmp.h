@@ -22,6 +22,8 @@
  */
 #ifndef BMP_PUB_H_
 #define BMP_PUB_H_
+
+extern struct OscModule OscModule_bmp;
 		
 /*! @brief Module-specific error codes.
  * 
@@ -34,22 +36,30 @@ enum EnOscBmpErrors {
 	EUNABLE_TO_VERIFY_IMAGE_FORMAT
 };
 
+/*! @brief Represents the color depth of a picture */
+enum EnOscPictureType {
+	OSC_PICTURE_GREYSCALE,
+	OSC_PICTURE_YUV_444,
+	OSC_PICTURE_YUV_422,
+	OSC_PICTURE_YUV_420,
+	OSC_PICTURE_YUV_400,
+	OSC_PICTURE_CHROM_U,
+	OSC_PICTURE_CHROM_V,
+	OSC_PICTURE_HUE,
+	OSC_PICTURE_BGR_24,
+	OSC_PICTURE_RGB_24,
+	OSC_PICTURE_BINARY
+};
+
+/*! @brief Structure representing an 8-bit picture */
+struct OSC_PICTURE {
+	void * data;                /*!< @brief The actual image data */
+	unsigned short width;       /*!< @brief Width of the picture */
+	unsigned short height;      /*!< @brief Height of the picture */
+	enum EnOscPictureType type; /*!< @brief The type of the picture */
+};
+
 /*====================== API functions =================================*/
-
-/*********************************************************************//*!
- * @brief Constructor
- * 
- * @param hFw Pointer to the handle of the framework.
- * @return SUCCESS or an appropriate error code otherwise
- *//*********************************************************************/
-OSC_ERR OscBmpCreate(void *hFw);
-
-/*********************************************************************//*!
- * @brief Destructor
- * 
- * @param hFw Pointer to the handle of the framework.
- *//*********************************************************************/
-void OscBmpDestroy(void *hFw);
 
 /*********************************************************************//*!
  * @brief Read the contents of a BMP image

@@ -23,6 +23,8 @@
 #ifndef CAM_PUB_H_
 #define CAM_PUB_H_
 
+extern struct OscModule OscModule_cam;
+
 /*! Module-specific error codes.
  * These are enumerated with the offset
  * assigned to each module, so a distinction over
@@ -70,24 +72,29 @@ enum EnOscCamPerspective
  * sensor. */
 #define OSC_CAM_MAX_IMAGE_HEIGHT 480
 
+/*! @brief The order in which the colored pixels of a bayer pattern
+ * appear in a row.
+ * 
+ * The colors are abbreviated as follows:
+ * - G: Green
+ * - R: Red
+ * - B: Blue
+ * 
+ * The enum is constructed from two bools; one saying whether the first
+ * pixel in the row is green and the other whether it is a red or blue
+ * row.
+ *          firstGreen      firstOther
+ * red          11              01
+ * blue         10              00
+ * */
+enum EnBayerOrder {
+	ROW_BGBG = 0,
+	ROW_RGRG = 1,
+	ROW_GBGB = 2,
+	ROW_GRGR = 3
+};
+
 /*========================== API functions =============================*/
-
-/*********************************************************************//*!
- * @brief Constructor
- * 
- * Initialize the member variables and set everything up for later.
- * 
- * @param hFw Pointer to the handle of the framework.
- * @return SUCCESS or an appropriate error code otherwise
- *//*********************************************************************/
-OSC_ERR OscCamCreate(void *hFw);
-
-/*********************************************************************//*!
- * @brief Destructor
- * 
- * @param hFw Pointer to the handle of the framework.
- *//*********************************************************************/
-void OscCamDestroy(void *hFw);
 
 /*********************************************************************//*!
  * @brief Host only: Set the file name reader the host implementation

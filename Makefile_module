@@ -17,14 +17,14 @@
 
 # Disable make's built-in rules.
 MAKE += -RL --no-print-directory
-SHELL := $(shell which bash)
+SHELL := $(shell which bash) -e -o pipefail
 
 # This includes the framework configuration.
 ROOT_PATH := $(dir $(shell readlink $(lastword $(MAKEFILE_LIST))))
 include $(ROOT_PATH)Makefile_config
 
 # Generic flags for the C compiler.
-CFLAGS := -c -std=gnu99 -Wall -pedantic $(if $(ROOT_PATH), -I$(ROOT_PATH))
+CFLAGS := -c -std=gnu99 -Wall $(if $(ROOT_PATH), -I$(ROOT_PATH))
 
 # Host-Compiler executables and flags.
 CC_host_ := gcc $(CFLAGS) -DOSC_HOST
@@ -68,7 +68,7 @@ $(1): $(patsubst %.c, build/%_$(1).o, $(patsubst %.asm, build/%_$(1).o, $(call f
 build/%_$(1).o: %.c $(filter-out %.d, $(MAKEFILE_LIST))
 	@ mkdir -p $$(dir $$@)
 	$$(call firstvar, CC_$(1)) -MD $$< -o $$@
-	@ grep -oE '[^ \\]+' < $$(@:.o=.d) | sed -r '/:$$$$/d; s/^.*$$$$/$$(subst /, \/, $$@): \0\n\0:/' > $$(@:.o=.d~) && mv -f $$(@:.o=.d){~,}
+	@ grep -oE '[^ \\]+' < $$(@:.o=.d) | sed -r '/:$$$$/d; s|^.*$$$$|$$@: \0\n\0:|' > $$(@:.o=.d~) && mv -f $$(@:.o=.d){~,}
 build/%_$(1).o: %.asm $(filter-out %.d, $(MAKEFILE_LIST))
 	@ mkdir -p $$(dir $$@)
 	$$(call firstvar, AS_$(1)) $$< -o $$@

@@ -22,16 +22,22 @@
 
 #include "gpio.h"
 
+OSC_ERR OscGpioCreate();
+
 /*! @brief The module singelton instance. */
 struct OSC_GPIO gpio;
 
-/*! @brief The dependencies of this module. */
-struct OSC_DEPENDENCY gpio_deps[] = {
-		{"log", OscLogCreate, OscLogDestroy}
+struct OscModule OscModule_gpio = {
+	.name = "gpio",
+	.create = OscGpioCreate,
+	.dependencies = {
+		&OscModule_log,
 #if defined(OSC_HOST) || defined(OSC_SIM)
-		,{"srd", OscSrdCreate, OscSrdDestroy}
-		,{"swr", OscSwrCreate, OscSwrDestroy}
+		&OscModule_srd,
+		&OscModule_swr,
 #endif /* OSC_HOST or OSC_SIM */
+		NULL // To end the flexible array.
+	}
 };
 		
 /*! @brief The length of the dependency array of this module. */
@@ -66,33 +72,11 @@ struct GPIO_PIN_CONFIG aryPinConfig[] = {
 
 const uint16 nrOfPins = sizeof(aryPinConfig)/sizeof(aryPinConfig[0]);
 
-OSC_ERR OscGpioCreate(void *hFw)
+OSC_ERR OscGpioCreate()
 {
-	struct OSC_FRAMEWORK *pFw;
-	OSC_ERR err;
-
-	pFw = (struct OSC_FRAMEWORK *)hFw;
-	if(pFw->gpio.useCnt != 0)
-	{
-		pFw->gpio.useCnt++;
-		/* The module is already allocated */
-		return SUCCESS;
-	}
+	OSC_ERR err = SUCCESS;
 	
-	/* Load the module dependencies of this module. */
-	err = OscLoadDependencies(pFw,
-			gpio_deps,
-			DEP_LEN);
-	
-	if(err != SUCCESS)
-	{
-		printf("%s: ERROR: Unable to load dependencies! (%d)\n",
-				__func__,
-				err);
-		return err;
-	}
-	
-	memset(&gpio, 0, sizeof(struct OSC_GPIO));
+	gpio = (struct OSC_GPIO) { };
 	
 	/* Setup our pins. */
 	err = OscGpioInitPins();
@@ -102,33 +86,8 @@ OSC_ERR OscGpioCreate(void *hFw)
 					__func__, err);
 		return -EDEVICE;
 	}
-	
-	/* Increment the use count */
-	pFw->gpio.hHandle = (void*)&gpio;
-	pFw->gpio.useCnt++;
-	
-	return SUCCESS;
-}
 
-void OscGpioDestroy(void *hFw)
-{
-	struct OSC_FRAMEWORK *pFw;
-			
-	pFw = (struct OSC_FRAMEWORK *)hFw;
-	/* Check if we really need to release or whether we still
-	 * have users. */
-	pFw->gpio.useCnt--;
-	if(pFw->gpio.useCnt > 0)
-	{
-		return;
-	}
-	
-	
-	OscUnloadDependencies(pFw,
-			gpio_deps,
-			DEP_LEN);
-	
-	memset(&gpio, 0, sizeof(struct OSC_GPIO));
+	return SUCCESS;
 }
 
 #ifdef TARGET_TYPE_LEANXCAM

@@ -201,9 +201,4 @@ static uint8 aryBmpHeadGrey[] = {
 	0xfe, 0x00, 0xff, 0xff, 0xff, 0x00                  /* 134 */
 };
 
-/*! @brief Object struct of the bitmap module */
-struct OSC_BMP {
-	uint32      bmp_dummy;  /*!< @brief dummy member */
-};
-
 #endif /*BMP_PRIV_H_*/

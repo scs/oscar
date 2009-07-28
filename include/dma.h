@@ -23,6 +23,8 @@
 #ifndef DMA_PUB_H_
 #define DMA_PUB_H_
 
+extern struct OscModule OscModule_dma;
+
 /*! Module-specific error codes.
  * These are enumerated with the offset
  * assigned to each module, so a distinction over
@@ -43,21 +45,6 @@ enum EnDmaWdSize
 };
 
 /*=========================== API functions ============================*/
-
-/*********************************************************************//*!
- * @brief Constructor
- * 
- * @param hFw Pointer to the handle of the framework.
- * @return SUCCESS or an appropriate error code otherwise
- *//*********************************************************************/
-OSC_ERR OscDmaCreate(void *hFw);
-
-/*********************************************************************//*!
- * @brief Destructor
- * 
- * @param hFw Pointer to the handle of the framework.
- *//*********************************************************************/
-void OscDmaDestroy(void *hFw);
 
 /*********************************************************************//*!
  * @brief Allocate a new, re-usable DMA chain handle.

@@ -27,46 +27,12 @@
 
 #include "dspl.h"
 
-/*! @brief The module singelton instance. */
-struct OSC_DSPL osc_dspl;
-
-OSC_ERR OscDsplCreate(void *hFw)
-{
-	struct OSC_FRAMEWORK *pFw;
-
-	pFw = (struct OSC_FRAMEWORK *)hFw;
-	if(pFw->dspl.useCnt != 0)
-	{
-		pFw->dspl.useCnt++;
-		/* The module is already allocated */
-		return SUCCESS;
+struct OscModule OscModule_dspl = {
+	.name = "dspl",
+	.dependencies = {
+		NULL // To end the flexible array.
 	}
-		
-	memset(&osc_dspl, 0, sizeof(struct OSC_DSPL));
-		
-	/* Increment the use count */
-	pFw->dspl.hHandle = (void*)&osc_dspl;
-	pFw->dspl.useCnt++;
-
-	return SUCCESS;
-}
-
-void OscDsplDestroy(void *hFw)
-{
-	struct OSC_FRAMEWORK *pFw;
-		
-	pFw = (struct OSC_FRAMEWORK *)hFw;
-	/* Check if we really need to release or whether we still
-	 * have users. */
-	pFw->dspl.useCnt--;
-	if(pFw->dspl.useCnt > 0)
-	{
-		return;
-	}
-	
-	memset(&osc_dspl, 0, sizeof(struct OSC_DSPL));
-}
-
+};
 
 inline float OscDsplFr16ToFloat(fract16 n)
 {

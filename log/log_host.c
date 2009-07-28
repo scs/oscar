@@ -25,27 +25,32 @@
 
 #include "log.h"
 
+OSC_ERR OscLogCreate();
+OSC_ERR OscLogDestroy();
+
 /*! @brief The module singelton instance.
  * 
  * This is called osc_log
  * instead of log because log is a internal function of the C
  * library */
-struct OSC_LOG osc_log;
+struct OSC_LOG osc_log = {
+	.consoleLogLevel = NONE,
+	.fileLogLevel = NONE
+};
 
-
-OSC_ERR OscLogCreate(void *hFw)
-{
-	struct OSC_FRAMEWORK *pFw;
-
-	pFw = (struct OSC_FRAMEWORK *)hFw;
-	if(pFw->log.useCnt != 0)
-	{
-		pFw->log.useCnt++;
-		/* The module is already allocated */
-		return SUCCESS;
+struct OscModule OscModule_log = {
+	.name = "log",
+	.create = OscLogCreate,
+	.destroy = OscLogDestroy,
+	.dependencies = {
+		NULL // To end the flexible array.
 	}
-		
-	memset(&osc_log, 0, sizeof(struct OSC_LOG));
+};
+
+OSC_ERR OscLogCreate()
+{
+	osc_log = (struct OSC_LOG) { };
+	
 	/* Set log levels to defaults. */
 	osc_log.consoleLogLevel = DEFAULT_CONSOLE_LOGLEVEL;
 	osc_log.fileLogLevel = DEFAULT_FILE_LOGLEVEL;
@@ -64,44 +69,33 @@ OSC_ERR OscLogCreate(void *hFw)
 		fclose(osc_log.pLogF);
 		return -EUNABLE_TO_OPEN_FILE;
 	}
-		
-	/* Increment the use count */
-	pFw->log.hHandle = (void*)&osc_log;
-	pFw->log.useCnt++;
+	
+	return SUCCESS;
+}
+
+OSC_ERR OscLogDestroy()
+{
+	fclose(osc_log.pLogF);
+	fclose(osc_log.pSimLogF);
 
 	return SUCCESS;
 }
 
-void OscLogDestroy(void *hFw)
-{
-	struct OSC_FRAMEWORK *pFw;
-		
-	pFw = (struct OSC_FRAMEWORK *)hFw;
-	/* Check if we really need to release or whether we still
-	 * have users. */
-	pFw->log.useCnt--;
-	if(pFw->log.useCnt > 0)
-	{
-		return;
-	}
-	
-	fclose(osc_log.pLogF);
-	fclose(osc_log.pSimLogF);
-	
-	memset(&osc_log, 0, sizeof(struct OSC_LOG));
-}
-
-inline void OscLogSetConsoleLogLevel(const enum EnOscLogLevel level)
+OSC_ERR OscLogSetConsoleLogLevel(const enum EnOscLogLevel level)
 {
 	osc_log.consoleLogLevel = level;
+	
+	return SUCCESS;
 }
 
-inline void OscLogSetFileLogLevel(const enum EnOscLogLevel level)
+OSC_ERR OscLogSetFileLogLevel(const enum EnOscLogLevel level)
 {
 	osc_log.fileLogLevel = level;
+	
+	return SUCCESS;
 }
 
-void OscLog(const enum EnOscLogLevel level, const char * strFormat, ...)
+OSC_ERR OscLog(const enum EnOscLogLevel level, const char * strFormat, ...)
 {
 	va_list ap;         /*< The dynamic argument list */
 		
@@ -138,9 +132,11 @@ void OscLog(const enum EnOscLogLevel level, const char * strFormat, ...)
 		vfprintf(osc_log.pSimLogF, strFormat, ap);
 		va_end(ap);
 	}
+	
+	return SUCCESS;
 }
 
-void OscFatalErr(const char * strFormat, ...)
+OSC_ERR OscFatalErr(const char * strFormat, ...)
 {
 	uint16 len = 0;
 	va_list ap; /*< The dynamic argument list */
@@ -163,8 +159,7 @@ void OscFatalErr(const char * strFormat, ...)
 
 	/* Write the message to the syslog daemon. */
 	syslog(EMERG, osc_log.strTemp);
-
+	
+	// FIXME: WTF is it the business of the logging module to terminate the application!?
 	exit(1);
 }
-
-

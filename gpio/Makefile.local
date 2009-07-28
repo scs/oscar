@@ -1,0 +1,3 @@
+SOURCES_host := gpio_shared.c gpio_host.c
+SOURCES_target := gpio_shared.c gpio_target.c
+SOURCES_target_sim := gpio_shared.c gpio_host.c

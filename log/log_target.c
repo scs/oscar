@@ -23,26 +23,32 @@
 #include <syslog.h>
 #include "log.h"
 
+OSC_ERR OscLogCreate();
+OSC_ERR OscLogDestroy();
+
 /*! @brief The module singelton instance.
  * 
  * This is called osc_log
  * instead of log because log is a internal function of the C
  * library */
-struct OSC_LOG osc_log;
+struct OSC_LOG osc_log = {
+	.consoleLogLevel = NONE,
+	.fileLogLevel = NONE
+};
 
-OSC_ERR OscLogCreate(void *hFw)
-{
-	struct OSC_FRAMEWORK *pFw;
-
-	pFw = (struct OSC_FRAMEWORK *)hFw;
-	if(pFw->log.useCnt != 0)
-	{
-		pFw->log.useCnt++;
-		/* The module is already allocated */
-		return SUCCESS;
+struct OscModule OscModule_log = {
+	.name = "log",
+	.create = OscLogCreate,
+	.destroy = OscLogDestroy,
+	.dependencies = {
+		NULL // To end the flexible array.
 	}
+};
+
+OSC_ERR OscLogCreate()
+{
+	osc_log = (struct OSC_LOG) { };
 	
-	memset(&osc_log, 0, sizeof(struct OSC_LOG));
 	/* Enable all logging by default */
 	osc_log.consoleLogLevel = DEFAULT_CONSOLE_LOGLEVEL;
 	osc_log.fileLogLevel = DEFAULT_FILE_LOGLEVEL;
@@ -52,46 +58,32 @@ OSC_ERR OscLogCreate(void *hFw)
 	sprintf(osc_log.logName, LOG_NAME);
 	/* Initialize the connection to syslog */
 	openlog(osc_log.logName, 0, LOG_USER);
-	
-	/* Increment the use count */
-	pFw->log.hHandle = (void*)&osc_log;
-	pFw->log.useCnt++;
 
 	return SUCCESS;
 }
 
-void OscLogDestroy(void *hFw)
+OSC_ERR OscLogDestroy()
 {
-	struct OSC_FRAMEWORK *pFw;
-
-	pFw = (struct OSC_FRAMEWORK *)hFw;
-	/* Check if we really need to release or whether we still
-	 * have users. */
-	pFw->log.useCnt--;
-	if(pFw->log.useCnt > 0)
-	{
-		return;
-	}
-		
 	/* Close the connection to syslog */
 	closelog();
-	
-	memset(&osc_log, 0, sizeof(struct OSC_LOG));
+
+	return SUCCESS;
 }
 
-inline void OscLogSetConsoleLogLevel(const enum EnOscLogLevel level)
-{
+OSC_ERR OscLogSetConsoleLogLevel(const enum EnOscLogLevel level) {
 	osc_log.consoleLogLevel = level;
+	
+	return SUCCESS;
 }
 
-inline void OscLogSetFileLogLevel(const enum EnOscLogLevel level)
-{
+OSC_ERR OscLogSetFileLogLevel(const enum EnOscLogLevel level) {
 	osc_log.fileLogLevel = level;
+	
+	return SUCCESS;
 }
 
 
-void OscLog(const enum EnOscLogLevel level, const char * strFormat, ...)
-{
+OSC_ERR OscLog(const enum EnOscLogLevel level, const char * strFormat, ...) {
 	va_list ap; /*< The dynamic argument list */
 
 	if (level <= osc_log.consoleLogLevel)
@@ -123,11 +115,13 @@ void OscLog(const enum EnOscLogLevel level, const char * strFormat, ...)
 		if (len >= sizeof osc_log.strTemp)
 			syslog(LOG_WARNING, "The last error message has been truncated because it was too big.");
 	}
+	
+	return SUCCESS;
 }
 
-void OscFatalErr(const char * strFormat, ...)
+OSC_ERR OscFatalErr(const char * strFormat, ...)
 {
-	uint16 len;
+	uint16 len = 0;
 	va_list ap; /*< The dynamic argument list */
 
 	osc_log.strTemp[0] = 0; /* Mark the string as empty */
@@ -140,15 +134,15 @@ void OscFatalErr(const char * strFormat, ...)
 
 	/* Log to the log file*/
 
-	/* We can't use sprintf because we only have the additional
-	 * arguments as a list => use vsprintf */
+	/* We can't use sprintf because we only have the additional arguments as a list => use vsprintf */
 	va_start(ap, strFormat);
 	len += vsprintf(osc_log.strTemp, strFormat, ap);
 	va_end(ap);
 
 	/* Write the message to the syslog daemon. */
 	syslog(EMERG, osc_log.strTemp);
-
+	
+	// FIXME: WTF is it the business of the logging module to terminate the application!?
 	exit(1);
 }
 

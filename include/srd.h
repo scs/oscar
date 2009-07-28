@@ -15,6 +15,8 @@
 	along with this library; if not, write to the Free Software Foundation,
 	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
+#ifndef OSCAR_INCLUDE_SRD_H_
+#define OSCAR_INCLUDE_SRD_H_
 
 /*! @file
  * @brief API definition for stimuli reader module
@@ -40,8 +42,7 @@
  * registration to the reader.
  */
 
-#ifndef SRD_PUB_H_
-#define SRD_PUB_H_
+extern struct OscModule OscModule_srd;
 
 /*! Module-specific error codes.
  * These are enumerated with the offset
@@ -53,21 +54,6 @@ enum EnOscSrdErrors
 };
 
 /*====================== API functions =================================*/
-
-/*********************************************************************//*!
- * @brief Constructor
- * 
- * @param hFw Pointer to the handle of the framework.
- * @return SUCCESS or an appropriate error code otherwise
- *//*********************************************************************/
-OSC_ERR OscSrdCreate(void *hFw);
-
-/*********************************************************************//*!
- * @brief Destructor
- * 
- * @param hFw Pointer to the handle of the framework.
- *//*********************************************************************/
-void OscSrdDestroy(void *hFw);
 
 /*********************************************************************//*!
  * @brief Create Stimuli Reader (host only)
@@ -100,6 +86,4 @@ OSC_ERR OscSrdRegisterSignal( void* pReader, char* strSignal, void** ppSignal);
  *//*********************************************************************/
 OSC_ERR OscSrdGetUpdateSignal( void* pSignal, bool* pbValue);
 
-
-
-#endif /*SRD_PUB_H_*/
+#endif // #ifndef OSCAR_INCLUDE_SRD_H_

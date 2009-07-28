@@ -37,67 +37,7 @@ uint32 lcode = 0;
 uint16 bitindex = 0; 
 uint16  Temp [BLOCK_SIZE];
 
-
-/*! @brief The dependencies of this module. */
-struct OSC_DEPENDENCY jpg_deps[] = {
-		{"log", OscLogCreate, OscLogDestroy}
-};
-
 void (*read_format) (IMGDATA *img, JPEG_ENCODER_STRUCTURE *jpeg_encoder_structure, uint8 *input_ptr);
-
-OSC_ERR OscJpgCreate(void *hFw)
-{
-	struct OSC_FRAMEWORK *pFw;
-	OSC_ERR err;
-	
-	pFw = (struct OSC_FRAMEWORK *)hFw;
-	if(pFw->jpg.useCnt != 0)
-	{
-		pFw->jpg.useCnt++;
-		/* The module is already allocated */
-		return SUCCESS;
-	}
-	
-	/* Load the module dependencies of this module. */
-	err = OscLoadDependencies(pFw,
-			jpg_deps,
-			sizeof(jpg_deps)/sizeof(struct OSC_DEPENDENCY));
-	
-	if(err != SUCCESS)
-	{
-		printf("%s: ERROR: Unable to load dependencies! (%d)\n",
-				__func__,
-				err);
-		return err;
-	}
-	
-	/* Increment the use count */
-	pFw->bmp.hHandle = NULL;
-	pFw->bmp.useCnt++;
-	
-	return SUCCESS;
-}
-
-void OscJpgDestroy(void *hFw)
-{
-	struct OSC_FRAMEWORK *pFw;
-		
-	pFw = (struct OSC_FRAMEWORK *)hFw;
-	
-	/* Check if we really need to release or whether we still
-	 * have users. */
-	pFw->jpg.useCnt--;
-	if(pFw->jpg.useCnt > 0)
-	{
-		return;
-	}
-	
-	OscUnloadDependencies(pFw,
-			jpg_deps,
-			sizeof(jpg_deps)/sizeof(struct OSC_DEPENDENCY));
-}
-
-
 
 void initialization (JPEG_ENCODER_STRUCTURE *jpeg, uint32 image_format, uint32 image_width, uint32 image_height)
 {

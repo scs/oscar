@@ -1,0 +1,3 @@
+SOURCES_host := sim_host.c
+SOURCES_target := sim_target.c
+SOURCES_target_sim := sim_host.c

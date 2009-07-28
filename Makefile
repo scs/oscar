@@ -17,10 +17,15 @@
 
 # Disable make's built-in rules.
 MAKE += -RL --no-print-directory
-SHELL := $(shell which bash)
+SHELL := $(shell which bash) -e -o pipefail
 
-# This includes the framework configuration.
-include Makefile_config
+# Include the configuration file only if a target given on the command line requires it.
+ifneq '$(filter-out clean distclean config doc, $(or $(MAKECMDGOALS), all))' ''
+  include Makefile_config
+endif
+
+# .PHONY is broken on static pattern rules.
+.PHONY: .FORCE
 
 # Executable to create the static library
 AR_host := ar -rcs
@@ -47,35 +52,31 @@ library/libosc_%.a: oscar_% $(addsuffix /%, $(MODULES))
 $(MODULES): .FORCE
 	$(MAKE) -C $@
 
-# Call this as oscar_$(MODE) to only build them main oscar files.
-oscar_%: .FORCE needs_config
+# Call this as oscar_$(MODE) to only build the main oscar files.
+oscar_%: .FORCE
 	$(MAKE) -f Makefile_module $*
 
 # Produce a target of the form "foo/%" for every directory foo that contains a Makefile
 define subdir_target
-$(1)/%: .FORCE needs_config
+$(1)/%: .FORCE
 	$(MAKE) -C $(1) $$*
 endef
 SUBDIRS := $(sort $(patsubst %/, %, $(dir $(wildcard */Makefile))) $(MODULES))
 $(foreach i, $(SUBDIRS), $(eval $(call subdir_target, $(i))))
 
-# Routing individual object file requests directly to the compile Makefile
-%.o: needs_config .FORCE
-	$(MAKE) -f Makefile_module $@
-
-# Use this target as a prerequisite in a target that should fail if the framework has not yet been configured.
-needs_config: .FORCE;
-ifneq '$(filter-out clean config, $(or $(MAKECMDGOALS), needs_config))' ''
-	@ [ -e ".config" ] || { echo "The framework has to be configured using 'make config' first!"; false; }
-endif
+# Do not try to rebuild any of the Makefiles.
 $(sort $(MAKEFILE_LIST) .config):;
+
+# Routing individual object file requests directly to the compile Makefile
+%.o: .FORCE
+	$(MAKE) -f Makefile_module $@
 
 # Target to explicitly start the configuration process.
 config: .FORCE
 	@ ./configure
 
 # Target that gets called by the configure script after the configuration.
-reconfigure: needs_config .FORCE
+reconfigure: .FORCE
 	@ ln -sf "../boards/$(CONFIG_BOARD).h" "include/board.h"
 	@ $(MAKE) --always-make -f Makefile_config reconfigure
 
@@ -93,3 +94,9 @@ clean: %: $(addsuffix /%, $(SUBDIRS)) oscar_clean .FORCE
 distclean: clean .FORCE
 	rm -f .config
 	rm -rf lgx
+
+# This captures all warnings generated while compiling the framework and sorts them by file.
+warnings: .FORCE
+	@ echo "Gathering all warnings, this may take a minute ..." >&2
+	@ $(MAKE) clean &> /dev/null
+	@ { $(MAKE) all; $(MAKE) doc; } 2>&1 > /dev/null | sed -rn 's,^([^:]+:[0-9]+): (warning|error): (.*)$$,\1 \3,pi' | sort | uniq | tee >(wc -l | sed -rn 's|[\t ]*||g; s|$$| warnings.|p')

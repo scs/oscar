@@ -22,69 +22,28 @@
 
 #include "srd.h"
 
+OSC_ERR OscSrdCreate();
+
 struct OSC_SRD srd; /*!< Module singelton instance */
 
-/*! The dependencies of this module. */
-struct OSC_DEPENDENCY srd_deps[] = {
-		{"log", OscLogCreate, OscLogDestroy}
+struct OscModule OscModule_srd = {
+	.name = "srd",
+	.create = OscSrdCreate,
+	.dependencies = {
+		&OscModule_log,
+		NULL // To end the flexible array.
+	}
 };
 
-OSC_ERR OscSrdCreate(void *hFw)
+OSC_ERR OscSrdCreate()
 {
-	struct OSC_FRAMEWORK *pFw;
 	OSC_ERR err;
+	
+	srd = (struct OSC_SRD) { };
 
-	pFw = (struct OSC_FRAMEWORK *)hFw;
-	if(pFw->srd.useCnt != 0)
-	{
-		pFw->srd.useCnt++;
-		/* The module is already allocated */
-		return SUCCESS;
-	}
-
-	/* Load the module srd_deps of this module. */
-	err = OscLoadDependencies(pFw,
-			srd_deps,
-			sizeof(srd_deps)/sizeof(struct OSC_DEPENDENCY));
-	
-	if(err != SUCCESS)
-	{
-		printf("%s: ERROR: Unable to load srd_deps! (%d)\n",
-				__func__,
-				err);
-		return err;
-	}
-	
-	memset(&srd, 0, sizeof(struct OSC_SRD));
-	
 	OscSimRegisterCycleCallback( &OscSrdCycleCallback);
-
-	/* Increment the use count */
-	pFw->srd.hHandle = (void*)&srd;
-	pFw->srd.useCnt++;
 	
 	return SUCCESS;
-}
-
-void OscSrdDestroy(void *hFw)
-{
-	struct OSC_FRAMEWORK *pFw;
-		
-	pFw = (struct OSC_FRAMEWORK *)hFw;
-	/* Check if we really need to release or whether we still
-	 * have users. */
-	pFw->srd.useCnt--;
-	if(pFw->srd.useCnt > 0)
-	{
-		return;
-	}
-	
-	OscUnloadDependencies(pFw,
-			srd_deps,
-			sizeof(srd_deps)/sizeof(struct OSC_DEPENDENCY));
-	
-	
-	memset(&srd, 0, sizeof(struct OSC_SRD));
 }
 
 OSC_ERR OscSrdCreateReader(

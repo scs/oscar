@@ -15,6 +15,8 @@
 	along with this library; if not, write to the Free Software Foundation,
 	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
+#ifndef OSCAR_INCLUDE_SIM_H_
+#define OSCAR_INCLUDE_SIM_H_
 
 /*! @file
  * @brief API definition for simulation module
@@ -23,8 +25,7 @@
  * stump function definition.
  */
 
-#ifndef SIM_PUB_H_
-#define SIM_PUB_H_
+extern struct OscModule OscModule_sim;
 
 /*! @brief Module-specific error codes.
  * 
@@ -38,28 +39,13 @@ enum EnOscSimErrors {
 /*======================== API functions ===============================*/
 
 /*********************************************************************//*!
- * @brief Constructor
- * 
- * @param hFw Pointer to the handle of the framework.
- * @return SUCCESS or an appropriate error code otherwise
- *//*********************************************************************/
-OSC_ERR OscSimCreate(void *hFw);
-
-/*********************************************************************//*!
- * @brief Destructor
- * 
- * @param hFw Pointer to the handle of the framework.
- *//*********************************************************************/
-void OscSimDestroy(void *hFw);
-
-/*********************************************************************//*!
  * @brief Initialize simulation
  * 
  * After creation of all required modules the application has to init
  * the simulation module. Time variable is set to 0. Callbacks to
  * stimuli reader and writer are issued to applie default signal values.
  *//*********************************************************************/
-void OscSimInitialize(void);
+OSC_ERR OscSimInitialize();
 
 /*********************************************************************//*!
  * @brief Increment the simulation time step.
@@ -72,7 +58,7 @@ void OscSimInitialize(void);
  * next cycle!)
  * Target: Stump since simulation is only done on host.
  *//*********************************************************************/
-void OscSimStep();
+OSC_ERR OscSimStep();
 
 /*********************************************************************//*!
  * @brief Get the current simulation time step.
@@ -93,4 +79,4 @@ uint32 OscSimGetCurTimeStep();
  *//*********************************************************************/
 OSC_ERR OscSimRegisterCycleCallback( void (*pCallback)(void));
 
-#endif /*SIM_PUB_H_*/
+#endif // #ifndef OSCAR_INCLUDE_SIM_H_
