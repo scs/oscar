@@ -14,13 +14,10 @@ usage() { print "$USAGE"; fail "$1"; }
 # The usage message
 USAGE='Usage: do-release'
 
-[ "$1" ] && usage "No arguments required."
+[ "$1" ] && usage 'No arguments required.'
 
-make doc
-
-find . -name ".gitignore" -or -name ".cdtproject" -or -name ".project" | while IFS= read i; do
+find . -name '.gitignore' -or -name '.cdtproject' -or -name '.project' -or -name '.gitmodules' | while IFS= read i; do
 	rm -f "$i"
 done
 
-rm -f "do-release" "do-tag"
-
+rm -f 'do-release' 'do-tag'
