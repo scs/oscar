@@ -35,37 +35,27 @@ struct OscModule OscModule_cpld = {
 	}
 };
 
-// FIXME: Why do we have this module on targets other than the indXcam?
 OSC_ERR OscCpldCreate()
 {
-#ifdef TARGET_TYPE_INDXCAM
 	cpld = (struct OSC_CPLD) { };
-#else
-	OscLog(ERROR, "%s: No CPLD available on this hardware platform!\n",
-				__func__);
-	return -ENO_SUCH_DEVICE;
-#endif /* TARGET_TYPE_INDXCAM */
+	return SUCCESS;
 }
 
 OSC_ERR OscCpldRset(
 		const uint16 regId,
-		const uint8 val)
+		const uint16 val)
 {
-#ifdef TARGET_TYPE_INDXCAM
 	cpld.reg[ regId] = val;
 	return SUCCESS;
-#else
-	return -ENO_SUCH_DEVICE;
-#endif /* TARGET_TYPE_INDXCAM */
 }
+
 
 OSC_ERR OscCpldFset(
 		uint16 regId,
-		uint8 field,
-		uint8 val)
+		uint16 field,
+		uint16 val)
 {
-#ifdef TARGET_TYPE_INDXCAM
-	uint8 current;
+	uint16 current;
 	current = cpld.reg[ regId];
 	
 	/* Set bits. */
@@ -76,30 +66,22 @@ OSC_ERR OscCpldFset(
 	
 	cpld.reg[ regId] = current;
 	return SUCCESS;
-#else
-	return -ENO_SUCH_DEVICE;
-#endif /* TARGET_TYPE_INDXCAM */
 }
 
 OSC_ERR OscCpldRget(
 		const uint16 regId,
-		uint8* val)
+		uint16* val)
 {
-#ifdef TARGET_TYPE_INDXCAM
 	*val = cpld.reg[ regId];
 	return SUCCESS;
-#else
-	return -ENO_SUCH_DEVICE;
-#endif /* TARGET_TYPE_INDXCAM */
 }
 
 OSC_ERR OscCpldFget(
 		const uint16 regId,
-		const uint8 field,
-		uint8* val)
+		const uint16 field,
+		uint16* val)
 {
-#ifdef TARGET_TYPE_INDXCAM
-	uint8 current = cpld.reg[ regId];
+	uint16 current = cpld.reg[ regId];
 	if( current & field)
 	{
 		*val = 1;
@@ -109,7 +91,4 @@ OSC_ERR OscCpldFget(
 		*val = 0;
 	}
 	return SUCCESS;
-#else
-	return -ENO_SUCH_DEVICE;
-#endif /* TARGET_TYPE_INDXCAM */
 }

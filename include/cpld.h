@@ -23,6 +23,8 @@
  * a CPLD device and its register set.
  * 
 	************************************************************************/
+#ifdef TARGET_TYPE_INDXCAM
+
 #ifndef CPLD_PUB_H_
 #define CPLD_PUB_H_
 
@@ -40,50 +42,44 @@ enum EnOscCpldErrors
 /*======================= API functions ================================*/
 
 /*********************************************************************//*!
- * @brief Write register
+ * @brief Write 16bit register
  * 
- * Available on Industrial OSC platform only.
- * 
- * @param regId register id
+ * @param redId	register offset
  * @param val   register value
- * @return 0
+ * @return SUCCESS
  *//*********************************************************************/
-OSC_ERR OscCpldRset( const uint16 regId, const uint8 val);
+OSC_ERR OscCpldRset( const uint16 regId, const uint16 val);
 
 /*********************************************************************//*!
  * @brief Write field of register
  * 
- * Available on Industrial OSC platform only.
- * 
- * @param regId register id
- * @param field field id
+ * @param regId	register offset
+ * @param field field mask
  * @param val   field value
- * @return 0
+ * @return SUCCESS
  *//*********************************************************************/
-OSC_ERR OscCpldFset( const uint16 regId, const uint8 field, const uint8 val);
+OSC_ERR OscCpldFset( const uint16 regId, const uint16 field, const uint16 val);
 
 /*********************************************************************//*!
  * @brief Read register
  * 
- * Available on Industrial OSC platform only.
- * 
- * @param regId   register id
- * @param val     return register value
- * @return 0
+ * @param regId	register offset
+ * @param val	return register value
+ * @return SUCCESS
  *//*********************************************************************/
-OSC_ERR OscCpldRget( const uint16 regId, uint8* val);
+OSC_ERR OscCpldRget( const uint16 regId, uint16* val);
 
 /*********************************************************************//*!
  * @brief Read field of register
  * 
- * Available on Industrial OSC platform only.
- * 
- * @param regId register id
- * @param field field id
- * @param val   return field value
- * @return 0
+ * @param regId		register offset
+ * @param field 	field mask
+ * @param val   	return field value
+ * @return SUCCESS
  *//*********************************************************************/
-OSC_ERR OscCpldFget( const uint16 regId, const uint8 field, uint8* val);
+OSC_ERR OscCpldFget( const uint16 regId, const uint16 field, uint16* val);
 
 
 #endif /*CPLD_PUB_H_*/
+
+#endif /* TARGET_TYPE_INDXCAM */

@@ -32,13 +32,11 @@
 
 #include <oscar.h>
 
-/*! cpld device driver */
-/*#include <cpldDrv/osc_cpld.h> */ /* not required @@@ */
-
 /*! @brief Device node which represents the cpld */
 #define OSC_CPLD_DRIVER_FILE "/dev/amc0"
-/*! @brief Number of mapped CPLD registers, defines Mmap aera size */
-#define OSC_CPLD_MAX_REGISTER_NR      0x1ff
+/*! @brief Number of mapped CPLD 16bit registers, defines Mmap aera size
+ * FIXME: The size should be application specific. */
+#define OSC_CPLD_MAX_REGISTER_NR	0x1ff
 
 /*! @brief Object struct of the cpld module */
 struct OSC_CPLD
@@ -51,7 +49,7 @@ struct OSC_CPLD
 	/*! @brief Register set
 	 * Host: Used for emulation on host.
 	 * Target: Used as local copy (field set on write only registers) */
-	uint8 reg[ OSC_CPLD_MAX_REGISTER_NR];
+	uint16 reg[ OSC_CPLD_MAX_REGISTER_NR];
 };
 
 /******************** Private methods ******************/

@@ -45,7 +45,6 @@ struct OscModule OscModule_cpld = {
 
 OSC_ERR OscCpldCreate()
 {
-#ifdef TARGET_TYPE_INDXCAM
 	cpld = (struct OSC_CPLD) { };
 	
 	/* Open cpld device driver */
@@ -70,11 +69,6 @@ OSC_ERR OscCpldCreate()
 	}
 	
 	return SUCCESS;
-#else
-	OscLog(ERROR, "%s: No CPLD available on this hardware platform!\n",
-			__func__);
-	return -ENO_SUCH_DEVICE;
-#endif /* TARGET_TYPE_INDXCAM */
 }
 
 OSC_ERR OscCpldDestroy()
@@ -85,31 +79,21 @@ OSC_ERR OscCpldDestroy()
 	return SUCCESS;
 }
 
-#ifdef TARGET_TYPE_INDXCAM
 OSC_ERR OscCpldRset(
 		const uint16 regId,
-		const uint8 val)
+		const uint16 val)
 {
 	cpld.addr[ regId] = val;
 	cpld.reg[ regId] = val;
 	return SUCCESS;
 }
-#else
-OSC_ERR OscCpldRset(
-		const uint16 regId,
-		const uint8 val)
-{
-	return -ENO_SUCH_DEVICE;
-}
-#endif /* TARGET_TYPE_INDXCAM */
 
-#ifdef TARGET_TYPE_INDXCAM
 OSC_ERR OscCpldFset(
 		uint16 regId,
-		uint8 field,
-		uint8 val)
+		uint16 field,
+		uint16 val)
 {
-	uint8 current;
+	uint16 current;
 	current = cpld.reg[ regId];
 	
 	/* Set bits. */
@@ -122,40 +106,21 @@ OSC_ERR OscCpldFset(
 	cpld.reg[ regId] = current;
 	return SUCCESS;
 }
-#else
-OSC_ERR OscCpldFset(
-		uint16 regId,
-		uint8 field,
-		uint8 val)
-{
-	return -ENO_SUCH_DEVICE;
-}
-#endif /* TARGET_TYPE_INDXCAM */
 
-#ifdef TARGET_TYPE_INDXCAM
 OSC_ERR OscCpldRget(
 		const uint16 regId,
-		uint8* val)
+		uint16* val)
 {
 	*val = cpld.addr[ regId];
 	return SUCCESS;
 }
-#else
-OSC_ERR OscCpldRget(
-		const uint16 regId,
-		uint8* val)
-{
-	return -ENO_SUCH_DEVICE;
-}
-#endif /* TARGET_TYPE_INDXCAM */
 
-#ifdef TARGET_TYPE_INDXCAM
 OSC_ERR OscCpldFget(
 		const uint16 regId,
-		const uint8 field,
-		uint8* val)
+		const uint16 field,
+		uint16* val)
 {
-	uint8 current = cpld.addr[ regId];
+	uint16 current = cpld.addr[ regId];
 	if( current & field)
 	{
 		*val = 1;
@@ -166,12 +131,3 @@ OSC_ERR OscCpldFget(
 	}
 	return SUCCESS;
 }
-#else
-OSC_ERR OscCpldFget(
-		const uint16 regId,
-		const uint8 field,
-		uint8* val)
-{
-	return -ENO_SUCH_DEVICE;
-}
-#endif /* TARGET_TYPE_INDXCAM */
