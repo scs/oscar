@@ -112,9 +112,14 @@ OSC_ERR OscDmaAdd2DMove(void *hChainHandle,
 	/* Use the supplied word size (8/16/32 bit) */
 	pDstDesc->config |= enDstWdSize;
 	
-	pDstDesc->startAddrLow = (uint16)((uint32)pDstAddr & 0x0000FFFF);
-	pDstDesc->startAddrHigh = (uint16)((uint32)pDstAddr >> 16);
-	
+#ifdef OSC_TARGET
+	pDstDesc->startAddrLow = (uint16)((uintptr_t)(pDstAddr) & 0x0000FFFF);
+	pDstDesc->startAddrHigh = (uint16)((uintptr_t)(pDstAddr) >> 16);
+#endif /* OSC_TARGET */
+#ifdef OSC_HOST
+	pDstDesc->startAddr = (uintptr_t)pDstAddr;
+#endif /* OSC_HOST */
+
 	pDstDesc->xCount = dstXCount;
 	pDstDesc->xModify = dstXModify;
 	pDstDesc->yCount = dstYCount;
@@ -130,9 +135,15 @@ OSC_ERR OscDmaAdd2DMove(void *hChainHandle,
 	/* Use the supplied word size (8/16/32 bit) */
 	pSrcDesc->config |= enSrcWdSize;
 	
-	pSrcDesc->startAddrLow = (uint16)((uint32)pSrcAddr & 0x0000FFFF);
-	pSrcDesc->startAddrHigh = (uint16)((uint32)pSrcAddr >> 16);
-	
+#ifdef OSC_TARGET
+	pSrcDesc->startAddrLow = (uint16)((uintptr_t)pSrcAddr & 0x0000FFFF);
+	pSrcDesc->startAddrHigh = (uint16)((uintptr_t)pSrcAddr >> 16);
+#endif /* OSC_TARGET */
+
+#ifdef OSC_HOST
+	pSrcDesc->startAddr = (uintptr_t)pSrcAddr;
+#endif /* OSC_HOST */	
+
 	pSrcDesc->xCount = srcXCount;
 	pSrcDesc->xModify = srcXModify;
 	pSrcDesc->yCount = srcYCount;
@@ -174,8 +185,8 @@ OSC_ERR OscDmaAddSyncPoint(void *hChainHandle)
 	struct DMA_CHAIN *pChain = (struct DMA_CHAIN*)hChainHandle;
 	struct DMA_DESC  *pSrcDesc = &pChain->arySrcDesc[pChain->nMoves];
 	struct DMA_DESC  *pDstDesc = &pChain->aryDstDesc[pChain->nMoves];
-	uint32 allOnesAddr = (uint32)&allOnes;
-	uint32 syncFlagAddr = (uint32)&pChain->syncFlag;
+	uintptr_t allOnesAddr = (uintptr_t)&allOnes;
+	uintptr_t syncFlagAddr = (uintptr_t)&pChain->syncFlag;
 	
 	if(unlikely(pChain->nMoves > MAX_MOVES_PER_CHAIN))
 	{
@@ -198,8 +209,13 @@ OSC_ERR OscDmaAddSyncPoint(void *hChainHandle)
 
 	/* Write to the stop Flag, so we can poll it until the DMA is
 	 * finished. */
+#ifdef OSC_TARGET
 	pDstDesc->startAddrLow = (uint16)(syncFlagAddr & 0x0000FFFF);
 	pDstDesc->startAddrHigh = (uint16)(syncFlagAddr >> 16);
+#endif /* OSC_TARGET */
+#ifdef OSC_HOST
+	pDstDesc->startAddr = (uintptr_t)syncFlagAddr;
+#endif /* OSC_HOST */
 
 	pDstDesc->xCount = 1;
 	pDstDesc->xModify = 4;
@@ -219,8 +235,13 @@ OSC_ERR OscDmaAddSyncPoint(void *hChainHandle)
 	}
 
 	/* Read some non-NULL value. */
+#ifdef OSC_TARGET
 	pSrcDesc->startAddrLow = (uint16)(allOnesAddr & 0x0000FFFF);
 	pSrcDesc->startAddrHigh = (uint16)(allOnesAddr >> 16);
+#endif /* OSC_TARGET */
+#ifdef OSC_HOST
+	pSrcDesc->startAddr = (uintptr_t)allOnesAddr;
+#endif /* OSC_HOST */
 
 	pSrcDesc->xCount = 1;
 	pSrcDesc->xModify = 4;

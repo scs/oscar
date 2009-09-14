@@ -77,10 +77,17 @@
 
 struct DMA_DESC
 {
-	/*! @brief The low part of the start address for the transfer */
+#ifdef OSC_TARGET
+	/*! @brief The low part of the start address for the transfer on the target */
 	uint16 startAddrLow;
-	/*! @brief The high part of the start address for the transfer */
+	/*! @brief The high part of the start address for the transfer on the target */
 	uint16 startAddrHigh;
+#endif /* OSC_TARGET */
+#ifdef OSC_HOST
+  /*! @brief The start address for the transfer on the host.
+    Needed for 64bit compatibility. */
+  uintptr_t startAddr;
+#endif /* OSC_HOST */
 	/*! @brief DMA channel config */
 	uint16 config;
 	/*! @brief Number of words along X axis. */

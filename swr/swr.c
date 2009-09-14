@@ -101,8 +101,6 @@ struct OscModule OscModule_swr = {
 #if defined(OSC_HOST) || defined(OSC_SIM)
 OSC_ERR OscSwrCreate()
 {
-	OSC_ERR err;
-	
 	OscSimRegisterCycleCallback( &OscSwrCycleCallback);
 	
 	return SUCCESS;
@@ -262,7 +260,7 @@ void OscSwrReport( const void* pWriter)
 	/* print instruction line */
 	if(pWr->bReportTime)
 	{
-		fprintf( pWr->pFile, "@\t%lu\t", OscSimGetCurTimeStep() );
+		fprintf( pWr->pFile, "@\t%u\t", OscSimGetCurTimeStep() );
 	}
 	for( sigId = 0; sigId < pWr->nrOfSignals; sigId++)
 	{

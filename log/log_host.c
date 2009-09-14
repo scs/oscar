@@ -113,7 +113,7 @@ OSC_ERR OscLog(const enum EnOscLogLevel level, const char * strFormat, ...)
 	if(level <= osc_log.fileLogLevel)
 	{
 		if(osc_log.pLogF == NULL)
-			return;
+			return -EFILE_ERROR;
 		
 		/* Log to the log file if the current log level is high enough */
 		va_start(ap, strFormat);
@@ -125,7 +125,7 @@ OSC_ERR OscLog(const enum EnOscLogLevel level, const char * strFormat, ...)
 	if(level == SIMULATION)
 	{
 		if(osc_log.pSimLogF == NULL)
-			return;
+			return -EFILE_ERROR;
 		
 		/* Log to the simulation log. */
 		va_start(ap, strFormat);
@@ -158,7 +158,7 @@ OSC_ERR OscFatalErr(const char * strFormat, ...)
 	va_end(ap);
 
 	/* Write the message to the syslog daemon. */
-	syslog(EMERG, osc_log.strTemp);
+	syslog(EMERG, "%s", osc_log.strTemp);
 	
 	// FIXME: WTF is it the business of the logging module to terminate the application!?
 	exit(1);

@@ -63,8 +63,7 @@ OSC_ERR OscDmaChanCopy(const struct DMA_DESC *pDesc,
 	void * pAddr;
 	
 	
-	pAddr = (void*)(((uint32)pDesc->startAddrLow) |
-			(((uint32)pDesc->startAddrHigh) << 16));
+	pAddr = (void*)pDesc->startAddr;
 	
 	if(pDesc->config & WNR)
 	{

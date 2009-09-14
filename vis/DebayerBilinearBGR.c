@@ -18,6 +18,7 @@
 
 /*! @file Jump-in point for debayering to BGR (target and host). */
 #include "oscar.h"
+#include "DebayerBilinear.h"
 
 OSC_ERR OscVisDebayerBilinearBGR(uint8 *pDst, 
 				 uint8 *pSrc, 

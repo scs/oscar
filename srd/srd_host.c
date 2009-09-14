@@ -37,8 +37,6 @@ struct OscModule OscModule_srd = {
 
 OSC_ERR OscSrdCreate()
 {
-	OSC_ERR err;
-	
 	srd = (struct OSC_SRD) { };
 
 	OscSimRegisterCycleCallback( &OscSrdCycleCallback);
@@ -234,7 +232,7 @@ OSC_ERR ReadLine( uint16 rdId)
 		return EFILE_PARSING_ERROR;
 	}
 	
-	ret = fscanf(srd.rd[ rdId].pFile, "\t%lu", &time);
+	ret = fscanf(srd.rd[ rdId].pFile, "\t%u", &time);
 	OscLog(DEBUG, "Parsing time: %d\n", time);
 	if( ret <= 0)
 	{
@@ -245,7 +243,7 @@ OSC_ERR ReadLine( uint16 rdId)
 	
 	for( sigId= 0; sigId<srd.rd[ rdId].nrOfSignals; sigId++)
 	{
-		ret = fscanf(srd.rd[ rdId].pFile, "\t%lu", &value);
+		ret = fscanf(srd.rd[ rdId].pFile, "\t%u", &value);
 		OscLog(DEBUG, "Parsing value: %d\n", value);
 		if( ret <= 0)
 		{

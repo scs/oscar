@@ -87,7 +87,7 @@ OSC_ERR OscVisVectorDebayerGrey(const struct OSC_PICTURE *pRaw, struct OSC_PICTU
 		return -EINVALID_PARAMETER;
 	}
 
-	if((uint32)pRaw->data % 4 != 0 || (uint32)pOut->data % 4 != 0)
+	if((uintptr_t)pRaw->data % 4 != 0 || (uintptr_t)pOut->data % 4 != 0)
 	{
 		OscLog(ERROR, "%s: Input and output image memory must be 4-byte aligned!\n",
 		       __func__);

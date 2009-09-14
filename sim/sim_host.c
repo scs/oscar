@@ -50,6 +50,7 @@ OSC_ERR OscSimInitialize() {
 	{
 		(*sim.aryCycleCallback[ i])();
 	}
+	return SUCCESS;
 }
 
 OSC_ERR OscSimStep() {
@@ -65,6 +66,8 @@ OSC_ERR OscSimStep() {
 	{
 		(*sim.aryCycleCallback[ i])();
 	}
+
+	return SUCCESS;
 }
 
 uint32 OscSimGetCurTimeStep()

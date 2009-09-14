@@ -42,9 +42,9 @@ void PrintObjectProperties(struct OSC_VIS_REGIONS *regions)
 	for(o = 0; o < regions->noOfObjects; o++)
 	{
 		if (regions->objects[o].root == NULL)
-			printf("%u\t\t", (uint)regions->objects[o].root);
+			printf("%p\t\t", regions->objects[o].root);
 		else
-			printf("%u\t", (uint)regions->objects[o].root);
+			printf("%p\t", regions->objects[o].root);
 	}
 	printf("\n");
 	printf("Area:\t");
@@ -108,7 +108,7 @@ void PrintRegionsStruct(struct OSC_VIS_REGIONS *regions)
 	printf("RunID:\t");
 	for(r = 0; r < regions->noOfRuns; r++)
 	{
-		printf("%u\t", (uint)&(regions->runs[r]));
+		printf("%p\t", &(regions->runs[r]));
 	}
 	printf("\n");
 	
@@ -116,9 +116,9 @@ void PrintRegionsStruct(struct OSC_VIS_REGIONS *regions)
 	for(r = 0; r < regions->noOfRuns; r++)
 	{
 		if (regions->runs[r].parent == NULL)
-			printf("%u\t\t",(uint)(regions->runs[r].parent));
+			printf("%p\t\t",(regions->runs[r].parent));
 		else
-			printf("%u\t",(uint)(regions->runs[r].parent));
+			printf("%p\t",(regions->runs[r].parent));
 	}
 	printf("\n");
 	
@@ -126,9 +126,9 @@ void PrintRegionsStruct(struct OSC_VIS_REGIONS *regions)
 	for(r = 0; r < regions->noOfRuns; r++)
 	{
 		if (regions->runs[r].next == NULL)
-			printf("%u\t\t",(uint)(regions->runs[r].next));
+			printf("%p\t\t",(regions->runs[r].next));
 		else
-			printf("%u\t",(uint)(regions->runs[r].next));
+			printf("%p\t",(regions->runs[r].next));
 	}
 	printf("\n");
 	

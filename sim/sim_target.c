@@ -47,9 +47,11 @@ OSC_ERR OscSimCreate()
  * Target: Stump since simulation is only done on host.
  *//*********************************************************************/
 OSC_ERR OscSimInitialize(void) {
+  return SUCCESS;
 }
 
 OSC_ERR OscSimStep() {
+  return SUCCESS;
 }
 
 uint32 OscSimGetCurTimeStep() {

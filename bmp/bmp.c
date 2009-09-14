@@ -210,7 +210,13 @@ OSC_ERR OscBmpRead(struct OSC_PICTURE *pPic, const char *strFileName)
 	}
 	
 	/* Read in the header and extract the interesting fields */
-	fread(pHeader, 1, sizeof(aryBmpHeadRGB), pPicFile);
+	if(fread(pHeader, 1, sizeof(aryBmpHeadRGB), pPicFile) != sizeof(aryBmpHeadRGB))
+	{
+	    OscLog(ERROR, "%s: Error reading in image header of %s!\n",
+		   __func__, strFileName);
+	    fclose(pPicFile);
+	    return -EUNABLE_TO_OPEN_FILE;
+	}
 	OscBmpReadHdrInfo((uint8*)pHeader,
 			&width,
 			&height,
@@ -294,8 +300,14 @@ OSC_ERR OscBmpRead(struct OSC_PICTURE *pPic, const char *strFileName)
 	pData = (uint8*)pPic->data;
 	for(row = 0; row < pPic->height; row++)
 	{
-		fread(&pData[row*pPic->width*colorDepth/8], 1,
-			rowLen, pPicFile);
+	  if(fread(&pData[row*pPic->width*colorDepth/8], 1,
+		   rowLen, pPicFile) != rowLen)
+	    {
+	      OscLog(ERROR, "%s: Error reading in image from %s!\n",
+		   __func__, strFileName);
+	      fclose(pPicFile);
+	      return -EUNABLE_TO_OPEN_FILE;
+	    }
 	}
 	
 	fclose(pPicFile);

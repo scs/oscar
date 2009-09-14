@@ -302,7 +302,7 @@ OSC_ERR OscFrdCreateSequenceReader(void **phReaderHandle,
 		OscLog(ERROR,
 				"%s(0x%x, 0x%x, %d, 0x%x): "
 				"Invalid parameter!\n", __func__,
-				(uint32)phReaderHandle, strPrefix,
+				(uintptr_t)phReaderHandle, strPrefix,
 				seqNrDigits, strSuffix);
 		return -EINVALID_PARAMETER;
 	}
@@ -405,7 +405,7 @@ OSC_ERR OscFrdCreateFileListReader(void **phReaderHandle,
 			strFileList[0] == '\0'))
 	{
 		OscLog(ERROR, "%s(0x%x, %s): Invalid parameter!\n",
-				__func__, (uint32)phReaderHandle, strFileList);
+				__func__, (uintptr_t)phReaderHandle, strFileList);
 		return -EINVALID_PARAMETER;
 	}
 	

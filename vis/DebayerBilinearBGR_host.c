@@ -245,11 +245,12 @@ OSC_ERR DebayerBilinearBGR(uint8 *pDst,
 	default:
 	  OscLog(ERROR, "%s: Unsupported bayer order encountered! (%d)\n",
 		 __func__, enBayerOrder);
-	  return;
+	  return -EUNSUPPORTED;
 	}
       pCurRow += width;
       pOneRowUp += width;
       pOneRowDown += width;
     }
 
+  return SUCCESS;
 }
