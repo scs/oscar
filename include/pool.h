@@ -33,27 +33,27 @@
 			union block * next; \
 			t value; \
 		} data[c]; \
-	} n;
+	} (n);
 
 #define PoolInit(n) \
 	({ \
-		typeof (n.free) p = n.data; \
-		while (p - n.data < length(n.data) - 1) { \
+		typeof ((n).free) p = (n).data; \
+		while (p - (n).data < length((n).data) - 1) { \
 			p->next = p + 1; \
 			p += 1; \
 		} \
 		p->next = NULL; \
-		n.free = n.data; \
+		(n).free = (n).data; \
 		SUCCESS; \
 	})
 
 #define PoolGet(n, p) \
 	({ \
-		OSC_ERR err = E_POOL; \
-		typeof (n.free) res = n.free; \
+		OSC_ERR err = EPOOL; \
+		typeof ((n).free) res = (n).free; \
 		if (res != NULL) { \
-			n.free = res->next; \
-			*p = &res->value; \
+			(n).free = res->next; \
+			*(p) = &res->value; \
 			err = SUCCESS; \
 		} \
 		err; \
@@ -61,10 +61,10 @@
 
 #define PoolPut(n, p) \
 	({ \
-		typeof (n.free) b = containerOf((p), typeof (*n.free), value); \
+		typeof ((n).free) b = containerOf((p), typeof (*(n).free), value); \
 		if (b != NULL) { \
-			b->next = n.free; \
-			n.free = b; \
+			b->next = (n).free; \
+			(n).free = b; \
 		} \
 		SUCCESS; \
 	})
