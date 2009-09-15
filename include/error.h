@@ -154,7 +154,7 @@
 #define OscAssert_s(expr) OscAssert_es(expr, -EASSERT)
 
 /*! @brief Check a condition and abort the current function with a custom error code while printing a default message. */
-#define OscAssert(expr) OscAssert_es(expr, -EASSERT)
+#define OscAssert(expr) OscAssert_em(expr, -EASSERT, "Assertion failed")
 
 /*! @brief Check a condition and abort the current function while printing a custom message. */
 #define OscAssert_m(expr, m, args ...) OscAssert_em(expr, -EASSERT, m, ## args)
