@@ -27,7 +27,7 @@ include $(ROOT_PATH)Makefile_config
 CFLAGS := -c -std=gnu99 -Wall $(if $(ROOT_PATH), -I$(ROOT_PATH))
 
 # Host-Compiler executables and flags.
-CC_host_ := gcc $(CFLAGS) -DOSC_HOST
+CC_host_ := gcc $(CFLAGS) -fgnu89-inline -DOSC_HOST
 CC_host := $(CC_host_) -O2
 CC_host_dbg := $(CC_host_) -g
 
