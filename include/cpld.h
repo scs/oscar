@@ -23,7 +23,6 @@
  * a CPLD device and its register set.
  * 
 	************************************************************************/
-#ifdef TARGET_TYPE_INDXCAM
 
 #ifndef CPLD_PUB_H_
 #define CPLD_PUB_H_
@@ -82,4 +81,3 @@ OSC_ERR OscCpldFget( const uint16 regId, const uint16 field, uint16* val);
 
 #endif /*CPLD_PUB_H_*/
 
-#endif /* TARGET_TYPE_INDXCAM */
