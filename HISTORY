@@ -1,3 +1,34 @@
++ Release v2.0
+
+Version 2 of the Oscar framework introduces a lot of changes and new features, some of which break compatibility with existing applications.
+
+Framework:
++ Simplified framework creation and destruction
++ Totally reworked build process to be able to use the same Makefiles for all modules.
++ Added support for the black-and-white version of leanXcam
++ Easier support of additional board types
++ New macros to help with common problems
+	- Memory management in pools
+	- Object lists
+	- Error handling in TRY-CATCH blocks
+
+Module clb:
+- Has been removed for now, due to being in an unusable state.
+
+Module vis:
++ Added assembler-optimized functions for bilinear debayering to vis module. These are much faster than the previously used debayering methods.
++ Added debayering to YUV, chrominance and HSL output images
++ Added very fast debayering methods to half-size.
++ Added many more useful vision functions for:
+	- Generic 2D Filters
+	- Sobel Filtering
+	- Erosion and dilation.
+	- Binary Labeling
+
+New module jpg:
++ JPEG encoding
+
+
 + Release v1.3-p1
 
 * This fixed some major bugs in the dspl modules which made the host implementation virtually useless.
