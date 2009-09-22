@@ -646,6 +646,7 @@ OscFunction(OscCfgGetSystemInfo, struct OscSystemInfo ** ppInfo)
 		remaining -= len;
 	OscFunctionEnd()
 	
+#if defined(TARGET_TYPE_LEANXCAM) || (TARGET_TYPE_INDXCAM)
 	OscFunction(hasBayernPattern, struct OscSystemInfo * pInfo, bool * res)
 		if (pInfo->hardware.board.boardType == OscSystemInfo_boardType_leanXcam) {
 			if (strcmp(pInfo->hardware.board.assembly, "A") == 0 || strcmp(pInfo->hardware.board.assembly, "B") == 0) {
@@ -661,6 +662,7 @@ OscFunction(OscCfgGetSystemInfo, struct OscSystemInfo ** ppInfo)
 			OscFail();
 		}
 	OscFunctionEnd()
+#endif /* TARGET_TYPE_LEANXCAM || TARGET_TYPE_INDXCAM*/
 	
 	static struct OscSystemInfo info = { };
 	static bool inited = false;
@@ -678,6 +680,9 @@ OscFunction(OscCfgGetSystemInfo, struct OscSystemInfo ** ppInfo)
 #endif
 #ifdef TARGET_TYPE_INDXCAM
 				envVar = "IX_1.1_A";
+#endif
+#ifdef TARGET_TYPE_LEANXRADIO
+				envVar = "LEANXRADIO_1.0_A";
 #endif
 			}
 		}
@@ -710,6 +715,8 @@ OscFunction(OscCfgGetSystemInfo, struct OscSystemInfo ** ppInfo)
 				info.hardware.board.boardType = OscSystemInfo_boardType_leanXcam;
 			else if (strcmp(envVar, "IX") == 0)
 				info.hardware.board.boardType = OscSystemInfo_boardType_indXcam;
+			else if (strcmp(envVar, "LEANXRADIO") == 0)
+				info.hardware.board.boardType = OscSystemInfo_boardType_leanXradio;
 			else
 				OscAssert_m(part2 != NULL, "Invalid format for hwrev: %s", info.hardware.board.revision);
 			
@@ -718,10 +725,12 @@ OscFunction(OscCfgGetSystemInfo, struct OscSystemInfo ** ppInfo)
 			
 			OscCall(staticStore, part4, &info.hardware.board.assembly);
 		}
-		
+
+#if defined(TARGET_TYPE_LEANXCAM) || (TARGET_TYPE_INDXCAM)
 		info.hardware.imageSensor.imageWidth = OSC_CAM_MAX_IMAGE_WIDTH;
 		info.hardware.imageSensor.imageWidth = OSC_CAM_MAX_IMAGE_HEIGHT;
 		OscCall(hasBayernPattern, &info, &info.hardware.imageSensor.hasBayernPattern);
+#endif /* TARGET_TYPE_LEANXCAM || TARGET_TYPE_INDXCAM*/
 		
 		{
 			char * version;

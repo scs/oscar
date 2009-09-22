@@ -228,7 +228,7 @@ OSC_ERR OscGpioToggleTestLed()
 }
 #endif /* TARGET_TYPE_LEANXCAM */
 
-#ifdef TARGET_TYPE_INDXCAM
+#if defined(TARGET_TYPE_INDXCAM) || defined(TARGET_TYPE_LEANXRADIO)
 
 OSC_ERR OscGpioTriggerImage()
 {
@@ -236,7 +236,7 @@ OSC_ERR OscGpioTriggerImage()
 	return -EUNSUPPORTED;
 }
 
-#else /* TARGET_TYPE_INDXCAM */
+#else /* TARGET_TYPE_INDXCAM || TARGET_TYPE_LEANXRADIO */
 
 OSC_ERR OscGpioTriggerImage()
 {

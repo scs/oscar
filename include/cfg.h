@@ -113,14 +113,17 @@ struct OscSystemInfo {
 				OscSystemInfo_boardType_leanXcam,
 				OscSystemInfo_boardType_indXcam,
 				OscSystemInfo_boardType_mesaSR4K,
+				OscSystemInfo_boardType_leanXradio,
 			} boardType;
 			int major, minor;
 			char * assembly, * revision;
 		} board;
+#if defined(TARGET_TYPE_LEANXCAM) || (TARGET_TYPE_INDXCAM)
 		struct {
 			bool hasBayernPattern;
 			int imageWidth, imageHeight;
 		} imageSensor;
+#endif /* TARGET_TYPE_LEANXCAM || TARGET_TYPE_INDXCAM*/
 /* Not jet implemented:
 #ifdef TARGET_TYPE_INDXCAM
 		struct {
