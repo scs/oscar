@@ -104,6 +104,14 @@ struct GPIO_PIN
 	#define PIN_TESTLED_N       27
 #endif /* TARGET_TYPE_INDXCAM */
 
+#ifdef TARGET_TYPE_LEANXRADIO
+	#define PIN_DCLK 		GPIO_DCLK
+	#define PIN_DATA		GPIO_DATA
+	#define PIN_CONFIG_N	GPIO_CONFIG_N
+	#define PIN_STATUS_N	GPIO_STATUS_N
+	#define PIN_CONFDONE_N	GPIO_CONFDONE_N
+#endif /* TARGET_TYPE_LEANXRADIO */
+
 #if defined(OSC_HOST) || defined(OSC_SIM)
 	/*! @brief True if pins reserved for internal use are to be logged
 	 * as well. */

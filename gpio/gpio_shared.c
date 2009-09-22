@@ -70,6 +70,20 @@ struct GPIO_PIN_CONFIG aryPinConfig[] = {
 };
 #endif /* TARGET_TYPE_INDXCAM */
 
+#ifdef TARGET_TYPE_LEANXRADIO
+/*! @brief Array with the default config of all the pins used on the
+ * leanXcradio.
+ * All I/Os are configured to be high active at the actual plug. */
+struct GPIO_PIN_CONFIG aryPinConfig[] = {
+	/* {pinNr, defaultFlags, name, defaultState} */
+	{PIN_DCLK, (DIR_OUTPUT | POL_HIGHACTIVE | FUN_GPIO), "Fpga DClk", FALSE},
+	{PIN_DATA, (DIR_OUTPUT | POL_HIGHACTIVE | FUN_GPIO), "Fpga Data", FALSE},
+	{PIN_CONFIG_N, (DIR_OUTPUT | POL_LOWACTIVE | FUN_GPIO), "Fpga nConfig", FALSE},
+	{PIN_STATUS_N, (DIR_INPUT | POL_LOWACTIVE | FUN_GPIO), "Fpga nStatus", FALSE},
+	{PIN_CONFDONE_N, (DIR_INPUT | POL_LOWACTIVE | FUN_GPIO), "Fpga nConfDone", FALSE},
+};
+#endif /* TARGET_TYPE_LEANXRADIO */
+
 const uint16 nrOfPins = sizeof(aryPinConfig)/sizeof(aryPinConfig[0]);
 
 OSC_ERR OscGpioCreate()

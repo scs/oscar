@@ -12,7 +12,7 @@ CONFIG_BOARD() {
 }
 
 CONFIG_LOCAL_FIRMWARE() {
-	enabled() { [ "$CONFIG_BOARD" == 'indXcam' ]; }
+	enabled() { [ "$CONFIG_BOARD" == 'indXcam' ] || [ "$CONFIG_BOARD" == 'leanXradio' ]; }
 	prompt() { echo "Is the lgx module allready at the path ./lgx (y/n)?"; }
 	default() { echo 'n'; }
 	check() { grep -xqE 'y|n'; }

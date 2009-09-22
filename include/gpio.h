@@ -33,6 +33,7 @@ extern struct OscModule OscModule_gpio;
  * platforms. Not all listed here may be available on your platform.
  * These are assigned to the same identifier as the corresponding pflags pin
  * driving them. */
+#ifdef TARGET_TYPE_LEANXCAM
 enum EnGpios
 {
 	GPIO_IN1 = 4,
@@ -40,6 +41,18 @@ enum EnGpios
 	GPIO_OUT1 = 2,
 	GPIO_OUT2 = 6
 };
+#endif /* #ifdef TARGET_TYPE_LEANXCAM */
+
+#ifdef TARGET_TYPE_LEANXRADIO
+enum EnGpios
+{
+	GPIO_DCLK =	25,			/* PG9 */
+	GPIO_DATA = 26,			/* PG10 */
+	GPIO_CONFIG_N = 27,		/* PG11 */
+	GPIO_STATUS_N = 28,		/* PG12 */
+	GPIO_CONFDONE_N = 29 	/* GP13 */
+};
+#endif /* TARGET_TYPE_LEANXRADIO */
 
 /*! @brief Defines whether the image trigger of the camera sensor is activated
  * internally from the camera module or from externally over an input
