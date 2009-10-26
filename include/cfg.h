@@ -378,6 +378,25 @@ OSC_ERR OscCfgGetStrRange(
 		const char* pDefault);		
 		
 /*********************************************************************//*!
+ * @brief Read a float number and apply a range check
+ *
+ * @param hFileContent Handle to the File content.
+ * @param pKey The name of the section and tag.
+ * @param iVal Return value (float).
+ * @param main Minimal value check. Ignored if NAN.
+ * @param main Maximal value check. Ignored if NAN.
+ * @param pDefault Use default value in case of failure.
+ * @return SUCCESS or an appropriate error code otherwise
+ *//*********************************************************************/
+OscFunctionDeclare( OscCfgGetFloatRange,
+		const CFG_FILE_CONTENT_HANDLE hFileContent,
+		const struct CFG_KEY *pKey,
+		float *iVal,
+		const float min,
+		const float max,
+		const float def);
+
+/*********************************************************************//*!
  * @brief Read boolean from content structure
  * 
  * Allowed false strings: 0, false, FALSE

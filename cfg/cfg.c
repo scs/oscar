@@ -26,6 +26,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include <math.h>
 
 #include "oscar.h"
 
@@ -585,6 +586,46 @@ OSC_ERR OscCfgGetUInt32Range(
 	}
 	return err;
 }
+
+OscFunction( OscCfgGetFloatRange,
+		const CFG_FILE_CONTENT_HANDLE hFileContent,
+		const struct CFG_KEY *pKey,
+		float *iVal,
+		const float min,
+		const float max,
+		const float def)
+
+	struct CFG_VAL_STR val;
+	float valF;
+	int ret;
+	OSC_ERR err;
+
+	if( !(max!=max) && !(min!=min)) /* NAN test */
+	{
+		OscAssert_es( max > min, -ECFG_INVALID_VAL);
+	}
+	err = OscCfgGetStr( hFileContent, pKey, &val);
+	if( err != SUCCESS)
+	{
+		*iVal = def;
+		return ECFG_USED_DEFAULT;
+	}
+	ret = sscanf(val.str, "%f", &valF);
+	if( ret == -1)
+	{
+		*iVal = def;
+		return ECFG_USED_DEFAULT;
+	}
+	if( ((min!=NAN) && (valF < min)) || ((max!=NAN) && (valF > max)) )
+	{
+		OscLog(WARN, "%s: Value out of range (%s: %f)!\n",
+				__func__, pKey->strTag, valF);
+		*iVal = def;
+		return ECFG_USED_DEFAULT;
+	}
+
+	*iVal = valF;
+OscFunctionEnd()
 
 OSC_ERR OscCfgGetBool(
 		const CFG_FILE_CONTENT_HANDLE hFileContent,
