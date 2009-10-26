@@ -93,7 +93,7 @@ static void bgbgToBgr(uint8 *pDstRow,
 
   /******* Last green pixel *********/  
   // Blue color of last green pixel
-  *pDstRow++ = pSrcRow[-1];
+  *pDstRow++ = pSrcRow[(ptrdiff_t)(-1)];
 
   // Green color of last green pixel
   *pDstRow++ = *pSrcRow++;
@@ -174,10 +174,10 @@ static void grgrToBgr(uint8 *pDstRow,
 
   /******* Last red pixel *********/  
   // Blue color of last red pixel
-  *pDstRow++ = pVertAvg[-1];
+  *pDstRow++ = pVertAvg[(ptrdiff_t)(-1)];
 
   // Green color of last red pixel
-  *pDstRow++ = ((*pVertAvg * 2) + pSrcRow[-1])/3;
+  *pDstRow++ = ((*pVertAvg * 2) + pSrcRow[(ptrdiff_t)(-1)])/3;
 
   // Red color of last red pixel
   *pDstRow++ = *pSrcRow++;
@@ -192,7 +192,7 @@ OSC_ERR DebayerBilinearBGR(uint8 *pDst,
 {
   uint32 row;
   uint8* pCurRow = pSrc;
-  uint8* pOneRowUp = &pSrc[-width];
+  uint8* pOneRowUp = &pSrc[-(ptrdiff_t)(width)];
   uint8* pOneRowDown = &pSrc[width];
   enum EnBayerOrder enRowBayerOrder = enBayerOrder;
   

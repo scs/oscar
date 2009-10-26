@@ -471,6 +471,51 @@ OSC_ERR OscCfgGetIntRange(
 	return err;
 }
 
+OSC_ERR OscCfgGetInt8Range(
+		const CFG_FILE_CONTENT_HANDLE hFileContent,
+		const struct CFG_KEY *pKey,
+		int8 *iVal,
+		const int8 min,
+		const int8 max,
+		const int8 def)
+{
+	OSC_ERR err;
+	int32 tmpVal;
+	err = OscCfgGetInt32Range(hFileContent, pKey, &tmpVal, min, max, (int32)def);
+	*iVal = (int8)tmpVal;
+	return err;
+}
+
+OSC_ERR OscCfgGetUInt8Range(
+		const CFG_FILE_CONTENT_HANDLE hFileContent,
+		const struct CFG_KEY *pKey,
+		uint8 *iVal,
+		const uint8 min,
+		const uint8 max,
+		const uint8 def)
+{
+	OSC_ERR err;
+	uint32 tmpVal;
+	err = OscCfgGetUInt32Range(hFileContent, pKey, &tmpVal, min, max, (uint32)def);
+	*iVal = (uint8)tmpVal;
+	return err;
+}
+
+OSC_ERR OscCfgGetInt16Range(
+		const CFG_FILE_CONTENT_HANDLE hFileContent,
+		const struct CFG_KEY *pKey,
+		int16 *iVal,
+		const int16 min,
+		const int16 max,
+		const int16 def)
+{
+	OSC_ERR err;
+	int32 tmpVal;
+	err = OscCfgGetInt32Range(hFileContent, pKey, &tmpVal, min, max, (int32)def);
+	*iVal = (int16)tmpVal;
+	return err;
+}
+
 OSC_ERR OscCfgGetUInt16Range(
 		const CFG_FILE_CONTENT_HANDLE hFileContent,
 		const struct CFG_KEY *pKey,
