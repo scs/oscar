@@ -1,3 +1,7 @@
++ Release v2.0-p1
+Fix some functions in cam and srd modules returning positive instead of negative numbers as error codes
+
+
 + Release v2.0
 
 Version 2 of the Oscar framework introduces a lot of changes and new features, some of which break compatibility with existing applications.
