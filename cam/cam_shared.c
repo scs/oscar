@@ -218,7 +218,7 @@ OSC_ERR OscCamSetupPerspective(const enum EnOscCamPerspective perspective)
 		colFlip = TRUE;
 		break;
 	default:
-		return EINVALID_PARAMETER;
+		return -EINVALID_PARAMETER;
 	}
 	
 #ifdef TARGET_TYPE_INDXCAM
