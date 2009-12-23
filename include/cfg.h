@@ -314,6 +314,65 @@ OSC_ERR OscCfgGetIntRange(
  * @param def Use default value in case of failure. 
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
+OSC_ERR OscCfgGetInt8Range(
+		const CFG_FILE_CONTENT_HANDLE hFileContent,
+		const struct CFG_KEY *pKey,
+		int8 *iVal,
+		const int8 min,
+		const int8 max,
+		const int8 def);
+
+
+/*********************************************************************//*!
+ * @brief Read Int from content structure and check range
+ *
+ * @param hFileContent Handle to the File content.
+ * @param pKey The name of the section and tag.
+ * @param iVal Return value.
+ * @param min Min value for range check.
+ * @param max Max value for range check. Ignored if -1.
+ * @param def Use default value in case of failure.
+ * @return SUCCESS or an appropriate error code otherwise
+ *//*********************************************************************/
+OSC_ERR OscCfgGetUInt8Range(
+		const CFG_FILE_CONTENT_HANDLE hFileContent,
+		const struct CFG_KEY *pKey,
+		uint8 *iVal,
+		const uint8 min,
+		const uint8 max,
+		const uint8 def);
+
+/*********************************************************************//*!
+ * @brief Read Int from content structure and check range
+ *
+ * @param hFileContent Handle to the File content.
+ * @param pKey The name of the section and tag.
+ * @param iVal Return value.
+ * @param min Min value for range check.
+ * @param max Max value for range check. Ignored if -1.
+ * @param def Use default value in case of failure.
+ * @return SUCCESS or an appropriate error code otherwise
+ *//*********************************************************************/
+OSC_ERR OscCfgGetInt16Range(
+		const CFG_FILE_CONTENT_HANDLE hFileContent,
+		const struct CFG_KEY *pKey,
+		int16 *iVal,
+		const int16 min,
+		const int16 max,
+		const int16 def);
+
+
+/*********************************************************************//*!
+ * @brief Read Int from content structure and check range
+ *
+ * @param hFileContent Handle to the File content.
+ * @param pKey The name of the section and tag.
+ * @param iVal Return value.
+ * @param min Min value for range check.
+ * @param max Max value for range check. Ignored if -1.
+ * @param def Use default value in case of failure.
+ * @return SUCCESS or an appropriate error code otherwise
+ *//*********************************************************************/
 OSC_ERR OscCfgGetUInt16Range(
 		const CFG_FILE_CONTENT_HANDLE hFileContent,
 		const struct CFG_KEY *pKey,
@@ -377,6 +436,25 @@ OSC_ERR OscCfgGetStrRange(
 		const uint32 len,
 		const char* pDefault);		
 		
+/*********************************************************************//*!
+ * @brief Read a float number and apply a range check
+ *
+ * @param hFileContent Handle to the File content.
+ * @param pKey The name of the section and tag.
+ * @param iVal Return value (float).
+ * @param main Minimal value check. Ignored if NAN.
+ * @param main Maximal value check. Ignored if NAN.
+ * @param pDefault Use default value in case of failure.
+ * @return SUCCESS or an appropriate error code otherwise
+ *//*********************************************************************/
+OscFunctionDeclare( OscCfgGetFloatRange,
+		const CFG_FILE_CONTENT_HANDLE hFileContent,
+		const struct CFG_KEY *pKey,
+		float *iVal,
+		const float min,
+		const float max,
+		const float def);
+
 /*********************************************************************//*!
  * @brief Read boolean from content structure
  * 
