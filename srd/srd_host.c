@@ -142,7 +142,7 @@ OSC_ERR ReadAllDescriptor( void)
 			if( ret < 0)
 			{
 				OscLog(ERROR, "%s: Missing descriptor begin (! \t Time)\n", srd.rd[ rdId].strFile);
-				return EFILE_PARSING_ERROR;
+				return -EFILE_PARSING_ERROR;
 			}
 			for( sigId= 0; sigId<srd.rd[ rdId].nrOfSignals; sigId++)
 			{
@@ -153,13 +153,13 @@ OSC_ERR ReadAllDescriptor( void)
 				{
 					OscLog(ERROR, "%s: Missing descriptor element or name does not match.\n",
 							srd.rd[ rdId].strFile);
-					return EFILE_PARSING_ERROR;
+					return -EFILE_PARSING_ERROR;
 				}
 				if( strcmp( strRead, srd.rd[ rdId].sig[ sigId].strName) != 0)
 				{
 					OscLog(ERROR, "%s: Wrong descriptor element order.\n",
 							srd.rd[ rdId].strFile);
-					return EFILE_PARSING_ERROR;
+					return -EFILE_PARSING_ERROR;
 				}
 				
 			}
@@ -168,7 +168,7 @@ OSC_ERR ReadAllDescriptor( void)
 			if( ret != 0)
 			{
 				OscLog(ERROR, "%s: Missing end of descriptor line.\n", srd.rd[ rdId].strFile);
-				return EFILE_PARSING_ERROR;
+				return -EFILE_PARSING_ERROR;
 			}
 		}
 		
@@ -229,7 +229,7 @@ OSC_ERR ReadLine( uint16 rdId)
 	if( ret != 0)
 	{
 		OscLog(ERROR, "%s: Missing line opening (@ \t)\n", srd.rd[ rdId].strFile);
-		return EFILE_PARSING_ERROR;
+		return -EFILE_PARSING_ERROR;
 	}
 	
 	ret = fscanf(srd.rd[ rdId].pFile, "\t%u", &time);
@@ -237,7 +237,7 @@ OSC_ERR ReadLine( uint16 rdId)
 	if( ret <= 0)
 	{
 		OscLog(ERROR, "%s: Missing time value  (unsigned decimal number)\n", srd.rd[ rdId].strFile);
-		return EFILE_PARSING_ERROR;
+		return -EFILE_PARSING_ERROR;
 	}
 	srd.rd[ rdId].readTime = time;
 	
@@ -249,7 +249,7 @@ OSC_ERR ReadLine( uint16 rdId)
 		{
 			OscLog(ERROR, "%s: Missing signal value (unsigned decimal number).\n",
 					srd.rd[ rdId].strFile);
-			return EFILE_PARSING_ERROR;
+			return -EFILE_PARSING_ERROR;
 		}
 		srd.rd[ rdId].sig[ sigId].bReadValue = value;
 			
@@ -258,7 +258,7 @@ OSC_ERR ReadLine( uint16 rdId)
 	if( ret != 0)
 	{
 		OscLog(ERROR, "%s: Missing end of line.\n", srd.rd[ rdId].strFile);
-		return EFILE_PARSING_ERROR;
+		return -EFILE_PARSING_ERROR;
 	}
 	
 	return SUCCESS;

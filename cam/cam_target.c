@@ -508,13 +508,13 @@ OSC_ERR OscCamReadPicture(const uint8 fbID,
 		case EAGAIN: /* Timeout */
 			OscLog(DEBUG, "%s: Sync on frame buffer %d timed out.\n",
 					__func__, fb);
-			return ETIMEOUT;
+			return -ETIMEOUT;
 			break;
 		case ERANGE: /* Too old */
 			OscLog(DEBUG,
 					"%s: Sync on frame buffer %d returned too late.\n",
 					__func__, fbID);
-			err = EPICTURE_TOO_OLD;
+			err = -EPICTURE_TOO_OLD;
 			break; /* User may still want picture */
 		default:
 			OscLog(ERROR, "%s: IOCTL Error \"%s\" (%d)\n",
