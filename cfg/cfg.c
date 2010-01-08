@@ -39,7 +39,7 @@ struct OscModule OscModule_cfg = {
 };
 
 /*! @brief Macro defining the maximal number of open configuration files */
-#define CONFIG_FILE_MAX_NUM 3
+#define CONFIG_FILE_MAX_NUM 5
 /*! @brief Macro defining the maximal file name string size */
 #define CONFIG_FILE_NAME_MAX_SIZE CONFIG_VAL_MAX_SIZE
 /*! @brief Macro defining the section suffix string */
@@ -186,8 +186,19 @@ OSC_ERR OscCfgRegisterFile(
 {
 	FILE    *pCfgFile;
 	size_t  fileSize;
-	unsigned int    actIndex = cfg.nrOfContents;
+	unsigned int    actIndex;
 	unsigned int    invalidCharIndex;
+	
+	/* find an unused file index */
+	if(cfg.nrOfContents==0) {
+		for(uint16 i=0; i<CONFIG_FILE_MAX_NUM; ++i) 
+			cfg.contents[i].data=NULL;
+		actIndex=0;
+	} else {
+		actIndex=0;
+		while(actIndex<CONFIG_FILE_MAX_NUM && cfg.contents[actIndex].data)
+			++actIndex;
+	}
 	
 	/* check preconditions */
 	if(pFileContentHandle == NULL || strFileName == NULL || strFileName[0] == '\0')
@@ -196,7 +207,7 @@ OSC_ERR OscCfgRegisterFile(
 				__func__, pFileContentHandle, strFileName);
 		return -ECFG_INVALID_FUNC_PARAMETER;
 	}
-	if(cfg.nrOfContents >= CONFIG_FILE_MAX_NUM) {
+	if(cfg.nrOfContents >= CONFIG_FILE_MAX_NUM || actIndex >= CONFIG_FILE_MAX_NUM) {
 		OscLog(ERROR, "%s: too many handles open (%d=%d) !\n",
 				__func__, cfg.nrOfContents, CONFIG_FILE_MAX_NUM);
 		return -ECFG_NO_HANDLES;
@@ -226,6 +237,7 @@ OSC_ERR OscCfgRegisterFile(
 		OscLog(ERROR, "%s: config file too long!\n",
 				__func__);
 		free(cfg.contents[actIndex].data);
+		cfg.contents[actIndex].data=NULL;
 		return -ECFG_UNABLE_TO_OPEN_FILE;
 	}
 	cfg.nrOfContents++;
@@ -243,6 +255,21 @@ OSC_ERR OscCfgRegisterFile(
 /*    OscLog(DEBUG, "Read config file (%s):\n%s\n", strFileName, cfg.contents[actIndex].data); does not work on OSC*/
 
 	return SUCCESS;
+}
+
+OSC_ERR OscCfgUnregisterFile(CFG_FILE_CONTENT_HANDLE pFileContentHandle) {
+	
+	if(pFileContentHandle<=0 || pFileContentHandle>CONFIG_FILE_MAX_NUM
+			|| cfg.contents[pFileContentHandle-1].data==NULL) {
+		return(EINVALID_PARAMETER);
+	}
+	
+	free(cfg.contents[pFileContentHandle-1].data);
+	cfg.contents[pFileContentHandle-1].data=NULL;
+	
+	--cfg.nrOfContents;
+	
+	return(SUCCESS);
 }
 
 OSC_ERR OscCfgDeleteAll( void)
@@ -526,7 +553,7 @@ OSC_ERR OscCfgGetUInt16Range(
 {
 	OSC_ERR err;
 	uint32 tmpVal;
-	err = OscCfgGetUInt32Range(hFileContent, pKey, &tmpVal, min, max, (uint32)def);
+	err = OscCfgGetUInt32Range(hFileContent, pKey, &tmpVal, (uint32)min, (uint32)max, (uint32)def);
 	*iVal = (uint16)tmpVal;
 	return err;
 }
@@ -656,7 +683,7 @@ OscFunction( OscCfgGetFloatRange,
 		return ECFG_USED_DEFAULT;
 	}
 	ret = sscanf(val.str, "%f", &valF);
-	if( ret == -1)
+	if( ret == EOF)
 	{
 		*iVal = def;
 		return ECFG_USED_DEFAULT;

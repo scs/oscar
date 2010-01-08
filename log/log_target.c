@@ -77,6 +77,7 @@ OSC_ERR OscLogSetConsoleLogLevel(const enum EnOscLogLevel level) {
 }
 
 OSC_ERR OscLogSetFileLogLevel(const enum EnOscLogLevel level) {
+	
 	osc_log.fileLogLevel = level;
 	
 	return SUCCESS;
@@ -97,8 +98,10 @@ OSC_ERR OscLog(const enum EnOscLogLevel level, const char * strFormat, ...) {
 		va_end(ap);
 	}
 
+	
 	if (level <= osc_log.fileLogLevel)
 	{
+		
 		int len;
 		osc_log.strTemp[0] = 0; /* Mark the string as empty */
 		

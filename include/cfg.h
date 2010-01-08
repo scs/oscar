@@ -118,7 +118,7 @@ struct OscSystemInfo {
 			int major, minor;
 			char * assembly, * revision;
 		} board;
-#if defined(TARGET_TYPE_LEANXCAM) || (TARGET_TYPE_INDXCAM)
+#if defined(TARGET_TYPE_LEANXCAM) || defined(TARGET_TYPE_INDXCAM)
 		struct {
 			bool hasBayernPattern;
 			int imageWidth, imageHeight;
@@ -136,6 +136,8 @@ struct OscSystemInfo {
 	} software;
 };
 
+
+
 /*====================== API functions =================================*/
 
 /*********************************************************************//*!
@@ -150,6 +152,16 @@ OSC_ERR OscCfgRegisterFile(
 		CFG_FILE_CONTENT_HANDLE* pFileContentHandle,
 		const char *strFileName,
 		const unsigned int maxFileSize);
+
+
+/*********************************************************************//*!
+ * @brief Closes an open file handle
+ * 
+ * @param pFileContentHandle Ptr to handle to the File content
+ * @return SUCCESS or an appropriate error code otherwise
+ *//*********************************************************************/
+OSC_ERR OscCfgUnregisterFile(
+		CFG_FILE_CONTENT_HANDLE pFileContentHandle);
 
 /*********************************************************************//*!
  * @brief Delete configuration file
@@ -477,6 +489,6 @@ OSC_ERR OscCfgGetBool(
 	@brief Get a pointer to static instance of struct OscSystemInfo.
 	@param ppInfo Will be set to point to the struct OscSystemInfo.
 */
-OscFunctionDeclare(OscCfgGetSystemInfo, struct OscSystemInfo ** ppInfo)		
+OscFunctionDeclare(OscCfgGetSystemInfo, struct OscSystemInfo ** ppInfo);
 
 #endif /*CFG_PUB_H_*/
