@@ -1186,25 +1186,35 @@ OscFunction(static parseInteger, char * str, int * res)
 OscFunctionEnd()
 
 OscFunction(static getUClinuxVersion, char ** res)
-	static char buffer[80];
 	FILE * file = NULL;
 	
-	char * ferr, * newline;
 	int err;
 	
-	file = popen("cat /proc/version | sed -rn 's,.*Git_(.*)-svn.*,\\1,p'", "r");
+	file=fopen("/proc/version", "r");
+				
 	OscAssert(file != NULL);
 	
-	ferr = fgets(buffer, sizeof buffer, file);
-	OscAssert(ferr != NULL || feof(file) != 0);
+	static char version[200];
+	fread(version, sizeof(char), 200, file);
 	
-	err = pclose(file);
+	char* occur=strstr(version, "Git_");
+	OscAssert(occur!=NULL);
+	occur+=4;
+	
+	char* next=strstr(occur, "-");
+	OscAssert(next!=NULL);
+	if(next[1]=='p') {
+		next=strstr(next+1, "-");
+		OscAssert(next!=NULL); 
+	}
+	char* end=strstr(next+1, "-");
+	if(end!=NULL) next=end;
+	
+	*next=0;
+	*res=occur;
+	
+	err = fclose(file);
 	OscAssert(err == 0);
-	
-	newline = strchr(buffer, '\n');
-	OscAssert(newline != NULL);
-	*newline = 0;
-	*res = buffer;
 	
 OscFunctionCatch()
 //	pclose(file); FIXME: Shit! file's not in scope anymore!
