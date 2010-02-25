@@ -750,3 +750,8 @@ OSC_ERR OscCamRegisterCorrectionCallback(
 	return SUCCESS;
 }
 
+OSC_ERR OscCamConfigSensorLedOut(bool bSensorLedOut, bool bInvert)
+{
+	return(SUCCESS);
+}
+
