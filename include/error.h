@@ -21,8 +21,43 @@
 
 /* OscFunction[Finally|Catch|End]: Declare a function using these macros to use the Osc(Fail|Assert|Call)* error handling macros. */
 /*! @brief Use this macro to declare a function. */
+#ifdef __cplusplus
+#define OscFunctionDeclare(name, ...) \
+	OSC_ERR name(__VA_ARGS__);
+
+#else
 #define OscFunctionDeclare(name, args ...) \
 	OSC_ERR name(args);
+
+#endif /* __cplusplus */
+
+
+
+
+#ifdef __cplusplus
+
+#define OscFunction(name, ...) \
+	OSC_ERR name(__VA_ARGS__) { \
+		struct { \
+			OSC_ERR error, status; \
+			bool caught: 1; \
+			uint32_t stage: 31; \
+		} _osc_internal_state_ = { \
+			/*.error =*/ SUCCESS, \
+			/*.status =*/ SUCCESS, \
+			/*.caught =*/ false, \
+			/*.stage =*/ 0 \
+		}; \
+	goto _osc_internal_top_; \
+	_osc_internal_top_: \
+		if (({ \
+			bool res = _osc_internal_state_.stage < 1; \
+			if (res) \
+				_osc_internal_state_.stage = 1; \
+			res; \
+		})) {
+
+#else
 
 #define OscFunction(name, args ...) \
 	OSC_ERR name(args) { \
@@ -44,6 +79,9 @@
 				_osc_internal_state_.stage = 1; \
 			res; \
 		})) {
+#endif /* __cplusplus */
+
+
 
 // FIXME: Too much redundancy between this and the next macro.
 #define OscFunctionCatch(e) \
@@ -76,6 +114,8 @@
 			res; \
 		})) {
 
+
+
 #define OscFunctionFinally() \
 		} \
 		if (({ \
@@ -92,14 +132,26 @@
 		return _osc_internal_state_.error; \
 	}
 
-#define OscMark_format(fmt, args ...) OscLog(ERROR, "%s: %s(): Line %d" fmt "\n", __FILE__, __FUNCTION__, __LINE__, ## args)
+
+
+#ifdef __cplusplus
+#define OscMark_format(fmt, ...) OscLog(ERROR, "%s: %s(): Line %d " fmt "\n", __FILE__, __FUNCTION__, __LINE__, ## __VA_ARGS__)
+#else
+#define OscMark_format(fmt, args ...) OscLog(ERROR, "%s: %s(): Line %d " fmt "\n", __FILE__, __FUNCTION__, __LINE__, ## args)
+#endif /* __cplusplus */
+
 
 /* OscMark[_m](): Macros to log a line whenever a source code line is hit. m allows a custom message to be passed. */
 /*! @brief Log a marker with a default message whenever a source code line is hit. */
 #define OscMark() OscMark_format("")
 
 /*! @brief Log a marker with a custom message whenever a source code line is hit */
+#ifdef __cplusplus
+#define OscMark_m(m, ...) OscMark_format(": " m, ## __VA_ARGS__)
+#else
 #define OscMark_m(m, args ...) OscMark_format(": " m, ## args)
+#endif /* __cplusplus */
+
 
 /* OscFail_[e](s|m)(): Macros to abort the current function and execute the exception handler. e is to pass a custom error code. s is not print a message. m is to print a custom message. */
 /*! @brief Abort the current function and jump to the exception handler after 'fail:'. */
@@ -111,11 +163,21 @@
 	}
 
 /*! @brief Abort the current function while printing a custom error mesage and jump to the exception handler after 'fail:'. */
+
+#ifdef __cplusplus
+#define OscFail_em(e, m, ...) \
+	{ \
+		OscMark_m(m, ## __VA_ARGS__); \
+		OscFail_es(e); \
+	}
+#else
 #define OscFail_em(e, m, args ...) \
 	{ \
 		OscMark_m(m, ## args); \
 		OscFail_es(e); \
 	}
+#endif /* __cplusplus */
+
 
 /*! @brief Abort the current function with a custom error code and jump to the exception handler after 'fail:'. */
 #define OscFail_e(e) OscFail_es(e)
@@ -126,7 +188,12 @@
 #define OscFail() OscFail_e(-EGENERAL)
 
 /*! @brief Abort the current function with a custom error code while printing a custom error mesage and jump to the exception handler after 'fail:'. */
+
+#ifdef __cplusplus
+#define OscFail_m(m, ...) OscFail_em(-EGENERAL, m, ## __VA_ARGS__)
+#else
 #define OscFail_m(m, args ...) OscFail_em(-EGENERAL, m, ## args)
+#endif /* __cplusplus */
 
 /* OscAssert_[e][s|m](): Macros to check an assertion and abort the current function and execute the exception handler on failure. e is to pass a custom error code. s is not print a message. m is to print a custom message. By defualt a general message is printed. */
 /*! @brief Check a condition and abort the current function. */
@@ -144,11 +211,41 @@
 	}
 
 /*! @brief Check a condition and abort the current function while printing a custom message. */
+
+#ifdef __cplusplus
+#define OscAssert_em(expr, e, m, ...) \
+	{ \
+		if (!(expr)) \
+			OscFail_em(e, m, ## __VA_ARGS__); \
+	}
+#else
 #define OscAssert_em(expr, e, m, args ...) \
 	{ \
 		if (!(expr)) \
 			OscFail_em(e, m, ## args); \
 	}
+#endif /* __cplusplus */
+
+
+/* @brief Assert without setting _osc_internal_state_ */
+
+#ifdef __cplusplus
+#define OscAssert_w(expr, m, ...)  \
+	{ \
+		if (!(expr)) { \
+			OscMark_format(m, ## __VA_ARGS__); \
+			return(EASSERT); \
+		} \
+	}
+#else
+#define OscAssert_w(expr, m, args ...)  \
+	{ \
+		if (!(expr)) { \
+			OscMark_format(m, ## args); \
+			return(EASSERT); \
+		} \
+	}
+#endif /* __cplusplus */
 
 /*! @brief Check a condition and abort the current function with a custom error code. */
 #define OscAssert_s(expr) OscAssert_es(expr, -EASSERT)
@@ -157,19 +254,56 @@
 #define OscAssert(expr) OscAssert_em(expr, -EASSERT, "Assertion failed")
 
 /*! @brief Check a condition and abort the current function while printing a custom message. */
+#ifdef __cplusplus
+#define OscAssert_m(expr, m, ...) OscAssert_em(expr, -EASSERT, m, ## __VA_ARGS__)
+#else
 #define OscAssert_m(expr, m, args ...) OscAssert_em(expr, -EASSERT, m, ## args)
+#endif /* __cplusplus */
+
 
 /* OscCall[_s](): Macros call a function and and abort the current function and execute the exception handler on failure. e is to pass a custom error code. */
 /*! @brief Call a function and check it's return code, aborting the current function on an error. */
 // FIXME: Too much redundancy between the next four macros.
+#ifdef __cplusplus
+#define OscCall_s(f, ...) \
+	{ \
+		_osc_internal_state_.status = f(__VA_ARGS__); \
+		if (_osc_internal_state_.status < SUCCESS) \
+			OscFail_es(_osc_internal_state_.status); \
+	}
+#else
 #define OscCall_s(f, args ...) \
 	{ \
 		_osc_internal_state_.status = f(args); \
 		if (_osc_internal_state_.status < SUCCESS) \
 			OscFail_es(_osc_internal_state_.status); \
 	}
+#endif /* __cplusplus */
+
 
 /*! @brief Call a function and check it's return code, aborting the current function with a default message on an error. */
+
+#ifdef __cplusplus
+#define OscCall(f, ...) \
+	{ \
+		_osc_internal_state_.status = f(__VA_ARGS__); \
+		if (_osc_internal_state_.status < SUCCESS) \
+			OscFail_em(_osc_internal_state_.status, "%s(): Error %d", #f, (int) _osc_internal_state_.status); \
+	}
+
+#define OscCall_is(f, ...) \
+	{ \
+		_osc_internal_state_.status = f(__VA_ARGS__); \
+	}
+
+#define OscCall_i(f, ...) \
+	{ \
+		_osc_internal_state_.status = f(__VA_ARGS__); \
+		if (_osc_internal_state_.status < SUCCESS) \
+			OscMark_m("%s(): Error %d", #f, (int) _osc_internal_state_.status); \
+	}
+
+#else
 #define OscCall(f, args ...) \
 	{ \
 		_osc_internal_state_.status = f(args); \
@@ -189,6 +323,11 @@
 			OscMark_m("%s(): Error %d", #f, (int) _osc_internal_state_.status); \
 	}
 
+#endif /* __cplusplus */
+
+
+
+
 #define OscLastError() _osc_internal_state_.error
 
 #define OscLastStatus() _osc_internal_state_.status
@@ -200,22 +339,22 @@ enum EnOscErrors {
 	EASSERT,
 	EPOOL,
 	ELIST,
-	EOUT_OF_MEMORY,			/* 5 */
+	EOUT_OF_MEMORY,
 	ETIMEOUT,
 	EUNABLE_TO_OPEN_FILE,
 	EINVALID_PARAMETER,
 	EDEVICE,
-	ENOTHING_TO_ABORT,		/* 10 */
+	ENOTHING_TO_ABORT,
 	EDEVICE_BUSY,
 	ECANNOT_DELETE,
 	EBUFFER_TOO_SMALL,
 	EFILE_ERROR,
-	ECANNOT_UNLOAD,			/* 15 */
+	ECANNOT_UNLOAD,
 	ENR_OF_INSTANCES_EXHAUSTED,
 	EFILE_PARSING_ERROR,
 	EALREADY_INITIALIZED,
 	ENO_SUCH_DEVICE,
-	EUNABLE_TO_READ,		/* 20 */
+	EUNABLE_TO_READ,
 	ETRY_AGAIN,
 	EINTERRUPTED,
 	EUNSUPPORTED
