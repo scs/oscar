@@ -97,12 +97,12 @@ OSC_ERR OscVisErode(struct OSC_PICTURE *picIn, struct OSC_PICTURE *picOut, uint8
 			}		
 			/* if the kernel is decomposed, copy result to the temp buffer again */
 			if (nSubElements > 1)		
-				memcpy(pTempBuffer, pBinImgIn, sizeof(uint8)*width*height);	
+				memcpy(pTempBuffer, pBinImgOut, sizeof(uint8)*width*height);	
 			
 		}
 		/* if multiple erosions are demanded, copy result to the temp buffer again */
 		if (nRepetitions > 1)
-				memcpy(pTempBuffer, pBinImgIn, sizeof(uint8)*width*height);		
+				memcpy(pTempBuffer, pBinImgOut, sizeof(uint8)*width*height);		
 	}
 	/* finalize picture */
 	picOut->height = height;
