@@ -87,7 +87,7 @@ OSC_ERR OscLogSetFileLogLevel(const enum EnOscLogLevel level) {
 OSC_ERR OscLog(const enum EnOscLogLevel level, const char * strFormat, ...) {
 	va_list ap; /*< The dynamic argument list */
 
-	if (level <= osc_log.consoleLogLevel)
+	if (level <= osc_log.consoleLogLevel && osc_log.consoleLogLevel!=NONE)
 	{
 		/* Log to console if the current log level is high enough */
 
@@ -99,7 +99,7 @@ OSC_ERR OscLog(const enum EnOscLogLevel level, const char * strFormat, ...) {
 	}
 
 	
-	if (level <= osc_log.fileLogLevel)
+	if (level <= osc_log.fileLogLevel && osc_log.fileLogLevel!=NONE)
 	{
 		
 		int len;
