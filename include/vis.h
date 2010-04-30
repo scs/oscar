@@ -54,8 +54,10 @@ extern struct OSC_VIS_STREL DISK0;
 #define MAX_NO_OF_RUNS 8192
 #define MAX_NO_OF_OBJECTS 1024
 
+#ifndef SKIP_MIN_MAX_DEF
 #define max(a, b) ((a) > (b) ? (a) : (b))
 #define min(a, b) ((a) < (b) ? (a) : (b))
+#endif /* SKIP_MIN_MAX_DEF */
 
 /*! @brief Structure representing a run used in connected components labeling based on run-length-encoding (RLE). */
 struct OSC_VIS_REGIONS_RUN {
