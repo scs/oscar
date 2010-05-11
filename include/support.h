@@ -47,7 +47,8 @@
 /*! @brief An endless loop, equivalent to while (true) { block }; */
 #define loop while (true)
 /*! @brief Gives the length of a field (Does not work on pointers!). */
+#ifndef SKIP_LENGTH_DEF
 #define length(a) ((sizeof (a)) / sizeof *(a))
-
+#endif
 
 #endif // #ifndef OSCAR_INCLUDE_POOL_H_
