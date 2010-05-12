@@ -38,7 +38,7 @@
 #define PoolInit(n) \
 	({ \
 		typeof ((n).free) p = (n).data; \
-		while (p - (n).data < length((n).data) - 1) { \
+		while (p - (n).data < ARR_LENGTH((n).data) - 1) { \
 			p->next = p + 1; \
 			p += 1; \
 		} \

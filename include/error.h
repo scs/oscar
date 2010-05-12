@@ -89,8 +89,8 @@
 			bool res = false; \
 			if (_osc_internal_state_.stage < 2) { \
 				OSC_ERR const errs[] = { e }; \
-				res = length(errs) == 0; \
-				for (int i = 0; !res && i < length(errs); i += 1) \
+				res = ARR_LENGTH(errs) == 0; \
+				for (int i = 0; !res && i < ARR_LENGTH(errs); i += 1) \
 					res = errs[i] == _osc_internal_state_.error; \
 				if (res) { \
 					_osc_internal_state_.stage = 2; \
@@ -105,8 +105,8 @@
 			bool res = false; \
 			if (_osc_internal_state_.stage < 3) { \
 				OSC_ERR const errs[] = { e }; \
-				res = length(errs) == 0; \
-				for (int i = 0; !res && i < length(errs); i += 1) \
+				res = ARR_LENGTH(errs) == 0; \
+				for (int i = 0; !res && i < ARR_LENGTH(errs); i += 1) \
 					res = errs[i] == _osc_internal_state_.error; \
 				if (res) \
 					_osc_internal_state_.stage = 3; \

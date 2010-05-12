@@ -373,10 +373,10 @@ OSC_ERR OscVisGetRegionProperties(struct OSC_VIS_REGIONS *regions)
 			CxAccu = CxAccu + currCx;
 			CyAccu = CyAccu + currCy;
 			/* update bounding box values */
-			regions->objects[i].bboxTop = min(regions->objects[i].bboxTop, currentRun->row);
-			regions->objects[i].bboxBottom = max(regions->objects[i].bboxBottom, currentRun->row+1);
-			regions->objects[i].bboxLeft = min(regions->objects[i].bboxLeft, currentRun->startColumn);
-			regions->objects[i].bboxRight = max(regions->objects[i].bboxRight, currentRun->endColumn); 		
+			regions->objects[i].bboxTop = MIN(regions->objects[i].bboxTop, currentRun->row);
+			regions->objects[i].bboxBottom = MAX(regions->objects[i].bboxBottom, currentRun->row+1);
+			regions->objects[i].bboxLeft = MIN(regions->objects[i].bboxLeft, currentRun->startColumn);
+			regions->objects[i].bboxRight = MAX(regions->objects[i].bboxRight, currentRun->endColumn); 		
 			currentRun = currentRun->next;
 		} while(currentRun != NULL);
 		
