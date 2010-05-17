@@ -476,7 +476,7 @@ static OSC_ERR OscFrdParseConstantReader(FILE *pConfigF,
 	return SUCCESS;
 }
 
-OSC_ERR OscFrdCreateConstantReader(void **phReaderHandle, char strFN[])
+OSC_ERR OscFrdCreateConstantReader(void **phReaderHandle, const char strFN[])
 {
 	struct OSC_FRD_READER           *pReader;
 	struct OSC_FRD_CONSTANT_READER  *pConstReader;

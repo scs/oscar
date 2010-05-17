@@ -139,7 +139,7 @@ OSC_ERR OscFrdCreateSequenceReader(void **phReaderHandle,
  * @param strFN The constant file name to read.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-OSC_ERR OscFrdCreateConstantReader(void **phReaderHandle, char strFN[]);
+OSC_ERR OscFrdCreateConstantReader(void **phReaderHandle, const char strFN[]);
 
 /*********************************************************************//*!
  * @brief Returns the file name corresponding to the current time step.
