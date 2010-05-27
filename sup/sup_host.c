@@ -21,6 +21,7 @@
  */
 
 #include <time.h>
+#include <sys/time.h>
 #include "sup.h"
 
 OSC_ERR OscSupCreate();
@@ -73,8 +74,10 @@ inline uint32 OscSupCycGet()
 	 * with much lower precision than on the blackfin.
 	 * The actual precision is dependent on the platform. */
 
-	/* ANSI C function, low resolution */
-	return ((uint32)clock());
+	/* in microseconds */
+	struct timeval tim;
+	gettimeofday(&tim, NULL);
+	return ((uint32)tim.tv_sec*1000000+tim.tv_usec);
 }
 
 inline long long OscSupCycGet64()
@@ -83,38 +86,40 @@ inline long long OscSupCycGet64()
 	 * with much lower precision than on the blackfin.
 	 * The actual precision is dependent on the platform. */
 
-	/* ANSI C function, low resolution */
-	return ((long long)clock());
+	/* in microseconds */
+	struct timeval tim;
+	gettimeofday(&tim, NULL);
+	return ((long long)tim.tv_sec*1000000+(long long)tim.tv_usec);
 }
 
 inline uint32 OscSupCycToMicroSecs(uint32 cycles)
 {
-	return (cycles/(CLOCKS_PER_SEC/1000000));
+	return (cycles);
 }
 
 inline uint32 OscSupCycToMilliSecs(uint32 cycles)
 {
-	return (cycles/((CPU_FREQ/1000000)*1000));
+	return (cycles/1000);
 }
 
 inline uint32 OscSupCycToSecs(uint32 cycles)
 {
-	return (cycles/((CPU_FREQ/1000000)*1000000));
+	return (cycles/1000000);
 }
 
 inline long long OscSupCycToMicroSecs64(long long cycles)
 {
-	return (cycles/(CPU_FREQ/1000000));
+	return (cycles);
 }
 
 inline long long OscSupCycToMilliSecs64(long long cycles)
 {
-	return (cycles/((CPU_FREQ/1000000)*1000));
+	return (cycles/1000);
 }
 
 inline long long OscSupCycToSecs64(long long cycles)
 {
-	return (cycles/((CPU_FREQ/1000000)*1000000));
+	return (cycles/1000000);
 }
 
 
