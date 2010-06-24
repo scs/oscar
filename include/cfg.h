@@ -106,15 +106,17 @@ struct OscCfgVersion {
 	char * version;
 };
 
+enum boardType {
+	OscSystemInfo_boardType_leanXcam,
+	OscSystemInfo_boardType_indXcam,
+	OscSystemInfo_boardType_mesaSR4K,
+	OscSystemInfo_boardType_leanXradio,
+};
+
 struct OscSystemInfo {
 	struct {
 		struct {
-			enum {
-				OscSystemInfo_boardType_leanXcam,
-				OscSystemInfo_boardType_indXcam,
-				OscSystemInfo_boardType_mesaSR4K,
-				OscSystemInfo_boardType_leanXradio,
-			} boardType;
+			enum boardType boardType;
 			int major, minor;
 			char * assembly, * revision;
 		} board;

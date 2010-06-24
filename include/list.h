@@ -19,8 +19,12 @@
 #ifndef OSCAR_INCLUDE_LIST_H_
 #define OSCAR_INCLUDE_LIST_H_
 
-#include <stdio.h>
+#if defined(__cplusplus) && !defined(__STDC_LIMIT_MACROS)
+	// For INT16_MAX usage with g++
+	#define __STDC_LIMIT_MACROS 1
+#endif
 #include <stdint.h>
+#include <stdio.h>
 #include <strings.h>
 #include <stdbool.h>
 #include <stddef.h>

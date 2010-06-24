@@ -25,8 +25,12 @@
 #ifndef OSCAR_INCLUDE_NIH_H_
 #define OSCAR_INCLUDE_NIH_H_
 
-#include <stdbool.h>
+#if defined(__cplusplus) && !defined(__STDC_LIMIT_MACROS)
+	// For INT16_MAX usage with g++
+	#define __STDC_LIMIT_MACROS 1
+#endif
 #include <stdint.h>
+#include <stdbool.h>
 #include <endian.h>
 
 /* This saves us two characters ... */

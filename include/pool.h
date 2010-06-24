@@ -19,26 +19,32 @@
 #ifndef OSCAR_INCLUDE_POOL_H_
 #define OSCAR_INCLUDE_POOL_H_
 
-#include <stdio.h>
+#if defined(__cplusplus) && !defined(__STDC_LIMIT_MACROS)
+	// For INT16_MAX usage with g++
+	#define __STDC_LIMIT_MACROS 1
+#endif
+
 #include <stdint.h>
+#include <stdio.h>
 #include <strings.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include "support.h"
 
 #define PoolDeclare(n, t, c) \
-	struct { \
-		union block * free; \
-		union block { \
+	union block { \
 			union block * next; \
 			t value; \
-		} data[c]; \
+	}; \
+	struct { \
+		union block * free; \
+		union block data[c]; \
 	} (n);
 
 #define PoolInit(n) \
 	({ \
 		typeof ((n).free) p = (n).data; \
-		while (p - (n).data < ARR_LENGTH((n).data) - 1) { \
+		while (p - (n).data < (int)ARR_LENGTH((n).data) - 1) { \
 			p->next = p + 1; \
 			p += 1; \
 		} \
