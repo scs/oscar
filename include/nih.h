@@ -43,6 +43,8 @@ typedef uint32_t uint32;
 typedef int OSC_ERR;
 typedef bool BOOL;
 
+#undef TRUE
+#undef FALSE
 #define TRUE true
 #define FALSE false
 
