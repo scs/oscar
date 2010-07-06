@@ -35,6 +35,7 @@ enum EnOscLogErrors {
 
 /*! @brief The different log levels of the logging module */
 enum EnOscLogLevel {
+	NOLOG = -1, /* not allowed for OscLog() */
 	EMERG,
 	ALERT,
 	CRITICAL,

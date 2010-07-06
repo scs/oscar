@@ -84,8 +84,10 @@ OSC_ERR OscLogSetFileLogLevel(const enum EnOscLogLevel level) {
 }
 
 
-OSC_ERR OscLog(const enum EnOscLogLevel level, const char * strFormat, ...) {
+OscFunction( OscLog, const enum EnOscLogLevel level, const char * strFormat, ...)
+
 	va_list ap; /*< The dynamic argument list */
+	OscAssert(level != NOLOG);
 
 	if (level <= osc_log.consoleLogLevel && osc_log.consoleLogLevel!=NONE)
 	{
@@ -119,8 +121,8 @@ OSC_ERR OscLog(const enum EnOscLogLevel level, const char * strFormat, ...) {
 			syslog(LOG_WARNING, "The last error message has been truncated because it was too big.");
 	}
 	
-	return SUCCESS;
-}
+OscFunctionEnd()
+
 
 OSC_ERR OscFatalErr(const char * strFormat, ...)
 {

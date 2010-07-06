@@ -95,9 +95,10 @@ OSC_ERR OscLogSetFileLogLevel(const enum EnOscLogLevel level)
 	return SUCCESS;
 }
 
-OSC_ERR OscLog(const enum EnOscLogLevel level, const char * strFormat, ...)
-{
+OscFunction(OscLog, const enum EnOscLogLevel level, const char * strFormat, ...)
+
 	va_list ap;         /*< The dynamic argument list */
+	OscAssert(level != NOLOG);
 		
 	if(level <= osc_log.consoleLogLevel && osc_log.consoleLogLevel!=NONE)
 	{
@@ -132,9 +133,9 @@ OSC_ERR OscLog(const enum EnOscLogLevel level, const char * strFormat, ...)
 		vfprintf(osc_log.pSimLogF, strFormat, ap);
 		va_end(ap);
 	}
-	
-	return SUCCESS;
-}
+
+OscFunctionEnd()
+
 
 OSC_ERR OscFatalErr(const char * strFormat, ...)
 {
