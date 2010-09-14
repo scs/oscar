@@ -1189,6 +1189,10 @@ OscFunction(static getUClinuxVersion, char ** res)
 	FILE * file = NULL;
 	
 	int err;
+	int ret;
+	int major=0, minor=0, patch_level=0, rc=0;
+	char* next = NULL;
+	char* occur = NULL;
 	
 	file=fopen("/proc/version", "r");
 				
@@ -1197,28 +1201,62 @@ OscFunction(static getUClinuxVersion, char ** res)
 	static char version[200];
 	fread(version, sizeof(char), 200, file);
 	
-	char* occur=strstr(version, "Git_");
+	occur=strstr(version, "Git_");
 	OscAssert(occur!=NULL);
 	occur+=4;
-	
-	char* next=strstr(occur, "-");
-	OscAssert(next!=NULL);
-	if(next[1]=='p') {
-		next=strstr(next+1, "-");
-		OscAssert(next!=NULL); 
+
+	ret = sscanf(occur, "v%d.%d-p%d-RC%d%*s", &major, &minor, &patch_level, &rc);
+	if(ret == 4 && major >= 0 && minor >= 0 && patch_level >= 0 && rc >= 0)
+	{
+		// Version number of form v1.2-p1-RC2
+		next = strstr(occur, "RC");
+		next += 2 + (1 + patch_level/10);
+		goto cleanup_and_exit;
 	}
-	char* end=strstr(next+1, "-");
-	if(end!=NULL) next=end;
+
+	ret = sscanf(occur, "v%d.%d-RC%d%*s", &major, &minor, &rc);
+	if(ret == 3 && major >= 0 && minor >= 0 && patch_level >= 0 && rc >= 0)
+	{
+		// Version number of form v1.2-RC2
+		next = strstr(occur, "RC");
+		next += 2 + (1 + patch_level/10);
+		goto cleanup_and_exit;
+	}
+
+	ret = sscanf(occur, "v%d.%d-p%d%*s", &major, &minor, &patch_level);
+	if(ret == 3 && major >= 0 && minor >= 0 && patch_level >= 0)
+	{
+		// Version number of form v1.2-p1
+		next = strstr(occur, "-p");
+		next += 2 + (1 + patch_level/10);
+		goto cleanup_and_exit;
+	}
+
+	ret = sscanf(occur, "v%d.%d%*s", &major, &minor);
+	if(ret == 2 && major >= 0 && minor >= 0)
+	{
+		// Version umber of form v1.2
+		next = strstr(occur, ".");
+		next += 1 + (1 + minor/10);
+		goto cleanup_and_exit;
+	}
 	
+	// Not able to parse => No valid version found.
+	OscLog(ERROR, "No valid uCLinux version string found!\n");
+	*res = "v0.0-p0";
+
+cleanup_and_exit:
+	OscAssert(next != NULL);
 	*next=0;
+	OscAssert(occur != NULL);
 	*res=occur;
-	
+
 	err = fclose(file);
 	OscAssert(err == 0);
 	
 OscFunctionCatch()
-//	pclose(file); FIXME: Shit! file's not in scope anymore!
-	*res = "v1.2-p1"; // FIXME: Do we need something more sopisticated as fallback? Maybe telling the user that we don't know, e.g. on the host?
+//	fclose(file); FIXME: File's not in scope anymore!
+	*res = "v0.0-p0";
 OscFunctionEnd()
 
 // FIXME: This file is too long! (Written on line 1018)
