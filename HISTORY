@@ -1,3 +1,11 @@
++ Release v2.1-p1
+! OscFrdCreateConstantReader: Avoid warnings
+! Make OscSupCycGet working on host
+! Better g++ compatibility of headers
+! Added #UNDEFS to prevent ... redefined errors
+! Add NOLOG for writin no log messages
+
+
 + Release v2.1
 + Fixed compatibility issues with C++ in general and OpenCV
 
