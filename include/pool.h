@@ -32,12 +32,11 @@
 #include "support.h"
 
 #define PoolDeclare(n, t, c) \
-	union block { \
+	struct { \
+		union block { \
 			union block * next; \
 			t value; \
-	}; \
-	struct { \
-		union block * free; \
+		} *free; \
 		union block data[c]; \
 	} (n);
 
