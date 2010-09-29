@@ -173,8 +173,10 @@ OscFunctionDeclare(static parseInteger, char * str, int * res)
 /*!
 	@brief Get the version of the running uClinux version.
 	@param res Is set to point to the value in a static buffer.
+	@param the other variables to matching ints parsed from the string
 */
-OscFunctionDeclare(static getUClinuxVersion, char ** res)
+OscFunctionDeclare(static getUClinuxVersion, char ** res, int* major, int* minor, int* patch_level, int* rc)
+
 
 /*! @brief The module singelton instance. */
 struct OSC_CFG cfg;
@@ -856,7 +858,12 @@ OscFunction(OscCfgGetSystemInfo, struct OscSystemInfo ** ppInfo)
 			OscCall(OscGetVersionString, &version);
 			OscCall(staticStore, version, &info.software.Oscar.version);
 			
-			OscCall(getUClinuxVersion, &version);
+			OscCall(getUClinuxVersion,
+					&version,
+					&info.software.uClinux.major,
+					&info.software.uClinux.minor,
+					&info.software.uClinux.patch,
+					&info.software.uClinux.rc);
 			OscCall(staticStore, version, &info.software.uClinux.version);
 		}
 		
@@ -1185,12 +1192,12 @@ OscFunction(static parseInteger, char * str, int * res)
 	*res = num;
 OscFunctionEnd()
 
-OscFunction(static getUClinuxVersion, char ** res)
+OscFunction(static getUClinuxVersion, char ** res, int* major, int* minor, int* patch_level, int* rc)
 	FILE * file = NULL;
 	
 	int err;
 	int ret;
-	int major=0, minor=0, patch_level=0, rc=0;
+	*major=0, *minor=0, *patch_level=0, *rc=0;
 	char* next = NULL;
 	char* occur = NULL;
 	
@@ -1205,39 +1212,39 @@ OscFunction(static getUClinuxVersion, char ** res)
 	OscAssert(occur!=NULL);
 	occur+=4;
 
-	ret = sscanf(occur, "v%d.%d-p%d-RC%d%*s", &major, &minor, &patch_level, &rc);
-	if(ret == 4 && major >= 0 && minor >= 0 && patch_level >= 0 && rc >= 0)
+	ret = sscanf(occur, "v%d.%d-p%d-RC%d%*s", major, minor, patch_level, rc);
+	if(ret == 4 && *major >= 0 && *minor >= 0 && *patch_level >= 0 && *rc >= 0)
 	{
 		// Version number of form v1.2-p1-RC2
 		next = strstr(occur, "RC");
-		next += 2 + (1 + patch_level/10);
+		next += 2 + (1 + *patch_level/10);
 		goto cleanup_and_exit;
 	}
 
-	ret = sscanf(occur, "v%d.%d-RC%d%*s", &major, &minor, &rc);
-	if(ret == 3 && major >= 0 && minor >= 0 && patch_level >= 0 && rc >= 0)
+	ret = sscanf(occur, "v%d.%d-RC%d%*s", major, minor, rc);
+	if(ret == 3 && *major >= 0 && *minor >= 0 && *patch_level >= 0 && *rc >= 0)
 	{
 		// Version number of form v1.2-RC2
 		next = strstr(occur, "RC");
-		next += 2 + (1 + patch_level/10);
+		next += 2 + (1 + *patch_level/10);
 		goto cleanup_and_exit;
 	}
 
-	ret = sscanf(occur, "v%d.%d-p%d%*s", &major, &minor, &patch_level);
-	if(ret == 3 && major >= 0 && minor >= 0 && patch_level >= 0)
+	ret = sscanf(occur, "v%d.%d-p%d%*s", major, minor, patch_level);
+	if(ret == 3 && *major >= 0 && *minor >= 0 && *patch_level >= 0)
 	{
 		// Version number of form v1.2-p1
 		next = strstr(occur, "-p");
-		next += 2 + (1 + patch_level/10);
+		next += 2 + (1 + *patch_level/10);
 		goto cleanup_and_exit;
 	}
 
-	ret = sscanf(occur, "v%d.%d%*s", &major, &minor);
-	if(ret == 2 && major >= 0 && minor >= 0)
+	ret = sscanf(occur, "v%d.%d%*s", major, minor);
+	if(ret == 2 && *major >= 0 && *minor >= 0)
 	{
 		// Version umber of form v1.2
 		next = strstr(occur, ".");
-		next += 1 + (1 + minor/10);
+		next += 1 + (1 + *minor/10);
 		goto cleanup_and_exit;
 	}
 	
