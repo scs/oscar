@@ -248,7 +248,7 @@ OSC_ERR OscCfgRegisterFile(
 	/* append string termination */
 	cfg.contents[actIndex].data[fileSize] = '\0';
 	OscLog(DEBUG, "%s: string length set to %d\n",
-			__func__, fileSize-1);
+			__func__, fileSize);
 
 	cfg.contents[actIndex].dataSize = maxFileSize + 1;
 	*pFileContentHandle = actIndex+1; /* return content handle */
