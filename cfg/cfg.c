@@ -326,10 +326,10 @@ OSC_ERR OscCfgGetStr(
 	if (stdErr == 0 || stdErr == EOF) // Empty string, return '\0' string...
 		pVal->str[0] = '\0';
 
-	if (strlen(pStrVal) >= 1023)
+	if (strlen(pVal->str) >= 1023)
 	{
-		OscLog(WARN, "%s: value too long found! (TAG=%s)\n",
-				__func__, pKey->strTag);
+		OscLog(WARN, "%s: value too long (%i)! (TAG=%s)\n",
+				__func__, strlen(pVal->str), pKey->strTag);
 		return -ECFG_INVALID_VAL;
 	}
 
