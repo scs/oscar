@@ -49,7 +49,7 @@ struct OscModule OscModule_cfg = {
 /*! @brief Macro defining the tag suffix string */
 #define CONFIG_FILE_LABEL_PREFIX "\n"
 /*! @brief Macro defining the escape characters for the string scanning */
-#define CONFIG_FILE_ESCAPE_CHARS "%1024[^\n]"
+#define CONFIG_FILE_ESCAPE_CHARS "%1023[^\n]"
 
 /*! @brief Structure containing the file content */
 struct CFG_FILE_CONTENT {
@@ -322,9 +322,13 @@ OSC_ERR OscCfgGetStr(
 	
 	/* scan value at beginning of file */
 	stdErr = sscanf(pStrVal, CONFIG_FILE_ESCAPE_CHARS, pVal->str);
-	if (stdErr == EOF)
+
+	if (stdErr == 0 || stdErr == EOF) // Empty string, return '\0' string...
+		pVal->str[0] = '\0';
+
+	if (strlen(pStrVal) >= 1023)
 	{
-		OscLog(WARN, "%s: no val found! (TAG=%s)\n",
+		OscLog(WARN, "%s: value too long found! (TAG=%s)\n",
 				__func__, pKey->strTag);
 		return -ECFG_INVALID_VAL;
 	}
