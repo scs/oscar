@@ -189,7 +189,6 @@ OSC_ERR OscCfgRegisterFile(
 	FILE    *pCfgFile;
 	size_t  fileSize;
 	unsigned int    actIndex;
-	unsigned int    invalidCharIndex;
 	
 	/* find an unused file index */
 	if(cfg.nrOfContents==0) {
@@ -232,23 +231,24 @@ OSC_ERR OscCfgRegisterFile(
 				__func__);
 		return -ECFG_ERROR;
 	}
+
 	fileSize = fread(cfg.contents[actIndex].data, sizeof(char), maxFileSize + 1, pCfgFile);
-	fclose(pCfgFile);
-	if (fileSize == maxFileSize + 1)
+	if (fileSize == maxFileSize + 1 || !feof(pCfgFile) || ferror(pCfgFile))
 	{
-		OscLog(ERROR, "%s: config file too long!\n",
-				__func__);
+		OscLog(ERROR, "%s: config file %s too long, or unable to open it! (ferror/feof: %i, %i)\n",
+				__func__, strFileName, ferror(pCfgFile), feof(pCfgFile));
+		fclose(pCfgFile);
 		free(cfg.contents[actIndex].data);
 		cfg.contents[actIndex].data=NULL;
 		return -ECFG_UNABLE_TO_OPEN_FILE;
 	}
+	fclose(pCfgFile);
 	cfg.nrOfContents++;
 	
 	/* append string termination */
-	invalidCharIndex = OscCfgFindInvalidChar((unsigned char *)cfg.contents[actIndex].data, fileSize);
-	cfg.contents[actIndex].data[invalidCharIndex] = '\0';
+	cfg.contents[actIndex].data[fileSize] = '\0';
 	OscLog(DEBUG, "%s: string length set to %d\n",
-			__func__, invalidCharIndex);
+			__func__, fileSize-1);
 
 	cfg.contents[actIndex].dataSize = maxFileSize + 1;
 	*pFileContentHandle = actIndex+1; /* return content handle */
@@ -1115,19 +1115,6 @@ char* OscCfgAppendLabel(
 	strcat(text, label);
 	strcat(text, labelSuffix);
 	return &text[strlen(text)];
-}
-
-unsigned int OscCfgFindInvalidChar(const unsigned char *str, const unsigned int strSize)
-{
-	int i;
-	for (i=0; i<strSize; i++)
-	{
-		if ((str[i] < (unsigned char)0x0a) || (str[i] > (unsigned char)0x7f))
-		{
-			return i;
-		}
-	}
-	return strSize;
 }
 
 OscFunction(static getUBootEnv, char * key, char ** value)
