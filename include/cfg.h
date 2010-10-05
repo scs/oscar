@@ -150,7 +150,7 @@ struct OscSystemInfo {
  * @param maxFileSize maximal file length.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-OSC_ERR OscCfgRegisterFile(
+OscFunctionDeclare(OscCfgRegisterFile, 
 		CFG_FILE_CONTENT_HANDLE* pFileContentHandle,
 		const char *strFileName,
 		const unsigned int maxFileSize);
@@ -162,7 +162,7 @@ OSC_ERR OscCfgRegisterFile(
  * @param pFileContentHandle Ptr to handle to the File content
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-OSC_ERR OscCfgUnregisterFile(
+OscFunctionDeclare( OscCfgUnregisterFile,
 		CFG_FILE_CONTENT_HANDLE pFileContentHandle);
 
 /*********************************************************************//*!
@@ -170,7 +170,7 @@ OSC_ERR OscCfgUnregisterFile(
  * 
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-OSC_ERR OscCfgDeleteAll( void);
+OscFunctionDeclare( OscCfgDeleteAll, void);
 
 /*********************************************************************//*!
  * @brief Writes content to the file content structure
@@ -178,17 +178,15 @@ OSC_ERR OscCfgDeleteAll( void);
  * @param hFileContent Handle to the File content.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-OSC_ERR OscCfgFlushContent(const CFG_FILE_CONTENT_HANDLE hFileContent);
+OscFunctionDeclare( OscCfgFlushContent, const CFG_FILE_CONTENT_HANDLE hFileContent);
 
 /*********************************************************************//*!
- * @brief Writes content of the whole allocated buffer to the file.
- * If the used string is smaller than the allocated buffer, the content
- * of the rest of the file is cleared with '\0'.
+ * @brief Does same as OscFlushContent !Old EEPROM flushing depreciated!
  * 
  * @param hFileContent Handle to the File content.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-OSC_ERR OscCfgFlushContentAll(const CFG_FILE_CONTENT_HANDLE hFileContent);
+OscFunctionDeclare( OscCfgFlushContentAll, const CFG_FILE_CONTENT_HANDLE hFileContent);
 
 /*********************************************************************//*!
  * @brief Read string from content structure
@@ -198,7 +196,7 @@ OSC_ERR OscCfgFlushContentAll(const CFG_FILE_CONTENT_HANDLE hFileContent);
  * @param pVal Return value (string).
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-OSC_ERR OscCfgGetStr(
+OscFunctionDeclare( OscCfgGetStr,
 		const CFG_FILE_CONTENT_HANDLE hFileContent,
 		const struct CFG_KEY *pKey,
 		struct CFG_VAL_STR *pVal);
@@ -211,7 +209,7 @@ OSC_ERR OscCfgGetStr(
  * @param strNewVal Write value (string).
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-OSC_ERR OscCfgSetStr(
+OscFunctionDeclare( OscCfgSetStr, 
 		const CFG_FILE_CONTENT_HANDLE hFileContent,
 		const struct CFG_KEY *pKey,
 		const char *strNewVal);
@@ -226,7 +224,7 @@ OSC_ERR OscCfgSetStr(
  * @param val Write value (boolean).
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-OSC_ERR OscCfgSetBool(
+OscFunctionDeclare( OscCfgSetBool, 
 		const CFG_FILE_CONTENT_HANDLE hFileContent,
 		const struct CFG_KEY *pKey,
 		const bool val);		
@@ -241,7 +239,7 @@ OSC_ERR OscCfgSetBool(
  * @param val Write value (integer).
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-OSC_ERR OscCfgSetInt(
+OscFunctionDeclare( OscCfgSetInt,
 		const CFG_FILE_CONTENT_HANDLE hFileContent,
 		const struct CFG_KEY *pKey,
 		const int val);			
@@ -254,7 +252,7 @@ OSC_ERR OscCfgSetInt(
  * @param iVal Return value.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-OSC_ERR OscCfgGetUInt8(
+OscFunctionDeclare( OscCfgGetUInt8,
 		const CFG_FILE_CONTENT_HANDLE hFileContent,
 		const struct CFG_KEY *pKey,
 		uint8 *iVal);
@@ -267,7 +265,7 @@ OSC_ERR OscCfgGetUInt8(
  * @param iVal Return value.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-OSC_ERR OscCfgGetInt(
+OscFunctionDeclare( OscCfgGetInt,
 		const CFG_FILE_CONTENT_HANDLE hFileContent,
 		const struct CFG_KEY *pKey,
 		int16 *iVal);
@@ -280,7 +278,7 @@ OSC_ERR OscCfgGetInt(
  * @param iVal Return value.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-OSC_ERR OscCfgGetInt32(
+OscFunctionDeclare( OscCfgGetInt32, 
 		const CFG_FILE_CONTENT_HANDLE hFileContent,
 		const struct CFG_KEY *pKey,
 		int32 *iVal);
@@ -293,7 +291,7 @@ OSC_ERR OscCfgGetInt32(
  * @param iVal Return value.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-OSC_ERR OscCfgGetUInt32(
+OscFunctionDeclare( OscCfgGetUInt32,
 		const CFG_FILE_CONTENT_HANDLE hFileContent,
 		const struct CFG_KEY *pKey,
 		uint32 *iVal);
@@ -309,7 +307,7 @@ OSC_ERR OscCfgGetUInt32(
  * @param def Use default value in case of failure. 
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-OSC_ERR OscCfgGetIntRange(
+OscFunctionDeclare( OscCfgGetIntRange,
 		const CFG_FILE_CONTENT_HANDLE hFileContent,
 		const struct CFG_KEY *pKey,
 		int16 *iVal,
@@ -328,7 +326,7 @@ OSC_ERR OscCfgGetIntRange(
  * @param def Use default value in case of failure. 
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-OSC_ERR OscCfgGetInt8Range(
+OscFunctionDeclare( OscCfgGetInt8Range,
 		const CFG_FILE_CONTENT_HANDLE hFileContent,
 		const struct CFG_KEY *pKey,
 		int8 *iVal,
@@ -348,7 +346,7 @@ OSC_ERR OscCfgGetInt8Range(
  * @param def Use default value in case of failure.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-OSC_ERR OscCfgGetUInt8Range(
+OscFunctionDeclare( OscCfgGetUInt8Range,
 		const CFG_FILE_CONTENT_HANDLE hFileContent,
 		const struct CFG_KEY *pKey,
 		uint8 *iVal,
@@ -367,7 +365,7 @@ OSC_ERR OscCfgGetUInt8Range(
  * @param def Use default value in case of failure.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-OSC_ERR OscCfgGetInt16Range(
+OscFunctionDeclare( OscCfgGetInt16Range,
 		const CFG_FILE_CONTENT_HANDLE hFileContent,
 		const struct CFG_KEY *pKey,
 		int16 *iVal,
@@ -387,7 +385,7 @@ OSC_ERR OscCfgGetInt16Range(
  * @param def Use default value in case of failure.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-OSC_ERR OscCfgGetUInt16Range(
+OscFunctionDeclare( OscCfgGetUInt16Range,
 		const CFG_FILE_CONTENT_HANDLE hFileContent,
 		const struct CFG_KEY *pKey,
 		uint16 *iVal,
@@ -406,7 +404,7 @@ OSC_ERR OscCfgGetUInt16Range(
  * @param def Use default value in case of failure. 
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-OSC_ERR OscCfgGetInt32Range(
+OscFunctionDeclare( OscCfgGetInt32Range,
 		const CFG_FILE_CONTENT_HANDLE hFileContent,
 		const struct CFG_KEY *pKey,
 		int32 *iVal,
@@ -425,7 +423,7 @@ OSC_ERR OscCfgGetInt32Range(
  * @param def Use default value in case of failure. 
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-OSC_ERR OscCfgGetUInt32Range(
+OscFunctionDeclare( OscCfgGetUInt32Range,
 		const CFG_FILE_CONTENT_HANDLE hFileContent,
 		const struct CFG_KEY *pKey,
 		uint32 *iVal,
@@ -443,7 +441,7 @@ OSC_ERR OscCfgGetUInt32Range(
  * @param pDefault Use default string in case of failure. Ignored if NULL. 
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-OSC_ERR OscCfgGetStrRange(
+OscFunctionDeclare( OscCfgGetStrRange,
 		const CFG_FILE_CONTENT_HANDLE hFileContent,
 		const struct CFG_KEY *pKey,
 		struct CFG_VAL_STR *pVal,
@@ -481,7 +479,7 @@ OscFunctionDeclare( OscCfgGetFloatRange,
  * @param def Use default value in case of failure. 
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-OSC_ERR OscCfgGetBool(
+OscFunctionDeclare( OscCfgGetBool,
 		const CFG_FILE_CONTENT_HANDLE hFileContent,
 		const struct CFG_KEY *pKey,
 		bool *iVal,

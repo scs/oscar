@@ -67,15 +67,6 @@ struct OSC_CFG {
 /*======================= Private methods ==============================*/
 
 /*********************************************************************//*!
- * @brief Helper function to write the file content
- * 
- * @param hFileContent Handle to the File content.
- * @param all True if the whole buffer shall be written.
- * @return SUCCESS or an appropriate error code otherwise
- *//*********************************************************************/
-OSC_ERR OscCfgFlushContentHelper(const CFG_FILE_CONTENT_HANDLE hFileContent, bool all);
-
-/*********************************************************************//*!
  * @brief Helper function to find the beginning of the value string in the file
  * 
  * @param contentIndex Index to the File content.
@@ -83,7 +74,7 @@ OSC_ERR OscCfgFlushContentHelper(const CFG_FILE_CONTENT_HANDLE hFileContent, boo
  * @param pPStrVal Return pointer to the value in the file.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-OSC_ERR OscCfgGetValPtr(
+OscFunctionDeclare( static OscCfgGetValPtr,
 		const unsigned int  contentIndex,
 		const struct CFG_KEY *pKey,
 		char **pPStrVal);
@@ -96,7 +87,7 @@ OSC_ERR OscCfgGetValPtr(
  * @param string Pointer to string.
  * @return Pointer to char in string after subString, NULL if no subString is found
  *//*********************************************************************/
-char* OscCfgIsSubStr(
+static char* OscCfgIsSubStr(
 		const char *subString,
 		const size_t subStringLen,
 		const char *string);
@@ -109,7 +100,7 @@ char* OscCfgIsSubStr(
  * @param text Pointer to text.
  * @return Pointer to char in test after label suffix, NULL if label not found
  *//*********************************************************************/
-char* OscCfgFindNewlineLabel(
+static char* OscCfgFindNewlineLabel(
 		const char* label,
 		const char* labelSuffix,
 		char* text);
@@ -123,7 +114,7 @@ char* OscCfgFindNewlineLabel(
  * @param text Pointer to text.
  * @return SUCCESS or an appropriate error code otherwise
  *//*********************************************************************/
-OSC_ERR OscCfgReplaceStr(
+OscFunctionDeclare( static OscCfgReplaceStr,
 		const unsigned int  contentIndex,
 		const char *oldStr,
 		const char *newStr,
@@ -140,21 +131,12 @@ OSC_ERR OscCfgReplaceStr(
  * @param labelSuffix Pointer to labelSuffix.
  * @return pointer to char after labelSuffix
  *//*********************************************************************/
-char* OscCfgAppendLabel(
+static char* OscCfgAppendLabel(
 		char* text,
 		const unsigned int maxTextLen,
 		const char* label,
 		const char* labelPrefix,
 		const char* labelSuffix);
-
-/*********************************************************************//*!
- * @brief Helper to find the first occurence of an invalid character
- * 
- * @param str Character array to search in.
- * @param strSize Array length of str.
- * @return index of first invalid char.
- *//*********************************************************************/
-unsigned int OscCfgFindInvalidChar(const unsigned char *str, const unsigned int strSize);
 
 /*!
 	@brief Get the value of a U-Boot environment variable.
@@ -181,11 +163,13 @@ OscFunctionDeclare(static getUClinuxVersion, char ** res, int* major, int* minor
 /*! @brief The module singelton instance. */
 struct OSC_CFG cfg;
 
-OSC_ERR OscCfgRegisterFile(
+/*======================= Public methods ==============================*/
+
+OscFunction( OscCfgRegisterFile,
 		CFG_FILE_CONTENT_HANDLE *pFileContentHandle,
 		const char *strFileName,
 		const unsigned int maxFileSize)
-{
+
 	FILE    *pCfgFile;
 	size_t  fileSize;
 	unsigned int    actIndex;
@@ -202,35 +186,17 @@ OSC_ERR OscCfgRegisterFile(
 	}
 	
 	/* check preconditions */
-	if(pFileContentHandle == NULL || strFileName == NULL || strFileName[0] == '\0')
-	{
-		OscLog(ERROR, "%s(0x%x, %s): Invalid parameter.\n",
-				__func__, pFileContentHandle, strFileName);
-		return -ECFG_INVALID_FUNC_PARAMETER;
-	}
-	if(cfg.nrOfContents >= CONFIG_FILE_MAX_NUM || actIndex >= CONFIG_FILE_MAX_NUM) {
-		OscLog(ERROR, "%s: too many handles open (%d=%d) !\n",
-				__func__, cfg.nrOfContents, CONFIG_FILE_MAX_NUM);
-		return -ECFG_NO_HANDLES;
-	}
+	OscAssert_e(pFileContentHandle && strFileName, -ECFG_ERROR);
+	OscAssert_e(strFileName[0] != '\0', -ECFG_INVALID_FUNC_PARAMETER);
+	OscAssert_em(cfg.nrOfContents < CONFIG_FILE_MAX_NUM && actIndex < CONFIG_FILE_MAX_NUM, ECFG_NO_HANDLES,  "too many handles open (%d=%d) !\n", cfg.nrOfContents, CONFIG_FILE_MAX_NUM);
 
 	/* copy file name and open file */
 	pCfgFile = fopen(strFileName, "r");
-	if(pCfgFile == NULL)
-	{
-		OscLog(WARN, "%s: Unable to open config file %s!\n",
-				__func__, strFileName);
-		return -ECFG_UNABLE_TO_OPEN_FILE;
-	}
+	OscAssert_em(pCfgFile, -ECFG_UNABLE_TO_OPEN_FILE, "Unable to open config file %s!\n", strFileName);
 
 	/* save data in content manager */
 	cfg.contents[actIndex].data = malloc(maxFileSize + 1);
-	if (cfg.contents[actIndex].data == NULL)
-	{
-		OscLog(ERROR, "%s: could not allocate memory!\n",
-				__func__);
-		return -ECFG_ERROR;
-	}
+	OscAssert_em(cfg.contents[actIndex].data, -ECFG_ERROR, "could not allocate memory!\n");
 
 	fileSize = fread(cfg.contents[actIndex].data, sizeof(char), maxFileSize + 1, pCfgFile);
 	if (fileSize == maxFileSize + 1 || !feof(pCfgFile) || ferror(pCfgFile))
@@ -240,7 +206,7 @@ OSC_ERR OscCfgRegisterFile(
 		fclose(pCfgFile);
 		free(cfg.contents[actIndex].data);
 		cfg.contents[actIndex].data=NULL;
-		return -ECFG_UNABLE_TO_OPEN_FILE;
+		OscFail_e(-ECFG_UNABLE_TO_OPEN_FILE);
 	}
 	fclose(pCfgFile);
 	cfg.nrOfContents++;
@@ -254,138 +220,130 @@ OSC_ERR OscCfgRegisterFile(
 	*pFileContentHandle = actIndex+1; /* return content handle */
 	strcpy(cfg.contents[actIndex].fileName, strFileName); /* store file name */
 	
-/*    OscLog(DEBUG, "Read config file (%s):\n%s\n", strFileName, cfg.contents[actIndex].data); does not work on OSC*/
+OscFunctionEnd()
 
-	return SUCCESS;
-}
-
-OSC_ERR OscCfgUnregisterFile(CFG_FILE_CONTENT_HANDLE pFileContentHandle) {
+OscFunction( OscCfgUnregisterFile, CFG_FILE_CONTENT_HANDLE pFileContentHandle)
 	
-	if(pFileContentHandle<=0 || pFileContentHandle>CONFIG_FILE_MAX_NUM
-			|| cfg.contents[pFileContentHandle-1].data==NULL) {
-		return(EINVALID_PARAMETER);
-	}
+	OscAssert_e(pFileContentHandle>0 && pFileContentHandle<=CONFIG_FILE_MAX_NUM
+			&& cfg.contents[pFileContentHandle-1].data, -EINVALID_PARAMETER);
 	
 	free(cfg.contents[pFileContentHandle-1].data);
 	cfg.contents[pFileContentHandle-1].data=NULL;
 	
 	--cfg.nrOfContents;
 	
-	return(SUCCESS);
-}
+OscFunctionEnd()
 
-OSC_ERR OscCfgDeleteAll( void)
-{
-	return SUCCESS;
-}
+OscFunction( OscCfgDeleteAll, void)
+	/* do nothing */
+OscFunctionEnd()
 
-OSC_ERR OscCfgFlushContent(const CFG_FILE_CONTENT_HANDLE hFileContent)
-{
-	return OscCfgFlushContentHelper(hFileContent, FALSE);
-}
+OscFunction( OscCfgFlushContent, const CFG_FILE_CONTENT_HANDLE hFileContent)
 
-OSC_ERR OscCfgFlushContentAll(const CFG_FILE_CONTENT_HANDLE hFileContent)
-{
-	return OscCfgFlushContentHelper(hFileContent, TRUE);
-}
+	FILE        *pCfgFile;
+	char        *strFileName;
+	size_t      fileSize;
+	unsigned int strSize, index;
+	
+	/* check preconditions */
+	OscAssert_e(hFileContent && hFileContent <= CONFIG_FILE_MAX_NUM, -ECFG_INVALID_FUNC_PARAMETER)
+	index = hFileContent-1;
+	strSize = strlen(cfg.contents[index].data); /* string size without \0 */
+	OscAssert_em(strSize < cfg.contents[index].dataSize, -ECFG_ERROR, "invalid content size!\n");
+	
+	/* open file */
+	strFileName = cfg.contents[index].fileName;
+	pCfgFile = fopen(strFileName, "w+");
+	OscAssert_em(pCfgFile, -ECFG_UNABLE_TO_OPEN_FILE, "Unable to open config file %s!\n", strFileName);
 
-OSC_ERR OscCfgGetStr(
+	fileSize = fwrite(cfg.contents[index].data, sizeof(char), strSize, pCfgFile);   /* write string */
+
+	fclose(pCfgFile);
+	OscAssert_em(fileSize == strSize, -ECFG_UNABLE_TO_WRITE_FILE, "could not write data!\n");
+	
+OscFunctionEnd()
+
+OscFunction( OscCfgFlushContentAll, const CFG_FILE_CONTENT_HANDLE hFileContent)
+
+	/* Does same as OscFlushContent - old EEPROM flushing depreciated */
+	return OscCfgFlushContent(hFileContent);
+
+OscFunctionEnd()
+		
+OscFunction( OscCfgGetStr,
 		const CFG_FILE_CONTENT_HANDLE hFileContent,
 		const struct CFG_KEY *pKey,
 		struct CFG_VAL_STR *pVal)
-{
+
 	char *pStrVal = NULL;
 	int  stdErr;
 	OSC_ERR err;
 	
 	/* check preconditions */
-	if(pKey == NULL || pVal == NULL || hFileContent == 0 || hFileContent > CONFIG_FILE_MAX_NUM)
-	{
-		OscLog(ERROR, "%s(%d, 0x%x, 0x%x): Invalid parameter.\n",
-				__func__, hFileContent, pKey, pVal);
-		return -ECFG_INVALID_FUNC_PARAMETER;
-	}
+	OscAssert_em(pKey && pVal && hFileContent && hFileContent <= CONFIG_FILE_MAX_NUM, -ECFG_INVALID_FUNC_PARAMETER, "Invalid parameter.(%d, 0x%x, 0x%x)\n", hFileContent, pKey, pVal);
 
 	/* find value pointer */
 	err = OscCfgGetValPtr(hFileContent-1, pKey, &pStrVal);
-	if (err != SUCCESS)
-	{
-		return err;
-	}
+	OscAssert_e (err == SUCCESS, err)
 	/* function may return null pointer */
-	else if(pStrVal == NULL)
-	{
-		/*OscLog(WARN, "%s: tag or section not found (%s)!\n",
-				__func__, pKey->strTag);*/
-		return -ECFG_INVALID_KEY;
-	}
+	OscAssert_e(pStrVal, -ECFG_INVALID_KEY);
 	
 	/* scan value at beginning of file */
 	stdErr = sscanf(pStrVal, CONFIG_FILE_ESCAPE_CHARS, pVal->str);
 
-	if (stdErr == 0 || stdErr == EOF) // Empty string, return '\0' string...
+	if (stdErr == 0 || stdErr == EOF) { 
+		// Empty string, return '\0' string...
 		pVal->str[0] = '\0';
-
-	if (strlen(pVal->str) >= 1023)
-	{
-		OscLog(WARN, "%s: value too long (%i)! (TAG=%s)\n",
-				__func__, strlen(pVal->str), pKey->strTag);
-		return -ECFG_INVALID_VAL;
 	}
 
+	OscAssert_em(strlen(pVal->str) < 1024, -ECFG_INVALID_VAL, "value too long (%i)! (TAG=%s)\n", strlen(pVal->str), pKey->strTag);
 	OscLog(DEBUG, "Read Tag '%s': Value '%s'\n", pKey->strTag, pVal->str);
-	return SUCCESS;
-}
 
-OSC_ERR OscCfgGetStrRange(
+OscFunctionEnd()
+	
+OscFunction( OscCfgGetStrRange,
 		const CFG_FILE_CONTENT_HANDLE hFileContent,
 		const struct CFG_KEY *pKey,
 		struct CFG_VAL_STR *pVal,
 		const uint32 len,
 		const char* pDefault)
-{
+
 	OSC_ERR err;
 	err = OscCfgGetStr( hFileContent, pKey, pVal);
 	
     if( (err == SUCCESS) && (strlen(pVal->str) > len) && (len != -1))
     {
-    	err = ECFG_INVALID_RANGE;
+    	OscFail_e(-ECFG_INVALID_RANGE);
 	}  
 	if( err != SUCCESS && pDefault != NULL)
 	{
     	strcpy( pVal->str, pDefault);
     	err = ECFG_USED_DEFAULT;
-	}	
+	}
 	return err;
-}
 
-OSC_ERR OscCfgSetStr(
+OscFunctionEnd()
+	
+OscFunction( OscCfgSetStr,
 		const CFG_FILE_CONTENT_HANDLE hFileContent,
 		const struct CFG_KEY *pKey,
 		const char *strNewVal)
-{
+
 	char *pStrSecStart = NULL;  /* points to beginning of section content */
 	char *pStrVal = NULL;
 	struct CFG_VAL_STR oldVal;
 	int  stdErr;
-	OSC_ERR err;
 	unsigned int index;
+	OSC_ERR err;
 	
 	/* check preconditions */
-	if(pKey == NULL || hFileContent == 0 || hFileContent > CONFIG_FILE_MAX_NUM)
-	{
-		OscLog(ERROR, "%s(%d, 0x%x, 0x%x): Invalid parameter.\n",
-				__func__, hFileContent, pKey, strNewVal);
-		return -ECFG_INVALID_FUNC_PARAMETER;
-	}
+	OscAssert_em(pKey && hFileContent && hFileContent <= CONFIG_FILE_MAX_NUM, -ECFG_INVALID_FUNC_PARAMETER, "Invalid parameter.(%d, 0x%x, 0x%x)\n", hFileContent, pKey, strNewVal);
 	index = hFileContent - 1;
 
 	/* find value pointer */
 	err = OscCfgGetValPtr(index, pKey, &pStrVal);
-	if (err != SUCCESS)
-	{
-		return err;
-	}
+	OscAssert_e(err == SUCCESS, err);
+
 	if (pStrVal == NULL) /* if section or tag not found */
 	{
 		/* find section */
@@ -394,20 +352,14 @@ OSC_ERR OscCfgSetStr(
 		{
 			/* append section label and get pointer to content string termination */
 			pStrSecStart = OscCfgAppendLabel(cfg.contents[index].data, cfg.contents[index].dataSize, pKey->strSection, CONFIG_FILE_LABEL_PREFIX, ""/* \n added with tag*/);
-			if (pStrSecStart == NULL)
-			{
-				return -ECFG_ERROR;
-			}
+			OscAssert_e (pStrSecStart, -ECFG_ERROR);
 		}
 		pStrVal = OscCfgFindNewlineLabel(pKey->strTag, CONFIG_FILE_TAG_SUFFIX, pStrSecStart);
 		if(pStrVal == NULL)
 		{
 			/* append tag label and get pointer to content string termination */
 			pStrVal = OscCfgAppendLabel(cfg.contents[index].data, cfg.contents[index].dataSize, pKey->strTag, CONFIG_FILE_LABEL_PREFIX, CONFIG_FILE_TAG_SUFFIX);
-			if (pStrVal == NULL)
-			{
-				return -ECFG_ERROR;
-			}
+			OscAssert_e(pStrVal, -ECFG_ERROR);
 		}
 	}
 	/* scan value after tag */
@@ -419,50 +371,43 @@ OSC_ERR OscCfgSetStr(
 	
 	/* insert the new string into config file */
 	err = OscCfgReplaceStr(index, oldVal.str, strNewVal, pStrVal);
-	if (err == SUCCESS)
-	{
-		OscLog(DEBUG, "Wrote Tag '%s': Value '%s'\n", pKey->strTag, strNewVal);
-	}
-	else
-	{
-		OscLog(WARN, "Unable to write Tag '%s': Value '%s'\n", pKey->strTag, strNewVal);
-	}
-	return err;
-}
+	OscAssert_em(err == SUCCESS, err, "Unable to write Tag '%s': Value '%s'\n", pKey->strTag, strNewVal);
+	OscLog(DEBUG, "Wrote Tag '%s': Value '%s'\n", pKey->strTag, strNewVal);
 
-OSC_ERR OscCfgSetBool(
+OscFunctionEnd()
+	
+OscFunction( OscCfgSetBool,
 		const CFG_FILE_CONTENT_HANDLE hFileContent,
 		const struct CFG_KEY *pKey,
 		const bool val)
-{
-	OSC_ERR err;
+
 	if(val)
 	{
-		err = OscCfgSetStr( hFileContent, pKey, "TRUE");
+		return OscCfgSetStr( hFileContent, pKey, "TRUE");
 	}
 	else
 	{
-		err = OscCfgSetStr( hFileContent, pKey, "FALSE");
+		return OscCfgSetStr( hFileContent, pKey, "FALSE");
 	}		
-	return err;
-}		
-
-OSC_ERR OscCfgSetInt(
+OscFunctionEnd()
+	
+OscFunction( OscCfgSetInt,
 		const CFG_FILE_CONTENT_HANDLE hFileContent,
 		const struct CFG_KEY *pKey,
 		const int val)
-{
+
 	char strVal[ CONFIG_VAL_MAX_SIZE];
 	
 	sprintf( strVal, "%d", val);
 	return OscCfgSetStr( hFileContent, pKey, strVal);
-}		
-
-OSC_ERR OscCfgGetInt(
+	
+OscFunctionEnd()
+	
+OscFunction( OscCfgGetInt,
 		const CFG_FILE_CONTENT_HANDLE hFileContent,
 		const struct CFG_KEY *pKey,
 		int16 *iVal)
-{
+
 	OSC_ERR err;
 	int32 tmpVal;
 	err = OscCfgGetInt32(hFileContent, pKey, &tmpVal);
@@ -471,13 +416,14 @@ OSC_ERR OscCfgGetInt(
 			*iVal = (int16)tmpVal;
 	}
 	return err;
-}
-
-OSC_ERR OscCfgGetUInt8(
+	
+OscFunctionEnd()
+	
+OscFunction( OscCfgGetUInt8,
 		const CFG_FILE_CONTENT_HANDLE hFileContent,
 		const struct CFG_KEY *pKey,
 		uint8 *iVal)
-{
+
 	OSC_ERR err;
 	uint32 tmpVal;
 	err = OscCfgGetUInt32(hFileContent, pKey, &tmpVal);
@@ -486,99 +432,98 @@ OSC_ERR OscCfgGetUInt8(
 			*iVal = (uint8)tmpVal;
 	}
 	return err;
-}
 
+OscFunctionEnd()
 
-OSC_ERR OscCfgGetIntRange(
+OscFunction( OscCfgGetIntRange,
 		const CFG_FILE_CONTENT_HANDLE hFileContent,
 		const struct CFG_KEY *pKey,
 		int16 *iVal,
 		const int16 min,
 		const int16 max,
 		const int16 def)
-{
+
 	OSC_ERR err;
 	int32 tmpVal;
 	err = OscCfgGetInt32Range(hFileContent, pKey, &tmpVal, min, max, (int32)def);
 	*iVal = (int16)tmpVal;
 	return err;
-}
 
-OSC_ERR OscCfgGetInt8Range(
+OscFunctionEnd()
+	
+OscFunction( OscCfgGetInt8Range,
 		const CFG_FILE_CONTENT_HANDLE hFileContent,
 		const struct CFG_KEY *pKey,
 		int8 *iVal,
 		const int8 min,
 		const int8 max,
 		const int8 def)
-{
+
 	OSC_ERR err;
 	int32 tmpVal;
 	err = OscCfgGetInt32Range(hFileContent, pKey, &tmpVal, min, max, (int32)def);
 	*iVal = (int8)tmpVal;
 	return err;
-}
 
-OSC_ERR OscCfgGetUInt8Range(
+OscFunctionEnd()
+	
+OscFunction( OscCfgGetUInt8Range,
 		const CFG_FILE_CONTENT_HANDLE hFileContent,
 		const struct CFG_KEY *pKey,
 		uint8 *iVal,
 		const uint8 min,
 		const uint8 max,
 		const uint8 def)
-{
+
 	OSC_ERR err;
 	uint32 tmpVal;
 	err = OscCfgGetUInt32Range(hFileContent, pKey, &tmpVal, min, max, (uint32)def);
 	*iVal = (uint8)tmpVal;
 	return err;
-}
-
-OSC_ERR OscCfgGetInt16Range(
+	
+OscFunctionEnd()
+	
+OscFunction( OscCfgGetInt16Range,
 		const CFG_FILE_CONTENT_HANDLE hFileContent,
 		const struct CFG_KEY *pKey,
 		int16 *iVal,
 		const int16 min,
 		const int16 max,
 		const int16 def)
-{
+
 	OSC_ERR err;
 	int32 tmpVal;
 	err = OscCfgGetInt32Range(hFileContent, pKey, &tmpVal, min, max, (int32)def);
 	*iVal = (int16)tmpVal;
 	return err;
-}
-
-OSC_ERR OscCfgGetUInt16Range(
+	
+OscFunctionEnd()
+			
+OscFunction( OscCfgGetUInt16Range,
 		const CFG_FILE_CONTENT_HANDLE hFileContent,
 		const struct CFG_KEY *pKey,
 		uint16 *iVal,
 		const uint16 min,
 		const uint16 max,
 		const uint16 def)
-{
+
 	OSC_ERR err;
 	uint32 tmpVal;
 	err = OscCfgGetUInt32Range(hFileContent, pKey, &tmpVal, (uint32)min, (uint32)max, (uint32)def);
 	*iVal = (uint16)tmpVal;
 	return err;
-}
 
+OscFunctionEnd()
 
-OSC_ERR OscCfgGetInt32(
+OscFunction( OscCfgGetInt32,
 		const CFG_FILE_CONTENT_HANDLE hFileContent,
 		const struct CFG_KEY *pKey,
 		int32 *iVal)
-{
+
 	struct CFG_VAL_STR val;
 	OSC_ERR err;
 	/* check preconditions */
-	if(pKey == NULL || iVal == NULL)
-	{
-		OscLog(ERROR, "%s(%d, 0x%x, 0x%x): Invalid parameter.\n",
-				__func__, hFileContent, pKey, iVal);
-		return -ECFG_INVALID_FUNC_PARAMETER;
-	}
+	OscAssert_em(pKey && iVal, -ECFG_INVALID_FUNC_PARAMETER, "Invalid parameter.(%d, 0x%x, 0x%x)\n", hFileContent, pKey, iVal);
 
 	err = OscCfgGetStr(hFileContent, pKey, &val);
 	if (err == SUCCESS)
@@ -586,22 +531,18 @@ OSC_ERR OscCfgGetInt32(
 		*iVal = (int32)atoi(val.str);
 	}
 	return err;
-}
 
-OSC_ERR OscCfgGetUInt32(
+OscFunctionEnd()
+	
+OscFunction( OscCfgGetUInt32,
 		const CFG_FILE_CONTENT_HANDLE hFileContent,
 		const struct CFG_KEY *pKey,
 		uint32 *iVal)
-{
+
 	struct CFG_VAL_STR val;
 	OSC_ERR err;
 	/* check preconditions */
-	if(pKey == NULL || iVal == NULL)
-	{
-		OscLog(ERROR, "%s(%d, 0x%x, 0x%x): Invalid parameter.\n",
-				__func__, hFileContent, pKey, iVal);
-		return -ECFG_INVALID_FUNC_PARAMETER;
-	}
+	OscAssert_em(pKey && iVal, -ECFG_INVALID_FUNC_PARAMETER, "Invalid parameter.(%d, 0x%x, 0x%x)\n", hFileContent, pKey, iVal);
 
 	err = OscCfgGetStr(hFileContent, pKey, &val);
 	if (err == SUCCESS)
@@ -609,26 +550,24 @@ OSC_ERR OscCfgGetUInt32(
 		*iVal = (uint32)atoi(val.str);
 	}
 	return err;
-}
 
-OSC_ERR OscCfgGetInt32Range(
+OscFunctionEnd()
+	
+OscFunction( OscCfgGetInt32Range,
 		const CFG_FILE_CONTENT_HANDLE hFileContent,
 		const struct CFG_KEY *pKey,
 		int32 *iVal,
 		const int32 min,
 		const int32 max,
 		const int32 def)
-{
+
 	OSC_ERR err;
 	err = OscCfgGetInt32(hFileContent, pKey, iVal);
 	if ((max > min) && (err == SUCCESS))
 	{
-		if( ((*iVal < min) || (*iVal > max)) && (max!=-1) )
-		{
-			OscLog(WARN, "%s: Value out of range (%s: %d)!\n",
-					__func__, pKey->strTag, *iVal);
-			err = -ECFG_INVALID_VAL;
-		}
+		/* check range */
+		OscAssert_em(*iVal >= min, -ECFG_INVALID_VAL, "Value too small (%s: %d)!\n", pKey->strTag, *iVal);
+		OscAssert_em((*iVal <= max) || (max==-1), -ECFG_INVALID_VAL, "Value too big (%s: %d)!\n", pKey->strTag, *iVal);
 	}
 	if( err != SUCCESS)
 	{
@@ -636,26 +575,24 @@ OSC_ERR OscCfgGetInt32Range(
 		err = ECFG_USED_DEFAULT;
 	}	
 	return err;
-}
 
-OSC_ERR OscCfgGetUInt32Range(
+OscFunctionEnd()
+	
+OscFunction( OscCfgGetUInt32Range,
 		const CFG_FILE_CONTENT_HANDLE hFileContent,
 		const struct CFG_KEY *pKey,
 		uint32 *iVal,
 		const uint32 min,
 		const uint32 max,
 		const uint32 def)
-{
+
 	OSC_ERR err;
 	err = OscCfgGetUInt32(hFileContent, pKey, iVal);
 	if ((max > min) && (err == SUCCESS))
 	{
-		if( ((*iVal < min) || (*iVal > max)) && (max!=-1) )
-		{
-			OscLog(WARN, "%s: Value out of range (%s: %d)!\n",
-					__func__, pKey->strTag, *iVal);
-			err = -ECFG_INVALID_VAL;
-		}
+		/* check range */
+		OscAssert_em(*iVal >= min, -ECFG_INVALID_VAL, "Value too small (%s: %d)!\n", pKey->strTag, *iVal);
+		OscAssert_em((*iVal <= max) || (max==-1), -ECFG_INVALID_VAL, "Value too big (%s: %d)!\n", pKey->strTag, *iVal);
 	}
 	if( err != SUCCESS)
 	{
@@ -663,8 +600,9 @@ OSC_ERR OscCfgGetUInt32Range(
     	err = ECFG_USED_DEFAULT;		
 	}
 	return err;
-}
-
+	
+OscFunctionEnd()
+	
 OscFunction( OscCfgGetFloatRange,
 		const CFG_FILE_CONTENT_HANDLE hFileContent,
 		const struct CFG_KEY *pKey,
@@ -705,12 +643,12 @@ OscFunction( OscCfgGetFloatRange,
 	*iVal = valF;
 OscFunctionEnd()
 
-OSC_ERR OscCfgGetBool(
+OscFunction( OscCfgGetBool,
 		const CFG_FILE_CONTENT_HANDLE hFileContent,
 		const struct CFG_KEY *pKey,
 		bool *iVal,
 		const bool def)
-{
+
 	OSC_ERR err;
 	struct CFG_VAL_STR val;
 	
@@ -734,7 +672,7 @@ OSC_ERR OscCfgGetBool(
 		}		
 		else
 		{
-			err = -ECFG_INVALID_VAL;
+			OscFail_e(-ECFG_INVALID_VAL);
 		}
 	}  
 	if( err != SUCCESS)
@@ -743,8 +681,9 @@ OSC_ERR OscCfgGetBool(
     	err = ECFG_USED_DEFAULT;		
 	}
 	return err;		
-}
-
+	
+OscFunctionEnd()
+	
 #ifdef TARGET_TYPE_MESA_SR4K
 #error OscCfgGetSystemInfo needs to be updated to work on the Mesa SwissRanger.
 #endif
@@ -878,75 +817,16 @@ OscFunction(OscCfgGetSystemInfo, struct OscSystemInfo ** ppInfo)
 OscFunctionEnd()
 
 /*======================= Private methods ==============================*/
-// FIXME: Private? Why aren't these static then?
-OSC_ERR OscCfgFlushContentHelper(const CFG_FILE_CONTENT_HANDLE hFileContent, bool all)
-{
-	FILE        *pCfgFile;
-	char        *strFileName;
-	size_t      fileSize;
-	unsigned int strSize;
-	unsigned int index;
 
-	/* check preconditions */
-	if(hFileContent == 0 || hFileContent > CONFIG_FILE_MAX_NUM)
-	{
-		OscLog(ERROR, "%s(%d): Invalid parameter.\n",
-				__func__, hFileContent);
-		return -ECFG_INVALID_FUNC_PARAMETER;
-	}
-	index = hFileContent-1;
-	strSize = strlen(cfg.contents[index].data); /* string size without \0 */
-	if (strSize > cfg.contents[index].dataSize - 1)
-		{
-		OscLog(ERROR, "%s: invalid content size!\n",
-				__func__);
-		return -ECFG_ERROR;
-	}
-
-	/* open file */
-	strFileName = cfg.contents[index].fileName;
-	pCfgFile = fopen(strFileName, "w+");
-	if(pCfgFile == NULL)
-	{
-		OscLog(ERROR, "%s: Unable to open config file %s!\n",
-				__func__, strFileName);
-		return -ECFG_UNABLE_TO_OPEN_FILE;
-	}
-	
-	fileSize = fwrite(cfg.contents[index].data, sizeof(char), strSize, pCfgFile);   /* write string */
-	if (all)
-	{
-		memset(&cfg.contents[index].data[strSize], 0, cfg.contents[index].dataSize - strSize);
-		fileSize += fwrite(&cfg.contents[index].data[strSize], sizeof(char), cfg.contents[index].dataSize - strSize - 1, pCfgFile);
-	}
-	fclose(pCfgFile);
-	if (fileSize < strSize)
-	{
-		OscLog(ERROR, "%s: could not write data!\n",
-				__func__);
-		return -ECFG_UNABLE_TO_WRITE_FILE;
-	}
-
-/*    OscLog(DEBUG, "Wrote config file (%s):\n%s\n", strFileName, cfg.contents[index].data);*/
-
-	return SUCCESS;
-}
-
-OSC_ERR OscCfgGetValPtr(
+OscFunction( static OscCfgGetValPtr,
 		const unsigned int  contentIndex,
 		const struct CFG_KEY *pKey,
 		char **pPStrVal)
-{
+
 	char            *pStrSecStart;  /* points to beginning of section content */
 	
 	/* check preconditions */
-	if(pPStrVal == NULL ||
-			pKey == NULL || pKey->strTag == NULL)
-	{
-		OscLog(ERROR, "%s(%d, 0x%x): Invalid parameter.\n",
-				__func__, contentIndex, pKey->strTag);
-		return -ECFG_INVALID_FUNC_PARAMETER;
-	}
+	OscAssert_em(pPStrVal && pKey && pKey->strTag,-ECFG_INVALID_FUNC_PARAMETER, "Invalid parameter.(%d, 0x%x)\n", contentIndex, pKey->strTag);
 	
 	/* find section */
 	pStrSecStart = OscCfgFindNewlineLabel(pKey->strSection, CONFIG_FILE_SECTION_SUFFIX, cfg.contents[contentIndex].data);
@@ -958,10 +838,10 @@ OSC_ERR OscCfgGetValPtr(
 
 	/* find tag */
 	*pPStrVal = OscCfgFindNewlineLabel(pKey->strTag, CONFIG_FILE_TAG_SUFFIX, pStrSecStart);
-	return SUCCESS;
-}
-
-char* OscCfgIsSubStr(
+	
+OscFunctionEnd()
+	
+static char* OscCfgIsSubStr(
 		const char *subString,
 		const size_t subStringLen,
 		const char *string)
@@ -986,7 +866,7 @@ char* OscCfgIsSubStr(
 	return (char*)&string[i];
 }
 
-char* OscCfgFindNewlineLabel(
+static char* OscCfgFindNewlineLabel(
 		const char* label,
 		const char* labelSuffix,
 		char* text)
@@ -1032,12 +912,12 @@ char* OscCfgFindNewlineLabel(
 	return NULL;
 }
 
-OSC_ERR OscCfgReplaceStr(
+OscFunction( static OscCfgReplaceStr,
 		const unsigned int  contentIndex,
 		const char *oldStr,
 		const char *newStr,
 		char* text)
-{
+
 	size_t newStrLen, oldStrLen, textLen, diffLen;
 	int16 i;
 
@@ -1084,9 +964,10 @@ OSC_ERR OscCfgReplaceStr(
 		text[i] = newStr[i];
 	}
 	return SUCCESS;
-}
-
-char* OscCfgAppendLabel(
+	
+OscFunctionEnd()
+	
+static char* OscCfgAppendLabel(
 		char* text,
 		const unsigned int maxTextLen,
 		const char* label,
@@ -1197,7 +1078,8 @@ OscFunction(static getUClinuxVersion, char ** res, int* major, int* minor, int* 
 	OscAssert(file != NULL);
 	
 	static char version[200];
-	fread(version, sizeof(char), 200, file);
+	ret = fread(version, sizeof(char), 200, file);
+	OscAssert(ret > 0);
 	
 	occur=strstr(version, "Git_");
 	OscAssert(occur!=NULL);
@@ -1256,5 +1138,3 @@ OscFunctionCatch()
 //	fclose(file); FIXME: File's not in scope anymore!
 	*res = "v0.0-p0";
 OscFunctionEnd()
-
-// FIXME: This file is too long! (Written on line 1018)
