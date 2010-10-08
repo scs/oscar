@@ -45,7 +45,7 @@ struct OscModule OscModule_cfg = {
 /*! @brief Macro defining the section suffix string */
 #define CONFIG_FILE_SECTION_SUFFIX "\n"
 /*! @brief Macro defining the tag suffix string */
-#define CONFIG_FILE_TAG_SUFFIX ": "
+#define CONFIG_FILE_TAG_SUFFIX ":"
 /*! @brief Macro defining the tag suffix string */
 #define CONFIG_FILE_LABEL_PREFIX "\n"
 /*! @brief Macro defining the escape characters for the string scanning */
@@ -106,6 +106,16 @@ static char* OscCfgFindNewlineLabel(
 		char* text);
 
 /*********************************************************************//*!
+ * @brief Finds start of next section.
+ * 
+ * @param pSectionStart Start of section that shall be analysed.
+ * @return Pointer to start of next section label. NULL if error
+ *//*********************************************************************/
+static char* OscCfgFindNextSectionStart(
+		char* pSectionStart);
+
+
+/*********************************************************************//*!
  * @brief Replaces oldStr with newStr in text
  * 
  * @param contentIndex Index to content structure.
@@ -122,21 +132,17 @@ OscFunctionDeclare( static OscCfgReplaceStr,
 
 
 /*********************************************************************//*!
- * @brief Appends label to the file content
+ * @brief Inserts Text to the file content
  * 
- * @param text Pointer to text.
- * @param maxTextLen maxFileSize + 1.
- * @param label Pointer to label. If NULL, nothing is appended
- * @param labelPrefix Pointer to labelPrefix.
- * @param labelSuffix Pointer to labelSuffix.
- * @return pointer to char after labelSuffix
+ * @param contentIndex Index to content structure.
+ * @param insertPosition Pointer to file text position, where text shall be inserted
+ * @param insertText Pointer to text string that shall be inserted. If NULL, nothing is inserted
+ * @return pointer to char after insertedText
  *//*********************************************************************/
-static char* OscCfgAppendLabel(
-		char* text,
-		const unsigned int maxTextLen,
-		const char* label,
-		const char* labelPrefix,
-		const char* labelSuffix);
+static char* OscCfgInsertText(
+		const unsigned int  contentIndex,
+		char* insertPosition,
+		const char* insertText);
 
 /*!
 	@brief Get the value of a U-Boot environment variable.
@@ -278,6 +284,7 @@ OscFunction( OscCfgGetStr,
 	char *pStrVal = NULL;
 	int  stdErr;
 	OSC_ERR err;
+	pVal->str[0] = '\0'; /* default */
 	
 	/* check preconditions */
 	OscAssert_em(pKey && pVal && hFileContent && hFileContent <= CONFIG_FILE_MAX_NUM, -ECFG_INVALID_FUNC_PARAMETER, "Invalid parameter.(%d, 0x%x, 0x%x)\n", hFileContent, pKey, pVal);
@@ -289,6 +296,13 @@ OscFunction( OscCfgGetStr,
 	OscAssert_e(pStrVal, -ECFG_INVALID_KEY);
 	
 	/* scan value at beginning of file */
+	{
+		char ignoreStr[80]; /* copy white spaces to this ignored string */
+		int result = sscanf(pStrVal, "%80[ \t]", ignoreStr);
+		if (result == 1) {
+			pStrVal = &pStrVal[strlen(ignoreStr)]; /* move pointer forward */
+		}
+	}
 	stdErr = sscanf(pStrVal, CONFIG_FILE_ESCAPE_CHARS, pVal->str);
 
 	if (stdErr == 0 || stdErr == EOF) { 
@@ -345,33 +359,36 @@ OscFunction( OscCfgSetStr,
 	OscAssert_e(err == SUCCESS, err);
 
 	if (pStrVal == NULL) /* if section or tag not found */
-	{
+	{ /* value inserted */
 		/* find section */
 		pStrSecStart = OscCfgFindNewlineLabel(pKey->strSection, CONFIG_FILE_SECTION_SUFFIX, cfg.contents[index].data);
 		if(pStrSecStart == NULL)
 		{
-			/* append section label and get pointer to content string termination */
-			pStrSecStart = OscCfgAppendLabel(cfg.contents[index].data, cfg.contents[index].dataSize, pKey->strSection, CONFIG_FILE_LABEL_PREFIX, ""/* \n added with tag*/);
-			OscAssert_e (pStrSecStart, -ECFG_ERROR);
+			/* append section label to end of file and get pointer to content string termination */
+			pStrSecStart = OscCfgInsertText(index, &cfg.contents[index].data[strlen(cfg.contents[index].data)], CONFIG_FILE_LABEL_PREFIX);
+			pStrSecStart = OscCfgInsertText(index, pStrSecStart/*append*/, pKey->strSection);
+			pStrSecStart = OscCfgInsertText(index, pStrSecStart/*append*/, CONFIG_FILE_SECTION_SUFFIX);
+			/* postfix '\n' added with tag*/
+			OscAssert_em(pStrSecStart, -ECFG_ERROR, "Unable to write Section '%s'\n", pKey->strSection);
 		}
-		pStrVal = OscCfgFindNewlineLabel(pKey->strTag, CONFIG_FILE_TAG_SUFFIX, pStrSecStart);
-		if(pStrVal == NULL)
+		/* insert tag label at beginning of section and get pointer to content string termination */
+		pStrVal = OscCfgInsertText(index, pStrSecStart, pKey->strTag);
+		pStrVal = OscCfgInsertText(index, pStrVal/*append*/, CONFIG_FILE_TAG_SUFFIX);
+		pStrVal = OscCfgInsertText(index, pStrVal/*append*/, strNewVal);
+		pStrVal = OscCfgInsertText(index, pStrVal/*append*/, "\n");
+	}
+	else { /* value replaced */
+		/* scan value after tag */
+		stdErr = sscanf(pStrVal, CONFIG_FILE_ESCAPE_CHARS, oldVal.str);
+		if (stdErr == EOF)
 		{
-			/* append tag label and get pointer to content string termination */
-			pStrVal = OscCfgAppendLabel(cfg.contents[index].data, cfg.contents[index].dataSize, pKey->strTag, CONFIG_FILE_LABEL_PREFIX, CONFIG_FILE_TAG_SUFFIX);
-			OscAssert_e(pStrVal, -ECFG_ERROR);
+			oldVal.str[0] = '\0'; /* set string termination */
 		}
-	}
-	/* scan value after tag */
-	stdErr = sscanf(pStrVal, CONFIG_FILE_ESCAPE_CHARS, oldVal.str);
-	if (stdErr == EOF)
-	{
-		oldVal.str[0] = '\0'; /* set string termination */
-	}
 	
-	/* insert the new string into config file */
-	err = OscCfgReplaceStr(index, oldVal.str, strNewVal, pStrVal);
-	OscAssert_em(err == SUCCESS, err, "Unable to write Tag '%s': Value '%s'\n", pKey->strTag, strNewVal);
+		/* insert the new string into config file */
+		err = OscCfgReplaceStr(index, oldVal.str, strNewVal, pStrVal);
+		OscAssert_em(err == SUCCESS, err, "Unable to write Tag '%s': Value '%s'\n", pKey->strTag, strNewVal);
+	}
 	OscLog(DEBUG, "Wrote Tag '%s': Value '%s'\n", pKey->strTag, strNewVal);
 
 OscFunctionEnd()
@@ -823,7 +840,8 @@ OscFunction( static OscCfgGetValPtr,
 		const struct CFG_KEY *pKey,
 		char **pPStrVal)
 
-	char            *pStrSecStart;  /* points to beginning of section content */
+	char *pStrSecStart;  /* points to beginning of section content */
+	char *pStrNextSecStart;
 	
 	/* check preconditions */
 	OscAssert_em(pPStrVal && pKey && pKey->strTag,-ECFG_INVALID_FUNC_PARAMETER, "Invalid parameter.(%d, 0x%x)\n", contentIndex, pKey->strTag);
@@ -838,6 +856,13 @@ OscFunction( static OscCfgGetValPtr,
 
 	/* find tag */
 	*pPStrVal = OscCfgFindNewlineLabel(pKey->strTag, CONFIG_FILE_TAG_SUFFIX, pStrSecStart);
+	
+	pStrNextSecStart = OscCfgFindNextSectionStart(pStrSecStart);
+	OscAssert_e(pStrNextSecStart, -ECFG_ERROR);
+	if (*pPStrVal > pStrNextSecStart) {
+		/* tag found is in next section */
+		*pPStrVal = NULL;
+	}
 	
 OscFunctionEnd()
 	
@@ -897,6 +922,13 @@ static char* OscCfgFindNewlineLabel(
 		/* find label */
 		textStr = &textStr[offset];
 		offset = 1;
+		{ /* find white spaces to ignore */
+			char ignoreStr[80]; /* copy white spaces to this ignored string */
+			int result = sscanf(textStr, "%80[ \t]", ignoreStr);
+			if (result == 1) {
+				textStr = &textStr[strlen(ignoreStr)]; /* move pointer forward */
+			}
+		}
 		tmpStr = OscCfgIsSubStr(label, labelLen, textStr);
 		if (tmpStr != NULL)
 		{
@@ -911,6 +943,57 @@ static char* OscCfgFindNewlineLabel(
 
 	return NULL;
 }
+
+static char* OscCfgFindNextSectionStart(char* pSectionStart)
+{
+	char tmpText[80]="";
+	const char newLine = '\n';
+	unsigned int offset = 0;
+	char *pSection;
+	int result;
+
+	/* check preconditions */
+	pSection = pSectionStart;
+	if (pSection == NULL) {
+		OscLog(ERROR, "%s(0x%x): Invalid parameter.\n",
+				__func__, pSection);
+		return NULL;
+	}
+
+	while (pSection!=NULL) {
+		if (strlen(pSection) > 0) {
+			pSection = &pSection[offset];
+			offset = 1;
+		} else {
+			break; /* EOF */
+		}
+
+		{/*ignore white spaces*/
+			char ignoreStr[80]; /* copy white spaces to this ignored string */
+			result = sscanf(pSection, "%80[ \t]", ignoreStr);
+			if (result == 1) {
+				pSection = &pSection[strlen(ignoreStr)]; /* move pointer forward */
+			}
+		}
+		result = sscanf(pSection, "%80[^\n]", tmpText);
+		if (result ==1) {
+			/*text found*/
+			if (tmpText[0] != '#' && tmpText[0] != '%' && tmpText[0] != '/') {
+				/* line is no comment */
+				if (strchr(tmpText, ':') == NULL) {
+					/* line is no tag*/
+					OscLog(DEBUG, " -- EOS (tmp = %s)\n", tmpText);
+					return pSection; /* in this case it must be a section */
+				}
+			}
+		}
+		/* goto next line */
+		pSection = strchr(pSection, newLine);
+	}
+	OscLog(DEBUG, " -- EOF\n");
+	return &pSectionStart[strlen(pSectionStart)]; /* return EOF */
+}
+
 
 OscFunction( static OscCfgReplaceStr,
 		const unsigned int  contentIndex,
@@ -967,39 +1050,44 @@ OscFunction( static OscCfgReplaceStr,
 	
 OscFunctionEnd()
 	
-static char* OscCfgAppendLabel(
-		char* text,
-		const unsigned int maxTextLen,
-		const char* label,
-		const char* labelPrefix,
-		const char* labelSuffix)
+static char* OscCfgInsertText(
+		const unsigned int  contentIndex,
+		char* insertPosition,
+		const char* insertText)
 {
+	size_t insertTextLen;
+	int16 i;
+	
 	/* check preconditions */
-	if (text == NULL || labelPrefix == NULL || labelSuffix == NULL)
-	{
-		OscLog(ERROR, "%s(0x%x, %d, 0x%x, 0x%x, 0x%x): Invalid parameter.\n",
-				__func__, text, maxTextLen, label, labelPrefix, labelSuffix);
+	if (insertPosition == NULL) {
+		OscLog(ERROR, "%s(0x%x, 0x%x): Invalid parameter.\n",
+				__func__, insertPosition, insertText);
+		return NULL;
+	}
+	/* do nothing if no insertText is handed over */
+	if (insertText == NULL) {
+		return insertPosition;
+	}
+	/* check file size */
+	insertTextLen = strlen(insertText);
+	if(strlen(cfg.contents[contentIndex].data) + insertTextLen > cfg.contents[contentIndex].dataSize) {
+		OscLog(ERROR, "%s: cannot insert text '%s'; file length exceeded!\n",
+				__func__, insertText);
 		return NULL;
 	}
 	
-	/* do nothing if label == NULL */
-	if (label == NULL)
+	/* shift file data right, starting from end of file */
+	for (i=(int16)strlen(insertPosition); i >= 0; i--)
 	{
-		return text;
+		insertPosition[i+insertTextLen] = insertPosition[i]; /* copy all including '\0' at string end */
+	}
+	/* insert text */
+	for (i=0; i<insertTextLen; i++)
+	{
+		insertPosition[i] = insertText[i];
 	}
 
-	/* check file size */
-	if(strlen(text) + strlen(label) + strlen(labelSuffix) + 1 > maxTextLen)
-	{
-		OscLog(ERROR, "%s: cannot insert label '%s'; file length exceeded!\n",
-				__func__, label);
-		return NULL;
-	}
-	/* add label string to end of file */
-	strcat(text, labelPrefix);
-	strcat(text, label);
-	strcat(text, labelSuffix);
-	return &text[strlen(text)];
+	return &insertPosition[insertTextLen];
 }
 
 OscFunction(static getUBootEnv, char * key, char ** value)
