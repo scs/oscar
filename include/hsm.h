@@ -23,6 +23,8 @@
 #ifndef HSM_PUB_H_
 #define HSM_PUB_H_
 
+#ifndef __cplusplus
+
 extern struct OscModule OscModule_hsm;
 
 /*! Module-specific error codes.
@@ -138,5 +140,5 @@ void HsmOnStart(Hsm *me);
  *//*********************************************************************/
 void HsmOnEvent(Hsm *me, Msg const *msg);
 
-
+#endif /*__cplusplus*/
 #endif /*HSM_PUB_H_*/
