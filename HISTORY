@@ -1,3 +1,7 @@
++ Release v2.1-p2
+Fixed GPIO module checking for uninitialized file descriptors on host.
+
+
 + Release v2.1-p1
 ! OscFrdCreateConstantReader: Avoid warnings
 ! Make OscSupCycGet working on host
