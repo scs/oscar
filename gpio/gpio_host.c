@@ -53,9 +53,9 @@ OSC_ERR OscGpioWrite(enum EnGpios enGpio, bool bState)
 {
 	struct GPIO_PIN     *pPin = &gpio.pins[enGpio];
 	
-	if(unlikely(!pPin->fd))
+	if(unlikely(!gpio.phSignalOut[enGpio]))
 	{
-		OscLog(ERROR, "%s: No file descriptor for pin %d found. "
+		OscLog(ERROR, "%s: No file writer for pin %d found. "
 				"This probably "
 				"means that this GPIO is not available on your "
 				"hardware platform.", __func__, enGpio);
@@ -93,9 +93,9 @@ OSC_ERR OscGpioRead(enum EnGpios enGpio, bool *pbState)
 {
 	struct GPIO_PIN     *pPin = &gpio.pins[enGpio];
 	
-	if(unlikely(!pPin->fd))
+	if(unlikely(!gpio.phSignalIn[enGpio]))
 	{
-		OscLog(ERROR, "%s: No file descriptor for pin %d found. "
+		OscLog(ERROR, "%s: No file reader for pin %d found. "
 				"This probably "
 				"means that this GPIO is not available on your "
 				"hardware platform.", __func__, enGpio);
