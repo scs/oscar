@@ -20,14 +20,17 @@
 #define OSCAR_INCLUDE_ERROR_H_
 
 /* OscFunction[Finally|Catch|End]: Declare a function using these macros to use the Osc(Fail|Assert|Call)* error handling macros. */
-/*! @brief Use this macro to declare a function. */
+/*! @brief Use this macro to declare a function.
+ * __warn_unused_result__: Do NOT ignore the return value, or else you will not
+ * catch OscAssert's! Either check the return value
+ * or do an OscCall or similar. */
 #ifdef __cplusplus
 #define OscFunctionDeclare(name, ...) \
-	OSC_ERR name(__VA_ARGS__);
+	__attribute__((__warn_unused_result__)) OSC_ERR name(__VA_ARGS__);
 
 #else
 #define OscFunctionDeclare(name, args ...) \
-	OSC_ERR name(args);
+	__attribute__((__warn_unused_result__)) OSC_ERR name(args);
 
 #endif /* __cplusplus */
 
