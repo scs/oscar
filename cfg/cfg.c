@@ -380,7 +380,7 @@ OscFunction( OscCfgSetStr,
 	else { /* value replaced */
 		/* scan value after tag */
 		stdErr = sscanf(pStrVal, CONFIG_FILE_ESCAPE_CHARS, oldVal.str);
-		if (stdErr == EOF)
+		if ((stdErr == EOF) || (stdErr == 0))
 		{
 			oldVal.str[0] = '\0'; /* set string termination */
 		}
