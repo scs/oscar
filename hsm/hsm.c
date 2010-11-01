@@ -24,6 +24,8 @@
 #include <string.h>
 #include <stdio.h>
 
+#ifndef __cplusplus
+
 #include "oscar.h"
 
 struct OscModule OscModule_hsm = {
@@ -144,4 +146,4 @@ unsigned char HsmToLCA_(Hsm *me, State *target) {
 	}
 	return 0;
 }
-
+#endif /*__cplusplus*/
