@@ -76,7 +76,10 @@ OSC_ERR OscLogCreate()
 OSC_ERR OscLogDestroy()
 {
 	fclose(osc_log.pLogF);
+	osc_log.pLogF = NULL;
+
 	fclose(osc_log.pSimLogF);
+	osc_log.pLogF = NULL;
 
 	return SUCCESS;
 }
