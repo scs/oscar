@@ -81,6 +81,9 @@ OSC_ERR OscLogDestroy()
 	fclose(osc_log.pSimLogF);
 	osc_log.pLogF = NULL;
 
+	osc_log.consoleLogLevel = NONE;
+	osc_log.fileLogLevel = NONE;
+
 	return SUCCESS;
 }
 
