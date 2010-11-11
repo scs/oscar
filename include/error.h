@@ -28,14 +28,13 @@
 #define OscFunctionDeclare(name, ...) \
 	__attribute__((__warn_unused_result__)) OSC_ERR name(__VA_ARGS__);
 
+#define OscPureVirtualFunctionDeclare(name, ...) \
+  __attribute__((__warn_unused_result__)) virtual OSC_ERR name(__VA_ARGS__) = 0;
 #else
 #define OscFunctionDeclare(name, args ...) \
 	__attribute__((__warn_unused_result__)) OSC_ERR name(args);
 
 #endif /* __cplusplus */
-
-
-
 
 #ifdef __cplusplus
 
