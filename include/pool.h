@@ -31,6 +31,15 @@
 #include <stddef.h>
 #include "support.h"
 
+#define PoolDeclareType(type, t, c) \
+  struct type { \
+    union block { \
+      union block * next; \
+      t value; \
+    } *free; \
+    union block data[c]; \
+  };
+
 #define PoolDeclare(n, t, c) \
 	struct { \
 		union block { \
