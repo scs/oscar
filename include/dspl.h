@@ -160,14 +160,16 @@ fract2x16 compose_fr2x16(fract16 h, fract16 l);
 fract2x16 OscDsplCompose_fr2x16(fract16 h, fract16 l);
 #endif /* OSC_HOST */
 
+#ifdef OSC_TARGET
+/*! @brief Target only: Redirect the call to the DSP runtime library */
+#define OscDsplTransfr32fr16 fr32_to_fr16
+#endif /* OSC_TARGET */
 #ifdef OSC_HOST
 /*********************************************************************//*!
  * @brief Transform a fract32 number into a fract16 number
  * 
  * Saturates and rounds the same way as the dsp
  * (when saving an accumulator result into a fract16 data register)
- * 
- * Only for host
  * 
  * @param multfr32 Fract32 number to be saved.
  * @return The saved fract16 value.
