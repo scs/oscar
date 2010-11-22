@@ -48,6 +48,16 @@ inline fract16 OscDsplFloatToFr16(float n)
 	return (fract16)ret;
 }
 
+
+fract16 OscDsplSat_fr1x32(fract32 x) {
+  if (x >= FR16_MAX)
+    return FR16_MAX;
+  if (x <= FR16_MIN)
+    return FR16_MIN;
+  return (fract16)(0xffff & x);
+}
+
+
 fract16 OscDsplHigh_of_fr2x16(fract2x16 x)
 {
 	return (fract16)(x >> 16);

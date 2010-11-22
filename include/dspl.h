@@ -65,6 +65,30 @@ float OscDsplFr16ToFloat(fract16 n);
 fract16 OscDsplFloatToFr16(float n);
 
 
+
+/*========================== VDSP++ functions ==========================*/
+
+#ifdef OSC_TARGET
+/*! @brief Target only: Redirect the call to the DSP runtime library */
+fract16 sat_fr1x32(fract32 x);
+#define OscDsplSat_fr1x32 sat_fr1x32
+#endif /* OSC_TARGET */
+#ifdef OSC_HOST
+/*********************************************************************//*!
+ * @brief Scale fract32 to fract16 accuracy.
+ * 
+ * Equivalent to sat_fr1x32 from the ADI DSP library. If x>0x00007fff, 
+ * it returns 0x7fff. If x<0xffff8000, it returns 0x8000. Otherwise, it 
+ * returns the lower 16 bits of x. 
+ * 
+ * @param f1 Fract32 number.
+ * @return The saturated fract16 value of f1.
+ *//*********************************************************************/
+fract16 OscDsplSat_fr1x32(fract32 x);
+#endif /* OSC_HOST */
+
+
+
 #ifdef OSC_TARGET
 /*! @brief Target only: Redirect the call to the DSP runtime library */
 fract16 high_of_fr2x16(fract2x16 x);
@@ -182,6 +206,7 @@ fract16 OscDsplTransfr32fr16(fract32 multfr32);
 #endif /* OSC_HOST */
 
 
+
 #ifdef OSC_TARGET
 fract16 mult_fr1x16(fract16 a,fract16 b);
 #define OscDsplMultFr16 mult_fr1x16
@@ -226,6 +251,7 @@ fract16 OscDsplMultRFr16(fract16 a, fract16 b);
 #endif /* OSC_HOST */
 
 
+
 #ifdef OSC_TARGET
 /*! @brief Target only: Redirect the call to the DSP runtime library */
 fract16 _sin_fr16(fract16 x);
@@ -242,6 +268,7 @@ fract16 _sin_fr16(fract16 x);
  *//*********************************************************************/
 fract16 OscDspl_sin_fr16(fract16 x);
 #endif /* OSC_HOST */
+
 
 
 #ifdef OSC_TARGET
@@ -701,4 +728,3 @@ fract16 OscDspl_cabs_fr16(complex_fract16 c);
 
 
 #endif /*DSPL_PUB_H_*/
-

@@ -39,7 +39,7 @@
 #ifdef __cplusplus
 
 #define OscFunction(name, ...) \
-	OSC_ERR name(__VA_ARGS__) { \
+	__attribute__((__warn_unused_result__)) OSC_ERR name(__VA_ARGS__) { \
 		struct { \
 			OSC_ERR error, status; \
 			bool caught: 1; \
@@ -62,7 +62,7 @@
 #else
 
 #define OscFunction(name, args ...) \
-	OSC_ERR name(args) { \
+	__attribute__((__warn_unused_result__)) OSC_ERR name(args) { \
 		struct { \
 			OSC_ERR error, status; \
 			bool caught: 1; \
