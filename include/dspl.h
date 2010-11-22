@@ -100,6 +100,7 @@ fract16 low_of_fr2x16(fract2x16 x);
 fract16 OscDsplLow_of_fr2x16(fract2x16 x);
 #endif /* OSC_HOST */
 
+
 #ifdef OSC_TARGET
 /*! @brief Target only: Redirect the call to the DSP runtime library */
 fract16 shl_fr1x16(fract16 x, int y);
@@ -119,6 +120,7 @@ fract16 shl_fr1x16(fract16 x, int y);
  *//*********************************************************************/
 fract16 OscDsplShl_fr1x16(fract16 x, int y);
 #endif /* OSC_HOST */
+
 
 #ifdef OSC_TARGET
 /*! @brief Target only: Redirect the call to the DSP runtime library */
@@ -142,6 +144,7 @@ fract2x16 shl_fr2x16(fract2x16 x, int y);
 fract2x16 OscDsplShl_fr2x16(fract2x16 x, int y);
 #endif /* OSC_HOST */
 
+
 #ifdef OSC_TARGET
 /*! @brief Target only: Redirect the call to the DSP runtime library */
 fract2x16 compose_fr2x16(fract16 h, fract16 l);
@@ -159,6 +162,7 @@ fract2x16 compose_fr2x16(fract16 h, fract16 l);
  *//*********************************************************************/
 fract2x16 OscDsplCompose_fr2x16(fract16 h, fract16 l);
 #endif /* OSC_HOST */
+
 
 #ifdef OSC_TARGET
 /*! @brief Target only: Redirect the call to the DSP runtime library */
@@ -198,6 +202,7 @@ fract16 mult_fr1x16(fract16 a,fract16 b);
  *//*********************************************************************/
 fract16 OscDsplMultFr16(fract16 a, fract16 b);
 #endif /* OSC_HOST */
+
 
 #ifdef OSC_TARGET
 fract16 multr_fr1x16(fract16 a,fract16 b);
@@ -275,6 +280,7 @@ fract16 _mean_fr16(const fract16 x[], int lenght);
 fract16 OscDspl_mean_fr16(const fract16 x[],int  length);
 #endif /* OSC_HOST */
 
+
 #ifdef OSC_TARGET
 /*! @brief Target only: Redirect the call to the DSP runtime library */
 complex_fract16 _cadd_fr16 ( complex_fract16 a, complex_fract16 b );
@@ -293,15 +299,14 @@ complex_fract16 _cadd_fr16 ( complex_fract16 a, complex_fract16 b );
  * @return Result of the addition
  *//*********************************************************************/
 complex_fract16 OscDspl_cadd_fr16(complex_fract16 a, complex_fract16 b );
-
 #endif /* OSC_HOST */
+
 
 #ifdef OSC_TARGET
 /*! @brief Target only: Redirect the call to the DSP runtime library */
 complex_fract16 _csub_fr16 ( complex_fract16 a, complex_fract16 b );
 #define OscDspl_csub_fr16 _csub_fr16
 #endif /* OSC_TARGET */
-
 #ifdef OSC_HOST
 /*********************************************************************//*!
  * @brief Complex_fract16 subtracter
@@ -314,15 +319,14 @@ complex_fract16 _csub_fr16 ( complex_fract16 a, complex_fract16 b );
  * @return Result of the subtraction
  *//*********************************************************************/
 complex_fract16 OscDspl_csub_fr16(complex_fract16 a, complex_fract16 b );
-
 #endif /* OSC_HOST */
+
 
 #ifdef OSC_TARGET
 /*! @brief Target only: Redirect the call to the DSP runtime library */
 complex_fract16 _cdiv_fr16 ( complex_fract16 a, complex_fract16 b );
 #define OscDspl_cdiv_fr16 _cdiv_fr16
 #endif /* OSC_TARGET */
-
 #ifdef OSC_HOST
 /*********************************************************************//*!
  * @brief Complex_fract16 division
@@ -337,12 +341,12 @@ complex_fract16 _cdiv_fr16 ( complex_fract16 a, complex_fract16 b );
 complex_fract16 OscDspl_cdiv_fr16(complex_fract16 a, complex_fract16 b);
 #endif /* OSC_HOST */
 
+
 #ifdef OSC_TARGET
 /*! @brief Target only: Redirect the call to the DSP runtime library */
 complex_fract16 _cmlt_fr16 ( complex_fract16 a, complex_fract16 b );
 #define OscDspl_cmlt_fr16 _cmlt_fr16
 #endif /* OSC_TARGET */
-
 #ifdef OSC_HOST
 /*********************************************************************//*!
  * @brief Complex_fract16 multiplicator
@@ -355,8 +359,8 @@ complex_fract16 _cmlt_fr16 ( complex_fract16 a, complex_fract16 b );
  * @return Result of the multiplication
  *//*********************************************************************/
 complex_fract16 OscDspl_cmlt_fr16(complex_fract16 a, complex_fract16 b );
-
 #endif /* OSC_HOST */
+
 
 #ifdef OSC_TARGET
 /*! @brief Target only: Redirect the call to the DSP runtime library
@@ -366,7 +370,6 @@ complex_fract16 OscDspl_cmlt_fr16(complex_fract16 a, complex_fract16 b );
 complex_fract16 _conj_fr16 ( complex_fract16 a);
 #define OscDspl_conj_fr16 _conj_fr16
 #endif /* OSC_TARGET */
-
 #ifdef OSC_HOST
 /*********************************************************************//*!
  * @brief Complex_fract16 conjugator
@@ -377,9 +380,7 @@ complex_fract16 _conj_fr16 ( complex_fract16 a);
  * @return Conjugated result
  *//*********************************************************************/
 complex_fract16 OscDspl_conj_fr16(complex_fract16 a);
-
 #endif /* OSC_HOST */
-
 
 
 #define __USE_FAST_LOOKUP__  1
@@ -389,9 +390,7 @@ complex_fract16 OscDspl_conj_fr16(complex_fract16 a);
 void _twidfftrad2_fr16(complex_fract16 w[],int n);
 #define OscDspl_twidfftrad2_fr16 _twidfftrad2_fr16
 #endif /* OSC_TARGET */
-
 #ifdef OSC_HOST
-
 /*********************************************************************//*!
  * @brief Twiddle table generator
  * 
@@ -401,8 +400,8 @@ void _twidfftrad2_fr16(complex_fract16 w[],int n);
  * @param n FFT size
  *//*********************************************************************/
 void OscDspl_twidfftrad2_fr16(complex_fract16 w[], int n );
-
 #endif /* OSC_HOST */
+
 
 #ifdef OSC_TARGET
 /*! @brief Target only: Redirect the call to the DSP runtime library */
@@ -466,8 +465,8 @@ void  OscDspl_rfft_fr16( const fract16          in[],
 									int  fft_size,
 									int  *block_exponent,
 									int  scaling );
-
 #endif /* OSC_HOST */
+
 
 #ifdef OSC_TARGET
 /*! @brief Target only: Redirect the call to the DSP runtime library */
@@ -480,7 +479,6 @@ void  cfft_fr16( const complex_fract16          in[],
 									int  scaling );
 #define OscDspl_cfft_fr16 cfft_fr16
 #endif /* OSC_TARGET */
-
 #ifdef OSC_HOST
 /*********************************************************************//*!
  * @brief Complex fast fourier transformation
@@ -509,8 +507,8 @@ void  OscDspl_cfft_fr16( const complex_fract16          in[],
 									int  fft_size,
 									int  *block_exponent,
 									int  scaling );
-
 #endif /* OSC_HOST */
+
 
 #ifdef OSC_TARGET
 /*! @brief Target only: Redirect the call to the DSP runtime library */
@@ -523,7 +521,6 @@ void  ifft_fr16( const complex_fract16          in[],
 									int  scaling );
 #define OscDspl_ifft_fr16 ifft_fr16
 #endif /* OSC_TARGET */
-
 #ifdef OSC_HOST
 /*********************************************************************//*!
  * @brief Inverse fast fourier transformation
@@ -552,15 +549,14 @@ void  OscDspl_ifft_fr16( const complex_fract16          in[],
 									int  fft_size,
 									int  *block_exponent,
 									int  scaling );
-
 #endif /* OSC_HOST */
+
 
 #ifdef OSC_TARGET
 /*! @brief Target only: Redirect the call to the DSP runtime library */
 fract16 _vecmax_fr16(const fract16 vec[], int length);
 #define OscDspl_vecmax_fr16 _vecmax_fr16
 #endif /* OSC_TARGET */
-
 #ifdef OSC_HOST
 /*********************************************************************//*!
  * @brief Find maximum vector value
@@ -572,12 +568,12 @@ fract16 _vecmax_fr16(const fract16 vec[], int length);
 fract16 OscDspl_vecmax_fr16(const fract16 vec[], int length);
 #endif /* OSC_HOST */
 
+
 #ifdef OSC_TARGET
 /*! @brief Target only: Redirect the call to the DSP runtime library */
 int _vecmaxloc_fr16(const fract16 vec[], int length);
 #define OscDspl_vecmaxloc_fr16 _vecmaxloc_fr16
 #endif /* OSC_TARGET */
-
 #ifdef OSC_HOST
 /*********************************************************************//*!
  * @brief Find maximum vector value location
@@ -589,12 +585,12 @@ int _vecmaxloc_fr16(const fract16 vec[], int length);
 int OscDspl_vecmaxloc_fr16(const fract16 vec[], int length);
 #endif /* OSC_HOST */
 
+
 #ifdef OSC_TARGET
 /*! @brief Target only: Redirect the call to the DSP runtime library */
 fract16 _vecmin_fr16(const fract16 vec[], int length);
 #define OscDspl_vecmin_fr16 _vecmin_fr16
 #endif /* OSC_TARGET */
-
 #ifdef OSC_HOST
 /*********************************************************************//*!
  * @brief Find minimun vector value
@@ -606,12 +602,12 @@ fract16 _vecmin_fr16(const fract16 vec[], int length);
 fract16 OscDspl_vecmin_fr16(const fract16 vec[], int length);
 #endif /* OSC_HOST */
 
+
 #ifdef OSC_TARGET
 /*! @brief Target only: Redirect the call to the DSP runtime library */
 fract16 _vecminloc_fr16(const fract16 vec[], int length);
 #define OscDspl_vecminloc_fr16 _vecminloc_fr16
 #endif /* OSC_TARGET */
-
 #ifdef OSC_HOST
 /*********************************************************************//*!
  * @brief Find minimum vector value location
@@ -623,12 +619,12 @@ fract16 _vecminloc_fr16(const fract16 vec[], int length);
 fract16 OscDspl_vecminloc_fr16(const fract16 vec[], int length);
 #endif /* OSC_HOST */
 
+
 #ifdef OSC_TARGET
 /*! @brief Target only: Redirect the call to the DSP runtime library */
 fract16 _var_fr16(const fract16 sample[], int length);
 #define OscDspl_var_fr16 _var_fr16
 #endif /* OSC_TARGET */
-
 #ifdef OSC_HOST
 /*********************************************************************//*!
  * @brief Find maximum vector value
@@ -640,6 +636,7 @@ fract16 _var_fr16(const fract16 sample[], int length);
 fract16 OscDspl_var_fr16(const fract16 sample[], int length);
 #endif /* OSC_HOST */
 
+
 #ifdef OSC_TARGET
 /*! @brief Target only: Redirect the call to the DSP runtime library */
 void _histogram_fr16(   const fract16 samples[],
@@ -650,7 +647,6 @@ void _histogram_fr16(   const fract16 samples[],
 							int bin_count);
 #define OscDspl_histogram_fr16 _histogram_fr16
 #endif /* OSC_TARGET */
-
 #ifdef OSC_HOST
 /*********************************************************************//*!
  * @brief Calculate histogram of a vector
@@ -669,12 +665,13 @@ void OscDspl_histogram_fr16(    const fract16 samples[],
 							int sample_length,
 							int bin_count);
 #endif /* OSC_HOST */
+
+
 #ifdef OSC_TARGET
 /*! @brief Target only: Redirect the call to the DSP runtime library */
 fract16 _sqrt_fr16(fract16 x);
 #define OscDspl_sqrt_fr16 _sqrt_fr16
 #endif /* OSC_TARGET */
-
 #ifdef OSC_HOST
 /*********************************************************************//*!
  * @brief Calculate the square root
@@ -684,6 +681,7 @@ fract16 _sqrt_fr16(fract16 x);
  *//*********************************************************************/
 fract16 OscDspl_sqrt_fr16(fract16 x);
 #endif /* OSC_HOST */
+
 
 #ifdef OSC_TARGET
 /*! @brief Target only: Redirect the call to the DSP runtime library */
