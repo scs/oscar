@@ -156,6 +156,83 @@ fract16 OscDsplAbsFr16(fract16 f1);
 #endif /* OSC_HOST */
 
 
+
+#ifdef OSC_TARGET
+/*! @brief Target only: Redirect the call to the DSP runtime library */
+fract32 add_fr1x32(fract32 f1, fract32 f2);
+#define OscDsplAddFr32 add_fr1x32
+#endif /* OSC_TARGET */
+#ifdef OSC_HOST
+/*********************************************************************//*!
+ * @brief   Performs 32-bit addition of the two input parameters
+ *
+ * The output of the function is saturated.
+ *
+ * @param   f1 fract32 number.
+ * @param   f2 fract32 number.
+ * @return  The fract32 value of f1+f2.
+ *//*********************************************************************/
+fract32 OscDsplAddFr32(fract32 f1, fract32 f2);
+#endif /* OSC_HOST */
+
+
+#ifdef OSC_TARGET
+/*! @brief Target only: Redirect the call to the DSP runtime library */
+fract32 sub_fr1x32(fract32 f1, fract32 f2);
+#define OscDsplSubFr32 sub_fr1x32
+#endif /* OSC_TARGET */
+#ifdef OSC_HOST
+/*********************************************************************//*!
+ * @brief   Performs 32-bit subtraction of the two input parameters
+ *
+ * The output of the function is saturated.
+ *
+ * @param   f1 fract32 number.
+ * @param   f2 fract32 number.
+ * @return  The fract32 value of f1-f2.
+ *//*********************************************************************/
+fract32 OscDsplSubFr32(fract32 f1, fract32 f2) ;
+#endif /* OSC_HOST */
+
+
+#ifdef OSC_TARGET
+/*! @brief Target only: Redirect the call to the DSP runtime library */
+fract32 negate_fr1x32(fract32 f1);
+#define OscDsplNegFr32 negate_fr1x32
+#endif /* OSC_TARGET */
+#ifdef OSC_HOST
+/*********************************************************************//*!
+ * @brief   Negate value.
+ *
+ * Returns the 32-bit result of the negation of the input parameter (-f1).
+ * If the input is 0x8000, saturation occurs and 0x7fff is returned.
+ *
+ * @param   f1 fract32 number.
+ * @return  The fract32 value of -f1.
+ *//*********************************************************************/
+fract32 OscDsplNegFr32(fract32 f1);
+#endif /* OSC_HOST */
+
+
+#ifdef OSC_TARGET
+/*! @brief Target only: Redirect the call to the DSP runtime library */
+fract32 abs_fr1x32(fract32 f1);
+#define OscDsplAbsFr32  abs_fr1x32
+#endif /* OSC_TARGET */
+#ifdef OSC_HOST
+/*********************************************************************//*!
+ * @brief   Abssolute value.
+ *
+ * Returns the 32-bit value that is the absolute value of the input parameter.
+ * Where the input is 0x8000, saturation occurs and 0x7fff is returned.
+ *
+ * @param   f1 fract32 number.
+ * @return  The fract32 value of abs(f1).
+ *//*********************************************************************/
+fract32 OscDsplAbsFr32(fract32 f1);
+#endif /* OSC_HOST */
+
+
 #ifdef OSC_TARGET
 /*! @brief Target only: Redirect the call to the DSP runtime library */
 fract16 high_of_fr2x16(fract2x16 x);

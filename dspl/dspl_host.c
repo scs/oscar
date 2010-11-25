@@ -87,6 +87,43 @@ fract16 OscDsplSubFr16(fract16 f1, fract16 f2) {
   return (fract16)ret;
 }
 
+
+fract32 OscDsplNegFr32(fract32 f1) {
+  if(f1 == FR32_MIN)
+      f1 = FR32_MAX;
+  else
+      f1 = -f1;
+  return f1;
+}
+
+fract32 OscDsplAbsFr32(fract32 f1) {
+  if(f1 == FR32_MIN)
+      f1 = FR32_MAX;
+  else if (f1 < 0)
+      f1 = -f1;
+  return f1;
+}
+
+fract32 OscDsplAddFr32(fract32 f1, fract32 f2) {
+  long ret = f1;
+  ret += f2;
+  if(ret >= FR32_MAX)
+      ret = FR32_MAX;
+    else if(ret <= FR32_MIN)
+      ret = FR32_MIN;
+  return (fract32)ret;
+}
+
+fract32 OscDsplSubFr32(fract32 f1, fract32 f2) {
+  long ret = f1;
+  ret -= (fract32)f2;
+  if(ret >= FR32_MAX)
+      ret = FR32_MAX;
+    else if(ret <= FR32_MIN)
+      ret = FR32_MIN;
+  return (fract32)ret;
+}
+
 fract32 OscDsplFr16_to_fr32(fract16 x) {
   return ((fract32)x) << 16;
 }
