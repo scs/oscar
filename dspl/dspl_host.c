@@ -174,7 +174,8 @@ fract16 OscDsplMultRFr16(fract16 a, fract16 b)
  * @param multfr32 Input fract32.
  * @return Compacted result.
  *//*********************************************************************/
-fract16 OscDsplTransfr32fr16(fract32 multfr32)
+// old function name: fract16 OscDsplTransfr32fr16(fract32 multfr32)
+fract16 OscDsplShr15RFr32(fract32 multfr32)
 {
 	fract16 resultfr16;
 	
@@ -195,7 +196,7 @@ fract16 OscDsplMultFr16(fract16 a, fract16 b)
 	fract32 multfr32;
 
 	multfr32 = (fract32) a*b;
-	return OscDsplTransfr32fr16(multfr32);
+	return OscDsplShr15RFr32(multfr32);
 }
 
 
