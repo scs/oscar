@@ -51,7 +51,7 @@ inline fract16 OscDsplFloatToFr16(float n)
 }
 
 
-fract16 OscDsplNegateFr16(fract16 f1) {
+fract16 OscDsplNegFr16(fract16 f1) {
   if(f1 == FR16_MIN)
       f1 = FR16_MAX;
   else
@@ -70,6 +70,16 @@ fract16 OscDsplAbsFr16(fract16 f1) {
 fract16 OscDsplAddFr16(fract16 f1, fract16 f2) {
   fract32 ret = f1;
   ret += f2;
+  if(ret >= FR16_MAX)
+      ret = FR16_MAX;
+    else if(ret <= FR16_MIN)
+      ret = FR16_MIN;
+  return (fract16)ret;
+}
+
+fract16 OscDsplSubFr16(fract16 f1, fract16 f2) {
+  fract32 ret = f1;
+  ret -= (fract32)f2;
   if(ret >= FR16_MAX)
       ret = FR16_MAX;
     else if(ret <= FR16_MIN)

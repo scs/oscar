@@ -95,14 +95,33 @@ fract16 add_fr1x16(fract16 f1, fract16 f2);
  * @param   f2 fract16 number.
  * @return  The fract16 value of f1+f2.
  *//*********************************************************************/
-fract16 OscDsplAdd_fr1x16(fract16 f1, fract16 f2);
+fract16 OscDsplAddFr16(fract16 f1, fract16 f2);
+#endif /* OSC_HOST */
+
+
+#ifdef OSC_TARGET
+/*! @brief Target only: Redirect the call to the DSP runtime library */
+fract16 sub_fr1x16(fract16 f1, fract16 f2);
+#define OscDsplSubFr16 sub_fr1x16
+#endif /* OSC_TARGET */
+#ifdef OSC_HOST
+/*********************************************************************//*!
+ * @brief   Performs 16-bit subtraction of the two input parameters
+ *
+ * The output of the function is saturated.
+ *
+ * @param   f1 fract16 number.
+ * @param   f2 fract16 number.
+ * @return  The fract16 value of f1-f2.
+ *//*********************************************************************/
+fract16 OscDsplSubFr16(fract16 f1, fract16 f2) ;
 #endif /* OSC_HOST */
 
 
 #ifdef OSC_TARGET
 /*! @brief Target only: Redirect the call to the DSP runtime library */
 fract16 negate_fr1x16(fract16 f1);
-#define OscDsplNegateFr16 negate_fr1x16
+#define OscDsplNegFr16 negate_fr1x16
 #endif /* OSC_TARGET */
 #ifdef OSC_HOST
 /*********************************************************************//*!
@@ -114,7 +133,7 @@ fract16 negate_fr1x16(fract16 f1);
  * @param   f1 fract16 number.
  * @return  The fract16 value of -f1.
  *//*********************************************************************/
-fract16 OscDsplNegateFr16(fract16 f1);
+fract16 OscDsplNegFr16(fract16 f1);
 #endif /* OSC_HOST */
 
 
