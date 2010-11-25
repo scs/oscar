@@ -273,6 +273,8 @@ fract2x16 OscDsplCompose_fr2x16(fract16 h, fract16 l);
  * @return The saved fract16 value.
  *//*********************************************************************/
 // Old function names was: OscDsplTransfr32fr16(). Not used anymore.
+// Old function names was: OscDsplTransfr32fr16(). Not used anymore.
+fract16 OscDsplShr15Fr32(fract32 multfr32);
 fract16 OscDsplShr15RFr32(fract32 multfr32);
 #endif /* OSC_HOST */
 

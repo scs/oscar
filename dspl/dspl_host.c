@@ -137,7 +137,8 @@ fract2x16 OscDsplCompose_fr2x16(fract16 h, fract16 l)
  * @param multfr32 Input fract32.
  * @return Compacted result.
  *//*********************************************************************/
-fract16 OscDsplTransRfr32fr16(fract32 multfr32)
+// old function name: fract16 OscDsplTransfrR32fr16(fract32 multfr32)
+fract16 OscDsplShr15RFr32(fract32 multfr32)
 {
 	fract16 cutoffbits, resultfr16;
 	
@@ -185,7 +186,7 @@ fract16 OscDsplMultRFr16(fract16 a, fract16 b)
  * @return Compacted result.
  *//*********************************************************************/
 // old function name: fract16 OscDsplTransfr32fr16(fract32 multfr32)
-fract16 OscDsplShr15RFr32(fract32 multfr32)
+fract16 OscDsplShr15Fr32(fract32 multfr32)
 {
 	fract16 resultfr16;
 	
