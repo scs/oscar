@@ -28,9 +28,11 @@ extern struct OscModule OscModule_dspl;
 #ifdef OSC_TARGET
 /* Include the header files of the DSP runtime library
  * (part of the toolchain)*/
-#include <filter.h>
 #include <fract.h>
 #include <fract_complex.h>
+#include <filter.h>
+//#include <fract2float_conv.h>
+//#include <fr2x16.h>
 #endif /* OSC_TARGET */
 
 #ifdef OSC_HOST
@@ -44,7 +46,20 @@ typedef struct complex_fract16 {
 	fract16 im;
 } complex_fract16;
 
+// Defines of <fract.h>
+#define FRACT16_BIT     16                       /* bits in a fract16 */
+#define FRACT32_BIT     32                       /* bits in a fract32 */
+#define FRACT16_MAX     ((fract16)0x7fff)        /* max value of a fract16 */
+#define FRACT16_MIN     ((fract16)0x8000)        /* min value of a fract16 */
+#define FRACT32_MAX     ((fract32)0x7fffffff)    /* max value of a fract32 */
+#define FRACT32_MIN     ((fract32)0x80000000)    /* min value of a fract32 */
+
 #endif /* OSC_HOST */
+
+// TODO(rmerz) Would this be useful?
+// #ifdef __cplusplus
+// extern "C" {
+// #endif
 
 /*=========================== API functions ============================*/
 
@@ -65,28 +80,61 @@ float OscDsplFr16ToFloat(fract16 n);
 fract16 OscDsplFloatToFr16(float n);
 
 
-
-/*========================== VDSP++ functions ==========================*/
-
 #ifdef OSC_TARGET
 /*! @brief Target only: Redirect the call to the DSP runtime library */
-fract16 sat_fr1x32(fract32 x);
-#define OscDsplSat_fr1x32 sat_fr1x32
+fract16 add_fr1x16(fract16 f1, fract16 f2);
+#define OscDsplAddFr16 add_fr1x16
 #endif /* OSC_TARGET */
 #ifdef OSC_HOST
 /*********************************************************************//*!
- * @brief Scale fract32 to fract16 accuracy.
- * 
- * Equivalent to sat_fr1x32 from the ADI DSP library. If x>0x00007fff, 
- * it returns 0x7fff. If x<0xffff8000, it returns 0x8000. Otherwise, it 
- * returns the lower 16 bits of x. 
- * 
- * @param f1 Fract32 number.
- * @return The saturated fract16 value of f1.
+ * @brief   Performs 16-bit addition of the two input parameters
+ *
+ * The output of the function is saturated.
+ *
+ * @param   f1 fract16 number.
+ * @param   f2 fract16 number.
+ * @return  The fract16 value of f1+f2.
  *//*********************************************************************/
-fract16 OscDsplSat_fr1x32(fract32 x);
+fract16 OscDsplAdd_fr1x16(fract16 f1, fract16 f2);
 #endif /* OSC_HOST */
 
+
+#ifdef OSC_TARGET
+/*! @brief Target only: Redirect the call to the DSP runtime library */
+fract16 negate_fr1x16(fract16 f1);
+#define OscDsplNegateFr16 negate_fr1x16
+#endif /* OSC_TARGET */
+#ifdef OSC_HOST
+/*********************************************************************//*!
+ * @brief   Negate value.
+ *
+ * Returns the 16-bit result of the negation of the input parameter (-f1).
+ * If the input is 0x8000, saturation occurs and 0x7fff is returned.
+ *
+ * @param   f1 fract16 number.
+ * @return  The fract16 value of -f1.
+ *//*********************************************************************/
+fract16 OscDsplNegateFr16(fract16 f1);
+#endif /* OSC_HOST */
+
+
+#ifdef OSC_TARGET
+/*! @brief Target only: Redirect the call to the DSP runtime library */
+fract16 abs_fr1x16(fract16 f1);
+#define OscDsplAbsFr16  abs_fr1x16
+#endif /* OSC_TARGET */
+#ifdef OSC_HOST
+/*********************************************************************//*!
+ * @brief   Abssolute value.
+ *
+ * Returns the 16-bit value that is the absolute value of the input parameter.
+ * Where the input is 0x8000, saturation occurs and 0x7fff is returned.
+ *
+ * @param   f1 fract16 number.
+ * @return  The fract16 value of abs(f1).
+ *//*********************************************************************/
+fract16 OscDsplAbsFr16(fract16 f1);
+#endif /* OSC_HOST */
 
 
 #ifdef OSC_TARGET
@@ -128,7 +176,8 @@ fract16 OscDsplLow_of_fr2x16(fract2x16 x);
 #ifdef OSC_TARGET
 /*! @brief Target only: Redirect the call to the DSP runtime library */
 fract16 shl_fr1x16(fract16 x, int y);
-#define OscDsplShl_fr1x16 shl_fr1x16
+#define OscDsplShl_fr1x16 shl_fr1x16  __attribute__ ((deprecated));
+#define OscDsplShlFr16 shl_fr1x16
 #endif /* OSC_TARGET */
 #ifdef OSC_HOST
 /*********************************************************************//*!
@@ -142,7 +191,9 @@ fract16 shl_fr1x16(fract16 x, int y);
  * @param y	Number of places to shift
  * @return The high part.
  *//*********************************************************************/
-fract16 OscDsplShl_fr1x16(fract16 x, int y);
+fract16 OscDsplShlFr16(fract16 x, int y);
+fract16 OscDsplShl_fr1x16(fract16 x, int y) __attribute__ ((deprecated));
+#define OscDsplShl_fr1x16 OscDsplShlFr16
 #endif /* OSC_HOST */
 
 
@@ -188,23 +239,23 @@ fract2x16 OscDsplCompose_fr2x16(fract16 h, fract16 l);
 #endif /* OSC_HOST */
 
 
-#ifdef OSC_TARGET
-/*! @brief Target only: Redirect the call to the DSP runtime library */
-#define OscDsplTransfr32fr16 fr32_to_fr16
-#endif /* OSC_TARGET */
 #ifdef OSC_HOST
 /*********************************************************************//*!
  * @brief Transform a fract32 number into a fract16 number
  * 
- * Saturates and rounds the same way as the dsp
- * (when saving an accumulator result into a fract16 data register)
+ * It's used for saving an accumulator result into a fract16 data
+ * register by 15 right shifts.
+ * E.g. A multiplication of two fract16 gives a signed bit and
+ * (only) 30 databits. It's useful to realign the value.
  * 
+ * Its for host only. Internally used by other OscDspl functions.
+ *
  * @param multfr32 Fract32 number to be saved.
  * @return The saved fract16 value.
  *//*********************************************************************/
-fract16 OscDsplTransfr32fr16(fract32 multfr32);
+// Old function names was: OscDsplTransfr32fr16(). Not used anymore.
+fract16 OscDsplShr15RFr32(fract32 multfr32);
 #endif /* OSC_HOST */
-
 
 
 #ifdef OSC_TARGET

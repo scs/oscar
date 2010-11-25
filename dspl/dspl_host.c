@@ -43,20 +43,43 @@ inline float OscDsplFr16ToFloat(fract16 n)
 inline fract16 OscDsplFloatToFr16(float n)
 {
 	float ret = (n * FR16_SCALE);
-	if(ret > FR16_MAX)
-		ret = FR16_MAX;
+  if(ret > FR16_MAX)
+    ret = FR16_MAX;
+  if(ret < FR16_MIN)
+    ret = FR16_MIN;
 	return (fract16)ret;
 }
 
 
-fract16 OscDsplSat_fr1x32(fract32 x) {
-  if (x >= FR16_MAX)
-    return FR16_MAX;
-  if (x <= FR16_MIN)
-    return FR16_MIN;
-  return (fract16)(0xffff & x);
+fract16 OscDsplNegateFr16(fract16 f1) {
+  if(f1 == FR16_MIN)
+      f1 = FR16_MAX;
+  else
+      f1 = -f1;
+  return f1;
 }
 
+fract16 OscDsplAbsFr16(fract16 f1) {
+  if(f1 == FR16_MIN)
+      f1 = FR16_MAX;
+  else if (f1 < 0)
+      f1 = -f1;
+  return f1;
+}
+
+fract16 OscDsplAddFr16(fract16 f1, fract16 f2) {
+  fract32 ret = f1;
+  ret += f2;
+  if(ret >= FR16_MAX)
+      ret = FR16_MAX;
+    else if(ret <= FR16_MIN)
+      ret = FR16_MIN;
+  return (fract16)ret;
+}
+
+fract32 OscDsplFr16_to_fr32(fract16 x) {
+  return ((fract32)x) << 16;
+}
 
 fract16 OscDsplHigh_of_fr2x16(fract2x16 x)
 {
@@ -68,7 +91,8 @@ fract16 OscDsplLow_of_fr2x16(fract2x16 x)
 	return (fract16)( 0xffff & x);
 }
 
-fract16 OscDsplShl_fr1x16(fract16 x, int y)
+// old function: fract16 OscDsplShl_fr1x16(fract16 x, int y)
+fract16 OscDsplShlFr16(fract16 x, int y)
 {
 	/* The C standard does not specify (to my knowledge) the result of a shift operation with a negative amount. */
 	if (y > 0)
@@ -77,7 +101,6 @@ fract16 OscDsplShl_fr1x16(fract16 x, int y)
 	} else if (y < 0) {
 	    x >>= (-y);
 	}
-	
 	return x;
 }
 
@@ -139,14 +162,14 @@ fract16 OscDsplMultRFr16(fract16 a, fract16 b)
 	fract32 multfr32;
 
 	multfr32 = (fract32) a*b;
-	return OscDsplTransRfr32fr16(multfr32);
+	return OscDsplShr15RFr32(multfr32);
 }
 
 /*********************************************************************//*!
  * @brief Transform a fract32 number being the result of the
  * multiplication of two fract16 numbers back to a fract16 without
  * rounding.
- * @see OscDsplTransRfr32fr16
+ * @see OscDsplShr15RFr32
  * 
  * @param multfr32 Input fract32.
  * @return Compacted result.
@@ -178,6 +201,8 @@ fract16 OscDsplMultFr16(fract16 a, fract16 b)
 
 fract16 OscDspl_sin_fr16(fract16 x)
 {
+  /*  OscDspl_sin_fr16([0x8000.. 0x7fff]) = sin([-0.5...0.5]*pi).    */
+
 	fract32 accufr32 = 0;
 	fract16 resultfr16,afr16,bfr16;
 	fract16 coef[]={0x6480,0x0059,0xD54D,0x0252,0x0388};
@@ -651,8 +676,8 @@ void  OscDspl_rfft_fr16( const fract16          in[],
 					accu0fr32=(fract32) R3.re * twiddle[twAct].re;
 					accu1fr32 += (fract32)R3.im * twiddle[twAct].re;
 					accu0fr32 -= (fract32)R3.im * twiddle[twAct].im;
-					R3.im = OscDsplTransRfr32fr16(accu1fr32);
-					R3.re = OscDsplTransRfr32fr16(accu0fr32);
+					R3.im = OscDsplShr15RFr32(accu1fr32);
+					R3.re = OscDsplShr15RFr32(accu0fr32);
 				}
 				if(scaling == 3)    /* no scaling */
 				{
@@ -801,8 +826,8 @@ void  OscDspl_cfft_fr16( const complex_fract16   in[],
 					accu0fr32=(fract32) R3.re * twiddle[twAct].re;
 					accu1fr32 += (fract32)R3.im * twiddle[twAct].re;
 					accu0fr32 -= (fract32)R3.im * twiddle[twAct].im;
-					R3.im = OscDsplTransRfr32fr16(accu1fr32);
-					R3.re = OscDsplTransRfr32fr16(accu0fr32);
+					R3.im = OscDsplShr15RFr32(accu1fr32);
+					R3.re = OscDsplShr15RFr32(accu0fr32);
 				}
 				
 				if(scaling == 3 )   /* no scaling */
@@ -949,8 +974,8 @@ void  OscDspl_ifft_fr16( const complex_fract16   in[],
 					accu0fr32=(fract32) R3.im * twiddle[twAct].im;
 					accu1fr32 -= (fract32)R3.re * twiddle[twAct].im;
 					accu0fr32 += (fract32)R3.re * twiddle[twAct].re;
-					R3.im = OscDsplTransRfr32fr16(accu1fr32);
-					R3.re = OscDsplTransRfr32fr16(accu0fr32);
+					R3.im = OscDsplShr15RFr32(accu1fr32);
+					R3.re = OscDsplShr15RFr32(accu0fr32);
 				}
 				if(scaling == 3)
 				{
