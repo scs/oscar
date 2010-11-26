@@ -105,8 +105,8 @@ fract32 OscDsplAbsFr32(fract32 f1) {
 }
 
 fract32 OscDsplAddFr32(fract32 f1, fract32 f2) {
-  long ret = f1;
-  ret += f2;
+  int64_t ret = f1;
+  ret += (int64_t) f2;
   if(ret >= FR32_MAX)
       ret = FR32_MAX;
     else if(ret <= FR32_MIN)
@@ -115,8 +115,8 @@ fract32 OscDsplAddFr32(fract32 f1, fract32 f2) {
 }
 
 fract32 OscDsplSubFr32(fract32 f1, fract32 f2) {
-  long ret = f1;
-  ret -= (fract32)f2;
+  int64_t ret = f1;
+  ret -= (int64_t) f2;
   if(ret >= FR32_MAX)
       ret = FR32_MAX;
     else if(ret <= FR32_MIN)
