@@ -124,6 +124,14 @@ fract32 OscDsplSubFr32(fract32 f1, fract32 f2) {
   return (fract32)ret;
 }
 
+fract16 OscDsplSatFr32(fract32 f1) {
+  if (f1 > FR16_MAX)
+    return FR16_MAX;
+  if (f1 < FR16_MIN)
+    return FR16_MIN;
+  return (fract16)(f1)  ;
+}
+
 fract32 OscDsplFr16_to_fr32(fract16 x) {
   return ((fract32)x) << 16;
 }
@@ -397,19 +405,6 @@ complex_fract16 OscDspl_csub_fr16( complex_fract16 a, complex_fract16 b)
 	return (result);
 }
 
-fract16 OscDsplSatFr16(fract32 satfr32)
-{
-	fract16 resultfr16;
-	if(satfr32 >= FR16_MAX)
-		resultfr16 = FR16_MAX;
-	else if(satfr32 <= FR16_MIN)
-		resultfr16 = FR16_MIN;
-	else
-		resultfr16=satfr32;
-	
-	return resultfr16;
-}
-
 // cdiv
 complex_fract16 OscDspl_cdiv_fr16(complex_fract16 a, complex_fract16 b)
 {
@@ -433,8 +428,8 @@ complex_fract16 OscDspl_cdiv_fr16(complex_fract16 a, complex_fract16 b)
 	numIm = (fract32) (a.im*b.re) - (fract32)(a.re * b.im);
 //  printf("numIm = %lx\n", numIm);
 	
-	result.re = OscDsplSatFr16(numRe/denum);
-	result.im = OscDsplSatFr16(numIm/denum);
+	result.re = OscDsplSatFr32(numRe/denum);
+	result.im = OscDsplSatFr32(numIm/denum);
 		
 	return result;
 
@@ -672,8 +667,8 @@ void  OscDspl_rfft_fr16( const fract16          in[],
 	{
 		if(scaling == 3) /* no scaling */
 		{
-			butterflycfr16[i].re=OscDsplSatFr16((fract32)(bitrevfr16[i] + bitrevfr16[i+1]));
-			butterflycfr16[i+1].re=OscDsplSatFr16((fract32)(bitrevfr16[i] - bitrevfr16[i+1]));
+			butterflycfr16[i].re=OscDsplSatFr32((fract32)(bitrevfr16[i] + bitrevfr16[i+1]));
+			butterflycfr16[i+1].re=OscDsplSatFr32((fract32)(bitrevfr16[i] - bitrevfr16[i+1]));
 		}
 		else if(scaling == 2)
 		{
@@ -730,10 +725,10 @@ void  OscDspl_rfft_fr16( const fract16          in[],
 				}
 				if(scaling == 3)    /* no scaling */
 				{
-					butterflycfr16[2*i*bOffset+j].re    =OscDsplSatFr16((fract32)(R2.re + R3.re));
-					butterflycfr16[2*i*bOffset+j].im    =OscDsplSatFr16((fract32)(R2.im + R3.im));
-					butterflycfr16[(2*i+1)*bOffset+j].re=OscDsplSatFr16((fract32)(R2.re - R3.re));
-					butterflycfr16[(2*i+1)*bOffset+j].im=OscDsplSatFr16((fract32)(R2.im - R3.im));
+					butterflycfr16[2*i*bOffset+j].re    =OscDsplSatFr32((fract32)(R2.re + R3.re));
+					butterflycfr16[2*i*bOffset+j].im    =OscDsplSatFr32((fract32)(R2.im + R3.im));
+					butterflycfr16[(2*i+1)*bOffset+j].re=OscDsplSatFr32((fract32)(R2.re - R3.re));
+					butterflycfr16[(2*i+1)*bOffset+j].im=OscDsplSatFr32((fract32)(R2.im - R3.im));
 				}
 				else if(scaling == 2)
 				{
@@ -812,10 +807,10 @@ void  OscDspl_cfft_fr16( const complex_fract16   in[],
 	{
 		if(scaling == 3 )   /* no scaling */
 		{
-			butterflycfr16[i].re  =OscDsplSatFr16((fract32)(bitrevfr16[i].re + bitrevfr16[i+1].re));
-			butterflycfr16[i].im  =OscDsplSatFr16((fract32)(bitrevfr16[i].im + bitrevfr16[i+1].im));
-			butterflycfr16[i+1].re=OscDsplSatFr16((fract32)(bitrevfr16[i].re - bitrevfr16[i+1].re));
-			butterflycfr16[i+1].im=OscDsplSatFr16((fract32)(bitrevfr16[i].im - bitrevfr16[i+1].im));
+			butterflycfr16[i].re  =OscDsplSatFr32((fract32)(bitrevfr16[i].re + bitrevfr16[i+1].re));
+			butterflycfr16[i].im  =OscDsplSatFr32((fract32)(bitrevfr16[i].im + bitrevfr16[i+1].im));
+			butterflycfr16[i+1].re=OscDsplSatFr32((fract32)(bitrevfr16[i].re - bitrevfr16[i+1].re));
+			butterflycfr16[i+1].im=OscDsplSatFr32((fract32)(bitrevfr16[i].im - bitrevfr16[i+1].im));
 		}
 		else if(scaling == 2)
 		{
@@ -881,10 +876,10 @@ void  OscDspl_cfft_fr16( const complex_fract16   in[],
 				
 				if(scaling == 3 )   /* no scaling */
 				{
-					butterflycfr16[2*i*bOffset+j].re    =OscDsplSatFr16((fract32)(R2.re + R3.re));
-					butterflycfr16[2*i*bOffset+j].im    =OscDsplSatFr16((fract32)(R2.im + R3.im));
-					butterflycfr16[(2*i+1)*bOffset+j].re=OscDsplSatFr16((fract32)(R2.re - R3.re));
-					butterflycfr16[(2*i+1)*bOffset+j].im=OscDsplSatFr16((fract32)(R2.im - R3.im));
+					butterflycfr16[2*i*bOffset+j].re    =OscDsplSatFr32((fract32)(R2.re + R3.re));
+					butterflycfr16[2*i*bOffset+j].im    =OscDsplSatFr32((fract32)(R2.im + R3.im));
+					butterflycfr16[(2*i+1)*bOffset+j].re=OscDsplSatFr32((fract32)(R2.re - R3.re));
+					butterflycfr16[(2*i+1)*bOffset+j].im=OscDsplSatFr32((fract32)(R2.im - R3.im));
 				}
 				else if(scaling == 2)
 				{
@@ -961,10 +956,10 @@ void  OscDspl_ifft_fr16( const complex_fract16   in[],
 	{
 		if(scaling == 3)
 		{
-			butterflycfr16[i].re  =OscDsplSatFr16((fract32)(bitrevfr16[i].re + bitrevfr16[i+1].re));
-			butterflycfr16[i].im  =OscDsplSatFr16((fract32)(bitrevfr16[i].im + bitrevfr16[i+1].im));
-			butterflycfr16[i+1].re=OscDsplSatFr16((fract32)(bitrevfr16[i].re - bitrevfr16[i+1].re));
-			butterflycfr16[i+1].im=OscDsplSatFr16((fract32)(bitrevfr16[i].im - bitrevfr16[i+1].im));
+			butterflycfr16[i].re  =OscDsplSatFr32((fract32)(bitrevfr16[i].re + bitrevfr16[i+1].re));
+			butterflycfr16[i].im  =OscDsplSatFr32((fract32)(bitrevfr16[i].im + bitrevfr16[i+1].im));
+			butterflycfr16[i+1].re=OscDsplSatFr32((fract32)(bitrevfr16[i].re - bitrevfr16[i+1].re));
+			butterflycfr16[i+1].im=OscDsplSatFr32((fract32)(bitrevfr16[i].im - bitrevfr16[i+1].im));
 		}
 		else if(scaling == 2)
 		{
@@ -1028,10 +1023,10 @@ void  OscDspl_ifft_fr16( const complex_fract16   in[],
 				}
 				if(scaling == 3)
 				{
-					butterflycfr16[2*i*bOffset+j].re    =OscDsplSatFr16((fract32)(R2.re + R3.re));
-					butterflycfr16[2*i*bOffset+j].im    =OscDsplSatFr16((fract32)(R2.im + R3.im));
-					butterflycfr16[(2*i+1)*bOffset+j].re=OscDsplSatFr16((fract32)(R2.re - R3.re));
-					butterflycfr16[(2*i+1)*bOffset+j].im=OscDsplSatFr16((fract32)(R2.im - R3.im));
+					butterflycfr16[2*i*bOffset+j].re    =OscDsplSatFr32((fract32)(R2.re + R3.re));
+					butterflycfr16[2*i*bOffset+j].im    =OscDsplSatFr32((fract32)(R2.im + R3.im));
+					butterflycfr16[(2*i+1)*bOffset+j].re=OscDsplSatFr32((fract32)(R2.re - R3.re));
+					butterflycfr16[(2*i+1)*bOffset+j].im=OscDsplSatFr32((fract32)(R2.im - R3.im));
 				}
 				else if(scaling == 2)
 				{
@@ -1184,11 +1179,11 @@ fract16 OscDspl_var_fr16(const fract16 sample[], int length)
 		}
 	}
 	
-	sumn16 = OscDsplSatFr16((fract32)sum64/length);
+	sumn16 = OscDsplSatFr32((fract32)sum64/length);
 	sumn64 = (fract32) (sumn16);
 	sumn64 = (sumn64*sum64) >> 15;
 	
-	result = OscDsplSatFr16(((fract32)sumsq64 - (fract32)sumn64)/(length-1));
+	result = OscDsplSatFr32(((fract32)sumsq64 - (fract32)sumn64)/(length-1));
 
 	return result;
 }
@@ -1335,23 +1330,23 @@ fract16 OscDspl_cabs_fr16(complex_fract16 c)
 	
 	if(ccp.re >= ccp.im)
 	{
-		div16 = OscDsplSatFr16(((((fract32)ccp.im) << 16)/(fract32)ccp.re)>>1);
+		div16 = OscDsplSatFr32(((((fract32)ccp.im) << 16)/(fract32)ccp.re)>>1);
 		mult32 = ((fract32) div16 * div16) << 1;
 		div16 = (fract16)(mult32 >> 0x12);
 		div16 += 0x2000;
 		div16 = OscDspl_sqrt_fr16(div16);
 		mult32 = ((fract32) ccp.re*div16) >> 14;
-		result = OscDsplSatFr16(mult32);
+		result = OscDsplSatFr32(mult32);
 	}
 	else
 	{
-		div16 = OscDsplSatFr16(((((fract32)ccp.re) << 16)/(fract32)ccp.im)>>1);
+		div16 = OscDsplSatFr32(((((fract32)ccp.re) << 16)/(fract32)ccp.im)>>1);
 		mult32 = ((fract32) div16 * div16) << 1;
 		div16 = (fract16)(mult32 >> 0x12);
 		div16 += 0x2000;
 		div16 = OscDspl_sqrt_fr16(div16);
 		mult32 = ((fract32) ccp.im*div16) >> 14;
-		result = OscDsplSatFr16(mult32);
+		result = OscDsplSatFr32(mult32);
 	}
 	return result;
 }

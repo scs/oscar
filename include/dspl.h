@@ -82,6 +82,25 @@ fract16 OscDsplFloatToFr16(float n);
 
 #ifdef OSC_TARGET
 /*! @brief Target only: Redirect the call to the DSP runtime library */
+fract16 sat_fr1x32(fract32 _x);
+#define OscDsplSatFr32 sat_fr1x32
+#endif /* OSC_TARGET */
+#ifdef OSC_HOST
+/*********************************************************************//*!
+ * @brief   Transfer low_byte(fract32) to fract16
+ *
+ * If f1>0x00007fff, it returns 0x7fff. If f1<0xffff8000, it returns 0x8000.
+ * Otherwise, it returns the lower 16 bits of f1.
+ *
+ * @param   f1 fract16 number.
+ * @param   f2 fract16 number.
+ * @return  The fract16 value of low_byte(f1).
+ *//*********************************************************************/
+fract16 OscDsplSatFr32(fract32 satfr32);
+#endif /* OSC_HOST */
+
+#ifdef OSC_TARGET
+/*! @brief Target only: Redirect the call to the DSP runtime library */
 fract16 add_fr1x16(fract16 f1, fract16 f2);
 #define OscDsplAddFr16 add_fr1x16
 #endif /* OSC_TARGET */
