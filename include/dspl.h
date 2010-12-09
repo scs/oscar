@@ -234,7 +234,10 @@ fract32 OscDsplNegFr32(fract32 f1);
 
 
 #ifdef OSC_TARGET
-/*! @brief Target only: Redirect the call to the DSP runtime library */
+/*! @brief Target only: Redirect the call to the DSP runtime library
+ * Note: This function may not be called with a constant value due to
+ * a Blackfin compiler error.
+ * */
 fract32 abs_fr1x32(fract32 f1);
 #define OscDsplAbsFr32  abs_fr1x32
 #endif /* OSC_TARGET */
