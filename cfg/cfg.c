@@ -742,6 +742,24 @@ OscFunction(OscCfgGetSystemInfo, struct OscSystemInfo ** ppInfo)
 	static struct OscSystemInfo info = { };
 	static bool inited = false;
 	
+#if defined(OSC_HOST)
+	memset(&info, 0, sizeof(struct OscSystemInfo));
+
+	info.hardware.board.boardType = OscSystemInfo_boardType_host;
+
+	info.software.Oscar.major = OSC_VERSION_MAJOR;
+  info.software.Oscar.minor = OSC_VERSION_MINOR;
+  info.software.Oscar.patch = OSC_VERSION_PATCH;
+  info.software.Oscar.rc = OSC_VERSION_RC;
+  char * version;
+  OscCall(OscGetVersionString, &version);
+  OscCall(staticStore, version, &info.software.Oscar.version);
+
+  inited = true;
+  *ppInfo = &info;
+	return SUCCESS;
+#endif
+
 	if (!inited) {
 		char * envVar;
 		char envVar2[80];
@@ -1170,7 +1188,6 @@ OscFunction(static getUClinuxVersion, char ** res, int* major, int* minor, int* 
 	OscAssert(ret > 0);
 	
 	occur=strstr(version, "Git_");
-	OscAssert(occur!=NULL);
 	occur+=4;
 
 	ret = sscanf(occur, "v%d.%d-p%d-RC%d%*s", major, minor, patch_level, rc);

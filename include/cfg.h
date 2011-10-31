@@ -111,6 +111,7 @@ enum boardType {
 	OscSystemInfo_boardType_indXcam,
 	OscSystemInfo_boardType_mesaSR4K,
 	OscSystemInfo_boardType_leanXradio,
+	OscSystemInfo_boardType_host,
 };
 
 struct OscSystemInfo {
