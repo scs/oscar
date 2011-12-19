@@ -326,6 +326,7 @@ static void InterpGreen_LastTwoRows(const uint8* pRaw,
 		pRawPix++;
 	}
 	
+	pOutPix += BYTES_PER_PIX;
 	/* --------------- Last row --------------------- */
 	/* Left-most pixel. */
 	if(bFirstIsGreen)
@@ -550,7 +551,7 @@ OSC_ERR OscVisDebayer(const uint8* pRaw,
 		enum EnBayerOrder enBayerOrderFirstRow,
 		uint8 *const pOut)
 {
-	bool        bTopLeftIsGreen, bTopRowIsRed, bFirstPixIsGreen, bRowIsRed;
+	bool        bTopLeftIsGreen, bTopRowIsRed, bFirstPixIsGreen, bRowIsRed, bLastRowIsRed;
 	uint8       *pOutPix, *pOutRow, *pOutPrefetch;
 	const uint8 *pRawPix, *pRawRow, *pRawPrefetch;
 	uint16      row, col;
@@ -832,11 +833,12 @@ OSC_ERR OscVisDebayer(const uint8* pRaw,
 	
 	BENCH_START(startCyc);
 	/* Last Row. */
+	bLastRowIsRed= IS_EVEN(height) ? !bTopRowIsRed : bTopRowIsRed;
 	bFirstPixIsGreen = IS_EVEN(height) ? !bTopLeftIsGreen : bTopLeftIsGreen;
 	InterpRedAndBlue_FirstOrLastRow(
 			&pRaw[(height - 1)*width],
 			width,
-			!bFirstPixIsGreen,
+			bLastRowIsRed,
 			bFirstPixIsGreen,
 			&pOut[(height - 2)*width*BYTES_PER_PIX],
 			&pOut[(height - 1)*width*BYTES_PER_PIX]);
@@ -845,7 +847,7 @@ OSC_ERR OscVisDebayer(const uint8* pRaw,
 	InterpRedAndBlue_FirstOrLastRow(
 			pRaw,
 			width,
-			!bTopLeftIsGreen,
+			bTopRowIsRed,
 			bTopLeftIsGreen,
 			&pOut[width*BYTES_PER_PIX],
 			pOut);
