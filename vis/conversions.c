@@ -27,7 +27,56 @@
 
 #include "vis.h"
 
+OscFunction( OscVisRGB2BGR, struct OSC_PICTURE *picIn, struct OSC_PICTURE *picOut)
 
+  uint32 outPos = 0;
+  uint32 nPixels;
+  uint32 pix, cacheLine, nCacheLines, nPixPerCacheLine;
+  uint8 *pImgOut = (uint8*)picOut->data;
+  const uint16 width = picIn->width;
+  const uint16 height = picIn->height;
+  uint8 *pImgIn = (uint8*)picIn->data;
+  uint8 *pIn_prefetch = pImgIn;
+  uint8 *pIn = pImgIn;
+  uint8 pointerOffset;
+  uint8 tmp;
+
+  OscAssert(picIn->type == OSC_PICTURE_RGB_24);
+  nPixels = width*height;
+
+  /* load cache (32 byte -> ~10 RGB pixels) */
+  PREFETCH(pIn_prefetch);
+  /* set pointer + 10 pixels (RGB) -> +30bytes*/
+  pointerOffset = (CACHE_LINE_LEN/(3*sizeof(uint8))) * 3;
+  pIn_prefetch += pointerOffset;
+
+  /* number of necessary cache lines to process entire RGB image (10 RGB pixels per CL) */
+  nCacheLines = (nPixels*3*sizeof(uint8))/pointerOffset;
+  /* number of pixels per cacheline (10 RGB pixels) */
+    nPixPerCacheLine = CACHE_LINE_LEN/(3*sizeof(uint8));
+
+    for(cacheLine = 0; cacheLine < nCacheLines; cacheLine++)
+    {
+      /* load next 10 RGB pixels */
+      PREFETCH(pIn_prefetch);
+      pIn_prefetch += pointerOffset;
+      for(pix = 0; pix < nPixPerCacheLine; pix++)
+        {
+          /* Use temporary buffer for R/B value swap,
+           * in order to support in-place modification. */
+          tmp = pIn[0];
+          pImgOut[0] = pIn[2];
+          pImgOut[1] = pIn[1];
+          pImgOut[2] = tmp;
+          pIn += 3;
+          pImgOut += 3;
+        }
+
+    }
+    picOut->width = width;
+    picOut->height = height;
+    picOut->type = OSC_PICTURE_BGR_24;
+OscFunctionEnd()
 
 OSC_ERR OscVisBGR2Grey(struct OSC_PICTURE *picIn, struct OSC_PICTURE *picOut)
 {

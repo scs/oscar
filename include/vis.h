@@ -525,6 +525,18 @@ OSC_ERR OscVisDrawBoundingBox(struct OSC_PICTURE *picIn, struct OSC_VIS_REGIONS 
 OSC_ERR OscVisBGR2Grey(struct OSC_PICTURE *picIn, struct OSC_PICTURE *picOut);
 
 /*********************************************************************//*!
+ * @brief RGB to BGR Conversion
+ *
+ * This function converts a RGB color image to a BGR color image.
+ * In-place is applied if picIn.data equals picOut.data.
+ *
+ * @param picIn Pointer to the input color picture struct (type must be OSC_PICTURE_RGB).
+ * @param picOut Pointer to the output picture struct. (type will be OSC_PICTURE_BGR).
+ * @return SUCCESS or an appropriate error code.
+ *//*********************************************************************/
+OscFunctionDeclare( OscVisRGB2BGR, struct OSC_PICTURE *picIn, struct OSC_PICTURE *picOut);
+
+/*********************************************************************//*!
  * @brief Greyscale to Binary Conversion * 
  * 
  * This function converts a greyscale image to a 'binary' image. In fact, the pixel values still are of type uint8,
