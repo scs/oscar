@@ -46,7 +46,7 @@ OSC_ERR OscGpioSetupPolarity(enum EnGpios enGpio, bool bLowActive)
 	
 	/* Since the default polarity setup of pin at the plug is always high
 	 * active, we can consult the default config to deduce the correct setup
-	 * of the DSP pin for the desired innput/output polarity. */
+	 * of the DSP pin for the desired input/output polarity. */
 	if(pPin->pDefConfig->defaultFlags & POL_MASK)
 	{
 		bPinLowActive = !bLowActive;
@@ -54,7 +54,8 @@ OSC_ERR OscGpioSetupPolarity(enum EnGpios enGpio, bool bLowActive)
 		bPinLowActive = bLowActive;
 	}
 	
-	pPin->flags = (pPin->flags & ~POL_MASK) | bPinLowActive;
+	pPin->flags = (pPin->flags & ~POL_MASK);
+	pPin->flags |= bPinLowActive ? POL_LOWACTIVE : 0;
 
 	return SUCCESS;
 }
