@@ -23,12 +23,14 @@
 #include "srd.h"
 
 OSC_ERR OscSrdCreate();
+OSC_ERR OscSrdDestroy();
 
 struct OSC_SRD srd; /*!< Module singelton instance */
 
 struct OscModule OscModule_srd = {
 	.name = "srd",
 	.create = OscSrdCreate,
+	.destroy = OscSrdDestroy,
 	.dependencies = {
 		&OscModule_log,
 		NULL // To end the flexible array.
@@ -42,6 +44,19 @@ OSC_ERR OscSrdCreate()
 	OscSimRegisterCycleCallback( &OscSrdCycleCallback);
 	
 	return SUCCESS;
+}
+
+OSC_ERR OscSrdDestroy()
+{
+	uint16 id;
+	for(id = 0; id < srd.nrOfReaders; id++)
+	{
+		if(srd.rd[id].pFile != NULL)
+		{
+			fclose(srd.rd[id].pFile);
+			srd.rd[id].pFile = NULL;
+		}
+	}
 }
 
 OSC_ERR OscSrdCreateReader(

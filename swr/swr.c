@@ -114,8 +114,12 @@ OSC_ERR OscSwrDestroy()
 	for( wrId = 0; wrId<swr.nrOfWriters; wrId++)
 	{
 		fflush(swr.wr[ wrId].pFile);
-		fclose( swr.wr[ wrId].pFile);
+		fclose( swr.wr[ wrId].pFile);		
 		OscLog(INFO, "Close %s\n", &swr.wr[ wrId].strFile);
+		
+		// Decrease number of writers to avoid persistant but non-accessible
+		// file pointers.
+		swr.nrOfWriters --;
 	}
 	
 	return SUCCESS;
