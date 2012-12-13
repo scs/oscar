@@ -1276,7 +1276,6 @@ cleanup_and_exit:
 	OscAssert(err == 0);
 	
 OscFunctionCatch()
-//	fclose(file); FIXME: File's not in scope anymore!
 	*res = "v0.0-p0";
 OscFunctionEnd()
 
