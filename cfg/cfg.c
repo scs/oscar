@@ -165,6 +165,14 @@ OscFunctionDeclare(static parseInteger, char * str, int * res)
 */
 OscFunctionDeclare(static getUClinuxVersion, char ** res, int* major, int* minor, int* patch_level, int* rc)
 
+/*!
+  @brief Get the version of the UBoot bootloader.
+  Requires "ver" UBoot environment variable, which is supported first in v1.0-p2.
+  @param res Is set to point to the value in a static buffer.
+  @param the other variables to matching ints parsed from the string
+*/
+OscFunctionDeclare(static getUBootVersion, char ** res, int* major, int* minor, int* patch_level, int* rc)
+
 
 /*! @brief The module singelton instance. */
 struct OSC_CFG cfg;
@@ -843,6 +851,14 @@ OscFunction(OscCfgGetSystemInfo, struct OscSystemInfo ** ppInfo)
 					&info.software.uClinux.patch,
 					&info.software.uClinux.rc);
 			OscCall(staticStore, version, &info.software.uClinux.version);
+
+      OscCall(getUBootVersion,
+          &version,
+          &info.software.UBoot.major,
+          &info.software.UBoot.minor,
+          &info.software.UBoot.patch,
+          &info.software.UBoot.rc);
+      OscCall(staticStore, version, &info.software.UBoot.version);
 		}
 		
 		inited = true;
@@ -1242,4 +1258,73 @@ cleanup_and_exit:
 OscFunctionCatch()
 //	fclose(file); FIXME: File's not in scope anymore!
 	*res = "v0.0-p0";
+OscFunctionEnd()
+
+
+OscFunction(static getUBootVersion, char ** res, int* major, int* minor, int* patch_level, int* rc)
+  int ret;
+  *major=0, *minor=0, *patch_level=0, *rc=0;
+  char* next = NULL;
+  char* occur = NULL;
+
+  char * version;
+  char version2[80];
+  OscCall(getUBootEnv, "ver", &version)
+  if (OscLastStatus() == ECFG_UBOOT_ENV_NOT_FOUND) {
+    OscCall(getUBootEnv, "VER", &version); // Fallback to the ALL_CAPS_VARIANT.
+    if (OscLastStatus() == ECFG_UBOOT_ENV_NOT_FOUND) {
+    OscFail_e(ECFG_UBOOT_ENV_NOT_FOUND);
+    }
+  }
+
+  // FIXME: why do I have to copy the string out of getUBootEnv's static buffer?
+  strcpy(version2, version);
+  version = version2;
+
+  occur=strstr(version, "Git_");
+  occur+=4;
+  ret = sscanf(occur, "v%d.%d-p%d-RC%d%*s", major, minor, patch_level, rc);
+  if(ret == 4 && *major >= 0 && *minor >= 0 && *patch_level >= 0 && *rc >= 0)
+  {
+    // Version number of form v1.2-p1-RC2
+    next = strstr(occur, "RC");
+    next += 2 + (1 + *patch_level/10);
+    goto cleanup_and_exit;
+  }
+  ret = sscanf(occur, "v%d.%d-RC%d%*s", major, minor, rc);
+  if(ret == 3 && *major >= 0 && *minor >= 0 && *patch_level >= 0 && *rc >= 0)
+  {
+    // Version number of form v1.2-RC2
+    next = strstr(occur, "RC");
+    next += 2 + (1 + *patch_level/10);
+    goto cleanup_and_exit;
+  }
+  ret = sscanf(occur, "v%d.%d-p%d%*s", major, minor, patch_level);
+  if(ret == 3 && *major >= 0 && *minor >= 0 && *patch_level >= 0)
+  {
+    // Version number of form v1.2-p1
+    next = strstr(occur, "-p");
+    next += 2 + (1 + *patch_level/10);
+    goto cleanup_and_exit;
+  }
+  ret = sscanf(occur, "v%d.%d%*s", major, minor);
+  if(ret == 2 && *major >= 0 && *minor >= 0)
+  {
+    // Version number of form v1.2
+    next = strstr(occur, ".");
+    next += 1 + (1 + *minor/10);
+    goto cleanup_and_exit;
+  }
+  // Not able to parse => No valid version found.
+  OscLog(ERROR, "No valid UBoot version string found!\n");
+  *res = "v0.0-p0";
+
+cleanup_and_exit:
+  OscAssert(next != NULL);
+  *next=0;
+  OscAssert(occur != NULL);
+  *res=occur;
+OscFunctionCatch()
+//  fclose(file); FIXME: File's not in scope anymore!
+  *res = "v0.0-p0";
 OscFunctionEnd()
