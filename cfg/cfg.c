@@ -763,6 +763,26 @@ OscFunction(OscCfgGetSystemInfo, struct OscSystemInfo ** ppInfo)
   OscCall(OscGetVersionString, &version);
   OscCall(staticStore, version, &info.software.Oscar.version);
 
+  // dummy uClinux version on host
+  info.software.uClinux.major = 0;
+  info.software.uClinux.minor = 0;
+  info.software.uClinux.patch = 0;
+  info.software.uClinux.rc = 0;
+  info.software.uClinux.version = "v0.0";
+
+  // dummy UBoot version on host
+  info.software.UBoot.major = 0;
+  info.software.UBoot.minor = 0;
+  info.software.UBoot.patch = 0;
+  info.software.UBoot.rc = 0;
+  info.software.UBoot.version = "v0.0";
+
+  // dummy board version on host
+  info.hardware.board.major = 0;
+  info.hardware.board.minor = 0;
+  info.hardware.board.assembly = "";
+  info.hardware.board.revision = "HOST_0.0";
+
   inited = true;
   *ppInfo = &info;
 	return SUCCESS;
@@ -1325,6 +1345,5 @@ cleanup_and_exit:
   OscAssert(occur != NULL);
   *res=occur;
 OscFunctionCatch()
-//  fclose(file); FIXME: File's not in scope anymore!
   *res = "v0.0-p0";
 OscFunctionEnd()
