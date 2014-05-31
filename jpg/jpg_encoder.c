@@ -190,7 +190,7 @@ uint8* OscJpgEncode(struct OSC_PICTURE *pic, uint8 *output_ptr, uint32 quality_f
 	}
 
 	/* Close Routine */
-	close_bitstream (output_ptr);
+	output_ptr = close_bitstream (output_ptr);
 	return output_ptr;
 }
 
